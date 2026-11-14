@@ -68,5 +68,21 @@ repository root; change that with `--root`.
 - An unreadable frame keeps its place and becomes `missing`. A named mask file that is absent
   stops the run.
 
+### Prepare the real scene (Student A)
+
+From the repository root, after `bash tools/download_frames.sh`:
+
+    python analysis/prepare_scene.py
+
+It reads `assets/regions_draft.json`, `assets/source_manifest.json` and the frames, and writes
+`data/scene.json` plus `data/masks/mask_<id>.png` (white inside the circle, black on land). A bad
+input stops with a message saying what to fix; an unusable frame keeps its place and is listed.
+The output is checked against `contracts/scene.schema.json` before it is written. Then measure it:
+
+    cd analysis && python features.py --scene ../data/scene.json --out ../data/features.json \
+        --first-index 23000 --index-step 4
+
+Tests: `tests/test_prepare_scene.py` (good input, bad inputs, unusable frames end to end).
+
 Background: `docs/mapping_spec.md` (the rule), `docs/math_notes.md` (why), `docs/science_review.md`
 (expected and observed).

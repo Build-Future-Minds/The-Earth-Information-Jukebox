@@ -1,0 +1,107 @@
+{
+  "schema_version": "0.1",
+  "is_mock": false,
+  "source": {
+    "svs_id": 3912,
+    "url": "https://svs.gsfc.nasa.gov/3912",
+    "title": "Global Sea Surface Currents and Temperature",
+    "credit": "NASA/Goddard Space Flight Center Scientific Visualization Studio",
+    "data_kind": "model_output",
+    "limitations": [
+      "Model output, not observation.",
+      "Flow lines are a rendering; values between model grid points are interpolated.",
+      "Equirectangular map: pixel scale varies with latitude.",
+      "Covers one modelled year; not a climate trend."
+    ],
+    "model_or_instrument": "ECCO2 (MIT/JPL), surface flows only",
+    "data_start": "2007-03-25T12:00Z",
+    "data_end": "2008-03-03T12:00Z"
+  },
+  "frames": {
+    "width": 2048,
+    "height": 1024,
+    "count": 30,
+    "pattern": "assets/frames/svs3912/flat_global_ecco2_2028x1024.{index}.tif",
+    "timestamps": [
+      "2007-03-25T12:00Z",
+      "2007-03-25T16:07Z",
+      "2007-03-25T20:15Z",
+      "2007-03-26T00:23Z",
+      "2007-03-26T04:30Z",
+      "2007-03-26T08:38Z",
+      "2007-03-26T12:46Z",
+      "2007-03-26T16:53Z",
+      "2007-03-26T21:01Z",
+      "2007-03-27T01:09Z",
+      "2007-03-27T05:16Z",
+      "2007-03-27T09:24Z",
+      "2007-03-27T13:32Z",
+      "2007-03-27T17:39Z",
+      "2007-03-27T21:47Z",
+      "2007-03-28T01:55Z",
+      "2007-03-28T06:02Z",
+      "2007-03-28T10:10Z",
+      "2007-03-28T14:18Z",
+      "2007-03-28T18:25Z",
+      "2007-03-28T22:33Z",
+      "2007-03-29T02:41Z",
+      "2007-03-29T06:48Z",
+      "2007-03-29T10:56Z",
+      "2007-03-29T15:04Z",
+      "2007-03-29T19:12Z",
+      "2007-03-29T23:19Z",
+      "2007-03-30T03:27Z",
+      "2007-03-30T07:35Z",
+      "2007-03-30T11:42Z"
+    ],
+    "camera_static_check": "analysis/check_motion.py (land-pixel difference test): PASS: land in only one frame 0.58% / 0.32%, mean land change 1.29 / 0.23 (0-255). A 5 px shifted copy fails (9.44%)."
+  },
+  "legend": {
+    "quantity": "Modelled sea surface temperature (colour of the flow lines)",
+    "units": "degrees C",
+    "stops": [
+      {
+        "colour": "blue",
+        "value": "0 C"
+      },
+      {
+        "colour": "green",
+        "value": "10-20 C"
+      },
+      {
+        "colour": "yellow",
+        "value": "about 25 C"
+      },
+      {
+        "colour": "red",
+        "value": "32 C"
+      }
+    ]
+  },
+  "regions": [
+    {
+      "id": "kuroshio_eddies",
+      "name": "Kuroshio eddies east of Japan",
+      "box_px": [
+        1811,
+        287,
+        122,
+        122
+      ],
+      "mask": "data/masks/mask_kuroshio_eddies.png",
+      "description": "A circle 122 pixels across, centred at x 1872, y 348 on the map. Only lines inside the circle are measured; land is left out (0% of the circle)."
+    },
+    {
+      "id": "equator_pacific",
+      "name": "Equatorial Pacific streaks",
+      "box_px": [
+        210,
+        443,
+        122,
+        122
+      ],
+      "mask": "data/masks/mask_equator_pacific.png",
+      "description": "A circle 122 pixels across, centred at x 271, y 504 on the map. Only lines inside the circle are measured; land is left out (0% of the circle)."
+    }
+  ]
+}

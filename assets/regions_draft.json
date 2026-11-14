@@ -1,56 +1,41 @@
 {
-  "_about": "DRAFT region proposal for Dev A to approve before final processing. Not scene.json. Owner: Student A. Source: SVS 3912 'orig' 2048x1024 frames.",
-  "status": "draft, awaiting Dev A approval",
+  "_about": "DRAFT region proposal for SVS 3912 'orig' 2048x1024 frames. Not scene.json. Owner: Student A.",
+  "status": "regions chosen by Dev A on 2026-11-14; Student A checked land",
   "date": "2026-11-14",
-  "shape": "All regions are circles (Dev A decision). Radius 61 px (about 10.7 degrees) was chosen to cover the same area as the earlier 171x68 boxes; confirm the radius with Dev A.",
+  "shape": "Circles, radius 61 px, same radius for both regions (Dev A).",
   "map": "Equirectangular 2048x1024. x = (lon + 180) * 2048 / 360, y = (90 - lat) * 1024 / 180. See map_geometry in source_manifest.json.",
-  "how_scored": "Rough estimate by Student A's planning script using the alignment formula in docs/mapping_spec.md (gradient threshold 8, land plus a 3 px coast margin excluded). Frames 23000, 23040, 23080, 23116, 25000. Dev A's features.py gives the real numbers.",
-  "for_dev_b": "scene.schema.json only has box_px. Each circle also lists box_px = its bounding square [cx-r, cy-r, 2r, 2r], so the current app can draw it today. Drawing real circles needs center_px and radius_px added to the schema, types.ts and SceneView.tsx. The mask (white = included) will be the circle minus land.",
+  "how_measured": "analysis/explore_regions.py (Dev A's engine, default settings), frames 23000-23116 step 4 (30 frames). Land mask: grey land in most frames plus a 3 px coast margin.",
+  "for_scene_json": "box_px is the square around the circle [cx-r, cy-r, 2r, 2r]. The mask is white inside the circle and black on land.",
   "regions": [
     {
-      "id": "gulf_stream_offshore",
-      "role": "swirly (short-long beat), first choice",
-      "name": "Gulf Stream meanders off the US east coast",
-      "shape": "circle",
-      "center_px": [641, 328],
-      "radius_px": 61,
-      "box_px": [580, 267, 122, 122],
-      "center_lonlat": [-67.3, 32.3],
-      "land_fraction": 0.02,
-      "mask_needed": "small bit of land at the edge; check every frame",
-      "alignment_estimate": { "min": 0.05, "max": 0.08 }
-    },
-    {
       "id": "kuroshio_eddies",
-      "role": "swirly (short-long beat), backup",
+      "role": "swirly (short-long beat)",
       "name": "Kuroshio eddies east of Japan",
       "shape": "circle",
       "center_px": [1872, 348],
       "radius_px": 61,
       "box_px": [1811, 287, 122, 122],
       "center_lonlat": [149.1, 28.8],
-      "land_fraction": 0.0,
-      "mask_needed": "none expected; check every frame",
-      "alignment_estimate": { "min": 0.02, "max": 0.03 }
+      "land_share": 0.002,
+      "alignment": { "mean": 0.073, "min": 0.058, "max": 0.101, "ok_frames": 30, "missing_frames": 0 }
     },
     {
-      "id": "southern_ocean_streaks",
+      "id": "equator_pacific",
       "role": "aligned (even beat)",
-      "name": "Southern Ocean south of Africa",
+      "name": "Equatorial Pacific streaks",
       "shape": "circle",
-      "center_px": [1080, 833],
+      "center_px": [271, 504],
       "radius_px": 61,
-      "box_px": [1019, 772, 122, 122],
-      "center_lonlat": [9.8, -56.4],
-      "land_fraction": 0.0,
-      "mask_needed": "none expected; check every frame",
-      "alignment_estimate": { "min": 0.16, "max": 0.18 }
+      "box_px": [210, 443, 122, 122],
+      "center_lonlat": [-132.4, 1.4],
+      "land_share": 0.0,
+      "land_check": "No land in the circle in any of the 30 frames (it spans about 143W-122W, 9S-12N; the Marquesas at about 139.5W 9S lie just outside).",
+      "alignment": { "mean": 0.671, "min": 0.652, "max": 0.689, "ok_frames": 30, "missing_frames": 0 }
     }
   ],
-  "questions_for_dev_a": [
-    "Radius: is 61 px OK? A different radius changes the scores.",
-    "Alignment gap is about 0.10 (Gulf Stream vs Southern Ocean), so the starting pulse rule gives roughly 71/29 vs 74/26. Stretch the end points? The Kuroshio backup gives a gap of about 0.15.",
-    "Southern Ocean lines are dim blue. Does your threshold still count them, or does it come out missing?",
-    "Swirly regions are outside the 0-90E strip; the aligned region is inside it. OK?"
+  "pair": { "mean_gap": 0.598, "smallest_gap": 0.551 },
+  "replaced": [
+    { "id": "southern_ocean_streaks", "center_px": [1080, 833], "why": "Looks aligned mostly because the map stretches east-west near the poles: 0.601 as drawn, about 0.16 with east-west distances corrected (cos 56.4S = 0.55)." },
+    { "id": "gulf_stream_offshore", "center_px": [641, 328], "why": "Not chosen; Kuroshio is swirlier (0.073 vs 0.217) and has less land." }
   ]
 }
