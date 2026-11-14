@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
+import { UserVoice, type InputSource } from './audio/userVoice';
+import { MelodyPad } from './components/MelodyPad';
 import { ExploreControls, regionLabel } from './components/ExploreControls';
 import { RhythmExplanation } from './components/RhythmExplanation';
 import { SceneView } from './components/SceneView';
@@ -15,15 +17,23 @@ export function App() {
   const [explaining, setExplaining] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [volumeDb, setVolumeDb] = useState(-6);
+  const [melodyDb, setMelodyDb] = useState(-10);
+  const [heldNotes, setHeldNotes] = useState<ReadonlySet<number>>(new Set());
   const transport = useRef<Transport | null>(null);
+  const melody = useRef<UserVoice | null>(null);
   const explanationRef = useRef<HTMLElement>(null);
 
   const track = useMemo(() => buildEarthTrack(features, regionId), [regionId]);
 
   useEffect(() => {
     const t = new Transport({ onStep: setSounding, onState: setPlayState });
+    const m = new UserVoice(setHeldNotes);
     transport.current = t;
-    return () => t.dispose();
+    melody.current = m;
+    return () => {
+      t.dispose();
+      m.dispose();
+    };
   }, []);
 
   useEffect(() => {
@@ -35,18 +45,32 @@ export function App() {
   const pause = useCallback(() => transport.current?.pause(), []);
   const stop = useCallback(() => {
     transport.current?.stop();
+    melody.current?.allOff(); // Stop silences everything, melody included
     setSounding(null);
   }, []);
   const replay = useCallback(() => void transport.current?.replay(), []);
+  // Melody inputs (keyboard, on-screen keys, later MIDI) all send MIDI note numbers.
+  const onMelodyNoteOn = useCallback(
+    (note: number, source: InputSource) => void melody.current?.noteOn(note, 0.7, source),
+    [],
+  );
+  const onMelodyNoteOff = useCallback((note: number, source: InputSource) => melody.current?.noteOff(note, source), []);
+  const onMelodyAllOff = useCallback(() => melody.current?.allOff(), []);
 
   // Keyboard shortcuts on top of the normal Tab / Enter / Space controls.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (e.key === 'Escape') return stop();
+      // 1/2 work only while focus is on the Region choice, the control they operate, so number keys
+      // elsewhere stay free for speech input and other tools (WCAG 2.2 SC 2.1.4; docs/DECISIONS.md D8).
+      if (!(e.target instanceof Element) || !e.target.closest('.region-group')) return;
       const n = Number(e.key);
       if (Number.isInteger(n) && n >= 1 && n <= scene.regions.length) {
-        setRegionId(scene.regions[n - 1].id);
+        const id = scene.regions[n - 1].id;
+        setRegionId(id);
+        // Move focus with the selection, as arrow keys do, so the next arrow press starts from here.
+        document.querySelector<HTMLInputElement>(`input[name="region"][value="${id}"]`)?.focus();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -118,6 +142,18 @@ export function App() {
         />
 
         {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} />}
+
+        <MelodyPad
+          heldNotes={heldNotes}
+          volumeDb={melodyDb}
+          onNoteOn={onMelodyNoteOn}
+          onNoteOff={onMelodyNoteOff}
+          onAllOff={onMelodyAllOff}
+          onVolume={(db) => {
+            setMelodyDb(db);
+            melody.current?.setVolume(db);
+          }}
+        />
 
         <footer>
           <h2>Source and credit</h2>
