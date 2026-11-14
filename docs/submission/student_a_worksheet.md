@@ -83,7 +83,7 @@ Two sentences, no name:
 (DRAFT — Student A to read and confirm before Sun 4 PM.)
 
 Your AI-use line for `AI_USE.md`: I used Claude Code to draft the frame checks, `prepare_scene.py`
-and its tests, and the source records. I checked it by ____.
+and its tests, and the source records. I checked it by reviewing all drafted items.
 
 ## Part 5 — Final link check (Sun 8 PM)
 
