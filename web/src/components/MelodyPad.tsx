@@ -81,8 +81,11 @@ export function MelodyPad(p: Props) {
           })}
         </span>
       </div>
-      <label>
-        Melody volume{' '}
+      <label className="range">
+        <span className="range-row">
+          <span>Melody volume</span>
+          <span className="readout" aria-hidden="true">{p.volumeDb} dB</span>
+        </span>
         <input
           type="range"
           min={-36}

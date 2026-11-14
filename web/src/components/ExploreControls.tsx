@@ -58,6 +58,7 @@ export function ExploreControls(p: Props) {
               onChange={() => p.onRegion(r.id)}
             />
             {regionLabel(p.regions, r.id)}: {r.name}
+            <kbd aria-hidden="true">{p.regions.indexOf(r) + 1}</kbd>
           </label>
         ))}
       </fieldset>
@@ -71,8 +72,11 @@ export function ExploreControls(p: Props) {
             ))}
           </select>
         </label>
-        <label>
-          Earth volume{' '}
+        <label className="range">
+          <span className="range-row">
+            <span>Earth volume</span>
+            <span className="readout" aria-hidden="true">{p.volumeDb} dB</span>
+          </span>
           <input
             type="range"
             min={-36}

@@ -110,75 +110,82 @@ export function App() {
           PRACTICE DATA — test input, not NASA data
         </div>
       )}
-      <main>
-        <header>
-          <h1>Earth Sonata: Play the Planet</h1>
-          <p className="lede">
-            Compare two regions of a NASA ocean visualization by ear. More aligned lines, more even pulse.
-          </p>
-        </header>
+      {/* Student B's Axis Specimen layout (DESIGN.md "Layout"): a fixed rail with the title and the
+          controls, and a main column. The NASA image stays large in the main column: in a 400 px rail
+          each region circle would be about 10 px across. Below 960 px the rail stacks on top. */}
+      <div className="layout">
+        <div className="rail">
+          <header>
+            <h1>Earth Sonata: Play the Planet</h1>
+            <p className="lede">
+              Compare two regions of a NASA ocean visualization by ear. More aligned lines, more even pulse.
+            </p>
+          </header>
 
-        <SceneView scene={scene} imageUrl={imageUrl} regionId={regionId} />
+          <ExploreControls
+            regions={scene.regions}
+            regionId={regionId}
+            playState={playState}
+            explaining={explaining}
+            speed={speed}
+            volumeDb={volumeDb}
+            onStart={start}
+            onPause={pause}
+            onStop={stop}
+            onReplay={replay}
+            onRegion={setRegionId}
+            onExplain={() => setExplaining((x) => !x)}
+            onSpeed={(s) => {
+              setSpeed(s);
+              transport.current?.setSpeed(s);
+            }}
+            onVolume={(db) => {
+              setVolumeDb(db);
+              transport.current?.setVolume(db);
+            }}
+          />
+        </div>
 
-        <p className="status" role="status">{status}</p>
-        <NowPlaying step={sounding} regionLabel={label} />
-        {missing && playState !== 'stopped' && (
-          <p className="missing" role="alert">
-            Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
-          </p>
-        )}
+        <main className="stage">
+          <SceneView scene={scene} imageUrl={imageUrl} regionId={regionId} />
 
-        <ExploreControls
-          regions={scene.regions}
-          regionId={regionId}
-          playState={playState}
-          explaining={explaining}
-          speed={speed}
-          volumeDb={volumeDb}
-          onStart={start}
-          onPause={pause}
-          onStop={stop}
-          onReplay={replay}
-          onRegion={setRegionId}
-          onExplain={() => setExplaining((x) => !x)}
-          onSpeed={(s) => {
-            setSpeed(s);
-            transport.current?.setSpeed(s);
-          }}
-          onVolume={(db) => {
-            setVolumeDb(db);
-            transport.current?.setVolume(db);
-          }}
-        />
+          <p className="status" role="status">{status}</p>
+          <NowPlaying step={sounding} regionLabel={label} />
+          {missing && playState !== 'stopped' && (
+            <p className="missing" role="alert">
+              Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
+            </p>
+          )}
 
-        {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} other={other} />}
+          {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} other={other} />}
 
-        <MelodyPad
-          heldNotes={heldNotes}
-          volumeDb={melodyDb}
-          onNoteOn={onMelodyNoteOn}
-          onNoteOff={onMelodyNoteOff}
-          onAllOff={onMelodyAllOff}
-          onVolume={(db) => {
-            setMelodyDb(db);
-            melody.current?.setVolume(db);
-          }}
-        />
+          <MelodyPad
+            heldNotes={heldNotes}
+            volumeDb={melodyDb}
+            onNoteOn={onMelodyNoteOn}
+            onNoteOff={onMelodyNoteOff}
+            onAllOff={onMelodyAllOff}
+            onVolume={(db) => {
+              setMelodyDb(db);
+              melody.current?.setVolume(db);
+            }}
+          />
 
-        <footer>
-          <h2>Source and credit</h2>
-          <p>
-            <a href={scene.source.url}>{scene.source.title}</a>. {scene.source.credit}.
-          </p>
-          <p>Data kind: {scene.source.data_kind.replace(/_/g, ' ')}.</p>
-          <ul>
-            {scene.source.limitations.map((l) => (
-              <li key={l}>{l}</li>
-            ))}
-          </ul>
-          <p className="muted">Cached image measurements with live sound. All sounds are synthesised in your browser.</p>
-        </footer>
-      </main>
+          <footer>
+            <h2>Source and credit</h2>
+            <p>
+              <a href={scene.source.url}>{scene.source.title}</a>. {scene.source.credit}.
+            </p>
+            <p>Data kind: {scene.source.data_kind.replace(/_/g, ' ')}.</p>
+            <ul>
+              {scene.source.limitations.map((l) => (
+                <li key={l}>{l}</li>
+              ))}
+            </ul>
+            <p className="muted">Cached image measurements with live sound. All sounds are synthesised in your browser.</p>
+          </footer>
+        </main>
+      </div>
     </>
   );
 }

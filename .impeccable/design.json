@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "generatedAt": "2026-11-14T00:00:00Z",
   "title": "Design System: Axis Specimen",
-  "scope": "tools/listening_game.html and future surfaces in the same world. Excludes Developer B's React app in web/ (web/src/styles.css), kept as Developer B built it.",
+  "scope": "tools/listening_game.html, future surfaces in the same world, and (since 14 Nov, agreed by Student B and Developer B) Developer B's React app in web/ (web/src/styles.css). The app keeps its NASA image in the main column, not the rail.",
   "extensions": {
     "colorMeta": {
       "signal": { "role": "primary", "displayName": "Signal Orange", "canonical": "#ff5a1f", "tonalRamp": ["#3d1405", "#6b220a", "#9c310e", "#cf4213", "#ff5a1f", "#ff8a5e", "#ffbb9f", "#ffe6dc"] },

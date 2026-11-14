@@ -115,7 +115,7 @@ components:
 
 # Design System: Axis Specimen
 
-Scope: this file covers the listening game's world, `tools/listening_game.html`, and since 14 Nov also Developer B's React app in `web/` (`web/src/styles.css`), agreed by Student B and Developer B. The app keeps its own single-column layout and controls; it takes this system's palette, type, shapes, focus ring, motion and the Weight Is the Value readout.
+Scope: this file covers the listening game, `tools/listening_game.html`, and since 14 Nov also Developer B's React app in `web/` (`web/src/styles.css`), agreed by Student B and Developer B. The app follows every rule here, with one exception: its NASA image sits large in the main column, not in the rail, because in a 400px rail each region circle would be about 10px across.
 
 ## Overview
 
