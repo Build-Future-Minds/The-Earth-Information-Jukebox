@@ -13,16 +13,16 @@ Start from the Team Briefing's "Our goal".
 
 Checklist before you write:
 
-- What does the visitor do? ____
-- What do they hear? ____
-- What do they learn? ____
+- What does the visitor do? Picks one of two regions of a NASA ocean picture and presses Start to hear it, then asks the app to explain.
+- What do they hear? A short repeating rhythm for that region: two pulses per beat, with the second pulse landing earlier or later depending on how much the visible lines in the region run the same way.
+- What do they learn? Which pattern in the picture made the sound, and how the two regions compare.
 
 Your draft:
 
-> Earth Sonata lets a visitor ____ by ____. The app ____ and then explains ____.
-> It uses a NASA model visualization, and the rhythm rule is a choice we made.
+> Earth Sonata lets a visitor compare two regions of a NASA ocean visualization by listening to a short rhythm for each one. The app plays the rhythm, where more lined-up lines in the picture give a more even pulse, and then explains in words which pattern in the image made the sound and how the two regions compare. It uses a NASA computer-model visualization (ECCO2), the rhythm rule is a choice we made, and it describes the picture, not water speed, turbulence or ocean health.
 
 Read it aloud to someone not on the team. What did they not understand? ____ Fix it.
+(Not done yet. Needs a real person.)
 
 ## Part 2 — Detailed description
 
@@ -56,7 +56,9 @@ the screen off does not show that it works for blind users.
 
 Two sentences, no name:
 
-> Student B wrote ____, which ____. It was tested by ____.
+> Student B wrote the Python listening-quiz builder, a listening game for testing whether the rhythm difference can be heard, and the comparison line in the rhythm explanation, which tell a listener which of two regions has the more even pulse. The quiz builder and the comparison line were tested with unit tests (18 Python tests and 14 web tests, all passing); the game has not yet been tried by listeners.
+
+(Draft from what exists on 14 Nov. Update the testing sentence with real numbers before the final.)
 
 Your AI-use line for `AI_USE.md`: I used ____ to ____. I checked it by ____.
 
