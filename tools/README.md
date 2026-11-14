@@ -78,6 +78,12 @@ extends it. Timing, pitch and note length still come from the patch exactly as b
 rendering the same patch both ways: the melody notes start at the same moments). Switch it off for
 the plain test tone, the strict setting for a real listening test.
 
+**Music style** (with Musical sound on): *Song* (the default, above) or *Christmas*. Christmas plays
+the melody as a celesta (a bright bell strike over a tone that holds for the note's length), moves
+the chords C, Am, Dm, G7 and home to C, and shakes sleigh bells on every beat, with the bass and
+never between beats, so they cannot be mistaken for the second note. Like the band, it is the same
+for every patch. A new style is heard from the next sound.
+
 **Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5) at one fixed
 length, so only the spacing of the pulses carries the answer. That is the team's actual rule
 (`docs/mapping_spec.md`) and the setting for the real test. The speed control at 0.5× gives a

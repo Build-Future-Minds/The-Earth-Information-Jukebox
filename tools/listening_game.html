@@ -248,6 +248,14 @@
       <p class="hint-note">On: the patch plays the melody in a soft piano-like tone, over a band: chords that move C, Am, F, G and home to C, and a bass on every beat. The band is the same for every patch, so it gives nothing away. Off: the plain test tone, for a strict listening test.</p>
     </div>
     <div class="axis">
+      <label for="musicStyle">Music style <span class="switch-state">with Musical sound</span></label>
+      <select id="musicStyle">
+        <option value="song" selected>Song: piano and band</option>
+        <option value="christmas">Christmas: celesta, sleigh bells</option>
+      </select>
+      <p class="hint-note">Christmas: the melody rings like a celesta, the chords move C, Am, Dm, G7 and home, and sleigh bells shake on every beat. Like the band, it is the same for every patch.</p>
+    </div>
+    <div class="axis">
       <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
       <p class="hint-note">Unless Rhythm only is on, the notes' pitch and length change with the patch. Both are this game's choice; the team's rule keeps pitch fixed until Dev A decides.</p>
     </div>
@@ -589,6 +597,7 @@
   // One note. Timing, pitch and length are set by the caller from the patch's alignment; this only
   // decides what the note sounds like, the same way for every patch.
   function pulse(t, hz, peak, length, bin = loose) {
+    if (musical() && christmas()) return celestaPulse(t, hz, peak, length, bin);
     if (musical()) return musicalPulse(t, hz, peak, length, bin);
     plainPulse(t, hz, peak, length, bin);
   }
@@ -624,14 +633,68 @@
   // answer. Its bass lands on the beat, where the first note of each beat already is, so it never
   // blurs where the second note falls. One band is shared by all sounds playing: a sound that joins
   // extends it instead of starting a second one.
-  const PHRASE = ["C", "C", "Am", "Am", "F", "F", "G", "G", "C", "C"];
+  // The Christmas style swaps F and G for Dm and G7, the classic holiday turnaround, and adds
+  // sleigh bells on the beat (with the bass, never between beats).
+  const PHRASES = {
+    song:      ["C", "C", "Am", "Am", "F", "F", "G", "G", "C", "C"],
+    christmas: ["C", "C", "Am", "Am", "Dm", "Dm", "G7", "G7", "C", "C"],
+  };
   const CHORDS = {
     C:  { root: 130.81, fifth: 196.00, tones: [261.63, 329.63, 392.00] },   // C3 bass; C4 E4 G4
     Am: { root: 110.00, fifth: 164.81, tones: [220.00, 261.63, 329.63] },   // A2 bass; A3 C4 E4
     F:  { root:  87.31, fifth: 130.81, tones: [174.61, 220.00, 261.63] },   // F2 bass; F3 A3 C4
     G:  { root:  98.00, fifth: 146.83, tones: [196.00, 246.94, 293.66] },   // G2 bass; G3 B3 D4
+    Dm: { root: 146.83, fifth: 220.00, tones: [293.66, 349.23, 440.00] },   // D3 bass; D4 F4 A4
+    G7: { root:  98.00, fifth: 146.83, tones: [196.00, 246.94, 349.23] },   // G2 bass; G3 B3 F4
   };
-  let band = null;   // { start, beat, upTo: beats scheduled so far, bus, sources }
+  const christmas = () => $("musicStyle").value === "christmas";
+  let band = null;   // { start, beat, upTo: beats scheduled so far, style, bus, sources }
+
+  // Christmas melody: a celesta. A bright bell strike (upper partials that die away fast) on top of
+  // a round tone that holds for the note's length, which is data, then fades.
+  function celestaPulse(t, hz, peak, length, bin) {
+    peak *= 0.7;
+    const end = t + Math.max(0.08, length), fade = 0.2;
+    const partial = (ratio, level, decay) => {
+      const o = ctx.createOscillator(), env = ctx.createGain();
+      o.type = "sine"; o.frequency.value = hz * ratio;
+      env.gain.setValueAtTime(0.0001, t);
+      env.gain.linearRampToValueAtTime(peak * level, t + 0.003);
+      if (decay) env.gain.exponentialRampToValueAtTime(0.0001, Math.min(t + decay, end + fade));
+      else {
+        env.gain.exponentialRampToValueAtTime(peak * 0.5, Math.min(t + 0.25, end));
+        env.gain.setValueAtTime(peak * 0.5, end);
+        env.gain.exponentialRampToValueAtTime(0.0001, end + fade);
+      }
+      o.connect(env).connect(master);
+      o.start(t); o.stop(end + fade + 0.02); bin.push(o);
+    };
+    partial(1, 1, 0);          // the held tone
+    partial(2, 0.35, 0.45);    // the ring
+    partial(3, 0.15, 0.22);
+    partial(5.4, 0.06, 0.08);  // the metal "tink"
+  }
+
+  // Sleigh bells: a short shake of bright noise, then a quieter second shake 40 ms later.
+  let noise = null;
+  function sleighBells(t) {
+    if (!noise) {
+      noise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.3), ctx.sampleRate);
+      const d = noise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    [[0, 0.11], [0.04, 0.06]].forEach(([at, level]) => {
+      const src = ctx.createBufferSource(), ring = ctx.createBiquadFilter(), env = ctx.createGain();
+      src.buffer = noise;
+      ring.type = "bandpass"; ring.frequency.value = 7500; ring.Q.value = 1.5;
+      env.gain.setValueAtTime(0.0001, t + at);
+      env.gain.linearRampToValueAtTime(level, t + at + 0.003);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.12);
+      src.connect(ring).connect(env).connect(band.bus);
+      src.start(t + at); src.stop(t + at + 0.15);
+      band.sources.push(src);
+    });
+  }
 
   function bandChord(t, tones, length, ring) {
     const env = ctx.createGain(), soft = ctx.createBiquadFilter();
@@ -667,12 +730,13 @@
   function bandExtend(until) {
     const last = Math.ceil((until - band.start) / band.beat - 1e-6);
     for (let b = band.upTo; b < last; b++) {
-      const t = band.start + b * band.beat, ch = CHORDS[PHRASE[b % PHRASE.length]];
+      const phrase = PHRASES[band.style], t = band.start + b * band.beat, ch = CHORDS[phrase[b % phrase.length]];
       if (b % 2 === 0 || b === band.upTo) {
         const beats = Math.min(2 - (b % 2), last - b), home = b + beats >= last;
         bandChord(t, ch.tones, beats * band.beat, home ? 0.8 : 0.25);   // the last chord rings out
       }
       bandBass(t, b % 2 ? ch.fifth : ch.root, 0.8 * band.beat);
+      if (band.style === "christmas") sleighBells(t);
     }
     band.upTo = Math.max(band.upTo, last);
   }
@@ -685,7 +749,7 @@
       bandStop(0.05);
       const bus = ctx.createGain();
       bus.connect(master);
-      band = { start: v.start, beat: v.beat, upTo: 0, bus, sources: [] };
+      band = { start: v.start, beat: v.beat, upTo: 0, style: christmas() ? "christmas" : "song", bus, sources: [] };
     }
     bandExtend(v.end);
   }
@@ -1075,6 +1139,7 @@
     roomSend.gain.setTargetAtTime(e.target.checked ? ROOM_LEVEL : 0, ctx.currentTime, 0.05);
     if (!e.target.checked) bandStop(0.2);   // switched on mid-sound, the band joins from the next sound
   });
+  // A new style is heard from the next sound; the band playing now finishes in its own style.
   $("hear0").addEventListener("click", () => playPatch(0));
   $("hear1").addEventListener("click", () => playPatch(1));
   $("showNotes").addEventListener("change", (e) => $("track").classList.toggle("hide-notes", !e.target.checked));
