@@ -1,0 +1,157 @@
+{
+  "schema_version": "0.2",
+  "is_mock": true,
+  "scene": "analysis/practice/scene.practice.json",
+  "step_seconds": 1.0,
+  "normalisation": {
+    "gradient_threshold": 12.0,
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8904,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8894,
+      "reason": null
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8911,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8909,
+      "reason": null
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8903,
+      "reason": null
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8903,
+      "reason": null
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8924,
+      "reason": null
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8971,
+      "reason": null
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0575,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.047,
+      "reason": null
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0522,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "missing",
+      "alignment": null,
+      "reason": "Too few visible lines: 0.0% of the region has clear edges; at least 5.0% is needed."
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "missing",
+      "alignment": null,
+      "reason": "Too few visible lines: 0.0% of the region has clear edges; at least 5.0% is needed."
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0605,
+      "reason": null
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.055,
+      "reason": null
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0746,
+      "reason": null
+    }
+  ]
+}

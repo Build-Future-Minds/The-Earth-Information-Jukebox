@@ -1,1 +1,66 @@
-To be written during the hackathon. See TASKS.md and docs/roles/.
+# analysis — the math engine
+
+Measures how strongly the visible lines in a picture share one direction (`alignment`, 0 to 1)
+and turns that into rhythm timing. It describes the rendered image. It is not a measurement of
+water speed, turbulence or ocean health.
+
+Owner: Developer A. `prepare_scene.py` (Student A) will live here too.
+
+## Set up
+
+From this folder, with Python 3.10 or newer:
+
+```
+python -m venv .venv
+.venv\Scripts\activate          (macOS/Linux: source .venv/bin/activate)
+pip install -r requirements.txt
+```
+
+## Run
+
+| Command | What it does |
+| --- | --- |
+| `python -m pytest` | Runs the tests. |
+| `python make_practice_scene.py` | Draws the practice frames in `practice/` (TEST INPUT, not NASA data). |
+| `python features.py --scene practice/scene.practice.json --out practice/features.practice.json --rhythm-out practice/rhythm_reference.practice.json` | Measures a scene and writes `features.json` plus the optional check file. |
+| `python run_experiments.py` | Re-measures every verification experiment, redraws `docs/figures/math/`, rewrites the tables in `docs/science_review.md`, and writes two test-tone rhythms to `out/`. |
+
+`features.py --help` lists the settings. Paths inside a scene file are read relative to the
+project folder (`earth-sonata/`); change that with `--root`.
+
+## What is where
+
+| Path | Contents |
+| --- | --- |
+| `features.py` | Command: scene in, `features.json` out. |
+| `sonata_math/image_analysis.py` | Grayscale, gradients, mask, structure tensor, alignment or `missing`. |
+| `sonata_math/smoothing.py` | Optional smoothing over time. |
+| `sonata_math/rhythm.py` | The rule `long_fraction = 0.75 − 0.25 × alignment` and the notes it gives. |
+| `sonata_math/pipeline.py`, `export.py` | Every region over every frame; the JSON documents. |
+| `sonata_math/synthetic.py` | Test-image generators. |
+| `sonata_math/experiments.py`, `viz.py`, `audio.py` | Verification runs, figures, test tones. |
+| `tests/` | What the engine must do, with the reason for each expectation. |
+| `practice/` | A small practice scene and the engine's real output for it (`is_mock: true`). |
+| `out/` | Scratch output. Not committed. |
+
+## For Developer B
+
+- `practice/features.practice.json` follows `contracts/features.schema.json` (0.2) and was written
+  by the engine. Frames 3 and 4 of `mixed_lines` are `missing` on purpose.
+- The rule: one step is one beat of `step_seconds`. Pulse 1 at `t`. Pulse 2 at
+  `t + long_fraction × step_seconds`, with `long_fraction = 0.75 − 0.25 × alignment`. A `missing`
+  step has no pulses.
+- `practice/rhythm_reference.practice.json` lists the pulse times and notes this gives, to compare
+  with the app's live output.
+
+## For Student A
+
+- Region boxes: the same size for both regions, at least about 128 pixels on the short side, no
+  coast or label inside unless the mask excludes it.
+- Masks: white = included. Frame-sized or region-sized. The engine keeps a 5-pixel margin away
+  from anything excluded.
+- An unreadable frame keeps its place and becomes `missing`. A named mask file that is absent
+  stops the run.
+
+Background: `docs/mapping_spec.md` (the rule), `docs/math_notes.md` (why), `docs/science_review.md`
+(expected and observed).

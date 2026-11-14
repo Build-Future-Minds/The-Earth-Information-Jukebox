@@ -1,0 +1,386 @@
+# Science review: expected and observed
+
+Owner: Developer A. This records what the math engine was expected to do and what it did.
+
+**Every image used here is a TEST INPUT (synthetic), not NASA data.** Nothing has been measured on
+NASA frames yet. The tables between the `table:` markers are written by
+`analysis/run_experiments.py` from the numbers it just measured; do not edit them by hand. Re-run
+that script after changing any setting.
+
+<!-- table:environment -->
+Last run: 2026-11-14 with Python 3.14.7, numpy 2.5.4, OpenCV 5.0.0.
+<!-- /table:environment -->
+
+Settings for every table unless it says otherwise: grayscale = max(R, G, B), Gaussian blur σ = 1 px,
+Sobel 3×3 ÷ 8, gradient threshold 12 grey levels per pixel, minimum usable fraction 0.05, weight
+m², no smoothing. Derivations are in `math_notes.md`.
+
+## Result in brief
+
+- All named cases, including the six in `mapping_spec.md`, behave as expected.
+- The score follows the closed-form predictions for two line families, unequal mixes, angular
+  spread, chance level and noise.
+- `pytest` in `analysis/` passes, and tests fail when the engine is deliberately broken (squared
+  score, no mask margin, 0 instead of missing, drifting tempo, smoothing across a gap).
+- Ten limitations were found. They are listed in section 6 with their evidence.
+
+## 1. Named test cases
+
+`long_fraction` is the share of the beat before the second pulse: 0.5 is even, 0.75 is the
+strongest short–long.
+
+<!-- table:spec_cases -->
+### Named test cases
+
+Expected: See the 'expected' column; the rule is long_fraction = 0.75 - 0.25 * alignment.
+
+| case | expected | status | alignment | reason_code | usable_fraction | long_fraction | agrees |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Aligned: parallel horizontal lines | near 1; even pulses | ok | 1.0 | - | 0.45 | 0.5 | yes |
+| Aligned: parallel diagonal lines (45 deg) | near 1; even pulses | ok | 1.0 | - | 0.408 | 0.5 | yes |
+| Aligned: parallel short dashes (40 px) | high, below 1: dash ends are edges too | ok | 0.9209 | - | 0.422 | 0.5198 | yes |
+| Mixed: horizontal and vertical lines, equal areas | near 0; strong short-long | ok | 0.0 | - | 0.474 | 0.75 | yes |
+| Mixed: dashes at random angles | near 0 (about 0.89/sqrt(n)); strong short-long | ok | 0.0892 | - | 0.422 | 0.7277 | yes |
+| Reversed: parallel lines turned 180 deg | same as aligned (1.0000) | ok | 1.0 | - | 0.45 | 0.5 | yes |
+| Blank image | missing with a reason; no pulses | missing | missing | too_few_edges | 0.0 | missing | yes |
+| Masked: everything excluded | missing with a reason; no pulses | missing | missing | all_masked | 0.0 | missing | yes |
+| Masked: right half excluded | same as aligned; fewer pixels vote | ok | 1.0 | - | 0.216 | 0.5 | yes |
+| Repeated: same image again | identical (1.0000) | ok | 1.0 | - | 0.45 | 0.5 | yes |
+| Noise added to parallel lines (sigma 20) | slightly below 1 | ok | 0.9921 | - | 0.449 | 0.502 | yes |
+| Noise added to random dashes (sigma 20) | still near 0 | ok | 0.0903 | - | 0.424 | 0.7274 | yes |
+| Noise only (sigma 20), no lines | missing: noise is below the edge threshold | missing | missing | too_few_edges | 0.0 | missing | yes |
+<!-- /table:spec_cases -->
+
+![Test images](figures/math/02_test_gallery.png)
+
+## 2. Does the score follow the mathematics?
+
+<!-- table:two_families -->
+### Two equal families of parallel lines, delta degrees apart
+
+Expected: alignment = |cos(delta)|
+
+| delta_deg | predicted | observed | difference |
+| --- | --- | --- | --- |
+| 0 | 1.0 | 1.0 | 0.0 |
+| 15 | 0.9659 | 0.9666 | 0.0007 |
+| 30 | 0.866 | 0.8674 | 0.0014 |
+| 45 | 0.7071 | 0.7071 | 0.0 |
+| 60 | 0.5 | 0.4976 | -0.0024 |
+| 75 | 0.2588 | 0.2562 | -0.0026 |
+| 90 | 0.0 | 0.005 | 0.005 |
+<!-- /table:two_families -->
+
+<!-- table:energy_share -->
+### Horizontal lines above, vertical lines below, in unequal shares
+
+Expected: alignment = |2f - 1|, where f is the horizontal share of the voting area
+
+| share of rows | f (voting area) | predicted | observed | difference |
+| --- | --- | --- | --- | --- |
+| 0.5 | 0.5 | 0.0 | 0.005 | 0.005 |
+| 0.6 | 0.6091 | 0.2182 | 0.215 | -0.0032 |
+| 0.75 | 0.7727 | 0.5455 | 0.5483 | 0.0028 |
+| 0.9 | 0.9364 | 0.8727 | 0.8725 | -0.0002 |
+<!-- /table:energy_share -->
+
+<!-- table:spread_law -->
+### 40 px dashes whose angles are normally spread (mean of 8 images)
+
+Expected: alignment = k * exp(-2 s^2), s in radians; k < 1 is the dash-end factor, so observed / observed(s=0) should equal exp(-2 s^2)
+
+| spread_deg | exp(-2s^2) | observed_mean | observed_sd | observed / observed(0) |
+| --- | --- | --- | --- | --- |
+| 0 | 1.0 | 0.923 | 0.0029 | 1.0 |
+| 5 | 0.9849 | 0.9089 | 0.0031 | 0.9847 |
+| 10 | 0.9409 | 0.8672 | 0.0074 | 0.9395 |
+| 15 | 0.8719 | 0.8041 | 0.0125 | 0.8712 |
+| 20 | 0.7837 | 0.7241 | 0.0201 | 0.7845 |
+| 30 | 0.5779 | 0.5386 | 0.0361 | 0.5835 |
+| 45 | 0.2912 | 0.2789 | 0.0459 | 0.3022 |
+| 60 | 0.1116 | 0.1266 | 0.0443 | 0.1372 |
+<!-- /table:spread_law -->
+
+The observed mean at 45° and 60° sits above the prediction. That is the chance level of a finite
+number of dashes (next table), not a failure of the formula.
+
+<!-- table:random_floor -->
+### Random dashes: how far from 0 does chance leave the score?
+
+Expected: mean about 0.886 / sqrt(n) for n independent dashes (about 174 in view here)
+
+| images | observed_mean | observed_sd | observed_max | 0.886/sqrt(n) |
+| --- | --- | --- | --- | --- |
+| 30 | 0.0652 | 0.0348 | 0.1326 | 0.0672 |
+<!-- /table:random_floor -->
+
+<!-- table:noise_formula -->
+### Noise on smooth stripes, threshold and blur switched off
+
+Expected: alignment = E / (E + 2 N (12/64) sigma^2)
+
+| noise_sigma | predicted | observed | difference |
+| --- | --- | --- | --- |
+| 2 | 0.9944 | 0.9944 | 0.0 |
+| 5 | 0.966 | 0.9661 | 0.0001 |
+| 10 | 0.8765 | 0.8768 | 0.0003 |
+| 20 | 0.6395 | 0.6401 | 0.0007 |
+| 40 | 0.3072 | 0.3071 | -0.0001 |
+<!-- /table:noise_formula -->
+
+![Score against theory](figures/math/03_matches_theory.png)
+
+## 3. Rotation, contrast, cropping, noise
+
+<!-- table:rotation -->
+### Rotating the picture (resampled, measured inside a disc)
+
+Expected: unchanged: the score depends on eigenvalues, which rotation does not alter. The last column redraws dashes at each angle instead of resampling (mean of 6).
+
+| rotation_deg | parallel lines | dashes, 20 deg spread | dashes, random | redrawn 20 deg spread |
+| --- | --- | --- | --- | --- |
+| 0 | 1.0 | 0.6906 | 0.0303 | 0.7123 |
+| 15 | 0.9998 | 0.6769 | 0.0319 | 0.7048 |
+| 30 | 0.9998 | 0.6592 | 0.0306 | 0.6822 |
+| 45 | 1.0 | 0.6506 | 0.0281 | 0.6732 |
+| 60 | 0.9998 | 0.6604 | 0.0281 | 0.6839 |
+| 75 | 0.9998 | 0.6779 | 0.028 | 0.7037 |
+| 90 | 1.0 | 0.6906 | 0.0303 | 0.7129 |
+| 120 | 0.9998 | 0.6592 | 0.0306 | 0.6856 |
+| 150 | 0.9998 | 0.6604 | 0.0281 | 0.6808 |
+| 180 | 1.0 | 0.6906 | 0.0303 | 0.7123 |
+<!-- /table:rotation -->
+
+The dashes score lowest near 45° whether the picture is resampled or redrawn, so the dip is a
+property of measuring on a pixel grid, not of the resampling. We did not isolate whether Sobel or
+the line drawing causes it.
+
+<!-- table:contrast -->
+### Scaling the contrast (1.0 = lines 200 grey levels above the background)
+
+Expected: unchanged while edges are well above the threshold; missing (never 0) once they are not
+
+| contrast_factor | parallel lines | usable (parallel lines) | dashes, 20 deg spread | usable (dashes, 20 deg spread) | dashes, random | usable (dashes, random) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1.0 | 1.0 | 0.45 | 0.681 | 0.465 | 0.0771 | 0.457 |
+| 0.75 | 1.0 | 0.45 | 0.6842 | 0.423 | 0.0775 | 0.416 |
+| 0.5 | 1.0 | 0.338 | 0.6966 | 0.34 | 0.0789 | 0.335 |
+| 0.35 | 1.0 | 0.225 | 0.7281 | 0.236 | 0.0846 | 0.236 |
+| 0.25 | 1.0 | 0.113 | 0.7977 | 0.091 | 0.1105 | 0.077 |
+| 0.15 | missing | 0.0 | missing | 0.0 | missing | 0.0 |
+| 0.1 | missing | 0.0 | missing | 0.0 | missing | 0.0 |
+<!-- /table:contrast -->
+
+<!-- table:crop -->
+### Crop size: 12 boxes at random positions in one large field of dashes
+
+Expected: same mean for a uniform field, but more scatter and an upward drift for small boxes (fewer independent dashes leave a larger chance vote)
+
+| box_px | 20 deg spread mean | sd | missing | random mean | sd  | missing  |
+| --- | --- | --- | --- | --- | --- | --- |
+| 512 | 0.7221 | 0.0 | 0 | 0.0217 | 0.0 | 0 |
+| 256 | 0.723 | 0.0123 | 0 | 0.0545 | 0.0273 | 0 |
+| 128 | 0.7275 | 0.0348 | 0 | 0.1035 | 0.0737 | 0 |
+| 64 | 0.7066 | 0.0536 | 0 | 0.2297 | 0.1095 | 0 |
+| 32 | 0.7824 | 0.1064 | 0 | 0.4448 | 0.2469 | 0 |
+<!-- /table:crop -->
+
+<!-- table:noise -->
+### Adding Gaussian noise (sigma in grey levels, default settings)
+
+Expected: aligned lines fall slowly; random stays near 0; noise alone is missing until it is strong enough to pass the edge threshold, where it reads as a low score
+
+| noise_sigma | parallel lines | dashes, 20 deg spread | dashes, random | no lines (flat grey) |
+| --- | --- | --- | --- | --- |
+| 0 | 1.0 | 0.681 | 0.0771 | missing |
+| 5 | 0.9994 | 0.6808 | 0.0767 | missing |
+| 10 | 0.9978 | 0.6796 | 0.0762 | missing |
+| 20 | 0.9921 | 0.6746 | 0.0749 | missing |
+| 40 | 0.9695 | 0.6544 | 0.0719 | 0.0275 |
+| 80 | 0.8386 | 0.55 | 0.0588 | 0.0111 |
+<!-- /table:noise -->
+
+<!-- table:blur -->
+### Blur before differentiating (sigma in pixels; 1.0 is the default)
+
+Expected: a light blur barely moves a clean picture and makes noise alone fall below the edge threshold
+
+| blur_sigma | dashes, 20 deg spread | usable | same + noise sigma 20 | noise sigma 20 alone |
+| --- | --- | --- | --- | --- |
+| 0.0 | 0.7091 | 0.417 | 0.6797 | 0.0091 |
+| 0.5 | 0.7043 | 0.425 | 0.6861 | 0.0136 |
+| 1.0 | 0.681 | 0.465 | 0.6734 | missing |
+| 1.5 | 0.6713 | 0.441 | 0.6658 | missing |
+| 2.0 | 0.695 | 0.336 | 0.6918 | missing |
+<!-- /table:blur -->
+
+![What moves the score](figures/math/04_robustness.png)
+
+## 4. Image handling: colour, legends, compression, camera
+
+<!-- table:colour -->
+### The same line drawing painted in different colours
+
+Expected: 'value' (max of R, G, B) treats pure hues alike; 'luma' makes blue lines too faint to count
+
+| line colour | value mode | usable (value) | luma mode | usable (luma) |
+| --- | --- | --- | --- | --- |
+| white | 0.6798 | 0.494 | 0.6798 | 0.494 |
+| yellow | 0.6798 | 0.494 | 0.6804 | 0.48 |
+| green | 0.6798 | 0.494 | 0.6844 | 0.422 |
+| red | 0.6798 | 0.494 | 0.7141 | 0.268 |
+| blue | 0.6798 | 0.494 | missing | 0.0 |
+| dark blue | 0.6881 | 0.394 | missing | 0.0 |
+<!-- /table:colour -->
+
+<!-- table:legend -->
+### A colour bar and label drawn into the picture
+
+Expected: the legend's own straight edges change the score; with the legend masked the result equals the clean picture measured with the same mask
+
+| picture | clean | with legend | legend masked | clean, same mask |
+| --- | --- | --- | --- | --- |
+| dashes, 20 deg spread around 60 deg | 0.6511 | 0.5734 | 0.6557 | 0.6557 |
+| dashes, random | 0.0771 | 0.0884 | 0.0672 | 0.0672 |
+<!-- /table:legend -->
+
+<!-- table:jpeg -->
+### JPEG compression of the test images
+
+Expected: small changes at normal quality; block edges may add horizontal/vertical votes at very low quality
+
+| jpeg_quality | parallel lines, 30 deg | dashes, 20 deg spread | dashes, random | blank |
+| --- | --- | --- | --- | --- |
+| uncompressed | 0.9998 | 0.681 | 0.0771 | missing |
+| 95 | 0.9998 | 0.6809 | 0.0771 | missing |
+| 75 | 0.9996 | 0.681 | 0.0772 | missing |
+| 50 | 0.9992 | 0.6809 | 0.0768 | missing |
+| 25 | 0.9981 | 0.6817 | 0.0778 | missing |
+| 10 | 0.9937 | 0.6824 | 0.0827 | missing |
+| 5 | 0.9791 | 0.6775 | 0.0852 | missing |
+<!-- /table:jpeg -->
+
+<!-- table:motion_blur -->
+### Horizontal camera smear on random dashes
+
+Expected: rises: smearing removes edges across the motion, so lines along the motion dominate
+
+| smear_px | alignment | dominant_angle_deg |
+| --- | --- | --- |
+| 1 | 0.0771 | 177.9 |
+| 3 | 0.2087 | 178.5 |
+| 5 | 0.3867 | 178.8 |
+| 9 | 0.6536 | 179.2 |
+| 15 | 0.8701 | 179.6 |
+| 25 | 0.9508 | 179.9 |
+<!-- /table:motion_blur -->
+
+<!-- table:zoom -->
+### Zooming the picture inside a fixed box
+
+Expected: not constant: zoom changes line width and how many dashes are in view
+
+| zoom_factor | dashes, 20 deg spread | dashes, random |
+| --- | --- | --- |
+| 0.5 | 0.6541 | 0.0801 |
+| 0.75 | 0.6864 | 0.0127 |
+| 1.0 | 0.681 | 0.0771 |
+| 1.5 | 0.6509 | 0.2034 |
+| 2.0 | 0.6711 | 0.2136 |
+| 3.0 | 0.6962 | 0.3214 |
+<!-- /table:zoom -->
+
+<!-- table:dash_length -->
+### Perfectly parallel dashes of different lengths
+
+Expected: rises toward 1 as dashes get longer: each dash end is an edge across the line direction
+
+| dash_length_px | observed_mean | observed_sd |
+| --- | --- | --- |
+| 20 | 0.8486 | 0.0027 |
+| 40 | 0.9246 | 0.0032 |
+| 80 | 0.9628 | 0.0015 |
+| 160 | 0.9798 | 0.001 |
+| 600 | 0.9947 | 0.0016 |
+<!-- /table:dash_length -->
+
+![Limits](figures/math/08_limits.png)
+
+## 5. Design decisions checked
+
+<!-- table:weighting -->
+### Weighting each pixel by m^2 (structure tensor) or by m (spec first draft)
+
+Expected: the same ordering of pictures; m-weighting gives a little more say to weak edges such as dash ends
+
+| picture | weight m^2 | weight m | difference |
+| --- | --- | --- | --- |
+| parallel lines, 30 deg | 0.9998 | 0.9997 | -0.0001 |
+| two families 45 deg apart | 0.7071 | 0.7071 | 0.0 |
+| parallel dashes, 20 px | 0.8475 | 0.8052 | -0.0423 |
+| parallel dashes, 40 px | 0.9209 | 0.8957 | -0.0252 |
+| dashes, 20 deg spread | 0.681 | 0.6429 | -0.0381 |
+| dashes, random | 0.0771 | 0.0703 | -0.0068 |
+<!-- /table:weighting -->
+
+Decision: weight m² (the structure tensor). Both weightings rank the pictures the same way.
+
+<!-- table:mapping -->
+### The rhythm rule at a 1 s beat
+
+Expected: long gap + short gap = one beat for every alignment (fixed tempo)
+
+| alignment | long_fraction | long_gap_s | short_gap_s | sum_s | long : short |
+| --- | --- | --- | --- | --- | --- |
+| 0.0 | 0.75 | 0.75 | 0.25 | 1.0 | 3.0 |
+| 0.25 | 0.6875 | 0.6875 | 0.3125 | 1.0 | 2.2 |
+| 0.3333 | 0.6667 | 0.6667 | 0.3333 | 1.0 | 2.0 |
+| 0.5 | 0.625 | 0.625 | 0.375 | 1.0 | 1.667 |
+| 0.75 | 0.5625 | 0.5625 | 0.4375 | 1.0 | 1.286 |
+| 1.0 | 0.5 | 0.5 | 0.5 | 1.0 | 1.0 |
+<!-- /table:mapping -->
+
+Over time: a 24-frame test sequence with two blank frames is in
+`analysis/out/verification_tables.md` and in the figure below. The blank frames come out `missing`,
+the smoothed value restarts after the gap, and smoothing with α = 0.3 lags a falling trend.
+
+![Over time](figures/math/05_sequence.png)
+
+## 6. Limitations found
+
+| # | Limitation | Evidence |
+| --- | --- | --- |
+| 1 | The score is one number for the whole box. Two organised line families at 90° score 0, like chaos. | Named cases; two-families table |
+| 2 | Any edge votes: labels, colour bars, coastlines, seams between patches. | Legend table |
+| 3 | Dash ends lower the score, so short dashes cannot reach 1. | Dash-length table |
+| 4 | Small boxes inflate the score and make it scatter. Regions must be large and equal in size. | Crop table; chance-level table |
+| 5 | Near the edge threshold, dimmer lines score higher before going missing. | Contrast table |
+| 6 | The same pattern scores about ±0.02 differently depending on its angle to the pixel grid. | Rotation table |
+| 7 | An equirectangular map squeezes directions toward horizontal at high latitude. | Reasoned in `math_notes.md` section 1. **Not tested.** |
+| 8 | Camera smear and zoom change the score. | Camera-smear and zoom tables |
+| 9 | Strong noise is reported as a low score, not as missing. | Noise table, last column |
+| 10 | Bright lines count more than faint ones (weight m²). | Weighting table |
+
+## 7. Wording
+
+**Approved**
+
+- "We measure how strongly the visible lines in the picture share one direction."
+- "More alignment gives a more even pulse. This is a sound rule we chose."
+- "The measurement describes the rendered image of ECCO2 model output."
+- "When there is too little to measure, the Earth voice is silent and the app says why."
+
+**Do not use**
+
+- "Turbulence", "chaos", "disorder", "calm" or "health" for a low or high score.
+- "Speed", "strength" or "energy" of currents.
+- "The ocean sounds like…" or "real-time analysis".
+- "Accuracy" figures for NASA frames: none have been measured.
+
+## 8. Not done yet
+
+- No measurement on NASA frames. Thresholds are practice values and are not calibrated.
+- No listening test. We do not know how small an alignment difference people can hear.
+- Limitation 7 (map projection) is reasoned, not tested.
+- JPEG results are for synthetic line art only.
+- The fixed-camera check on the real frame set is Student A's open task.

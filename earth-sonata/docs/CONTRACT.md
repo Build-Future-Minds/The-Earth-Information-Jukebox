@@ -34,6 +34,17 @@ Each note carries `why`: the region, the alignment value, the pulse split it pro
 rule. "Explain this rhythm" is written from `why`, so the explanation always matches the sound
 actually playing.
 
+## 4. `rhythm_reference.json` — optional check file (PROPOSED by Dev A, needs Dev B's yes)
+
+Written by `features.py --rhythm-out`. The app does not need it. It repeats `features.json`
+step for step and adds, for each step, the `long_fraction`, the two pulse times and the two gaps
+the rule produces, plus the list of Earth-voice notes per region. Use it to check that the live
+rhythm in the app matches the rule. Schema: `contracts/rhythm-reference.schema.json`. It changes
+no existing schema.
+
+Timing it assumes: one step is one beat of `step_seconds`; pulse 1 at `t`, pulse 2 at
+`t + long_fraction × step_seconds`.
+
 ## Rules
 
 - A practice file has `is_mock: true` and the app shows a PRACTICE DATA banner. Never in the demo.

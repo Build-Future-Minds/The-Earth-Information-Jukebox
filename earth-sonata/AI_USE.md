@@ -13,6 +13,7 @@ Rules:
 | Date | Role | Tool | What it was used for | Human review |
 | --- | --- | --- | --- | --- |
 | 2026-11-14 | Team lead | Claude | Planning documents, task breakdown, JSON schemas, practice fixtures, submission worksheets, source-page fact checks | Team reads and corrects the plan; unverified items are flagged |
+| 2026-11-14 | Developer A | Claude Code | Math engine in `analysis/` (image analysis, rhythm rule, tests, synthetic test images, verification experiments and figures), `docs/math_notes.md`, `docs/science_review.md`, edits to `docs/mapping_spec.md` and `docs/CONTRACT.md` | Pending: Developer A to read, run `pytest` and `run_experiments.py`, and be able to explain it before merge |
 |  |  |  |  |  |
 
 ## Summary for the submission form (edit before submitting)

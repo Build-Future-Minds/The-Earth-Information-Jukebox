@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "earth-sonata/rhythm-reference.schema.json",
+  "title": "RhythmReference",
+  "description": "PROPOSED, optional check file written by analysis/features.py --rhythm-out. It repeats features.json, adds diagnostics, and lists the pulse times and Earth-voice notes the rhythm rule produces, so the app's live rhythm can be compared with it. The app does not need this file to run. Each note in `events` follows music-event.schema.json.",
+  "type": "object",
+  "required": ["schema_version", "is_mock", "generated_by", "scene", "source", "measurement", "rhythm", "steps", "events"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "is_mock": { "type": "boolean", "description": "true for practice data; copied from the scene" },
+    "generated_by": { "type": "string" },
+    "scene": { "type": "string", "description": "Path or id of the scene these measurements describe" },
+    "source": {
+      "type": ["object", "null"],
+      "description": "Copied from scene.source so the file can be read on its own",
+      "additionalProperties": false,
+      "properties": {
+        "svs_id": { "type": ["integer", "null"] },
+        "url": { "type": ["string", "null"] },
+        "title": { "type": ["string", "null"] },
+        "credit": { "type": ["string", "null"] },
+        "data_kind": { "type": ["string", "null"] }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "description": "Every setting that can change a measurement. Identical for all regions.",
+      "required": ["what", "gray_mode", "blur_sigma_px", "blur_radius_px", "gradient_operator", "weight_power", "gradient_threshold", "gradient_threshold_units", "min_usable_fraction", "smoothing_alpha", "smoothing_rule", "same_settings_for_all_regions"],
+      "additionalProperties": false,
+      "properties": {
+        "what": { "type": "string" },
+        "gray_mode": { "enum": ["value", "luma"] },
+        "blur_sigma_px": { "type": "number", "minimum": 0 },
+        "blur_radius_px": { "type": "integer", "minimum": 0 },
+        "gradient_operator": { "type": "string" },
+        "weight_power": { "enum": [1, 2] },
+        "gradient_threshold": { "type": "number", "minimum": 0 },
+        "gradient_threshold_units": { "type": "string" },
+        "min_usable_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+        "smoothing_alpha": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "smoothing_rule": { "type": "string" },
+        "same_settings_for_all_regions": { "const": true }
+      }
+    },
+    "rhythm": {
+      "type": "object",
+      "description": "The sound rule and its fixed settings. A design choice, identical for all regions.",
+      "required": ["rule", "beat_seconds", "pulses_per_beat", "long_fraction_at_alignment_0", "long_fraction_at_alignment_1", "voice", "pitch", "dur", "vel", "carries_data", "fixed_no_data", "missing_rule"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "type": "string", "description": "e.g. long_fraction = 0.75 - 0.25 * alignment" },
+        "beat_seconds": { "type": "number", "exclusiveMinimum": 0, "description": "One step = one beat" },
+        "pulses_per_beat": { "const": 2 },
+        "long_fraction_at_alignment_0": { "type": "number" },
+        "long_fraction_at_alignment_1": { "type": "number" },
+        "voice": { "const": "earth" },
+        "pitch": { "type": "integer", "minimum": 0, "maximum": 127 },
+        "dur": { "type": "number", "exclusiveMinimum": 0 },
+        "vel": { "type": "number", "minimum": 0, "maximum": 1 },
+        "carries_data": { "type": "array", "items": { "type": "string" } },
+        "fixed_no_data": { "type": "array", "items": { "type": "string" } },
+        "missing_rule": { "type": "string" }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "description": "Same order and same t, frame, source_time, region, status, alignment, reason as features.json",
+      "items": {
+        "type": "object",
+        "required": ["t", "frame", "source_time", "region", "status", "alignment", "alignment_raw", "reason", "reason_code", "usable_fraction", "dominant_angle_deg", "long_fraction", "pulse_times", "long_interval", "short_interval"],
+        "additionalProperties": false,
+        "properties": {
+          "t": { "type": "number", "minimum": 0, "description": "seconds from playback start; the beat starts here" },
+          "frame": { "type": "integer", "minimum": 0 },
+          "source_time": { "type": ["string", "null"] },
+          "region": { "type": "string" },
+          "status": { "enum": ["ok", "missing"] },
+          "alignment": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "after smoothing; the value the rule uses; null when missing" },
+          "alignment_raw": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "this frame alone, before smoothing" },
+          "reason": { "type": ["string", "null"], "description": "sentence for people; null when ok" },
+          "reason_code": { "type": ["string", "null"], "description": "for code: too_few_edges, all_masked, region_too_small, empty_region, frame_unreadable, frame_size_mismatch" },
+          "usable_fraction": { "type": "number", "minimum": 0, "maximum": 1, "description": "share of the region's pixels that voted" },
+          "dominant_angle_deg": { "type": ["number", "null"], "description": "on-screen line direction, 0 = horizontal, counter-clockwise, 0-180; only meaningful when alignment is well above 0" },
+          "long_fraction": { "type": ["number", "null"], "description": "share of the beat before the second pulse; null when missing" },
+          "pulse_times": { "type": "array", "items": { "type": "number", "minimum": 0 }, "description": "seconds from playback start; empty when missing" },
+          "long_interval": { "type": ["number", "null"], "description": "seconds from pulse 1 to pulse 2" },
+          "short_interval": { "type": ["number", "null"], "description": "seconds from pulse 2 to the next beat" }
+        }
+      }
+    },
+    "events": {
+      "type": "object",
+      "description": "Earth-voice notes per region id. Each note follows music-event.schema.json. A missing step has no notes.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["t", "voice", "pitch", "dur", "vel", "why"],
+          "properties": { "voice": { "const": "earth" } }
+        }
+      }
+    }
+  }
+}
