@@ -240,6 +240,10 @@
       <input type="range" id="volume" min="0" max="1" step="0.05" value="0.7">
     </div>
     <div class="axis">
+      <label class="switch"><input type="checkbox" id="grooveLock" checked> Groove lock</label>
+      <p class="hint-note">Two sounds can play at once: press Q, W or R while another sound is playing. On: the new sound waits for the next beat of the one already playing and keeps its speed, so the pulses line up. Off: it starts the moment you press.</p>
+    </div>
+    <div class="axis">
       <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
       <p class="hint-note">Unless Rhythm only is on, the notes' pitch and length change with the patch. Both are this game's choice; the team's rule keeps pitch fixed until Dev A decides.</p>
     </div>
@@ -541,20 +545,28 @@
   }
 
   // ---------- sound ----------
-  let ctx = null, master = null, sources = [], timers = [];
+  // `voices` are the sounds playing now (a patch or the mystery sound), oldest first, at most
+  // MAX_VOICES. `loose` holds single notes played by dragging the timeline.
+  const MAX_VOICES = 2;
+  let ctx = null, master = null, voices = [], loose = [], timers = [];
 
   function ensureAudio() {
     if (!ctx) {
       ctx = new AudioContext();
       master = ctx.createGain();
       master.gain.value = Number($("volume").value);
-      master.connect(ctx.destination);
+      // Two sounds at once can add up past full scale; the limiter keeps them from clipping.
+      // One sound at the default volume stays under its threshold, so it is not changed.
+      const limiter = ctx.createDynamicsCompressor();
+      limiter.threshold.value = -3; limiter.knee.value = 0; limiter.ratio.value = 20;
+      limiter.attack.value = 0.002; limiter.release.value = 0.1;
+      master.connect(limiter).connect(ctx.destination);
     }
     if (ctx.state === "suspended") ctx.resume();
   }
 
   // One note: a quick attack, held for `length` seconds, then a short release.
-  function pulse(t, hz, peak, length) {
+  function pulse(t, hz, peak, length, bin = loose) {
     const osc = ctx.createOscillator(), env = ctx.createGain();
     const end = t + Math.max(0.06, length);
     osc.type = "triangle";
@@ -567,21 +579,50 @@
     env.gain.exponentialRampToValueAtTime(0.0001, end);
     osc.connect(env).connect(master);
     osc.start(t); osc.stop(end + 0.02);
-    sources.push(osc);
+    bin.push(osc);
+  }
+
+  const silence = (list) => list.forEach((s) => { try { s.stop(); } catch (e) {} });
+
+  function stopVoice(v) {
+    silence(v.sources);
+    voices = voices.filter((x) => x !== v);
   }
 
   function stopAll() {
-    sources.forEach((s) => { try { s.stop(); } catch (e) {} });
-    sources = []; timers.forEach(clearTimeout); timers = [];
+    voices.forEach((v) => silence(v.sources)); voices = [];
+    silence(loose); loose = [];
+    timers.forEach(clearTimeout); timers = [];
     cancelAnimationFrame(anim);
     $("track").querySelectorAll(".note.live").forEach((r) => r.classList.remove("live"));
+    if (track && track.voice) $("trackLabel").textContent = "Now playing: " + track.voice.label;
   }
 
-  // Schedules one patch's sound starting at `start`; returns the time it ends.
-  function scheduleRhythm(p, start, variant = 0) {
-    const beat = BEAT_S / SPEEDS[Number($("speed").value)];
-    notesFor(p, variant).forEach((n) => pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat));
-    return start + BEATS * beat;
+  const liveVoices = () => voices.filter((v) => v.end > ctx.currentTime);
+
+  // Starts one sound. If another is already playing, the new one plays alongside it (two at most:
+  // a third replaces the oldest; pressing the same sound again restarts just that one). With Groove
+  // lock on, the new sound waits for the playing sound's next beat and keeps its speed, so the two
+  // pulse together instead of drifting. Returns the sound and the one it joined, if any.
+  function startVoice(key, p, variant, label) {
+    ensureAudio();
+    const now = ctx.currentTime;
+    voices = liveVoices();
+    const again = voices.find((v) => v.key === key);
+    if (again) stopVoice(again);
+    while (voices.length >= MAX_VOICES) stopVoice(voices[0]);
+    const anchor = voices[0] || null;
+    let beat = BEAT_S / SPEEDS[Number($("speed").value)], start = now + 0.1;
+    if (anchor && $("grooveLock").checked) {
+      beat = anchor.beat;
+      start = anchor.start + Math.max(0, Math.ceil((now + 0.05 - anchor.start) / beat)) * beat;
+    }
+    const v = { key, p, variant, label, beat, start, end: start + BEATS * beat, sources: [] };
+    notesFor(p, variant).forEach((n) =>
+      pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat, v.sources));
+    voices.push(v);
+    followVoices();
+    return { v, joined: anchor };
   }
 
   // ---------- the moving dot ----------
@@ -625,16 +666,28 @@
     lastBeat = pos;
   }
 
-  function animateTrack(p, start, end, variant = 0, label = "mystery sound") {
+  // The timeline shows the newest sound that is still playing. When two play, the label names both;
+  // when the newest ends first, the timeline moves to the one still going.
+  function showVoice(v) {
+    track = { p: v.p, variant: v.variant, notes: notesFor(v.p, v.variant),
+              rects: drawNotes($("trackSvg"), v.p, v.variant), beat: v.beat, voice: v };
+  }
+
+  function followVoices() {
     cancelAnimationFrame(anim);
-    $("trackLabel").textContent = "Now playing: " + label;
-    const notes = notesFor(p, variant), rects = drawNotes($("trackSvg"), p, variant), total = end - start;
-    track = { p, variant, notes, rects, beat: total / BEATS };
     const frame = () => {
-      const t = ctx.currentTime - start;
-      paintTrack(Math.max(0, t) / track.beat);
-      if (t < total) anim = requestAnimationFrame(frame);
-      else rects.forEach((r) => r.classList.remove("live"));
+      const live = liveVoices();
+      if (!live.length) {
+        if (track && track.voice) paintTrack(BEATS);
+        if (track) track.rects.forEach((r) => r.classList.remove("live"));
+        return;
+      }
+      const v = live[live.length - 1];
+      if (!track || track.voice !== v) showVoice(v);
+      const label = "Now playing: " + v.label + (live.length > 1 ? ", with " + live[0].label : "");
+      if ($("trackLabel").textContent !== label) $("trackLabel").textContent = label;
+      paintTrack(Math.max(0, ctx.currentTime - v.start) / v.beat);
+      anim = requestAnimationFrame(frame);
     };
     anim = requestAnimationFrame(frame);
   }
@@ -679,27 +732,34 @@
     paintTrack(next); soundNote(track.notes[starts.indexOf(next)]);
   });
 
+  // Shows `text` once the sound has ended, unless another sound is still playing then.
   function say(text, atAudioTime) {
-    timers.push(setTimeout(() => setStatus(text), Math.max(0, (atAudioTime - ctx.currentTime) * 1000)));
+    timers.push(setTimeout(() => { if (!liveVoices().length) setStatus(text); },
+      Math.max(0, (atAudioTime - ctx.currentTime) * 1000)));
+  }
+
+  function startStatus(v, joined, alone) {
+    if (!joined) return alone;
+    const name = v.label[0].toUpperCase() + v.label.slice(1);
+    return $("grooveLock").checked ? `${name} joins ${joined.label} on its next beat…` : `${name} plays over ${joined.label}…`;
   }
 
   // A round plays one sound, made by one of the two patches. The listener picks which patch made it.
-  function playRound(endText) {
-    stopAll(); ensureAudio();
-    const start = ctx.currentTime + 0.1, end = scheduleRhythm(target, start, mysteryVariant);
-    animateTrack(target, start, end, mysteryVariant, "mystery sound");
-    setStatus("Listen to the mystery sound…");
-    say(endText, end + 0.1);
+  // A new round starts from silence; Replay can play alongside a patch that is already sounding.
+  function playRound(endText, fresh) {
+    if (fresh) stopAll();
+    const { v, joined } = startVoice("mystery", target, mysteryVariant, "mystery sound");
+    setStatus(startStatus(v, joined, "Listen to the mystery sound…"));
+    say(endText, v.end + 0.1);
   }
 
   // Plays what one patch sounds like, so the listener can learn the link between picture and sound.
+  // Press both patches (Q and W) to hear them together.
   function playPatch(side) {
     if (!shown) return;
-    stopAll(); ensureAudio();
-    const start = ctx.currentTime + 0.1, end = scheduleRhythm(shown[side], start);
-    animateTrack(shown[side], start, end, 0, `patch ${side + 1}`);
-    setStatus(`Patch ${side + 1} sounds like this…`);
-    say(guessed ? "Done. Press P for the next round." : "Which patch made the mystery sound? Press 1 or 2.", end + 0.1);
+    const { v, joined } = startVoice("patch" + side, shown[side], 0, `patch ${side + 1}`);
+    setStatus(startStatus(v, joined, `Patch ${side + 1} sounds like this…`));
+    say(guessed ? "Done. Press P for the next round." : "Which patch made the mystery sound? Press 1 or 2.", v.end + 0.1);
   }
 
   // ---------- drawing ----------
@@ -798,8 +858,8 @@
     clearPlot();
     $("replay").disabled = false;
     $("hear0").disabled = false; $("hear1").disabled = false;
-    $("sub").textContent = "Listen to the mystery sound. Use Hear patch 1 and Hear patch 2 to learn how each patch sounds, then pick the patch that made the mystery sound.";
-    playRound("Which patch made this sound? Press 1 or 2.");
+    $("sub").textContent = "Listen to the mystery sound. Use Hear patch 1 and Hear patch 2 to learn how each patch sounds (press both to hear them together), then pick the patch that made the mystery sound.";
+    playRound("Which patch made this sound? Press 1 or 2.", true);
   }
 
   function guess(side) {
