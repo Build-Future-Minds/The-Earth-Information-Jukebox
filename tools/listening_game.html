@@ -251,9 +251,9 @@
       <label for="musicStyle">Music style <span class="switch-state">with Musical sound</span></label>
       <select id="musicStyle">
         <option value="song" selected>Song: piano and band</option>
-        <option value="christmas">Christmas: celesta, sleigh bells</option>
+        <option value="christmas">Christmas: celesta and orchestra</option>
       </select>
-      <p class="hint-note">Christmas: the melody rings like a celesta, the chords move C, Am, Dm, G7 and home, and sleigh bells shake on every beat. Like the band, it is the same for every patch.</p>
+      <p class="hint-note">Christmas: the patch plays the melody on a celesta, a choir sings a harmony under it, and strings, harp, bass, sleigh bells and timpani play C, Am, Dm, G7 and home, in a concert-hall echo. Everything added plays on the beat or under the melody, never between beats, and is the same for every patch.</p>
     </div>
     <div class="axis">
       <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
@@ -590,6 +590,13 @@
       roomSend = ctx.createGain();
       roomSend.gain.value = musical() ? ROOM_LEVEL : 0;
       master.connect(roomSend).connect(room).connect(limiter);
+      // Christmas mix: dry plus a 3.2 s concert-hall echo, both through the volume control.
+      const hallIn = ctx.createGain(), hallVerb = ctx.createConvolver(), hallWet = ctx.createGain();
+      hallVerb.buffer = hallImpulse(3.2, 0.025);
+      hallWet.gain.value = 0.3;
+      hallIn.connect(master);
+      hallIn.connect(hallWet).connect(hallVerb).connect(master);
+      hall = { in: hallIn };
     }
     if (ctx.state === "suspended") ctx.resume();
   }
@@ -650,49 +657,201 @@
   const christmas = () => $("musicStyle").value === "christmas";
   let band = null;   // { start, beat, upTo: beats scheduled so far, style, bus, sources }
 
-  // Christmas melody: a celesta. A bright bell strike (upper partials that die away fast) on top of
-  // a round tone that holds for the note's length, which is data, then fades.
-  function celestaPulse(t, hz, peak, length, bin) {
-    peak *= 0.7;
-    const end = t + Math.max(0.08, length), fade = 0.2;
-    const partial = (ratio, level, decay) => {
-      const o = ctx.createOscillator(), env = ctx.createGain();
-      o.type = "sine"; o.frequency.value = hz * ratio;
-      env.gain.setValueAtTime(0.0001, t);
-      env.gain.linearRampToValueAtTime(peak * level, t + 0.003);
-      if (decay) env.gain.exponentialRampToValueAtTime(0.0001, Math.min(t + decay, end + fade));
-      else {
-        env.gain.exponentialRampToValueAtTime(peak * 0.5, Math.min(t + 0.25, end));
-        env.gain.setValueAtTime(peak * 0.5, end);
-        env.gain.exponentialRampToValueAtTime(0.0001, end + fade);
-      }
-      o.connect(env).connect(master);
-      o.start(t); o.stop(end + fade + 0.02); bin.push(o);
-    };
-    partial(1, 1, 0);          // the held tone
-    partial(2, 0.35, 0.45);    // the ring
-    partial(3, 0.15, 0.22);
-    partial(5.4, 0.06, 0.08);  // the metal "tink"
+  // ---------- Christmas: a small orchestra ----------
+  // All made in the browser: no samples to download or license. The patch's notes are the melody,
+  // played on a celesta. Under each melody note a choir sings a harmony taken from the chord of the
+  // moment, so a repeated melody note (a lined-up patch) still gets new harmony as the chords move.
+  // Strings hold the chords, a harp strums each chord change, the bass plays root and fifth, sleigh
+  // bells shake, and a timpani marks the start and the home chord. Every one of these lands on the
+  // beat or under the melody's own notes, never between beats, so where the second note falls (the
+  // data) stays clear. A concert-hall echo ties it together, and a celesta sparkle ends the phrase.
+  let hall = null;   // { in }: the Christmas mix, dry plus a long, wide hall echo
+  let noise = null;
+  const midiOf = (hz) => 69 + 12 * Math.log2(hz / 440), hzOf = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  const CHORD_PCS = { C: [0, 4, 7], Am: [9, 0, 4], F: [5, 9, 0], G: [7, 11, 2], Dm: [2, 5, 9], G7: [7, 11, 2, 5] };
+
+  function hallImpulse(seconds, predelay) {
+    const len = Math.floor(ctx.sampleRate * seconds), pre = Math.floor(ctx.sampleRate * predelay);
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {   // each side its own noise, so the echo is wide
+      const d = buf.getChannelData(ch);
+      for (let i = pre; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - (i - pre) / (len - pre), 2.5);
+    }
+    return buf;
   }
 
-  // Sleigh bells: a short shake of bright noise, then a quieter second shake 40 ms later.
-  let noise = null;
-  function sleighBells(t) {
+  function panTo(node, pan, dest) {
+    const p = ctx.createStereoPanner();
+    p.pan.value = pan;
+    node.connect(p).connect(dest);
+  }
+
+  function chordAt(t) {
+    if (!band) return null;
+    const phrase = PHRASES[band.style], b = Math.floor((t - band.start) / band.beat + 1e-6);
+    return b < 0 ? null : phrase[b % phrase.length];
+  }
+
+  // Celesta, by FM: a modulator at the note's own pitch, its depth falling fast, gives the bright
+  // hammer-on-steel strike that mellows into a round tone. The tone holds for the note's length,
+  // which is data, then rings away. A short, slightly sharp "tine" adds the sparkle.
+  function celestaPulse(t, hz, peak, length, bin) {
+    peak *= 0.7;
+    const end = t + Math.max(0.08, length), fade = 0.35;
+    const car = ctx.createOscillator(), mod = ctx.createOscillator(), depth = ctx.createGain(), env = ctx.createGain();
+    car.frequency.value = hz; mod.frequency.value = hz;
+    depth.gain.setValueAtTime(hz * 2.2, t);
+    depth.gain.exponentialRampToValueAtTime(hz * 0.25, t + 0.12);
+    depth.gain.exponentialRampToValueAtTime(hz * 0.06, Math.max(t + 0.13, end));
+    mod.connect(depth).connect(car.frequency);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(peak, t + 0.003);
+    env.gain.exponentialRampToValueAtTime(peak * 0.5, Math.min(t + 0.3, end));
+    env.gain.setValueAtTime(peak * 0.5, end);
+    env.gain.exponentialRampToValueAtTime(0.0001, end + fade);
+    car.connect(env).connect(hall.in);
+    const tine = ctx.createOscillator(), tineEnv = ctx.createGain();
+    tine.frequency.value = hz * 4.07;
+    tineEnv.gain.setValueAtTime(0.0001, t);
+    tineEnv.gain.linearRampToValueAtTime(peak * 0.12, t + 0.002);
+    tineEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+    tine.connect(tineEnv).connect(hall.in);
+    [car, mod, tine].forEach((o) => { o.start(t); o.stop(end + fade + 0.02); bin.push(o); });
+    choirUnder(t, hz, end - t, bin);
+  }
+
+  // Choir: the nearest chord note at least a minor third under the melody note, sung "ooh" (three
+  // slightly detuned voices through vowel filters, with a gentle vibrato) for as long as it is held.
+  function choirUnder(t, hz, length, bin) {
+    const name = chordAt(t + 0.001);
+    if (!name) return;
+    let m = Math.round(midiOf(hz)) - 3;
+    while (!CHORD_PCS[name].includes(((m % 12) + 12) % 12)) m--;
+    if (m < 50) return;   // under D3 it would only muddy the bass
+    const f = hzOf(m), end = t + length, fade = 0.3, level = 0.5;
+    const mix = ctx.createGain(), env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(level, t + 0.07);
+    env.gain.setValueAtTime(level, end);
+    env.gain.exponentialRampToValueAtTime(0.0001, end + fade);
+    [[400, 5, 1], [800, 7, 0.45], [2600, 9, 0.12]].forEach(([fr, q, g]) => {   // the "ooh" vowel
+      const bp = ctx.createBiquadFilter(), gain = ctx.createGain();
+      bp.type = "bandpass"; bp.frequency.value = fr; bp.Q.value = q; gain.gain.value = g;
+      mix.connect(bp).connect(gain).connect(env);
+    });
+    panTo(env, -0.25, hall.in);
+    const vib = ctx.createOscillator(), vibDepth = ctx.createGain();
+    vib.frequency.value = 5.2; vibDepth.gain.value = f * 0.006;
+    vib.connect(vibDepth);
+    const saws = [-8, 0, 8].map((d) => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth"; o.frequency.value = f; o.detune.value = d;
+      vibDepth.connect(o.frequency); o.connect(mix);
+      return o;
+    });
+    [...saws, vib].forEach((o) => { o.start(t); o.stop(end + fade + 0.02); bin.push(o); });
+  }
+
+  // Strings: each chord note on two slightly detuned bowed (sawtooth) voices, one left, one right,
+  // swelling in and opening up as they are held.
+  function strings(t, tones, length, ring) {
+    const env = ctx.createGain(), soft = ctx.createBiquadFilter();
+    soft.type = "lowpass"; soft.Q.value = 0.5;
+    soft.frequency.setValueAtTime(900, t);
+    soft.frequency.linearRampToValueAtTime(2200, t + Math.min(length, 0.6));
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(0.024, t + 0.18);
+    env.gain.setValueAtTime(0.024, t + length);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + length + ring);
+    env.connect(soft).connect(band.bus);
+    [tones[0] / 2, ...tones].forEach((hz) => [[-10, -0.55], [10, 0.55]].forEach(([detune, pan]) => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth"; o.frequency.value = hz; o.detune.value = detune;
+      panTo(o, pan, env);
+      o.start(t); o.stop(t + length + ring + 0.05);
+      band.sources.push(o);
+    }));
+  }
+
+  // Harp: the chord strummed upward, 18 ms a string, starting on the beat.
+  function harpRoll(t, tones) {
+    [...tones, tones[0] * 2].forEach((hz, i) => {
+      const at = t + i * 0.018, o = ctx.createOscillator(), env = ctx.createGain();
+      o.type = "triangle"; o.frequency.value = hz;
+      env.gain.setValueAtTime(0.0001, at);
+      env.gain.linearRampToValueAtTime(0.06, at + 0.002);
+      env.gain.exponentialRampToValueAtTime(0.0001, at + 1.2);
+      o.connect(env); panTo(env, 0.35, band.bus);
+      o.start(at); o.stop(at + 1.25);
+      band.sources.push(o);
+    });
+  }
+
+  // Sleigh bells: a cluster of tiny metal bells (three ringing partials each) and a bright "shh",
+  // all within 25 ms of the beat. Louder on the first beat of each chord.
+  function sleighBells(t, accent) {
     if (!noise) {
       noise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.3), ctx.sampleRate);
       const d = noise.getChannelData(0);
       for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     }
-    [[0, 0.11], [0.04, 0.06]].forEach(([at, level]) => {
-      const src = ctx.createBufferSource(), ring = ctx.createBiquadFilter(), env = ctx.createGain();
-      src.buffer = noise;
-      ring.type = "bandpass"; ring.frequency.value = 7500; ring.Q.value = 1.5;
-      env.gain.setValueAtTime(0.0001, t + at);
-      env.gain.linearRampToValueAtTime(level, t + at + 0.003);
-      env.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.12);
-      src.connect(ring).connect(env).connect(band.bus);
-      src.start(t + at); src.stop(t + at + 0.15);
-      band.sources.push(src);
+    const out = ctx.createGain();
+    out.gain.value = accent ? 1 : 0.65;
+    panTo(out, 0.5, band.bus);
+    for (let k = 0; k < 5; k++) {
+      const at = t + Math.random() * 0.025, f0 = 3800 + Math.random() * 1400, lvl = 0.018 * (0.6 + 0.4 * Math.random());
+      [1, 1.47, 2.09].forEach((ratio, j) => {
+        const o = ctx.createOscillator(), env = ctx.createGain();
+        o.frequency.value = f0 * ratio;
+        env.gain.setValueAtTime(0.0001, at);
+        env.gain.linearRampToValueAtTime(lvl / (j + 1), at + 0.001);
+        env.gain.exponentialRampToValueAtTime(0.0001, at + 0.07 + 0.05 * Math.random());
+        o.connect(env).connect(out);
+        o.start(at); o.stop(at + 0.14);
+        band.sources.push(o);
+      });
+    }
+    const src = ctx.createBufferSource(), air = ctx.createBiquadFilter(), env = ctx.createGain();
+    src.buffer = noise;
+    air.type = "bandpass"; air.frequency.value = 9000; air.Q.value = 1.2;
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(0.03, t + 0.004);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+    src.connect(air).connect(env).connect(out);
+    src.start(t); src.stop(t + 0.12);
+    band.sources.push(src);
+  }
+
+  // Timpani: a soft drum that settles onto its pitch and rings, on the beat.
+  function timpani(t, hz) {
+    const o = ctx.createOscillator(), over = ctx.createOscillator(), env = ctx.createGain(), overEnv = ctx.createGain();
+    o.frequency.setValueAtTime(hz * 1.4, t);
+    o.frequency.exponentialRampToValueAtTime(hz, t + 0.06);
+    over.frequency.value = hz * 1.5;
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(0.3, t + 0.006);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + 1.3);
+    overEnv.gain.setValueAtTime(0.0001, t);
+    overEnv.gain.linearRampToValueAtTime(0.08, t + 0.004);
+    overEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    o.connect(env).connect(band.bus); over.connect(overEnv).connect(band.bus);
+    [o, over].forEach((n) => { n.start(t); n.stop(t + 1.35); band.sources.push(n); });
+  }
+
+  // After the last beat: a quiet celesta run up the scale while the home chord rings out. If a
+  // joining sound extends the band, the run moves to the new end.
+  function sparkleAt(t) {
+    (band.sparkle || []).forEach((o) => { try { o.stop(); } catch (e) {} });
+    band.sparkle = [];
+    [1046.5, 1174.66, 1318.51, 1567.98, 1760.0, 2093.0].forEach((hz, i) => {
+      const at = t + i * 0.065, o = ctx.createOscillator(), env = ctx.createGain();
+      o.frequency.value = hz;
+      env.gain.setValueAtTime(0.0001, at);
+      env.gain.linearRampToValueAtTime(0.07, at + 0.003);
+      env.gain.exponentialRampToValueAtTime(0.0001, at + 0.6);
+      o.connect(env); panTo(env, -0.2 + i * 0.1, band.bus);
+      o.start(at); o.stop(at + 0.65);
+      band.sparkle.push(o); band.sources.push(o);
     });
   }
 
@@ -731,13 +890,21 @@
     const last = Math.ceil((until - band.start) / band.beat - 1e-6);
     for (let b = band.upTo; b < last; b++) {
       const phrase = PHRASES[band.style], t = band.start + b * band.beat, ch = CHORDS[phrase[b % phrase.length]];
+      const xmas = band.style === "christmas";
       if (b % 2 === 0 || b === band.upTo) {
         const beats = Math.min(2 - (b % 2), last - b), home = b + beats >= last;
-        bandChord(t, ch.tones, beats * band.beat, home ? 0.8 : 0.25);   // the last chord rings out
+        if (xmas) {
+          strings(t, ch.tones, beats * band.beat, home ? 1.6 : 0.3);   // the home chord rings out long
+          harpRoll(t, ch.tones);
+        } else bandChord(t, ch.tones, beats * band.beat, home ? 0.8 : 0.25);   // the last chord rings out
       }
       bandBass(t, b % 2 ? ch.fifth : ch.root, 0.8 * band.beat);
-      if (band.style === "christmas") sleighBells(t);
+      if (xmas) {
+        sleighBells(t, b % 2 === 0);
+        if (b % 10 === 0 || b % 10 === 8) timpani(t, 65.41);   // start of the phrase, and home
+      }
     }
+    if (band.style === "christmas" && last > band.upTo) sparkleAt(band.start + last * band.beat);
     band.upTo = Math.max(band.upTo, last);
   }
 
@@ -747,9 +914,9 @@
     if (!musical()) return;
     if (!joined || !band) {
       bandStop(0.05);
-      const bus = ctx.createGain();
-      bus.connect(master);
-      band = { start: v.start, beat: v.beat, upTo: 0, style: christmas() ? "christmas" : "song", bus, sources: [] };
+      const bus = ctx.createGain(), style = christmas() ? "christmas" : "song";
+      bus.connect(style === "christmas" ? hall.in : master);
+      band = { start: v.start, beat: v.beat, upTo: 0, style, bus, sources: [] };
     }
     bandExtend(v.end);
   }
@@ -818,10 +985,10 @@
       start = anchor.start + Math.max(0, Math.ceil((now + 0.05 - anchor.start) / beat)) * beat;
     }
     const v = { key, p, variant, label, beat, start, end: start + BEATS * beat, sources: [] };
+    bandFor(v, anchor);   // first, so the Christmas choir knows which chord each melody note is on
     notesFor(p, variant).forEach((n) =>
       pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat, v.sources));
     voices.push(v);
-    bandFor(v, anchor);
     followVoices();
     return { v, joined: anchor };
   }

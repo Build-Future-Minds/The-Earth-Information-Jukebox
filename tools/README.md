@@ -78,11 +78,25 @@ extends it. Timing, pitch and note length still come from the patch exactly as b
 rendering the same patch both ways: the melody notes start at the same moments). Switch it off for
 the plain test tone, the strict setting for a real listening test.
 
-**Music style** (with Musical sound on): *Song* (the default, above) or *Christmas*. Christmas plays
-the melody as a celesta (a bright bell strike over a tone that holds for the note's length), moves
-the chords C, Am, Dm, G7 and home to C, and shakes sleigh bells on every beat, with the bass and
-never between beats, so they cannot be mistaken for the second note. Like the band, it is the same
-for every patch. A new style is heard from the next sound.
+**Music style** (with Musical sound on): *Song* (the default, above) or *Christmas*, a small
+orchestra made in the browser (no samples to download or license):
+
+- **Celesta** plays the melody (the patch's notes), by FM synthesis: a bright strike that mellows
+  into a round tone held for the note's length, plus a short "tine".
+- **Choir** sings "ooh" under each melody note: the nearest note of the current chord at least a
+  minor third below, held as long as the melody note. So a repeated melody note (a lined-up patch)
+  still gets new harmony every two beats.
+- **Strings** (detuned sawtooth pairs, left and right) hold the chords C, Am, Dm, G7 and home to C;
+  a **harp** strums each chord change upward from the beat (18 ms a string).
+- **Bass** on every beat (root, then fifth), **sleigh bells** on every beat (clusters of tiny metal
+  bells within 25 ms), **timpani** at the start of the phrase and on the home chord.
+- A 3.2 s **concert-hall echo**, and a quiet **celesta run** up the scale after the last beat.
+
+Everything added plays on the beat or under the melody's own notes, never between beats, so where
+the second note falls stays clear; it is the same for every patch, so it carries no answer.
+Checked by rendering the audio offline: the melody notes start at the same moments as in Song, the
+band starts sounds only on the beats, the choir and band sit 6–7 dB under the melody, and two
+layered sounds peak at 0.97. A new style is heard from the next sound.
 
 **Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5) at one fixed
 length, so only the spacing of the pulses carries the answer. That is the team's actual rule
