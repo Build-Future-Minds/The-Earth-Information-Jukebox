@@ -24,6 +24,10 @@ python tools/build_listening_tasks.py fixtures/mock/features.mock.json --seed 42
 
 ### Practice game: "Which patch made this rhythm?" (real NASA image)
 
+Live: <https://build-future-minds.github.io/The-Earth-Information-Jukebox/tools/listening_game.html>
+(the quiz player is at `tools/listening_quiz_player.html` on the same site). The Pages workflow copies
+both pages and downloads the NASA still on every deploy. To run it locally instead:
+
 1. Download the NASA still (once; `assets/frames/` is git-ignored):
 
    ```
