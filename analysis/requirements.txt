@@ -5,3 +5,4 @@ opencv-python>=4.8
 matplotlib>=3.8
 pytest>=8.0
 jsonschema>=4.20   # tests only: checks our output against contracts/*.schema.json
+pillow>=10.0       # check_motion.py (Student A)

@@ -6,7 +6,7 @@ Owner: Developer A. Companion to `mapping_spec.md` (the one-page rule) and `scie
 Tags used below, as `CONTRIBUTING.md` asks:
 **Verified** = measured by our tests on synthetic TEST INPUTS, with the table named;
 **Design choice** = something we decided; **Unverified** = reasoning not yet checked on NASA frames.
-Nothing in this document has been measured on NASA imagery yet.
+The first measurements on NASA frames are in `science_review.md` section 9.
 
 ## Summary
 
@@ -46,8 +46,10 @@ seeded and drawn. Three examples that matter for SVS 3912:
   stretched by $1/\cos(\text{latitude})$ relative to north–south. A direction at true angle $\theta$
   from east is drawn at $\theta'$ with $\tan\theta' = \tan\theta \cdot \cos(\text{latitude})$. At 60°
   latitude a 45° line is drawn at 27°. Every direction is squeezed toward horizontal, which
-  *raises* alignment at high latitude for the same flow. *Unverified on frames; follows from the
-  projection.* Choose the two regions at similar latitudes, or say this out loud.
+  *raises* alignment at high latitude for the same flow. A rough estimate on NASA frames
+  (`science_review.md` section 9): a draft circle at 56°S scores 0.60 as drawn and about 0.16
+  with the stretch undone, while a circle on the equator is unchanged at 0.67. Choose the two
+  regions at similar, low latitudes, or say this out loud.
 - **Colour.** Line colour encodes modelled temperature. A brightness formula that favours some
   hues would make our number depend on temperature (section 2).
 
@@ -197,7 +199,8 @@ the mathematics predicts on every test we ran.
 5. **Line brightness matters near the threshold.** Dimming a test picture to 25% contrast moved
    its score from 0.68 to 0.80 before it went `missing`.
 6. **Orientation on the pixel grid** shifts the score by about ±0.02.
-7. **Map projection** squeezes directions toward horizontal at high latitude (section 1). *Unverified.*
+7. **Map projection** squeezes directions toward horizontal at high latitude (section 1). Rough
+   estimate on NASA frames: 0.60 becomes about 0.16 at 56°S.
 8. **Camera motion and zoom are not allowed.** A 3-pixel smear raised random dashes from 0.08 to
    0.21; 9 pixels gave 0.65. Zoom changed the same picture between 0.01 and 0.32.
 9. **Strong noise or fine texture** passes for lines pointing every way (noise $\sigma$ = 40 on a
@@ -300,12 +303,17 @@ measures 0.54.
 
 ## 9. Still to do on real frames
 
-- Calibrate `gradient_threshold` and `min_usable_fraction` on a few real frames, then freeze them.
-  The current values (12 and 0.05) are the practice values, not tuned ones.
-- Check that the usable fraction is comfortably above 5% and similar in both regions.
-- Confirm the frame set has no camera motion, fades or overlays (Student A's land-pixel test).
-- Measure the alignment gap between the two chosen regions and decide whether the rule's slope
-  needs steepening.
+Done on 30 frames with draft regions (`science_review.md` section 9): the practice threshold
+works, the usable fraction is 0.21 to 0.40, the camera check passes, and the gap between an
+aligned and a swirly region is 0.38 to 0.60, so the rule's slope does not need steepening.
+
+Still open:
+
+- Approve the two regions. The Southern Ocean draft owes most of its score to the map
+  projection; an equatorial circle does not.
+- Freeze `gradient_threshold`, the radius and the regions together. The aligned regions move with
+  the threshold, and one swirly region moves with the radius.
+- A listening check that people can hear the difference.
 
 ## References
 

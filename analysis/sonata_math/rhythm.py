@@ -38,13 +38,16 @@ class RhythmParams:
     long_fraction_at_zero  Where pulse 2 falls when alignment = 0 (share of the beat).
     long_fraction_at_one   Where pulse 2 falls when alignment = 1 (0.5 = even).
     pitch, dur, vel        MIDI note, note length in seconds, loudness 0-1. No data.
+
+    The defaults for pitch, dur and vel are the app's (web/src/audio/earthVoice.ts).
+    Like the app, a note is shortened to 90% of the short gap if it would not fit.
     """
 
     beat_seconds: float = 1.0
     long_fraction_at_zero: float = 0.75
     long_fraction_at_one: float = 0.5
-    pitch: int = 60
-    dur: float = 0.1
+    pitch: int = 64
+    dur: float = 0.08
     vel: float = 0.8
 
     def __post_init__(self) -> None:
@@ -56,12 +59,8 @@ class RhythmParams:
             raise ValueError("pitch must be a MIDI note 0-127")
         if not (0.0 <= self.vel <= 1.0):
             raise ValueError("vel must be in [0, 1]")
-        shortest_gap = self.beat_seconds * (1.0 - self.long_fraction_at_zero)
-        if not (0 < self.dur <= shortest_gap):
-            raise ValueError(
-                f"dur must be > 0 and no longer than the shortest gap ({shortest_gap:g} s) "
-                "so notes never overlap"
-            )
+        if not (math.isfinite(self.dur) and self.dur > 0):
+            raise ValueError("dur must be > 0")
 
 
 @dataclass(frozen=True)
@@ -136,12 +135,14 @@ def events_for_step(
         "long_fraction": round(timing.long_fraction, 6),
         "rule": rule_text(params),
     }
+    # Same as the app: never let a note run into the next pulse.
+    dur = round(min(params.dur, 0.9 * timing.short_interval), 6)
     return [
         {
             "t": round(float(t) + offset, 6),
             "voice": EARTH_VOICE,
             "pitch": params.pitch,
-            "dur": params.dur,
+            "dur": dur,
             "vel": params.vel,
             "why": dict(why),
         }

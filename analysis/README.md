@@ -24,9 +24,13 @@ pip install -r requirements.txt
 | `python make_practice_scene.py` | Draws the practice frames in `practice/` (TEST INPUT, not NASA data). |
 | `python features.py --scene practice/scene.practice.json --out practice/features.practice.json --rhythm-out practice/rhythm_reference.practice.json` | Measures a scene and writes `features.json` plus the optional check file. |
 | `python run_experiments.py` | Re-measures every verification experiment, redraws `docs/figures/math/`, rewrites the tables in `docs/science_review.md`, and writes two test-tone rhythms to `out/`. |
+| `python explore_regions.py --map` | Measures the draft circles in `assets/regions_draft.json` on the NASA frames and scores every circle position in the picture. Needs `bash tools/download_frames.sh` first. Writes only to `out/`. |
+
+For SVS 3912, whose frame files are numbered 23000, 23004, …, add `--first-index 23000 --index-step 4`
+to `features.py`.
 
 `features.py --help` lists the settings. Paths inside a scene file are read relative to the
-project folder (`earth-sonata/`); change that with `--root`.
+repository root; change that with `--root`.
 
 ## What is where
 
@@ -59,6 +63,8 @@ project folder (`earth-sonata/`); change that with `--root`.
   coast or label inside unless the mask excludes it.
 - Masks: white = included. Frame-sized or region-sized. The engine keeps a 5-pixel margin away
   from anything excluded.
+- Circles: give `box_px` as the bounding square and a mask that is white inside the circle and
+  black on land. `explore_regions.py --write-draft-scene` writes an example to `out/draft/`.
 - An unreadable frame keeps its place and becomes `missing`. A named mask file that is absent
   stops the run.
 

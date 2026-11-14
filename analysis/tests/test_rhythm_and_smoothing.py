@@ -94,7 +94,7 @@ def test_missing_alignment_has_no_rhythm(bad):
         {"long_fraction_at_zero": 1.0},
         {"long_fraction_at_one": 0.4},
         {"long_fraction_at_zero": 0.6, "long_fraction_at_one": 0.7},
-        {"dur": 0.3},  # longer than the shortest gap of a 1 s beat (0.25 s)
+        {"dur": 0},
         {"pitch": 200},
         {"vel": 1.5},
     ],
@@ -144,14 +144,28 @@ def test_average_tempo_is_fixed_whatever_the_data():
 
 def test_pitch_loudness_and_length_carry_no_data():
     events = events_for_steps(STEPS)
-    assert {(e["voice"], e["pitch"], e["dur"], e["vel"]) for e in events} == {("earth", 60, 0.1, 0.8)}
+    assert {(e["voice"], e["pitch"], e["dur"], e["vel"]) for e in events} == {("earth", 64, 0.08, 0.8)}
 
 
-def test_notes_never_overlap():
+@pytest.mark.parametrize("beat_seconds", [1.0, 0.5, 0.2])
+def test_notes_never_overlap(beat_seconds):
+    """Like the app, a note is cut to 90% of the short gap when the beat is fast."""
+    params = RhythmParams(beat_seconds=beat_seconds)
     for a in GRID:
-        events = events_for_steps([{"t": float(i), "region": "a", "alignment": a} for i in range(3)])
-        gaps = [later["t"] - earlier["t"] for earlier, later in zip(events, events[1:])]
-        assert min(gaps) >= R.dur - 1e-9
+        steps = [{"t": i * beat_seconds, "region": "a", "alignment": a} for i in range(3)]
+        events = events_for_steps(steps, params)
+        for earlier, later in zip(events, events[1:]):
+            assert earlier["t"] + earlier["dur"] < later["t"]
+
+
+def test_note_settings_match_the_app():
+    """web/src/audio/earthVoice.ts: pitch 64, velocity 0.8, 0.08 s pulses, same rule text."""
+    source = (CONTRACTS.parent / "web/src/audio/earthVoice.ts").read_text(encoding="utf-8")
+    assert f"EARTH_PITCH = {R.pitch};" in source
+    assert f"EARTH_VELOCITY = {R.vel};" in source
+    assert f"PULSE_SECONDS = {R.dur};" in source
+    assert f"LONG_AT_A0 = {R.long_fraction_at_zero};" in source
+    assert f"LONG_AT_A1 = {R.long_fraction_at_one};" in source
 
 
 def test_replay_gives_the_same_notes():

@@ -70,11 +70,16 @@ def build_regions(scene: dict, root: Path) -> list[Region]:
     return regions
 
 
-def iter_frames(scene: dict, root: Path, first_index: int) -> Iterator[Union[np.ndarray, FrameProblem]]:
-    """Load frames one at a time. A frame that cannot be read keeps its place."""
+def iter_frames(
+    scene: dict, root: Path, first_index: int, index_step: int = 1
+) -> Iterator[Union[np.ndarray, FrameProblem]]:
+    """Load frames one at a time. A frame that cannot be read keeps its place.
+
+    File numbers run first_index, first_index + index_step, ... (SVS 3912 counts in fours).
+    """
     pattern = scene["frames"]["pattern"]
     for i in range(scene["frames"]["count"]):
-        path = root / pattern.format(index=first_index + i)
+        path = root / pattern.format(index=first_index + i * index_step)
         try:
             yield load_image(path)
         except FileNotFoundError:
@@ -99,13 +104,16 @@ def run(
     smoothing_alpha: float = 0.3,
     step_seconds: float = 1.0,
     first_index: int = 0,
+    index_step: int = 1,
 ) -> dict:
     """Measure a scene and write the output file(s). Returns the features document."""
+    if index_step < 1:
+        raise ValueError("index_step must be 1 or more")
     scene = load_scene(scene_path)
     regions = build_regions(scene, root)
     timestamps = scene["frames"].get("timestamps") or None
     records = analyse_sequence(
-        iter_frames(scene, root, first_index),
+        iter_frames(scene, root, first_index, index_step),
         regions,
         params=params,
         smoothing_alpha=smoothing_alpha,
@@ -149,6 +157,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--root", type=Path, default=PROJECT_ROOT, help="folder that scene paths are relative to")
     parser.add_argument("--step-seconds", type=float, default=1.0, help="playback seconds per frame (= one beat)")
     parser.add_argument("--first-index", type=int, default=0, help="number of the first frame file")
+    parser.add_argument("--index-step", type=int, default=1, help="gap between frame file numbers (SVS 3912: 4)")
     parser.add_argument("--threshold", type=float, default=defaults.gradient_threshold, help="gradient threshold, grey levels per pixel")
     parser.add_argument("--min-usable", type=float, default=defaults.min_usable_fraction, help="smallest share of pixels that must vote")
     parser.add_argument("--alpha", type=float, default=0.3, help="smoothing alpha in (0, 1]; 1 = off")
@@ -172,6 +181,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             smoothing_alpha=args.alpha,
             step_seconds=args.step_seconds,
             first_index=args.first_index,
+            index_step=args.index_step,
         )
     except (OSError, ValueError, KeyError) as error:
         print(f"features.py: {error}", file=sys.stderr)

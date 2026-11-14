@@ -82,7 +82,7 @@ chance (`science_review.md` section 3).
 Record expected and observed values for each in `science_review.md`.
 
 Status 14 Nov: all six pass on practice images (`science_review.md` section 1; `pytest` in
-`analysis/`). Not yet run on NASA frames.
+`analysis/`). First run on NASA frames, for draft regions: `science_review.md` section 9.
 
 ## What we do not claim
 

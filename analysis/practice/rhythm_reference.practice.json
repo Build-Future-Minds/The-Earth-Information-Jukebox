@@ -31,8 +31,8 @@
     "long_fraction_at_alignment_0": 0.75,
     "long_fraction_at_alignment_1": 0.5,
     "voice": "earth",
-    "pitch": 60,
-    "dur": 0.1,
+    "pitch": 64,
+    "dur": 0.08,
     "vel": 0.8,
     "carries_data": [
       "position of the second pulse inside the beat"
@@ -366,8 +366,8 @@
       {
         "t": 0.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -379,8 +379,8 @@
       {
         "t": 0.5274,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -392,8 +392,8 @@
       {
         "t": 1.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -405,8 +405,8 @@
       {
         "t": 1.52765,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -418,8 +418,8 @@
       {
         "t": 2.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -431,8 +431,8 @@
       {
         "t": 2.527225,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -444,8 +444,8 @@
       {
         "t": 3.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -457,8 +457,8 @@
       {
         "t": 3.527275,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -470,8 +470,8 @@
       {
         "t": 4.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -483,8 +483,8 @@
       {
         "t": 4.527425,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -496,8 +496,8 @@
       {
         "t": 5.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -509,8 +509,8 @@
       {
         "t": 5.527425,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -522,8 +522,8 @@
       {
         "t": 6.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -535,8 +535,8 @@
       {
         "t": 6.5269,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -548,8 +548,8 @@
       {
         "t": 7.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -561,8 +561,8 @@
       {
         "t": 7.525725,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
@@ -576,8 +576,8 @@
       {
         "t": 0.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -589,8 +589,8 @@
       {
         "t": 0.735625,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -602,8 +602,8 @@
       {
         "t": 1.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -615,8 +615,8 @@
       {
         "t": 1.73825,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -628,8 +628,8 @@
       {
         "t": 2.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -641,8 +641,8 @@
       {
         "t": 2.73695,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -654,8 +654,8 @@
       {
         "t": 5.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -667,8 +667,8 @@
       {
         "t": 5.734875,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -680,8 +680,8 @@
       {
         "t": 6.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -693,8 +693,8 @@
       {
         "t": 6.73625,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -706,8 +706,8 @@
       {
         "t": 7.0,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
@@ -719,8 +719,8 @@
       {
         "t": 7.73135,
         "voice": "earth",
-        "pitch": 60,
-        "dur": 0.1,
+        "pitch": 64,
+        "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",

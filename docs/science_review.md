@@ -2,8 +2,9 @@
 
 Owner: Developer A. This records what the math engine was expected to do and what it did.
 
-**Every image used here is a TEST INPUT (synthetic), not NASA data.** Nothing has been measured on
-NASA frames yet. The tables between the `table:` markers are written by
+**Sections 1 to 7 use TEST INPUTS (synthetic images), not NASA data.** Section 9 holds the first
+measurements on NASA frames, for draft regions that are not approved yet. The tables between the
+`table:` markers are written by
 `analysis/run_experiments.py` from the numbers it just measured; do not edit them by hand. Re-run
 that script after changing any setting.
 
@@ -23,6 +24,8 @@ m², no smoothing. Derivations are in `math_notes.md`.
 - `pytest` in `analysis/` passes, and tests fail when the engine is deliberately broken (squared
   score, no mask margin, 0 instead of missing, drifting tempo, smoothing across a gap).
 - Ten limitations were found. They are listed in section 6 with their evidence.
+- On 30 NASA frames the draft regions are far apart (0.60 against 0.22 and 0.07) and steady from
+  frame to frame. Most of the Southern Ocean's score comes from the map projection (section 9).
 
 ## 1. Named test cases
 
@@ -356,7 +359,7 @@ the smoothed value restarts after the gap, and smoothing with α = 0.3 lags a fa
 | 4 | Small boxes inflate the score and make it scatter. Regions must be large and equal in size. | Crop table; chance-level table |
 | 5 | Near the edge threshold, dimmer lines score higher before going missing. | Contrast table |
 | 6 | The same pattern scores about ±0.02 differently depending on its angle to the pixel grid. | Rotation table |
-| 7 | An equirectangular map squeezes directions toward horizontal at high latitude. | Reasoned in `math_notes.md` section 1. **Not tested.** |
+| 7 | An equirectangular map squeezes directions toward horizontal at high latitude. | Reasoned in `math_notes.md` section 1. Rough estimate on NASA frames in section 9: Southern Ocean 0.60 as drawn, about 0.16 with the stretch undone. |
 | 8 | Camera smear and zoom change the score. | Camera-smear and zoom tables |
 | 9 | Strong noise is reported as a low score, not as missing. | Noise table, last column |
 | 10 | Bright lines count more than faint ones (weight m²). | Weighting table |
@@ -379,8 +382,85 @@ the smoothed value restarts after the gap, and smoothing with α = 0.3 lags a fa
 
 ## 8. Not done yet
 
-- No measurement on NASA frames. Thresholds are practice values and are not calibrated.
+- The regions are drafts. Developer A has not approved them, and `data/scene.json` does not exist.
+- The threshold (12) and minimum usable fraction (0.05) are still the practice values. They work
+  on the draft regions (section 9) but have not been frozen.
 - No listening test. We do not know how small an alignment difference people can hear.
-- Limitation 7 (map projection) is reasoned, not tested.
-- JPEG results are for synthetic line art only.
-- The fixed-camera check on the real frame set is Student A's open task.
+- The map-projection figure in section 9 is a rough estimate, not a re-projection of the frames.
+- JPEG results are for synthetic line art only. The NASA frames we use are TIFF.
+- Only 30 frames (about 5 model days) have been measured.
+
+## 9. First measurements on NASA frames (draft regions)
+
+Source: SVS 3912, `orig` 2048×1024 frames 23000 to 23116 in steps of 4 (30 frames, model time
+2007-03-25T12:00Z to 2007-03-30T11:42Z). Circles of radius 61 px from `assets/regions_draft.json`
+(Student A), plus one candidate added by Developer A. Mask = circle minus land. Default settings.
+Run on 2026-11-14 with `python explore_regions.py --map --also equatorial_pacific,271,504` in
+`analysis/`. These numbers describe the rendered image of ECCO2 model output.
+
+| Circle | Latitude | Alignment (mean of 30) | sd | Lowest to highest | Usable fraction | Beat split | With map stretch undone (rough) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `southern_ocean_streaks` (draft) | −56.4° | 0.601 | 0.013 | 0.578 to 0.623 | 0.208 | 60 / 40 | 0.162 |
+| `gulf_stream_offshore` (draft) | +32.3° | 0.217 | 0.015 | 0.196 to 0.243 | 0.372 | 70 / 30 | 0.071 |
+| `kuroshio_eddies` (draft) | +28.8° | 0.073 | 0.013 | 0.058 to 0.101 | 0.398 | 73 / 27 | 0.066 |
+| Equatorial Pacific, centre [271, 504] (candidate) | +1.4° | 0.671 | 0.011 | 0.652 to 0.689 | 0.380 | 58 / 42 | 0.671 |
+
+No frame was `missing` in any circle.
+
+**How far apart are the pairs?**
+
+| Pair | Mean gap | Smallest gap in any frame | Second pulse apart at a 1 s beat |
+| --- | --- | --- | --- |
+| Southern Ocean − Gulf Stream | 0.384 | 0.374 | 96 ms |
+| Southern Ocean − Kuroshio | 0.528 | 0.506 | 132 ms |
+| Equatorial Pacific − Gulf Stream | 0.454 | 0.412 | 113 ms |
+| Equatorial Pacific − Kuroshio | 0.598 | 0.551 | 149 ms |
+
+**What the settings change** (mean alignment)
+
+| Setting | Gulf Stream | Kuroshio | Southern Ocean | Equatorial Pacific |
+| --- | --- | --- | --- | --- |
+| Default | 0.217 | 0.073 | 0.601 | 0.671 |
+| Grayscale = luma | 0.239 | 0.073 | missing in all 30 frames | 0.754 |
+| Threshold 8 | 0.210 | 0.071 | 0.536 | 0.644 |
+| Threshold 20 | 0.246 | 0.079 | 0.749 (5 frames missing) | 0.764 |
+| No blur | 0.176 | 0.090 | 0.517 | 0.608 |
+| Weight m | 0.185 | 0.077 | 0.551 | 0.600 |
+
+**Circle radius** (mean alignment)
+
+| Radius | Gulf Stream | Kuroshio | Southern Ocean | Equatorial Pacific |
+| --- | --- | --- | --- | --- |
+| 40 px | 0.186 | 0.166 | 0.653 | 0.684 |
+| 61 px (draft) | 0.217 | 0.073 | 0.601 | 0.671 |
+| 90 px | 0.238 (27% land inside) | 0.184 | 0.622 | 0.601 |
+
+**The whole picture.** Scoring a radius-61 circle at every position that is at least 95% open
+water (540,263 positions): 5% of positions score below 0.147, the median is 0.332, 95% score
+below 0.603, and the highest is 0.676. The draft Southern Ocean circle is higher than 95% of
+positions; Kuroshio is higher than 1%; Gulf Stream is higher than 19%.
+
+**What this shows**
+
+1. The dim blue Southern Ocean lines are counted (usable fraction 0.21, minimum 0.05). With luma
+   grayscale they would be `missing` in every frame, so max(R, G, B) matters on real frames.
+2. The regions are well separated and steady. The smallest gap in any frame is 0.37, and each
+   circle moves by about 0.01 from frame to frame.
+3. **Most of the Southern Ocean's score comes from the map projection.** The map stretches
+   east–west distances by 1/cos(latitude), 1.8× at 56°S. Undoing that for the gradients takes
+   the score from 0.60 to about 0.16. This is a rough estimate: it treats latitude as constant
+   across the circle and ignores that blur and threshold act in pixels. The equatorial circle is
+   unaffected (0.67).
+4. The aligned circles depend on the threshold (Southern Ocean 0.54 to 0.75, Equatorial Pacific
+   0.64 to 0.76 for thresholds 8 to 20). The swirly circles barely move. The ordering and a gap
+   of at least 0.3 hold for every setting tried.
+5. The Kuroshio score depends on the radius (0.07 at 61 px, 0.17 and 0.18 at 40 and 90 px). The
+   radius must be fixed and the same for both regions.
+
+**Checks on this run**
+
+- Student A's camera check reproduced exactly: 0.58% and 0.32% of land pixels differ, mean land
+  change 1.29 and 0.23, both PASS.
+- The whole-picture map and the engine agree at the draft centres to 3 × 10⁻¹⁶.
+- `features.py` on a draft scene built from the same circles gives the same means to four
+  decimals, and its output passes the `features` and `scene` contract schemas.

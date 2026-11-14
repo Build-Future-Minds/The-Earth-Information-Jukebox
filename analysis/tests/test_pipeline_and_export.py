@@ -294,6 +294,25 @@ def test_command_applies_the_mask_file(tmp_path):
     assert right[0]["status"] == "missing" and "mask" in right[0]["reason"].lower()
 
 
+def test_command_reads_frame_files_numbered_in_steps(tmp_path):
+    """SVS 3912 frame files are numbered 23000, 23004, 23008, ... not 0, 1, 2."""
+    frames_dir = tmp_path / "frames"
+    frames_dir.mkdir()
+    for i, number in enumerate((23000, 23004, 23008)):
+        cv2.imwrite(str(frames_dir / f"TEST_INPUT.{number}.png"), two_box_frame(i))
+    scene = {
+        "is_mock": True,
+        "frames": {"width": 256, "height": 128, "count": 3, "pattern": "frames/TEST_INPUT.{index}.png"},
+        "regions": [{"id": "left", "name": "Left", "box_px": [0, 0, 128, 128], "mask": None, "description": "x"}],
+    }
+    scene_path = tmp_path / "scene.json"
+    scene_path.write_text(json.dumps(scene), encoding="utf-8")
+    document = features.run(scene_path, tmp_path / "f.json", root=tmp_path, first_index=23000, index_step=4)
+    assert [(s["frame"], s["status"]) for s in document["steps"]] == [(0, "ok"), (1, "ok"), (2, "ok")]
+    without_step = features.run(scene_path, tmp_path / "g.json", root=tmp_path, first_index=23000)
+    assert [s["status"] for s in without_step["steps"]] == ["ok", "missing", "missing"]
+
+
 def test_command_gives_the_same_file_twice(tmp_path):
     scene_path = write_scene(tmp_path)
     a, b = tmp_path / "a.json", tmp_path / "b.json"
