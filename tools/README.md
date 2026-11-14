@@ -24,6 +24,10 @@ python tools/build_listening_tasks.py fixtures/mock/features.mock.json --seed 42
 
 ### Practice game: "Which patch made this rhythm?" (real NASA image)
 
+Live: <https://build-future-minds.github.io/The-Earth-Information-Jukebox/tools/listening_game.html>
+(the quiz player is at `tools/listening_quiz_player.html` on the same site). The Pages workflow copies
+both pages and downloads the NASA still on every deploy. To run it locally instead:
+
 1. Download the NASA still (once; `assets/frames/` is git-ignored):
 
    ```
@@ -55,6 +59,17 @@ the patch that made the mystery sound. The mystery sound is a different take of 
 patches are 192 × 120 image pixels, shown 3 times larger (an earlier 96 × 60 crop shown 6 times
 larger was too blocky to read). The **Rounds** menu sets how far apart the two patches are (Easy by
 default; Mixed draws hard, medium and easy at random).
+
+**Two sounds at once and Groove lock:** pressing `Q`, `W` or `R` while a sound is playing adds the
+new sound on top instead of cutting the first one off, so two patches (or a patch and the mystery
+sound) can be heard together. At most two play at once: a third replaces the oldest, and pressing
+the same sound again restarts just that one. `P` (new round) and `Esc` still stop everything. With
+the **Groove lock** switch on (the default), the joining sound waits for the next beat of the one
+already playing and keeps its speed, so both pulse together; off, it starts the moment you press.
+The game still plays only one sound by itself; layering happens only when the player asks for it. A
+limiter keeps two sounds from clipping (one sound at the default volume is unchanged). For a real
+listening test, note that layering the mystery sound with its own patch makes the two line up exactly
+in Rhythm only mode, which gives the answer away by ear.
 
 **Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5) at one fixed
 length, so only the spacing of the pulses carries the answer. That is the team's actual rule
