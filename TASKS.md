@@ -74,7 +74,7 @@ Each person shows one input, one working output and one check. Practice data is 
 One approved NASA sample moves through preparation, measurement, sound and explanation.
 
 - [x] **A** Approve source, section and two regions — *SVS 3912, frames 23000–23116, Equatorial Pacific and Kuroshio (14 Nov)*
-- [ ] **SA** Approved images, exclusion masks, previews, two still crops for the fallback — *`data/preview.jpg` and `data/masks/` done; still crops to do*
+- [x] **SA** Approved images, exclusion masks, previews, two still crops for the fallback — *`data/preview.jpg`, `data/masks/` and `docs/submission/stills/` (Kuroshio and Equatorial Pacific, frame 23000, with credit) done; needs review*
 - [x] **SA** `analysis/test_prepare_scene.py`: a good input, a bad file (actionable error), an unusable frame (kept in place, marked missing with a reason) — *11 tests pass; needs review*
 - [x] **A** All six test cases in `mapping_spec.md` pass; results in `science_review.md` — *practice images; on `a/math-engine`*
 - [ ] **A + SA** Checked measurements for both regions — *`data/features.json`: means 0.672 and 0.072, 30 of 30 frames ok, timestamps match NASA's dates file (`science_review.md` section 10); Student A still to go through them with Dev A*
@@ -89,7 +89,7 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 
 - [x] **B** Speed and volume controls; setup instructions; Student A tries them from a clean copy — *Student A: npm ci, test, build, dev and preview all worked from a clean clone*
 - [ ] **SB** Keyboard and screen-reader checks logged in `docs/ACCESSIBILITY_LOG.md`
-- [ ] **SA** 7-slide backup deck drafted from `docs/submission/slides_7.md`
+- [x] **SA** 7-slide backup deck drafted from `docs/submission/slides_7.md` — *slides 1, 2, 3 and 7 drafted; 4, 5, 6 wait on the rule wording (Dev A), app screenshot (Dev B) and test counts (Student B); team name from Mr. E*
 - [ ] **SB** Detailed description drafted in `docs/submission/project_page_draft.md`
 - [x] **B** After the core passes: optional keyboard melody with its own volume. MIDI only after that. — *melody in PR #4, needs review; MIDI not built*
 
