@@ -24,3 +24,6 @@ Thumbs.db
 
 # Local recordings (upload final demo elsewhere)
 recordings/
+
+# Generated listening quizzes (make them with tools/build_listening_tasks.py)
+listening_tasks*.json
