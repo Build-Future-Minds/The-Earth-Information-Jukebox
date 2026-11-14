@@ -8,4 +8,6 @@ export default defineConfig({
   plugins: [react()],
   // The app imports the shared fixtures and data from the repo root (../fixtures, ../data).
   server: { fs: { allow: ['..'] } },
+  // Two pages: the app (index.html) and Student A's globe prototype (globe.html, see src/globe/README.md).
+  build: { rollupOptions: { input: { main: 'index.html', globe: 'globe.html' } } },
 });
