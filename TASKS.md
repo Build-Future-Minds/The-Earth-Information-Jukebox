@@ -1,6 +1,7 @@
 # Task board
 
-Roles: **A** = Developer A (Mr. E), **B** = Developer B, **SA** = Student A, **SB** = Student B.
+Roles: **A** = Developer A (Mr. E), **B** = Developer B, **SA** = Student A, **SB** = Student B,
+**SC** = Student C (submission checks and rules).
 Hard deadline: **Sunday 15 Nov, 11:59 PM local**. Target submit: **Sunday 9:00 PM**.
 The three checkpoints are the ones in the Team Briefing. Finish standard for every task:
 **it runs, the checks have real evidence, a teammate reviewed it, the owner can explain it.**
@@ -36,10 +37,15 @@ real NASA material, and Dev B checks it in the browser and records the backup at
 its commits are also in Dev A's PR). Student B's tools are committed on Student B's computer but
 not pushed.
 
+**Student C (joined 14 Nov):** a submission kit (`.docx`), a five-sentence summary template and
+`check_submission.py` with 2 passing tests, all on Student C's computer and not in the repo yet.
+The kit calls the project "Interstellar Sonata"; the project is **Earth Sonata: Play the Planet**.
+The repo stays the single source of truth: final wording goes into the repo files, not the kit.
+
 ## Before Checkpoint 1
 
 - [x] **B** Create public repo, push this kit, enable GitHub Pages — PR #1
-- [ ] **A** Confirm event requirements on the live submission form and legal page; fill the "unverified" list in `docs/SUBMISSION_CHECKLIST.md` — *not started; all 7 boxes empty*
+- [ ] **A** Confirm event requirements on the live submission form and legal page; fill the "unverified" list in `docs/SUBMISSION_CHECKLIST.md` — *not started; all 7 boxes empty. Student C now collects the evidence (Sat 6 PM); Dev A confirms and ticks*
 - [ ] **All** Read the Team Briefing together; agree the shared input/output format in `docs/CONTRACT.md`
 
 ## Checkpoint 1 — Show your piece (Sat 1:00 PM)
@@ -59,6 +65,9 @@ Each person shows one input, one working output and one check. Practice data is 
 - [x] **SA** Worksheet parts 1–3 in `docs/submission/student_a_worksheet.md`: NASA data, references, tools — *filled; unknowns marked NOT CHECKED YET; needs review*
 - [ ] **SB** Worksheet part 1 in `docs/submission/student_b_worksheet.md`: high-level summary
 - [ ] **SB** 30-second script draft in `docs/submission/video_30s.md` (due 9 PM)
+- [ ] **SC** Before the first commit: Git name "Student C" and a GitHub no-reply email. The repo is public; no real names
+- [ ] **SC** Project name in the submission kit: "Interstellar Sonata" → "Earth Sonata: Play the Planet" (or tell Dev A where the other name came from)
+- [ ] **SC** The 7 "Still unverified" rules in `docs/SUBMISSION_CHECKLIST.md`: for each, the link, the exact sentence that answers it and the date checked. Dev A confirms and ticks the boxes
 
 ## Checkpoint 2 — Connect it (Sat 9:00 PM)
 
@@ -73,6 +82,8 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 - [ ] **SB** Region, replay, stop and explanation controls, reviewed with Dev B
 - [ ] **SB** Listening questions exclude ties, weak differences and missing information — *built and tested on practice cases, not pushed*
 - [ ] **B** Record a backup capture of the working app with its actual sound
+- [ ] **SC** `tools/check_submission.py` and its tests on branch `sc/submission-checker`. Checks `docs/submission/*.md`, `docs/SUBMISSION_CHECKLIST.md`, `AI_USE.md` and `docs/ACCESSIBILITY_LOG.md` for the repo's real markers: `____`, `NOT CHECKED YET`, `Status: draft`, unticked `- [ ]`. A test proves it skips the "Replace every `____`" instruction lines. First "still blank" list, file by file, posted to the team — *built with 2 passing tests on Student C's computer; not yet run against the repo*
+- [ ] **SC** Kit's draft form answers compared with `docs/submission/project_page_draft.md`; suggestions sent to each field's owner, not written over their sections (summary template and storyboard → Student B)
 
 ## Sunday morning (10:00 AM)
 
@@ -89,6 +100,7 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 - [ ] **A** Review all scientific wording in the app and the submission drafts
 - [ ] **SA** NASA data, tools: final
 - [ ] **SB** Summary and testing paragraph with real counts: final
+- [ ] **SC** Run `check_submission.py` at 12 PM; post what is still blank and whose it is
 
 ## Submit (Sun 2:00 PM → 9:00 PM)
 
@@ -96,6 +108,8 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 - [ ] **SB** Captioned 30-second demo and transcript from Dev B's recording (Sun 5 PM)
 - [ ] **SA** References and slide deck final (Sun 4 PM)
 - [ ] **All** Own line in `AI_USE.md` and own contribution line (Sun 4 PM)
+- [ ] **SC** Collect everyone's AI-use and contribution lines; check each uses a role, not a name (Sun 4 PM)
+- [ ] **SC** Run `check_submission.py` again; post what is still blank (Sun 6 PM)
 - [ ] **B** Upload demo to a public link; local fallback ready
 - [ ] **A** Review every draft; paste into the form
 - [ ] **SA** Open every link signed out and on a phone (Sun 8 PM)
