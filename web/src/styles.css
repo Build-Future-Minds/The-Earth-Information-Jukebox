@@ -54,18 +54,18 @@ h2 { font-size: 1.15rem; margin: 0 0 0.5rem; }
 .frame-placeholder { fill: var(--panel); }
 /* Boxes and labels sit on top of a busy image: light strokes with a dark halo stay readable on any background. */
 .box { filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.9)); }
-.box rect { fill: none; stroke: #ffffff; stroke-width: 5; stroke-dasharray: 16 10; }
+.box circle { fill: none; stroke: #ffffff; stroke-width: 5; stroke-dasharray: 16 10; }
 .box text {
   fill: #ffffff; font-size: 40px; font-weight: 700;
   paint-order: stroke; stroke: rgba(0, 0, 0, 0.85); stroke-width: 8px; stroke-linejoin: round;
 }
-.box.active rect { stroke: var(--box); stroke-width: 10; stroke-dasharray: none; }
+.box.active circle { stroke: var(--box); stroke-width: 10; stroke-dasharray: none; }
 .box.active text { fill: var(--box); }
 /* Practice data has no image: plain outlines on the empty panel. */
 .scene.no-image .box { filter: none; }
-.scene.no-image .box rect { stroke: var(--muted); }
+.scene.no-image .box circle { stroke: var(--muted); }
 .scene.no-image .box text { fill: var(--muted); stroke: none; }
-.scene.no-image .box.active rect { stroke: var(--box); }
+.scene.no-image .box.active circle { stroke: var(--box); }
 .scene.no-image .box.active text { fill: var(--box); }
 figcaption { margin-top: 8px; }
 .status { font-weight: 600; }
@@ -102,3 +102,19 @@ select, input { font: inherit; }
 }
 footer { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 16px; font-size: 0.95rem; }
 a { color: var(--accent); }
+.melody { margin: 24px 0; display: grid; gap: 10px; }
+.melody h2, .melody p { margin: 0; }
+.pad {
+  border: 2px dashed var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+  cursor: pointer;
+  background: var(--panel);
+}
+.pad.active { border-style: solid; border-color: var(--accent); }
+.pad-hint { color: var(--muted); }
+.pad-keys { display: flex; flex-wrap: wrap; gap: 8px; }
+.pad-keys kbd { touch-action: none; user-select: none; cursor: pointer; font-size: 1.1rem; min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; margin: 0; }
+.pad-keys kbd.down { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }

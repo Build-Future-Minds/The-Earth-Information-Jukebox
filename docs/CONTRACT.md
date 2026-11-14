@@ -13,8 +13,13 @@ NASA frames ─(Student A: prepare_scene.py)─► scene.json + masks + crops
 ## 1. `scene.json` — what we are looking at (Student A writes)
 
 Source (SVS ID, URL, title, exact credit, data kind, dates, limitations), frame list with the
-model timestamp of each frame, the legend, and two regions: `id`, spoken `name`, pixel box
-`[x, y, width, height]`, mask file, one-line description.
+model timestamp of each frame, the legend, and two regions: `id`, spoken `name`, a **circle**
+(`center_px` `[x, y]` and `radius_px`), its bounding square `box_px` `[cx − r, cy − r, 2r, 2r]`,
+mask file, one-line description.
+
+All regions are circles of the **same radius** (team decision, 14 Nov; schema 0.2). The engine
+crops to `box_px` and measures inside the mask; the app draws the circle. The app's tests check
+that `box_px` matches the circle and that the radii are equal.
 
 ## 2. `features.json` — what we measured (Developer A's code writes)
 

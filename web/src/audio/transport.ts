@@ -18,7 +18,7 @@ const BASE_BPM = 120;
 
 type PartItem =
   | { kind: 'step'; step: TrackStep }
-  | { kind: 'note'; pitch: number; dur: number; vel: number; region: string; longFraction: number; pulse: number };
+  | { kind: 'note'; pitch: number; dur: number; vel: number; region: string; longFraction: number; pulse: number; trackTime: number };
 
 /** Development-only record of every Earth note handed to the synth, with its exact audio time.
  *  Used by browser tests to check the real sound (not just the screen). Absent in production builds. */
@@ -28,6 +28,8 @@ export interface NoteLogEntry {
   longFraction: number;
   /** 0 = first pulse of the beat, 1 = second */
   pulse: number;
+  /** Seconds into the region's loop at speed 1 (from earthVoice): lets tests compare with the schedule */
+  trackTime: number;
 }
 declare global {
   interface Window {
@@ -163,13 +165,14 @@ export class Transport {
           region: ev.why!.region,
           longFraction: ev.why!.long_fraction,
           pulse,
+          trackTime: ev.t,
         });
       }
     }
     const part = new Tone.Part((time, item) => {
       if (item.kind === 'note') {
         this.synth?.triggerAttackRelease(Tone.Frequency(item.pitch, 'midi').toFrequency(), item.dur, time, item.vel);
-        window.__earthNotes?.push({ audioTime: time, region: item.region, longFraction: item.longFraction, pulse: item.pulse });
+        window.__earthNotes?.push({ audioTime: time, region: item.region, longFraction: item.longFraction, pulse: item.pulse, trackTime: item.trackTime });
       } else {
         // Draw runs the callback when the audio actually reaches `time`, so the screen
         // (status, explanation) follows the sound that is really playing.

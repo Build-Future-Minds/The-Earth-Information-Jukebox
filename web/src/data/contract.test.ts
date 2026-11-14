@@ -28,6 +28,23 @@ describe('data matches the contract', () => {
       const ids = new Set(scene.regions.map((r) => r.id));
       expect(features.steps.filter((s) => !ids.has(s.region))).toEqual([]);
     });
+    it(`${name} each region's box_px is the bounding square of its circle`, () => {
+      for (const r of scene.regions) {
+        const [cx, cy] = r.center_px;
+        const d = r.radius_px;
+        expect(r.box_px, r.id).toEqual([cx - d, cy - d, 2 * d, 2 * d]);
+      }
+    });
+    it(`${name} all regions have the same radius (fair comparison: docs/mapping_spec.md)`, () => {
+      expect(new Set(scene.regions.map((r) => r.radius_px)).size).toBe(1);
+    });
+    it(`${name} every circle fits inside the frame`, () => {
+      for (const r of scene.regions) {
+        const [cx, cy] = r.center_px;
+        expect(cx - r.radius_px >= 0 && cy - r.radius_px >= 0, r.id).toBe(true);
+        expect(cx + r.radius_px <= scene.frames.width && cy + r.radius_px <= scene.frames.height, r.id).toBe(true);
+      }
+    });
     it(`${name} every scene region has steps to play`, () => {
       const used = new Set(features.steps.map((s) => s.region));
       expect(scene.regions.map((r) => r.id).filter((id) => !used.has(id))).toEqual([]);
