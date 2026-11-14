@@ -7,7 +7,7 @@ browser. No server, no cloud service, works with Wi-Fi off once installed.
 
 ## Run it (from a clean copy)
 
-You need **Node.js 20 or newer** (`node -v` to check; install from https://nodejs.org).
+You need **Node.js 22.12 or newer** (the LTS from https://nodejs.org works; `node -v` to check).
 
 ```bash
 git clone https://github.com/Build-Future-Minds/The-Earth-Information-Jukebox.git
@@ -56,4 +56,4 @@ Every push to `main` runs the tests, builds, and publishes to GitHub Pages
 
 - **No sound:** check the system volume and the Earth volume slider. Click the page once;
   browsers block audio until you interact.
-- **`npm ci` fails:** check `node -v` is 20 or newer, then delete `node_modules` and retry.
+- **`npm ci` fails:** check `node -v` is 22.12 or newer, then delete `node_modules` and retry.
