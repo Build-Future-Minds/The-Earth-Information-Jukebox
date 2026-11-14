@@ -1,45 +1,62 @@
-// Optional melody: a separate "user" voice the visitor plays from the keyboard.
-// Keys only play while this pad has focus, so letter keys stay free for screen-reader navigation.
-import { useState } from 'react';
-import { MELODY_KEYS } from '../audio/userVoice';
+// Optional melody: a separate "user" voice. Play it with the computer keyboard (while this pad
+// has focus) or by pressing the on-screen keys with a mouse or touch. Letter keys only play while
+// the pad has focus, so they stay free for screen readers and speech input (docs/DECISIONS.md D8).
+// Inputs send MIDI note numbers, so a MIDI piano can later call the same onNoteOn / onNoteOff.
+import { useEffect, useState } from 'react';
+import { KEYBOARD_NOTES } from '../audio/userVoice';
 
 interface Props {
   volumeDb: number;
-  onNoteOn: (key: string) => void;
-  onNoteOff: (key: string) => void;
+  onNoteOn: (note: number) => void;
+  onNoteOff: (note: number) => void;
   onAllOff: () => void;
   onVolume: (db: number) => void;
 }
 
-const KEYS = Object.keys(MELODY_KEYS);
+const KEYS = Object.keys(KEYBOARD_NOTES);
 
 export function MelodyPad(p: Props) {
   const [down, setDown] = useState<Set<string>>(new Set());
   const [active, setActive] = useState(false);
+  const { onAllOff } = p;
 
   const press = (k: string) => {
-    if (!(k in MELODY_KEYS)) return false;
+    const note = KEYBOARD_NOTES[k];
+    if (note === undefined) return false;
     setDown((s) => new Set(s).add(k));
-    p.onNoteOn(k);
+    p.onNoteOn(note);
     return true;
   };
   const release = (k: string) => {
-    if (!(k in MELODY_KEYS)) return false;
+    const note = KEYBOARD_NOTES[k];
+    if (note === undefined) return false;
     setDown((s) => {
       const n = new Set(s);
       n.delete(k);
       return n;
     });
-    p.onNoteOff(k);
+    p.onNoteOff(note);
     return true;
   };
+  const releaseAll = () => {
+    setDown(new Set());
+    onAllOff();
+  };
+
+  // Switching windows while holding a key never delivers the key-up: release everything.
+  useEffect(() => {
+    const onWindowBlur = () => {
+      setDown(new Set());
+      onAllOff();
+    };
+    window.addEventListener('blur', onWindowBlur);
+    return () => window.removeEventListener('blur', onWindowBlur);
+  }, [onAllOff]);
 
   return (
     <section className="melody" aria-labelledby="melody-heading">
       <h2 id="melody-heading">Add a melody (optional)</h2>
-      <p className="muted">
-        Your melody is a separate voice. It never changes the Earth rhythm.
-      </p>
+      <p className="muted">Your melody is a separate voice. It never changes the Earth rhythm.</p>
       <div
         className={active ? 'pad active' : 'pad'}
         tabIndex={0}
@@ -49,8 +66,7 @@ export function MelodyPad(p: Props) {
         onFocus={() => setActive(true)}
         onBlur={() => {
           setActive(false);
-          setDown(new Set());
-          p.onAllOff();
+          releaseAll();
         }}
         onKeyDown={(e) => {
           if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -60,10 +76,24 @@ export function MelodyPad(p: Props) {
           if (release(e.key.toLowerCase())) e.preventDefault();
         }}
       >
-        <span className="pad-hint">{active ? 'Playing: press the keys below' : 'Tab or click here, then press the keys'}</span>
+        <span className="pad-hint">
+          {active ? 'Playing: press the keys below, or click them' : 'Tab here and press the keys, or click a key'}
+        </span>
         <span className="pad-keys" aria-hidden="true">
           {KEYS.map((k) => (
-            <kbd key={k} className={down.has(k) ? 'down' : ''}>{k.toUpperCase()}</kbd>
+            <kbd
+              key={k}
+              data-key={k}
+              className={down.has(k) ? 'down' : ''}
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture?.(e.pointerId);
+                press(k);
+              }}
+              onPointerUp={() => release(k)}
+              onPointerCancel={() => release(k)}
+            >
+              {k.toUpperCase()}
+            </kbd>
           ))}
         </span>
       </div>

@@ -1,12 +1,16 @@
-// User voice: a melody the visitor plays live from the computer keyboard.
+// User voice: a melody the visitor plays live.
 // Completely separate from the Earth voice: its own synth and volume, played immediately
 // (not on the Transport), so it can never move, add or remove an Earth note (docs/CONTRACT.md).
+//
+// The API takes MIDI note numbers, not keys, so every input feeds the same two calls:
+// the computer keyboard (MelodyPad), clicks on the on-screen keys, and later a MIDI piano
+// (Web MIDI note-on/note-off → noteOn(note, velocity / 127) / noteOff(note)).
 
 import * as Tone from 'tone';
 
-/** Home-row keys → MIDI pitches. C major pentatonic from C5, an octave above the Earth pulse (E4),
+/** Home-row keys → MIDI notes. C major pentatonic from C5, an octave above the Earth pulse (E4),
  *  so any combination sounds consonant and the two voices stay easy to tell apart. Design choice. */
-export const MELODY_KEYS: Record<string, number> = {
+export const KEYBOARD_NOTES: Record<string, number> = {
   a: 72, // C5
   s: 74, // D5
   d: 76, // E5
@@ -17,25 +21,31 @@ export const MELODY_KEYS: Record<string, number> = {
   k: 88, // E6
 };
 
+const hz = (note: number) => Tone.Frequency(note, 'midi').toFrequency();
+
 export class UserVoice {
   private synth: Tone.PolySynth | null = null;
   private volume: Tone.Volume | null = null;
   private volumeDb = -10;
-  private held = new Set<string>();
+  private initP: Promise<void> | null = null;
+  /** Notes currently held down, by MIDI number. */
+  private held = new Set<number>();
 
-  /** Call from a key press: browsers only allow audio after a user gesture. */
-  async noteOn(key: string): Promise<void> {
-    const pitch = MELODY_KEYS[key];
-    if (pitch === undefined || this.held.has(key)) return; // ignore key auto-repeat
-    this.held.add(key);
-    if (!this.synth) await this.init();
-    this.synth!.triggerAttack(Tone.Frequency(pitch, 'midi').toFrequency(), Tone.immediate(), 0.7);
+  /** Start a note. Call from a user gesture: browsers only allow audio after one. */
+  async noteOn(note: number, velocity = 0.7): Promise<void> {
+    if (!Number.isInteger(note) || note < 0 || note > 127) return;
+    if (this.held.has(note)) return; // key auto-repeat, or a second input already holding it
+    this.held.add(note);
+    this.initP ??= this.init();
+    await this.initP;
+    // The note may have been released while audio was starting (a quick first tap): don't start it.
+    if (!this.held.has(note)) return;
+    this.synth!.triggerAttack(hz(note), Tone.immediate(), velocity);
   }
 
-  noteOff(key: string): void {
-    const pitch = MELODY_KEYS[key];
-    if (pitch === undefined || !this.held.delete(key)) return;
-    this.synth?.triggerRelease(Tone.Frequency(pitch, 'midi').toFrequency(), Tone.immediate());
+  noteOff(note: number): void {
+    if (!this.held.delete(note)) return;
+    this.synth?.triggerRelease(hz(note), Tone.immediate());
   }
 
   /** Stop every melody note (Stop button, Esc, or the pad losing focus). */

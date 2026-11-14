@@ -48,6 +48,10 @@ export function App() {
     setSounding(null);
   }, []);
   const replay = useCallback(() => void transport.current?.replay(), []);
+  // Melody inputs (keyboard, on-screen keys, later MIDI) all send MIDI note numbers.
+  const onMelodyNoteOn = useCallback((note: number) => void melody.current?.noteOn(note), []);
+  const onMelodyNoteOff = useCallback((note: number) => melody.current?.noteOff(note), []);
+  const onMelodyAllOff = useCallback(() => melody.current?.allOff(), []);
 
   // Keyboard shortcuts on top of the normal Tab / Enter / Space controls.
   useEffect(() => {
@@ -137,9 +141,9 @@ export function App() {
 
         <MelodyPad
           volumeDb={melodyDb}
-          onNoteOn={(k) => void melody.current?.noteOn(k)}
-          onNoteOff={(k) => melody.current?.noteOff(k)}
-          onAllOff={() => melody.current?.allOff()}
+          onNoteOn={onMelodyNoteOn}
+          onNoteOff={onMelodyNoteOff}
+          onAllOff={onMelodyAllOff}
           onVolume={(db) => {
             setMelodyDb(db);
             melody.current?.setVolume(db);
