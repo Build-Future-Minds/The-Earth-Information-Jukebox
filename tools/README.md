@@ -71,6 +71,14 @@ limiter keeps two sounds from clipping (one sound at the default volume is uncha
 listening test, note that layering the mystery sound with its own patch makes the two line up exactly
 in Rhythm only mode, which gives the answer away by ear.
 
+**Musical sound** (on by default): notes play as a soft, piano-like tone (a round fundamental plus a
+quiet octave through a filter that closes as the note rings) with a little room echo, over a quiet
+held C chord (C2, C3, G3, E4). The chord is the same for every patch, has no rhythm, and is shared
+when two sounds play, so it carries no answer; the pentatonic notes all sit in its key. Timing,
+pitch and note length still come from the patch exactly as before (checked by rendering the same
+patch both ways: the notes start at the same moments). Switch it off for the plain test tone, the
+strict setting for a real listening test.
+
 **Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5) at one fixed
 length, so only the spacing of the pulses carries the answer. That is the team's actual rule
 (`docs/mapping_spec.md`) and the setting for the real test. The speed control at 0.5× gives a
