@@ -27,3 +27,6 @@ recordings/
 
 # Generated listening quizzes (make them with tools/build_listening_tasks.py)
 listening_tasks*.json
+
+# Browser test artefacts
+.playwright-mcp/
