@@ -9,6 +9,7 @@ import { BeatTrack } from './components/BeatTrack';
 import { LookingAt } from './components/LookingAt';
 import { RegionCloseups } from './components/RegionCloseups';
 import { RhythmsPlot } from './components/RhythmsPlot';
+import { PracticeGame } from './components/PracticeGame';
 import { ExploreControls, regionLabel } from './components/ExploreControls';
 import { RhythmExplanation, stepAtSameMoment } from './components/RhythmExplanation';
 import { SceneView } from './components/SceneView';
@@ -188,6 +189,7 @@ export function App() {
             onListen={listenTo}
           />
           <RhythmsPlot features={features} regions={scene.regions} activeRegionId={regionId} />
+          <PracticeGame />
 
           <MelodyPad
             heldNotes={heldNotes}

@@ -63,3 +63,13 @@ test('the explainer and close-ups are present; Listen picks a region and plays i
   await expect(page.getByRole('status')).toHaveText(/Playing Region B/);
   await expect(page.getByRole('button', { name: 'Listening to Region B' })).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('the landing page links to Student B\'s listening game, labelled as a separate practice tool', async ({ page }) => {
+  const section = page.getByRole('region', { name: 'Practice: test your ear' });
+  await expect(section).toBeVisible();
+  await expect(section).toContainText('A separate practice tool');
+  const game = section.getByRole('link', { name: /Open the listening game/ });
+  await expect(game).toHaveAttribute('href', 'tools/listening_game.html');
+  await expect(game).toHaveAttribute('target', '_blank');
+  await expect(section.getByRole('link', { name: 'quiz player' })).toHaveAttribute('href', 'tools/listening_quiz_player.html');
+});
