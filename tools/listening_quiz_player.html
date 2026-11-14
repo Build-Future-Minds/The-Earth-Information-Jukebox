@@ -175,12 +175,13 @@
     sources.push(osc);
   }
 
-  // Short gap then long gap, repeated. Returns the time the rhythm ends.
+  // Long gap then short gap, repeated, the same order as the app (second pulse at 75 % of the
+  // beat when alignment is 0). The team calls this pattern "short–long". Returns the end time.
   function scheduleRhythm(r, start) {
     let t = start;
     for (let beat = 0; beat < BEATS_PER_RHYTHM; beat++) {
-      pulse(t); t += r.short_gap_s;
       pulse(t); t += r.long_gap_s;
+      pulse(t); t += r.short_gap_s;
     }
     return t;
   }

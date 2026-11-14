@@ -52,9 +52,11 @@ numbers that made it.
 - Two-choice question: hear one rhythm, pick which of two patches made it. Rounds are random.
 - Pairs that are tied, too close to hear, or missing are left out of scored questions.
 - Missing information is never turned into a rhythm or treated as alignment 0.
-- In the team's rule, pitch, loudness and tempo carry no data; only pulse spacing does. Any extra
-  cue (for example a pitch hint) is a labelled practice aid, scored separately, and not part of the
-  team's rule unless Developer A changes `docs/mapping_spec.md`.
+- In the team's rule, pitch, loudness and tempo carry no data; only pulse spacing does. The
+  listening game (Student B's choice, after testing showed spacing alone was too hard to hear) also
+  maps alignment to pitch and to note length (lined-up patches hold their notes so the sound keeps
+  going), always on and labelled as the game's choice. It becomes part of the
+  team's rule only if Developer A changes `docs/mapping_spec.md`.
 - No sound before the user presses a control; Stop silences everything.
 - Undecided: final alignment end points and minimum audible difference (Developer A).
 
@@ -71,8 +73,8 @@ numbers that made it.
 ## Evidence on Hand
 
 - NASA still `flat_global_ecco2_2028x1024.25000.jpg` (model time 2007-06-19T12:00Z), colour bar
-  `sst_ecco2_cbar.png`, and `flat_ecco2_dates.txt` in `earth-sonata/assets/frames/svs3912/`.
-- Practice data: `earth-sonata/fixtures/mock/` (synthetic, labelled MOCK).
+  `sst_ecco2_cbar.png`, and `flat_ecco2_dates.txt` in `assets/frames/svs3912/`.
+- Practice data: `fixtures/mock/` (synthetic, labelled MOCK).
 - Practice measurement on the real frame: most ocean patches score about 0.15–0.60 alignment.
 - No tester results yet. Never invent counts, testimonials or accessibility claims.
 

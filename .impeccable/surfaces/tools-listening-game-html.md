@@ -1,19 +1,19 @@
 ---
 version: 1
-slug: "earth-sonata-tools-listening-game-html"
-primary_target: "earth-sonata/tools/listening_game.html"
+slug: "tools-listening-game-html"
+primary_target: "tools/listening_game.html"
 related_targets: []
 ---
 
 # Listening game surface brief
 
-Scope: `earth-sonata/tools/listening_game.html`, the practice listening game. Mode: Operate.
+Scope: `tools/listening_game.html`, the practice listening game. Mode: Operate.
 Audience: testers in Student B's sessions, playing alone, open-ended rounds; some low-vision or blind.
 Task: hear one rhythm, pick which of two NASA ocean patches made it (keys 1/2), then see why.
 Must keep: keys 1 / 2 / P / R / Esc, world map with numbered boxes, rhythm fingerprint, score by difference.
-Sound: two-pitch pulse (low on the beat, high on the second pulse, same for every patch; carries no
-data); optional pitch hint (pitch rises with alignment), off by default, labelled as not part of the
-team rule, scored separately.
+Sound: 12 beats; pitch follows alignment, always on (user's decision): one of 11 C-pentatonic notes
+C4 to C6, second pulse a fifth above; note length also follows alignment (held 12 % to 95 % of each gap). Labelled in the page as the game's choice; the team rule keeps
+pitch fixed until Dev A decides.
 Unresolved: final alignment end points and minimum audible difference (Dev A).
 
 ## Direction contract
@@ -33,7 +33,7 @@ then sees the answer drawn: the weights of the two numerals and one shared plot 
 They leave knowing that lined-up streaks sound even and swirls sound short then long.
 
 FIRST VIEWPORT: Left rail 400px: title, NASA map with boxes 1 and 2, credit, New round / Replay /
-Stop, Speed, Volume and Pitch hint sliders with readouts, score and by-difference table, Reset score
+Stop, Speed and Volume sliders with readouts, a Pitch line, score and by-difference table, Reset score
 set apart at the foot. Main: status line; two equal patch columns, each a crop with a giant numeral
 (1, 2) overlapping its lower edge and a full-width pick button keyed 1 or 2; under them one shared
 plot with both rhythms on a single time axis. Primary action: the two pick buttons.

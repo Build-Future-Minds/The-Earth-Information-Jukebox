@@ -21,11 +21,14 @@
 
   Sound: the rhythm rule and timing of Dev B's app (web/src/audio/earthVoice.ts): beat 0.5 s at
   speed 1, pulses at 0 and long_fraction × beat, long_fraction = 0.75 − 0.25 × A.
-  Each beat is a low pulse then a high pulse; those two pitches are the same for every patch and
-  carry no data. The optional pitch hint raises both pitches with alignment. It is a practice aid,
-  not part of the team's rule, and its rounds are scored separately.
+  Pitch (this game's choice, Student B; the team rule in docs/mapping_spec.md keeps pitch fixed
+  until Dev A decides): alignment, stretched across this image's measured range, picks a base note
+  from E3 to C6 on a C pentatonic scale (C3 to C7). The second pulse of each beat sits two scale
+  steps higher. Swirly patches jump up to 4 steps away from the base on each note and are held for
+  a random 8 to 58 % of the gap; lined-up patches stay on the base note and are held for 95 %.
+  The jumps are seeded by the patch position, so a patch always sounds the same. 10 beats.
 
-  Run from the earth-sonata folder:  python -m http.server 8000 --bind 127.0.0.1
+  Run from the repository folder:  python -m http.server 8000 --bind 127.0.0.1
   then open http://localhost:8000/tools/listening_game.html
 -->
 <style>
@@ -63,7 +66,7 @@
     .rail-bottom { border-top: 1px solid var(--rule); padding-top: 24px; }
   }
   h1 { font-size: 1.9rem; font-weight: 750; line-height: 1.1; letter-spacing: -0.015em; margin: 0; }
-  .lede { margin: 8px 0 0; color: var(--ink-2); font-size: 1rem; }
+  .lede { margin: 8px 0 0; color: var(--ink-2); font-size: 1rem; text-wrap: pretty; }
   .map { position: relative; margin: 0; background: var(--well); border-radius: 4px; overflow: hidden; }
   .map img { display: block; width: 100%; height: auto; }
   .box { position: absolute; border: 2px solid #fff; outline: 2px solid #000; }
@@ -99,7 +102,19 @@
   .switch { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; }
   .switch input { width: 22px; height: 22px; accent-color: var(--signal); margin: 0; }
   .switch-state { margin-left: auto; font: 400 0.9rem var(--mono); color: var(--ink-2); }
+  .axis .switch { justify-content: flex-start; }
   .hint-note { font-size: 0.85rem; color: var(--ink-2); margin: 0; }
+  select { font: 600 1rem var(--sans); min-height: 44px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 4px;
+           background: var(--paper); color: var(--ink); width: 100%; }
+  .hear { width: 100%; justify-content: space-between; margin-bottom: 10px; border-color: var(--ink-2); font-weight: 600; }
+  .intro { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: flex-start; max-width: 78ch;
+           border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 14px 0; }
+  .intro > div:first-child { flex: 1 1 28ch; min-width: 0; }
+  .intro p { margin: 0 0 8px; color: var(--ink-2); font-size: 0.95rem; }
+  .intro p:last-child { margin-bottom: 0; }
+  .key { display: flex; gap: 14px; }
+  .key figure { margin: 0; display: grid; gap: 4px; font-size: 0.8rem; color: var(--ink-2); }
+  .key svg { display: block; width: 150px; height: 64px; background: var(--well); border-radius: 4px; }
 
   .score-head { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px solid var(--rule); padding-top: 18px; }
   .score-head h2 { font-size: 1.05rem; margin: 0; }
@@ -148,9 +163,32 @@
   .plot { border-top: 1px solid var(--rule); padding-top: 16px; }
   .plot h2 { font-size: 1.05rem; margin: 0 0 4px; }
   .plot p { margin: 0 0 10px; color: var(--ink-2); font-size: 0.95rem; }
-  .plot-row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: center; gap: 12px; height: 52px; }
+  .plot-row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: center; gap: 12px; height: 72px; }
   .plot-row b { font-weight: 650; }
-  .plot svg { display: block; width: 100%; height: 40px; }
+  .plot svg { display: block; width: 100%; height: 64px; }
+  svg .beat { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  svg .note.lo { fill: var(--ink); }
+  svg .note.hi { fill: var(--signal); }
+
+  /* ---------- the moving dot ---------- */
+  .track { position: sticky; bottom: 0; z-index: 2; background: var(--paper); border-top: 1px solid var(--rule);
+           padding: 10px 0 14px; }
+  .track-head { display: flex; justify-content: space-between; gap: 12px; font: 400 0.85rem var(--mono);
+                color: var(--ink-2); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+  .track-hint { margin: 0 0 10px; font-size: 0.85rem; color: var(--ink-2); }
+  .track-lane { position: relative; height: 64px; margin-top: 4px; background: var(--rule-2); border-radius: 4px;
+                cursor: ew-resize; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .track-lane svg { display: block; width: 100%; height: 100%; }
+  .track .note { opacity: 0.16; }
+  .track .note.played { opacity: 1; }
+  .track .note.live { stroke: var(--ink); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+  .track.hide-notes .note { display: none; }
+  .playline { position: absolute; top: -6px; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: var(--signal); }
+  .playline::before { content: ""; position: absolute; top: -4px; left: 50%; width: 14px; height: 14px; transform: translateX(-50%);
+                      background: var(--signal); border-radius: 3px; }
+  .dot, .playline { pointer-events: none; }
+  .dot { position: absolute; top: 50%; left: 0; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%;
+         background: var(--signal); border: 2px solid var(--paper); box-sizing: content-box; }
   .plot .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--ink-2); margin-top: 8px; }
   .swatch { display: inline-block; width: 4px; height: 16px; vertical-align: -3px; margin-right: 8px; }
 
@@ -173,7 +211,7 @@
   <aside class="rail rail-top" aria-label="Map and playback">
     <div>
       <h1>Which patch made this rhythm?</h1>
-      <p class="lede">An Earth Sonata: Play the Planet practice game. Hear one rhythm, then pick the patch that made it.</p>
+      <p class="lede">An Earth Sonata: Play the Planet practice game. Hear one sound, then pick the patch that made it.</p>
     </div>
 
     <figure class="map" id="mapFigure">
@@ -202,14 +240,39 @@
       <input type="range" id="volume" min="0" max="1" step="0.05" value="0.7">
     </div>
     <div class="axis">
-      <label class="switch"><input type="checkbox" id="hint"> Pitch hint <span class="switch-state" id="hintOut">off</span></label>
-      <p class="hint-note">On: higher pitch means more lined-up lines. A practice aid, not part of the team's rule. Scored separately.</p>
+      <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
+      <p class="hint-note">Unless Rhythm only is on, the notes' pitch and length change with the patch. Both are this game's choice; the team's rule keeps pitch fixed until Dev A decides.</p>
+    </div>
+    <div class="axis">
+      <label class="switch"><input type="checkbox" id="showNotes" checked> Show notes while playing</label>
+      <p class="hint-note">Off: only the moving dot shows, so a listening test is judged by ear alone.</p>
+    </div>
+    <div class="axis">
+      <label class="switch"><input type="checkbox" id="showLines" checked> Show line directions</label>
+      <p class="hint-note">White ticks show which way the visible lines run in each part of a patch. The sound is made from how much they agree. They always appear after you answer.</p>
+    </div>
+    <div class="axis">
+      <label class="switch"><input type="checkbox" id="rhythmOnly"> Rhythm only</label>
+      <p class="hint-note">On: pitch and note length stay fixed for every patch, so only the spacing of the pulses carries the answer. This is the team's actual rule, and the setting for the real test.</p>
+    </div>
+    <div class="axis">
+      <label class="switch"><input type="checkbox" id="stretchTiming" checked> Stretch the pulse spacing</label>
+      <p class="hint-note">On: the spacing uses the whole range this image has, so the difference is easier to hear (up to about 125 ms). Off: the team's exact rule, where real patches differ by only about 44 ms. Turn it off for a test of the team's rule.</p>
+    </div>
+    <div class="axis">
+      <label for="difficulty">Rounds <span class="switch-state">how far apart</span></label>
+      <select id="difficulty">
+        <option value="easy" selected>Easy: patches far apart</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard: patches close together</option>
+        <option value="mixed">Mixed</option>
+      </select>
     </div>
 
     <div>
       <div class="score-head"><h2>Score</h2><span class="score-big" id="score">0 / 0</span></div>
-      <table aria-label="Right answers by sound and by alignment difference">
-        <thead><tr><th>Sound</th><th>Difference</th><th class="num">Right</th><th class="num">Played</th></tr></thead>
+      <table aria-label="Right answers by alignment difference">
+        <thead><tr><th>Difference</th><th class="num">Right</th><th class="num">Played</th></tr></thead>
         <tbody id="statsBody"></tbody>
       </table>
     </div>
@@ -220,19 +283,31 @@
   <main>
     <div id="loadError" class="error" hidden>
       <h2>The NASA image is not here yet</h2>
-      <p>Put <code>flat_global_ecco2_2028x1024.25000.jpg</code> in <code>assets/frames/svs3912/</code>. From the <code>earth-sonata</code> folder:</p>
+      <p>Put <code>flat_global_ecco2_2028x1024.25000.jpg</code> in <code>assets/frames/svs3912/</code>. From the repository folder:</p>
       <p><code>curl -o assets/frames/svs3912/flat_global_ecco2_2028x1024.25000.jpg https://svs.gsfc.nasa.gov/vis/a000000/a003900/a003912/flat_global_ecco2_2028x1024.25000.jpg</code></p>
       <p>Then reload this page through the local server, not by double-clicking the file.</p>
     </div>
 
     <p class="status" id="status" aria-live="polite">Measuring the NASA image…</p>
-    <p class="sub" id="sub">Lined-up streaks make an even pulse. Swirls make a short–long pulse.</p>
+    <p class="sub" id="sub">Listen to the sound, then pick the patch you think made it.</p>
+
+    <div class="intro">
+      <div>
+        <p><strong>What you are looking at.</strong> The NASA picture draws ocean currents as thin bright streaks. Each patch below is a small window onto the map. The white ticks show which way the streaks run in each part of the window. When the ticks mostly agree, the streaks are lined up. When they point every which way, the water is swirly.</p>
+        <p>The sound is made from how much the ticks agree. Use Hear patch 1 and Hear patch 2 to learn what each one sounds like.</p>
+      </div>
+      <div class="key" aria-hidden="true">
+        <figure><svg viewBox="0 0 150 64" id="keyAgree"></svg><figcaption>Ticks agree: lined up</figcaption></figure>
+        <figure><svg viewBox="0 0 150 64" id="keyScatter"></svg><figcaption>Ticks scatter: swirly</figcaption></figure>
+      </div>
+    </div>
 
     <div class="pair" id="pair">
       <figure class="patch" id="patch0">
         <canvas id="canvas0" width="576" height="360" role="img" aria-label="Patch 1, not chosen yet."></canvas>
         <span class="numeral" id="num0" aria-hidden="true">1</span>
         <div class="readout"><span id="align0"></span><span id="wght0"></span></div>
+        <button class="hear" id="hear0" disabled aria-label="Hear what patch 1 sounds like">Hear patch 1 <kbd>Q</kbd></button>
         <button class="pick" id="pick0" disabled aria-label="Patch 1 made it"><span id="label0">Patch 1</span> <kbd>1</kbd></button>
         <p class="where" id="where0"></p>
       </figure>
@@ -240,20 +315,31 @@
         <canvas id="canvas1" width="576" height="360" role="img" aria-label="Patch 2, not chosen yet."></canvas>
         <span class="numeral" id="num1" aria-hidden="true">2</span>
         <div class="readout"><span id="align1"></span><span id="wght1"></span></div>
+        <button class="hear" id="hear1" disabled aria-label="Hear what patch 2 sounds like">Hear patch 2 <kbd>W</kbd></button>
         <button class="pick" id="pick1" disabled aria-label="Patch 2 made it"><span id="label1">Patch 2</span> <kbd>2</kbd></button>
         <p class="where" id="where1"></p>
       </figure>
+    </div>
+
+    <div class="track" id="track">
+      <div class="track-head"><span id="trackLabel">Now playing</span><span id="trackTime">Press New round to hear a sound</span></div>
+      <p class="track-hint">Drag the line, or press the left and right arrow keys, to hear the sound at that point.</p>
+      <div class="track-lane" id="lane" tabindex="0" role="slider" aria-label="Sound timeline" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" aria-valuetext="Start">
+        <svg id="trackSvg" viewBox="0 0 600 64" preserveAspectRatio="none"></svg>
+        <span class="playline" id="playline"></span>
+        <span class="dot" id="dot"></span>
+      </div>
     </div>
 
     <section class="plot" aria-labelledby="plotTitle">
       <h2 id="plotTitle">Both rhythms, one time line</h2>
       <p id="plotNote">Appears after you answer, so the screen never gives the answer away.</p>
       <div id="plotRows" hidden>
-        <div class="plot-row"><b>Patch 1</b><svg id="plot0" viewBox="0 0 600 40" preserveAspectRatio="none" role="img"></svg></div>
-        <div class="plot-row"><b>Patch 2</b><svg id="plot1" viewBox="0 0 600 40" preserveAspectRatio="none" role="img"></svg></div>
+        <div class="plot-row"><b>Patch 1</b><svg id="plot0" viewBox="0 0 600 64" preserveAspectRatio="none" role="img"></svg></div>
+        <div class="plot-row"><b>Patch 2</b><svg id="plot1" viewBox="0 0 600 64" preserveAspectRatio="none" role="img"></svg></div>
       </div>
-      <div class="legend" id="plotLegend" hidden><span><i class="swatch" style="background:var(--ink)"></i>Low pulse, on the beat</span>
-        <span><i class="swatch" style="background:var(--signal)"></i>High pulse</span></div>
+      <div class="legend" id="plotLegend" hidden><span><i class="swatch" style="background:var(--ink)"></i>First note of each beat</span>
+        <span><i class="swatch" style="background:var(--signal)"></i>Second note</span></div>
     </section>
 
     <details>
@@ -261,10 +347,20 @@
       <p>Every bit of visible line in a patch votes for its direction. If most lines run the same way,
         alignment is near 1 and the two pulses in each beat are evenly spaced. If they run every which way,
         alignment is near 0 and the second pulse comes late: short–long.</p>
-      <p>Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat. After you answer, the big
-        numerals take a font weight from the alignment: thin means swirly, heavy means lined up. The weight
-        scale is stretched across this image's measured range, so the least lined-up patch found is
-        weight 200 and the most lined-up is weight 800.</p>
+      <p>The white ticks on each patch show which way the visible lines run in each part of it. When most
+        ticks point the same way, the patch is lined up. When they point every which way, it is swirly.</p>
+      <p>Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat. Real patches only span about
+        0.15 to 0.50 alignment, so that moves the pulse by only about 44 ms. With Stretch the pulse spacing
+        on, the game uses where the patch sits in this image's range instead of the raw alignment.</p>
+      <p>The same rule, in more detail: After you answer, the big
+        numerals take a font weight from the alignment: thin means swirly, heavy means lined up. The scale
+        is stretched across the middle 80 % of patches measured in this image: the most swirly tenth all
+        read as weight 200 and the most lined-up tenth as weight 800. The notes use the same scale.</p>
+      <p>Pitch and note length follow alignment too, on a four-octave scale. Lined-up patches play
+        steady, high notes held almost until the next one, so the sound keeps going like a line. Swirly
+        patches play lower notes that jump around in pitch and stop short at random lengths, like lines
+        running every which way. The more swirly the patch, the more the notes jump. That is this game's
+        choice; the team's rule keeps pitch fixed until Dev A decides.</p>
       <p>The numbers here are a quick practice measurement made in your browser, not the team's checked
         numbers. The rule is a choice the team made. It describes the picture, not water speed,
         turbulence or ocean health.</p>
@@ -275,24 +371,71 @@
 <script>
   // ---------- settings ----------
   const IMAGE_W = 2048, IMAGE_H = 1024;
-  const PATCH_W = 96, PATCH_H = 60;          // patch size in image pixels
+  const PATCH_W = 192, PATCH_H = 120;        // patch size in image pixels (shown 3x, so it is not blocky)
   const CANDIDATES = 700;                    // random patches measured per page load
   const MAX_LAND = 0.02;                     // skip patches with more than 2 % land
   const MIN_USABLE = 0.05;                   // under 5 % usable pixels = missing
   const STRONG_PERCENTILE = 0.60;            // pixels stronger than this vote
-  const MIN_PAIR_DIFFERENCE = 0.30;          // keep rounds audible
-  const BEAT_S = 0.5, BEATS = 8;             // Dev B's app: step_seconds 0.5
-  const LOW_HZ = 329.6, HIGH_HZ = 659.3;     // E4 and E5: fixed, carry no data
+  const DIFFICULTY_BANDS = [[0.10, 0.20], [0.20, 0.30], [0.30, Infinity]];   // alignment gap per round: hard, medium, easy
+  const BANDS = { easy: [[0.30, Infinity]], medium: [[0.20, 0.30]], hard: [[0.10, 0.20]], mixed: DIFFICULTY_BANDS };
+  const BEAT_S = 0.5, BEATS = 10;            // Dev B's app: step_seconds 0.5
+  // C pentatonic, C3 to C7, 21 notes (this game's choice, not yet the team rule)
+  const SCALE = [], NOTE_NAMES = [];
+  for (let o = 3; o <= 6; o++) [0, 2, 4, 7, 9].forEach((st, i) => {
+    SCALE.push(130.81 * Math.pow(2, (o - 3) + st / 12)); NOTE_NAMES.push("CDEGA"[i] + o);
+  });
+  SCALE.push(2093.0); NOTE_NAMES.push("C7");
+  const MAX_JUMP = 4;                        // most swirly: each note jumps up to 4 scale steps
+  const FLAT_LOW = 8, FLAT_HIGH = 11;        // rhythm-only mode: G4 then D5 for every patch, one fixed length
   const SPEEDS = [0.5, 0.75, 1];
   const WGHT_MIN = 200, WGHT_MAX = 800;      // font weight range = alignment 0 to 1
+  const TICK_BLOCK = 24, TICK_LEN = 46;      // one line-direction tick per 24 px cell (8 x 5 per patch); length in canvas px
 
   const $ = (id) => document.getElementById(id);
   const longFraction = (a) => 0.75 - 0.25 * Math.min(1, Math.max(0, a));  // earthVoice.ts
   let A_LOW = 0, A_HIGH = 1;                 // set from the measured pool
-  const weightFor = (a) => {
-    const t = Math.min(1, Math.max(0, (a - A_LOW) / Math.max(1e-6, A_HIGH - A_LOW)));
-    return Math.round(WGHT_MIN + (WGHT_MAX - WGHT_MIN) * t);
-  };
+  let field = null;                          // per-pixel measurement, kept so patches can show their line directions
+  const spread = (a) => Math.min(1, Math.max(0, (a - A_LOW) / Math.max(1e-6, A_HIGH - A_LOW)));
+  // Where the second pulse lands in each beat. The team's rule uses the raw alignment, but real
+  // patches only span about 0.15 to 0.50, a shift of ~44 ms at a 0.5 s beat. "Stretch" uses where the
+  // patch sits in this image's range instead, so the same rule gives up to ~125 ms.
+  const timingFraction = (a) => $("stretchTiming").checked ? 0.75 - 0.25 * spread(a) : longFraction(a);
+  const weightFor = (a) => Math.round(WGHT_MIN + (WGHT_MAX - WGHT_MIN) * spread(a));
+  const noteFor = (a) => Math.round(2 + spread(a) * 13);   // base note: E3 (swirly) to C6 (lined up)
+
+  // Same patch, same "random" notes every time it plays (seeded by its position).
+  function seeded(seed) {
+    return () => {
+      seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Every note of one patch's sound, in beats. Timing is the team's rule (second pulse at
+  // 0.75 − 0.25 × A). Pitch and length are this game's choice: lined-up patches play steady high
+  // notes held almost to the next one; swirly patches play lower notes that jump around in pitch
+  // and stop short at random, like lines running every which way.
+  // `variant` changes the random jumps but not the character of the sound: the mystery sound of a
+  // round is a different take of the patch's sound than the "Hear patch" button plays, so matching
+  // them means recognising how the patch sounds, not just spotting an identical copy.
+  // Rhythm-only mode drops pitch and length: every patch plays the same two notes at one length.
+  function notesFor(p, variant = 0) {
+    const flat = $("rhythmOnly").checked;
+    const s = spread(p.alignment), wobble = 1 - s, lf = timingFraction(p.alignment);
+    const rand = seeded(p.x * 7919 + p.y * 104729 + variant * 1299721), base = noteFor(p.alignment), notes = [];
+    for (let b = 0; b < BEATS; b++) {
+      [[0, lf, 0], [lf, 1 - lf, 2]].forEach(([at, gap, up], k) => {
+        if (flat) { notes.push({ at: b + at, len: gap * 0.5, idx: k ? FLAT_HIGH : FLAT_LOW, second: k === 1 }); return; }
+        const jump = Math.round((rand() * 2 - 1) * MAX_JUMP * wobble);
+        const idx = Math.min(SCALE.length - 1, Math.max(0, base + up + jump));
+        const hold = Math.min(0.97, 0.95 * s + wobble * (0.08 + 0.5 * rand()));
+        notes.push({ at: b + at, len: gap * hold, idx, second: k === 1 });
+      });
+    }
+    return notes;
+  }
 
   // ---------- measuring the image ----------
   function boxBlur(src, w, h, r) {
@@ -344,6 +487,7 @@
     sample.sort((a, b) => a - b);
     const threshold = sample[Math.floor(sample.length * STRONG_PERCENTILE)];
 
+    field = { m, vc, vs, land, threshold };
     const patches = []; let missing = 0, onLand = 0;
     for (let k = 0; k < CANDIDATES; k++) {
       const x0 = Math.floor(Math.random() * (IMAGE_W - PATCH_W - 2)) + 1;
@@ -365,6 +509,31 @@
     return { patches, missing, onLand };
   }
 
+  // The direction the visible lines run in each 12 px cell of a patch: the same strong pixels that
+  // vote in the alignment measurement. If the ticks mostly point the same way, alignment is high;
+  // if they point every which way, it is low. Cells with too few strong pixels get no tick.
+  function orientationTicks(p) {
+    const ticks = [];
+    if (!field) return ticks;
+    const { m, vc, vs, land, threshold } = field;
+    for (let by = 0; by < PATCH_H; by += TICK_BLOCK) {
+      for (let bx = 0; bx < PATCH_W; bx += TICK_BLOCK) {
+        let used = 0, c = 0, s = 0;
+        for (let y = p.y + by; y < p.y + by + TICK_BLOCK; y++) {
+          for (let x = p.x + bx; x < p.x + bx + TICK_BLOCK; x++) {
+            const i = y * IMAGE_W + x;
+            if (land[i] || m[i] <= threshold) continue;
+            used++; c += vc[i]; s += vs[i];
+          }
+        }
+        if (used < 0.15 * TICK_BLOCK * TICK_BLOCK) continue;
+        // (c, s) is the doubled gradient angle, and the gradient points across a line, so the line runs 90° from it
+        ticks.push({ cx: bx + TICK_BLOCK / 2, cy: by + TICK_BLOCK / 2, angle: 0.5 * Math.atan2(s, c) + Math.PI / 2 });
+      }
+    }
+    return ticks;
+  }
+
   function where(p) {   // equirectangular map, left edge about 180° W
     const lon = -180 + 360 * (p.x + PATCH_W / 2) / IMAGE_W;
     const lat = 90 - 180 * (p.y + PATCH_H / 2) / IMAGE_H;
@@ -384,35 +553,153 @@
     if (ctx.state === "suspended") ctx.resume();
   }
 
-  function pulse(t, hz, peak) {   // short drum-like hit: quick pitch drop, then decay
+  // One note: a quick attack, held for `length` seconds, then a short release.
+  function pulse(t, hz, peak, length) {
     const osc = ctx.createOscillator(), env = ctx.createGain();
+    const end = t + Math.max(0.06, length);
     osc.type = "triangle";
-    osc.frequency.setValueAtTime(hz * 3, t);
+    osc.frequency.setValueAtTime(hz * 2, t);
     osc.frequency.exponentialRampToValueAtTime(hz, t + 0.012);
     env.gain.setValueAtTime(0.0001, t);
-    env.gain.linearRampToValueAtTime(peak, t + 0.002);
-    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+    env.gain.linearRampToValueAtTime(peak, t + 0.004);
+    env.gain.exponentialRampToValueAtTime(peak * 0.6, t + 0.05);
+    env.gain.setValueAtTime(peak * 0.6, Math.max(t + 0.05, end - 0.03));
+    env.gain.exponentialRampToValueAtTime(0.0001, end);
     osc.connect(env).connect(master);
-    osc.start(t); osc.stop(t + 0.17);
+    osc.start(t); osc.stop(end + 0.02);
     sources.push(osc);
   }
 
   function stopAll() {
     sources.forEach((s) => { try { s.stop(); } catch (e) {} });
     sources = []; timers.forEach(clearTimeout); timers = [];
+    cancelAnimationFrame(anim);
+    $("track").querySelectorAll(".note.live").forEach((r) => r.classList.remove("live"));
   }
 
-  function play(p, startText, endText) {
+  // Schedules one patch's sound starting at `start`; returns the time it ends.
+  function scheduleRhythm(p, start, variant = 0) {
+    const beat = BEAT_S / SPEEDS[Number($("speed").value)];
+    notesFor(p, variant).forEach((n) => pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat));
+    return start + BEATS * beat;
+  }
+
+  // ---------- the moving dot ----------
+  // The strip at the bottom shows the sound as it plays: a dot moves left to right, and each note
+  // sounds (and lights up) the moment the dot reaches it. The dot rides at the height of the pitch.
+  let anim = 0;
+  const LANE_W = 600, LANE_H = 64, BAR_H = 11;
+  const yTop = (idx) => 4 + (1 - idx / (SCALE.length - 1)) * (LANE_H - 8 - BAR_H);
+
+  function drawNotes(svg, p, variant = 0) {
+    let s = "";
+    for (let b = 0; b <= BEATS; b++) s += `<line class="beat" x1="${b / BEATS * LANE_W}" x2="${b / BEATS * LANE_W}" y1="0" y2="${LANE_H}"/>`;
+    notesFor(p, variant).forEach((n) => {
+      s +=`<rect class="note ${n.second ? "hi" : "lo"}" x="${(n.at / BEATS * LANE_W).toFixed(1)}" y="${yTop(n.idx).toFixed(1)}" width="${Math.max(3, n.len / BEATS * LANE_W).toFixed(1)}" height="${BAR_H}"/>`;
+    });
+    svg.innerHTML = s;
+    return [...svg.querySelectorAll("rect.note")];
+  }
+
+  // The timeline: one clip per note, a playhead line you can watch or drag, and the dot riding at the
+  // pitch. Whether the sound plays by itself or you drag the line, a note sounds when the line reaches it.
+  let track = null, lastBeat = 0, dragging = false;
+
+  function paintTrack(beatPos) {
+    if (!track) return;
+    const pos = Math.min(BEATS, Math.max(0, beatPos));
+    $("dot").style.left = $("playline").style.left = (pos / BEATS * 100) + "%";
+    let current = null;
+    track.notes.forEach((n, i) => {
+      const on = pos >= n.at;
+      track.rects[i].classList.toggle("played", on);
+      track.rects[i].classList.toggle("live", on && pos < n.at + Math.max(n.len, 0.2));
+      if (on) current = n;
+    });
+    const showPitch = $("showNotes").checked && current;
+    $("dot").style.top = showPitch ? ((yTop(current.idx) + BAR_H / 2) / LANE_H * 100) + "%" : "50%";
+    const text = `${(pos * track.beat).toFixed(1)} / ${(BEATS * track.beat).toFixed(1)} s`;
+    $("trackTime").textContent = text;
+    $("lane").setAttribute("aria-valuenow", pos.toFixed(1));
+    $("lane").setAttribute("aria-valuetext", text);
+    lastBeat = pos;
+  }
+
+  function animateTrack(p, start, end, variant = 0, label = "mystery sound") {
+    cancelAnimationFrame(anim);
+    $("trackLabel").textContent = "Now playing: " + label;
+    const notes = notesFor(p, variant), rects = drawNotes($("trackSvg"), p, variant), total = end - start;
+    track = { p, variant, notes, rects, beat: total / BEATS };
+    const frame = () => {
+      const t = ctx.currentTime - start;
+      paintTrack(Math.max(0, t) / track.beat);
+      if (t < total) anim = requestAnimationFrame(frame);
+      else rects.forEach((r) => r.classList.remove("live"));
+    };
+    anim = requestAnimationFrame(frame);
+  }
+
+  // Dragging the line: each note sounds as the line crosses it (either direction), and pressing on a
+  // clip plays that clip.
+  function soundNote(n) {
+    ensureAudio();
+    pulse(ctx.currentTime + 0.01, SCALE[n.idx], n.second ? 0.65 : 0.9, Math.min(0.4, Math.max(0.12, n.len * track.beat)));
+  }
+  function scrubTo(beatPos, pressed) {
+    const prev = lastBeat, lo = Math.min(prev, beatPos), hi = Math.max(prev, beatPos);
+    paintTrack(beatPos);
+    track.notes.forEach((n) => {
+      if (pressed ? (n.at <= beatPos && beatPos < n.at + n.len) : (n.at > lo && n.at <= hi)) soundNote(n);
+    });
+  }
+  const laneBeat = (e) => {
+    const r = $("lane").getBoundingClientRect();
+    return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * BEATS;
+  };
+  $("lane").addEventListener("pointerdown", (e) => {
+    if (!track) return;
     stopAll(); ensureAudio();
-    const beat = BEAT_S / SPEEDS[Number($("speed").value)], lf = longFraction(p.alignment);
-    const shift = $("hint").checked ? Math.pow(2, p.alignment) : 1;   // pitch hint only
-    const start = ctx.currentTime + 0.1;
-    for (let b = 0; b < BEATS; b++) {
-      pulse(start + b * beat, LOW_HZ * shift, 1.0);
-      pulse(start + (b + lf) * beat, HIGH_HZ * shift, 0.75);
-    }
-    setStatus(startText);
-    timers.push(setTimeout(() => setStatus(endText), (BEATS * beat + 0.2) * 1000));
+    dragging = true; $("lane").setPointerCapture(e.pointerId);
+    lastBeat = laneBeat(e);
+    setStatus("Dragging the line: each note sounds as the line reaches it.");
+    scrubTo(lastBeat, true);
+  });
+  $("lane").addEventListener("pointermove", (e) => { if (dragging && track) scrubTo(laneBeat(e), false); });
+  ["pointerup", "pointercancel"].forEach((ev) => $("lane").addEventListener(ev, () => {
+    if (!dragging) return;
+    dragging = false;
+    setStatus(guessed ? "Press P for the next round." : "Which patch made the mystery sound? Press 1 or 2.");
+  }));
+  $("lane").addEventListener("keydown", (e) => {
+    if (!track || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+    e.preventDefault(); stopAll();
+    const starts = track.notes.map((n) => n.at);
+    const next = e.key === "ArrowRight" ? starts.find((a) => a > lastBeat + 1e-6) : [...starts].reverse().find((a) => a < lastBeat - 1e-6);
+    if (next === undefined) return;
+    paintTrack(next); soundNote(track.notes[starts.indexOf(next)]);
+  });
+
+  function say(text, atAudioTime) {
+    timers.push(setTimeout(() => setStatus(text), Math.max(0, (atAudioTime - ctx.currentTime) * 1000)));
+  }
+
+  // A round plays one sound, made by one of the two patches. The listener picks which patch made it.
+  function playRound(endText) {
+    stopAll(); ensureAudio();
+    const start = ctx.currentTime + 0.1, end = scheduleRhythm(target, start, mysteryVariant);
+    animateTrack(target, start, end, mysteryVariant, "mystery sound");
+    setStatus("Listen to the mystery sound…");
+    say(endText, end + 0.1);
+  }
+
+  // Plays what one patch sounds like, so the listener can learn the link between picture and sound.
+  function playPatch(side) {
+    if (!shown) return;
+    stopAll(); ensureAudio();
+    const start = ctx.currentTime + 0.1, end = scheduleRhythm(shown[side], start);
+    animateTrack(shown[side], start, end, 0, `patch ${side + 1}`);
+    setStatus(`Patch ${side + 1} sounds like this…`);
+    say(guessed ? "Done. Press P for the next round." : "Which patch made the mystery sound? Press 1 or 2.", end + 0.1);
   }
 
   // ---------- drawing ----------
@@ -420,8 +707,21 @@
 
   function drawPatch(side, p) {
     const c = $("canvas" + side), g = c.getContext("2d");
-    g.imageSmoothingEnabled = false;
+    g.imageSmoothingEnabled = true;            // smooth the 6x enlargement instead of showing blocks
+    g.imageSmoothingQuality = "high";
     g.drawImage(image, p.x, p.y, PATCH_W, PATCH_H, 0, 0, c.width, c.height);
+    if ($("showLines").checked || guessed) {
+      const k = c.width / PATCH_W, ticks = orientationTicks(p);
+      g.lineCap = "round";
+      [[7, "#000"], [3.5, "#fff"]].forEach(([width, colour]) => {   // dark under white so ticks read on any colour
+        g.lineWidth = width; g.strokeStyle = colour; g.beginPath();
+        ticks.forEach((t) => {
+          const dx = Math.cos(t.angle) * TICK_LEN / 2, dy = Math.sin(t.angle) * TICK_LEN / 2;
+          g.moveTo(t.cx * k - dx, t.cy * k - dy); g.lineTo(t.cx * k + dx, t.cy * k + dy);
+        });
+        g.stroke();
+      });
+    }
     const box = $("box" + side);
     Object.assign(box.style, {
       left: (100 * p.x / IMAGE_W) + "%", top: (100 * p.y / IMAGE_H) + "%",
@@ -431,22 +731,17 @@
     $("where" + side).textContent = where(p);
   }
 
-  function drawRow(svg, p, n) {      // two beats of one rhythm; both rows share the same time axis
-    const W = 600, pad = 4, span = W - 2 * pad, lf = longFraction(p.alignment);
-    let s = `<line x1="${pad}" x2="${W - pad}" y1="20" y2="20" stroke="#d9dce1" stroke-width="2"/>`;
-    for (let b = 0; b <= 2; b++) s += `<line x1="${pad + b / 2 * span}" x2="${pad + b / 2 * span}" y1="0" y2="40" stroke="#d9dce1" stroke-width="2"/>`;
-    for (let b = 0; b < 2; b++) {
-      s += `<rect x="${pad + b / 2 * span - 3}" y="4" width="6" height="32" fill="#111214"/>`;
-      s += `<rect x="${pad + (b + lf) / 2 * span - 3}" y="8" width="6" height="24" fill="#ff5a1f"/>`;
-    }
-    svg.innerHTML = s;
-    svg.setAttribute("aria-label", `Patch ${n}: the second pulse lands ${Math.round(lf * 100)} percent of the way through each beat.`);
+  function drawRow(svg, p, n) {      // the whole sound of one patch; both rows share the same time axis
+    drawNotes(svg, p);
+    const s = spread(p.alignment);
+    svg.setAttribute("aria-label", `Patch ${n}: base note ${NOTE_NAMES[noteFor(p.alignment)]}, ` +
+      (s > 0.7 ? "steady, long notes." : s < 0.3 ? "notes jump around in pitch and stop short." : "notes wander a little and are medium length."));
   }
 
   function drawPlot(left, right) {
     drawRow($("plot0"), left, 1); drawRow($("plot1"), right, 2);
     $("plotRows").hidden = false; $("plotLegend").hidden = false;
-    $("plotNote").textContent = "Black marks are the beat. Orange marks are the second pulse: the closer to halfway, the more even.";
+    $("plotNote").textContent = "Each bar is a note: higher up is a higher note, longer is held longer. Steady, long, high bars: lined up. Jumpy, short, low bars: swirly.";
   }
 
   function clearPlot() {
@@ -459,17 +754,20 @@
   }
 
   // ---------- game ----------
-  let pool = [], shown = null, target = null, guessed = true;
-  const stats = {};          // "rhythm|0.30–0.39" -> { right, played }
+  let pool = [], shown = null, target = null, guessed = true, mysteryVariant = 1;
+  const stats = {};          // "0.20–0.29 medium" -> { right, played }
   let right = 0, total = 0;
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
+  // Each round draws a difficulty band at random, then any two patches whose alignments differ by
+  // that much. Patches can come from anywhere in the range, so the sound is not always an extreme,
+  // and the by-difference score shows where hearing the difference starts to fail.
   function choosePair() {
-    const third = Math.max(1, Math.floor(pool.length * 0.3));
-    const low = pool.slice(0, third), high = pool.slice(-third);
-    for (let tries = 0; tries < 200; tries++) {
-      const a = pick(low), b = pick(high);
-      if (b.alignment - a.alignment >= MIN_PAIR_DIFFERENCE) return [a, b];
+    const [lo, hi] = pick(BANDS[$("difficulty").value] || DIFFICULTY_BANDS);
+    for (let tries = 0; tries < 500; tries++) {
+      const a = pick(pool), b = pick(pool);
+      const d = Math.abs(a.alignment - b.alignment);
+      if (d >= lo && d < hi) return [a, b];
     }
     return [pool[0], pool[pool.length - 1]];
   }
@@ -490,6 +788,7 @@
     const pair = choosePair();
     shown = Math.random() < 0.5 ? pair : [pair[1], pair[0]];
     target = pick(shown);
+    mysteryVariant = 1 + Math.floor(Math.random() * 9999);
     guessed = false;
     [0, 1].forEach((side) => {
       drawPatch(side, shown[side]);
@@ -498,10 +797,9 @@
     });
     clearPlot();
     $("replay").disabled = false;
-    $("sub").textContent = $("hint").checked
-      ? "Pitch hint is on: this round counts in the pitch-hint score."
-      : "Listen to the spacing between the low and high pulse.";
-    play(target, "Listen…", "Which patch made it? Press 1 or 2.");
+    $("hear0").disabled = false; $("hear1").disabled = false;
+    $("sub").textContent = "Listen to the mystery sound. Use Hear patch 1 and Hear patch 2 to learn how each patch sounds, then pick the patch that made the mystery sound.";
+    playRound("Which patch made this sound? Press 1 or 2.");
   }
 
   function guess(side) {
@@ -511,32 +809,37 @@
     const answer = shown[0] === target ? 0 : 1, correct = side === answer;
     if (correct) right++;
     const diff = Math.abs(shown[0].alignment - shown[1].alignment);
-    const bucket = diff >= 0.5 ? "0.50+" : diff >= 0.4 ? "0.40–0.49" : "0.30–0.39";
-    const key = ($("hint").checked ? "With pitch hint" : "Rhythm only") + "|" + bucket;
+    const bucket = diff >= 0.3 ? "0.30+ easy" : diff >= 0.2 ? "0.20–0.29 medium" : "0.10–0.19 hard";
+    const key = bucket;
     stats[key] = stats[key] || { right: 0, played: 0 };
     stats[key].played++; if (correct) stats[key].right++;
 
+    [0, 1].forEach((s) => drawPatch(s, shown[s]));   // line-direction ticks appear once you have answered
     [0, 1].forEach((s) => {
       const p = shown[s];
       $("num" + s).style.fontWeight = weightFor(p.alignment);
       $("align" + s).innerHTML = `<span class="value" style="font-weight:${weightFor(p.alignment)}">${p.alignment.toFixed(2)}<small>alignment</small></span>`;
-      $("wght" + s).textContent = `wght ${weightFor(p.alignment)}`;
+      $("wght" + s).textContent = `base note ${NOTE_NAMES[noteFor(p.alignment)]}, wght ${weightFor(p.alignment)}`;
       $("pick" + s).setAttribute("aria-disabled", "true");
       $("patch" + s).classList.add("revealed");
     });
     $("pick" + side).classList.add("chosen");
     $("pick" + answer).classList.add("answer");
+    const narrow = window.matchMedia("(max-width: 640px)").matches;   // keep labels on one line
     if (correct) {
-      $("label" + side).textContent = "Your pick made it";
+      $("label" + side).textContent = narrow ? "You got it" : "Your pick made it";
+      $("pick" + side).setAttribute("aria-label", `Patch ${side + 1}: your pick, and it made this rhythm`);
+      $("pick" + (1 - side)).setAttribute("aria-label", `Patch ${2 - side}`);
     } else {
       $("label" + side).textContent = "Your pick";
-      $("label" + answer).textContent = "Made this rhythm";
+      $("label" + answer).textContent = narrow ? "Made it" : "Made this sound";
+      $("pick" + side).setAttribute("aria-label", `Patch ${side + 1}: your pick`);
+      $("pick" + answer).setAttribute("aria-label", `Patch ${answer + 1}: made this sound`);
     }
-    [0, 1].forEach((s) => $("pick" + s).setAttribute("aria-label", `Patch ${s + 1}: ${$("label" + s).textContent}`));
     drawPlot(shown[0], shown[1]);
 
-    const kind = longFraction(target.alignment) < longFraction(shown[1 - answer].alignment) ? "more even" : "more short–long";
-    setStatus((correct ? "Right. " : "Not this time. ") + `Patch ${answer + 1} made it: its rhythm is the ${kind} one.`);
+    const kind = target.alignment > shown[1 - answer].alignment ? "higher, longer and more even" : "lower, shorter and more short–long";
+    setStatus((correct ? "Right. " : "Not this time. ") + `Patch ${answer + 1} made this sound: it was the ${kind} one.`);
     $("sub").textContent = "Thin numeral: swirly lines. Heavy numeral: lined-up lines. Press P for the next round.";
     updateScore();
     $("newRound").focus();
@@ -546,15 +849,36 @@
     $("score").textContent = `${right} / ${total}`;
     const keys = Object.keys(stats).sort();
     $("statsBody").innerHTML = keys.length
-      ? keys.map((k) => { const [mode, b] = k.split("|");
-          return `<tr><td>${mode}</td><td class="mono">${b}</td><td class="num">${stats[k].right}</td><td class="num">${stats[k].played}</td></tr>`; }).join("")
-      : `<tr class="empty-row"><td colspan="4">No rounds yet. Press New round.</td></tr>`;
+      ? keys.map((k) => `<tr><td class="mono">${k}</td><td class="num">${stats[k].right}</td><td class="num">${stats[k].played}</td></tr>`).join("")
+      : `<tr class="empty-row"><td colspan="3">No rounds yet. Press New round.</td></tr>`;
   }
 
+  // The two small examples in "What you are looking at": ticks that agree, and ticks that scatter.
+  (function buildKey() {
+    const draw = (id, degrees) => {
+      let s = "";
+      degrees.forEach((deg, i) => {
+        const cx = 19 + (i % 4) * 37, cy = 17 + Math.floor(i / 4) * 30, r = deg * Math.PI / 180;
+        const x1 = cx - Math.cos(r) * 14, y1 = cy - Math.sin(r) * 14, x2 = cx + Math.cos(r) * 14, y2 = cy + Math.sin(r) * 14;
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000" stroke-width="5" stroke-linecap="round"/>` +
+             `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`;
+      });
+      $(id).innerHTML = s;
+    };
+    draw("keyAgree", [-6, 4, -2, 8, 2, -8, 6, -4]);
+    draw("keyScatter", [20, 100, 150, 60, 130, 10, 80, 170]);
+  })();
+
   // ---------- wiring ----------
+  $("showLines").addEventListener("change", () => { if (shown) [0, 1].forEach((s) => drawPatch(s, shown[s])); });
+  ["rhythmOnly", "stretchTiming"].forEach((id) =>
+    $(id).addEventListener("change", () => { if (shown && guessed) drawPlot(shown[0], shown[1]); }));
+  $("hear0").addEventListener("click", () => playPatch(0));
+  $("hear1").addEventListener("click", () => playPatch(1));
+  $("showNotes").addEventListener("change", (e) => $("track").classList.toggle("hide-notes", !e.target.checked));
   $("newRound").addEventListener("click", newRound);
   $("replay").addEventListener("click", () => target &&
-    play(target, "Replaying…", guessed ? "Done. Press P for the next round." : "Which patch made it? Press 1 or 2."));
+    playRound(guessed ? "Done. Press P for the next round." : "Which patch made this sound? Press 1 or 2."));
   $("stop").addEventListener("click", () => { stopAll(); setStatus("Stopped."); });
   $("pick0").addEventListener("click", () => guess(0));
   $("pick1").addEventListener("click", () => guess(1));
@@ -568,7 +892,6 @@
     $("speedOut").textContent = s.toFixed(2) + "×";
     e.target.setAttribute("aria-valuetext", `${s} times`);
   });
-  $("hint").addEventListener("change", (e) => { $("hintOut").textContent = e.target.checked ? "on" : "off"; });
 
   document.addEventListener("keydown", (e) => {
     const t = e.target;
@@ -582,6 +905,8 @@
     else if (k === "r") $("replay").click();
     else if (k === "1") guess(0);
     else if (k === "2") guess(1);
+    else if (k === "q") playPatch(0);
+    else if (k === "w") playPatch(1);
   });
 
   updateScore();
@@ -592,10 +917,13 @@
     setTimeout(() => {
       const result = measureImage(world);
       pool = result.patches;
-      if (pool.length) { A_LOW = pool[0].alignment; A_HIGH = pool[pool.length - 1].alignment; }
+      if (pool.length) {   // scale spans the middle 80 % of patches, so outliers do not squash it
+        A_LOW = pool[Math.floor(pool.length * 0.1)].alignment;
+        A_HIGH = pool[Math.min(pool.length - 1, Math.floor(pool.length * 0.9))].alignment;
+      }
       $("newRound").disabled = pool.length < 2;
       if (pool.length < 2) { setStatus("Not enough usable ocean patches were found in this image."); return; }
-      setStatus("Ready. Press New round to hear the first rhythm.");
+      setStatus("Ready. Press New round to hear a sound.");
       $("sub").textContent = `${pool.length} ocean patches measured. ${result.onLand} touched land and ${result.missing} were too blank, so they are left out.`;
     }, 30);
   }
