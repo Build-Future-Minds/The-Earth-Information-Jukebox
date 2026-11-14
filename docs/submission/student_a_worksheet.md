@@ -74,9 +74,16 @@ Ask each teammate what they actually used. Delete anything we did not use in the
 
 Two sentences, no name:
 
-> Student A wrote ____, which ____. It was tested by ____ and catches ____.
+> Student A wrote `prepare_scene.py`, which turns 30 NASA frames and the two approved circles into
+> the scene file and masks that the measurement and the app both read. It was tested by 11
+> automated tests (a good input, six bad inputs, and broken frames run all the way through the
+> measurement) and catches missing or broken input files, circles off the map or on land, and
+> unusable frames, which keep their place and become a clear "missing" step.
 
-Your AI-use line for `AI_USE.md`: I used ____ to ____. I checked it by ____.
+(DRAFT — Student A to read and confirm before Sun 4 PM.)
+
+Your AI-use line for `AI_USE.md`: I used Claude Code to draft the frame checks, `prepare_scene.py`
+and its tests, and the source records. I checked it by ____.
 
 ## Part 5 — Final link check (Sun 8 PM)
 
