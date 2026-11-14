@@ -42,8 +42,11 @@ class AnalysisParams:
 
     gradient_threshold   Smallest gradient that counts as a clear edge, in grey levels
                          (0-255 scale) per pixel. Weaker pixels do not vote.
-    min_usable_fraction  Smallest share of the region's pixels that must vote. Below
-                         this the measurement is `missing`.
+    min_usable_fraction  Smallest share of the region's pixels that must vote (have a clear
+                         edge). The region is the circle for a circle region (pass
+                         `region_px`), else the whole box. Masked-out pixels count in the
+                         region but cannot vote, so a mostly masked region is `missing`.
+                         It measures the amount of evidence. Below it: `missing`.
     gray_mode            "value" = max(R, G, B): a line's brightness regardless of its
                          hue. "luma" = Rec.601 weighted sum, which makes blue lines
                          about 8x fainter than yellow ones.
@@ -84,8 +87,8 @@ class AlignmentResult:
     alignment: Optional[float]
     reason: Optional[str]
     reason_code: Optional[str]
-    usable_fraction: float  # voting pixels / all pixels in the region
-    eligible_fraction: float  # pixels the mask (and safety margin) allow / all pixels
+    usable_fraction: float  # voting pixels / pixels in the region (the circle, else the box)
+    eligible_fraction: float  # pixels the mask (and safety margin) allow / pixels in the region
     dominant_angle_deg: Optional[float]  # on-screen line direction, 0 = horizontal, counter-clockwise, [0, 180)
     jxx: float
     jyy: float
@@ -311,14 +314,25 @@ def analyse(
     image: np.ndarray,
     mask: Optional[np.ndarray] = None,
     params: AnalysisParams = AnalysisParams(),
+    region_px: Optional[int] = None,
 ) -> AnalysisDetails:
-    """Measure one region and keep the intermediate images."""
+    """Measure one region and keep the intermediate images.
+
+    region_px  How many pixels the region has. The usable-fraction gate divides by it.
+               Default: every pixel of the image (a box region). For a circle region pass
+               the circle's pixel count, so the gate is judged on the circle, not on its
+               bounding square. Masked-out parts of the circle (land) still count in it:
+               they hold no evidence, and a mostly masked circle should go `missing`.
+    """
     gray = to_gray(image, params.gray_mode)
     height, width = gray.shape
-    n_region = height * width
+    n_box = height * width
+    if region_px is not None and not (0 < int(region_px) <= n_box):
+        raise ValueError(f"region_px must be between 1 and the box's {n_box} pixels (got {region_px})")
+    n_region = n_box if region_px is None else int(region_px)
     gx, gy = (
         gradients(gray, params.blur_sigma)
-        if n_region
+        if n_box
         else (np.zeros_like(gray), np.zeros_like(gray))
     )
     magnitude = np.hypot(gx, gy)
@@ -327,7 +341,7 @@ def analyse(
         return AnalysisDetails(result, gray, gx, gy, magnitude, eligible, voting)
 
     nothing = np.zeros((height, width), dtype=bool)
-    if n_region == 0:
+    if n_box == 0:
         return details(
             _missing(REASON_EMPTY_REGION, "The region has no pixels to measure."), nothing, nothing
         )
@@ -335,15 +349,19 @@ def analyse(
     eligible = eligible_pixels((height, width), mask, params.blur_sigma)
     n_eligible = int(eligible.sum())
     if n_eligible == 0:
-        if mask is None or bool(np.all(np.asarray(mask) > 0)):
-            code, reason = (
-                REASON_REGION_TOO_SMALL,
-                "The region is too small to measure.",
-            )
-        else:
+        if mask is not None and not bool(np.any(np.asarray(mask) > 0)):
             code, reason = (
                 REASON_ALL_MASKED,
                 "The mask leaves no pixels to measure in this region.",
+            )
+        else:
+            # Some pixels are included, but none is far enough from the region's edge or the
+            # mask's edge for the blur and Sobel to see only included pixels.
+            margin = support_radius(params.blur_sigma)
+            code, reason = (
+                REASON_REGION_TOO_SMALL,
+                "The area left to measure is too small: no included pixel is at least "
+                f"{margin} px inside the region and the mask.",
             )
         return details(_missing(code, reason, n_region=n_region), eligible, nothing)
 
@@ -390,9 +408,11 @@ def measure_alignment(
     image: np.ndarray,
     mask: Optional[np.ndarray] = None,
     params: AnalysisParams = AnalysisParams(),
+    region_px: Optional[int] = None,
 ) -> AlignmentResult:
-    """Measure one region. `image` is a grey or BGR array; `mask` is True where included."""
-    return analyse(image, mask, params).result
+    """Measure one region. `image` is a grey or BGR array; `mask` is True where included.
+    `region_px`: the region's pixel count when it is not the whole image (see `analyse`)."""
+    return analyse(image, mask, params, region_px).result
 
 
 def region_mask(
@@ -418,7 +438,9 @@ def measure_region(
     box_px: Sequence[int],
     mask: Optional[np.ndarray] = None,
     params: AnalysisParams = AnalysisParams(),
+    region_px: Optional[int] = None,
 ) -> AlignmentResult:
-    """Measure the box [x, y, width, height] of a frame, with an optional mask."""
+    """Measure the box [x, y, width, height] of a frame, with an optional mask.
+    `region_px`: the region's pixel count when it is a circle inside the box (see `analyse`)."""
     crop = crop_box(frame, box_px)
-    return measure_alignment(crop, region_mask(mask, frame.shape[:2], box_px), params)
+    return measure_alignment(crop, region_mask(mask, frame.shape[:2], box_px), params, region_px)

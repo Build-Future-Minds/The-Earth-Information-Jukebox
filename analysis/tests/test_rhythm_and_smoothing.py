@@ -16,6 +16,7 @@ from sonata_math.rhythm import (
     events_for_step,
     events_for_steps,
     long_fraction,
+    note_length,
     rule_text,
     second_pulse_shift,
 )
@@ -149,13 +150,23 @@ def test_pitch_loudness_and_length_carry_no_data():
 
 @pytest.mark.parametrize("beat_seconds", [1.0, 0.5, 0.2])
 def test_notes_never_overlap(beat_seconds):
-    """Like the app, a note is cut to 90% of the short gap when the beat is fast."""
+    """Like the app, a note fits in the shortest gap the rule can make when the beat is fast."""
     params = RhythmParams(beat_seconds=beat_seconds)
     for a in GRID:
         steps = [{"t": i * beat_seconds, "region": "a", "alignment": a} for i in range(3)]
         events = events_for_steps(steps, params)
         for earlier, later in zip(events, events[1:]):
             assert earlier["t"] + earlier["dur"] < later["t"]
+
+
+@pytest.mark.parametrize("beat_seconds", [1.0, 0.5, 0.2, 0.1])
+def test_note_length_is_the_same_for_every_alignment(beat_seconds):
+    """Note length must carry no data, even on fast beats where notes are shortened
+    (Dev A's catch, fixed in the app in PR #6). 0.2 s and 0.1 s beats shorten the note."""
+    params = RhythmParams(beat_seconds=beat_seconds)
+    lengths = {e["dur"] for a in GRID for e in events_for_step(0.0, "a", a, params)}
+    expected = round(min(params.dur, 0.9 * beat_seconds * (1 - params.long_fraction_at_zero)), 6)
+    assert lengths == {expected} == {note_length(params)}
 
 
 def test_note_settings_match_the_app():
@@ -166,6 +177,8 @@ def test_note_settings_match_the_app():
     assert f"PULSE_SECONDS = {R.dur};" in source
     assert f"LONG_AT_A0 = {R.long_fraction_at_zero};" in source
     assert f"LONG_AT_A1 = {R.long_fraction_at_one};" in source
+    # The app sizes every note for the shortest gap (alignment 0), as note_length() does.
+    assert "beatSeconds * (1 - LONG_AT_A0) * 0.9" in source
 
 
 def test_replay_gives_the_same_notes():

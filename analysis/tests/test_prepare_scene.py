@@ -90,6 +90,8 @@ def test_every_frame_traces_to_its_file_and_model_time(project: Path) -> None:
     for i, n in enumerate(INDICES):
         assert (project / frames["pattern"].format(index=n)).is_file()
         assert frames["timestamps"][i] == f"2007-03-{25 + i:02d}T12:00Z"
+        # The scene alone says which file frame i is (scene schema 0.2, frames.first_index / index_step).
+        assert frames["first_index"] + i * frames["index_step"] == n
 
 
 def test_mask_is_white_inside_the_circle_and_black_on_land(project: Path) -> None:

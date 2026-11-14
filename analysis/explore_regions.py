@@ -74,8 +74,10 @@ def measure_circles(frames, land, circles, params):
     results = {}
     for region_id, (cx, cy), r in circles:
         box = (slice(cy - r, cy + r), slice(cx - r, cx + r))
-        mask = (disc(land.shape, (cx, cy), r) & ~land)[box]
-        results[region_id] = [measure_alignment(f[box], mask, params) for f in frames]
+        circle = disc(land.shape, (cx, cy), r)[box]
+        mask = circle & ~land[box]
+        region_px = int(circle.sum())  # as features.py: the usable gate is judged on the circle
+        results[region_id] = [measure_alignment(f[box], mask, params, region_px) for f in frames]
     return results
 
 
@@ -115,7 +117,8 @@ def alignment_map(frame_bgr, land, params, radius):
     jyy = window_sum(np.where(voting, gy * gy, 0.0))
     jxy = window_sum(np.where(voting, gx * gy, 0.0))
     n_voting = window_sum(voting)
-    usable = n_voting / float((2 * radius) ** 2)
+    circle_px = float((d[None, :] ** 2 + d[:, None] ** 2 <= radius**2).sum())
+    usable = n_voting / circle_px  # as the engine with region_px = the circle's pixel count
     open_water = window_sum(eligible) / kernel.sum()  # 1 = no land or frame edge near the circle
     with np.errstate(invalid="ignore", divide="ignore"):
         score = np.hypot(jxx - jyy, 2.0 * jxy) / (jxx + jyy + params.epsilon)

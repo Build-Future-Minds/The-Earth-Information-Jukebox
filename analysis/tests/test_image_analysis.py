@@ -298,6 +298,62 @@ def test_region_smaller_than_the_filter_is_missing():
     assert result.reason_code == REASON_REGION_TOO_SMALL
 
 
+def test_a_small_mask_area_is_too_small_not_all_masked():
+    """Some pixels are included, but none survives the blur margin: the honest reason is
+    'too small' (Dev B's review). 'all masked' is kept for a mask that includes nothing."""
+    image = S.line_stripes()
+    mask = np.zeros(image.shape, bool)
+    mask[100:106, 100:106] = True  # 6 x 6 included pixels; the margin needs 11 x 11
+    result = measure_alignment(image, mask, P)
+    assert result.status == "missing" and result.reason_code == REASON_REGION_TOO_SMALL
+    assert result.alignment is None and "too small" in result.reason
+    nothing = measure_alignment(image, np.zeros(image.shape, bool), P)
+    assert nothing.reason_code == REASON_ALL_MASKED
+
+
+def _circle(size: int) -> np.ndarray:
+    yy, xx = np.mgrid[0:size, 0:size]
+    c = size // 2
+    return (xx - c) ** 2 + (yy - c) ** 2 <= c**2
+
+
+def test_a_circle_region_is_judged_on_the_circle_not_its_box():
+    """Dev B's review: with the box as the denominator a circle was held to a 1.27x stricter
+    gate. With region_px = the circle's pixel count the share is of the circle."""
+    image = S.line_field((128, 128), n_lines=90, spread_deg=None, seed=3)
+    circle = _circle(128)
+    as_box = measure_alignment(image, circle, P)
+    as_circle = measure_alignment(image, circle, P, region_px=int(circle.sum()))
+    assert as_circle.alignment == as_box.alignment  # only the gate changes, never the score
+    assert as_circle.usable_fraction == pytest.approx(as_circle.n_voting / int(circle.sum()))
+    assert as_box.usable_fraction == pytest.approx(as_box.n_voting / 128**2)
+
+    sparse = np.zeros((128, 128), np.uint8)
+    sparse[60:68, 10:118] = S.line_stripes((8, 108), angle_deg=90.0)  # one thin band of short lines
+    n = measure_alignment(sparse, circle, P, region_px=int(circle.sum())).n_voting
+    params = replace(P, min_usable_fraction=(n / int(circle.sum()) + n / 128**2) / 2)  # gate between the two
+    assert measure_alignment(sparse, circle, params, region_px=int(circle.sum())).status == "ok"
+    assert measure_alignment(sparse, circle, params).status == "missing"
+
+
+def test_a_mostly_masked_circle_is_missing():
+    """Land the mask removes still counts in the circle: it holds no evidence. So a circle that
+    is 95% land is missing, not scored from a sliver of water (why the denominator is not the
+    measured area)."""
+    image = S.line_stripes((128, 128))
+    circle = _circle(128)
+    water = circle.copy()
+    water[:, 20:] = False  # only a thin strip on the left is open water
+    result = measure_alignment(image, water, P, region_px=int(circle.sum()))
+    assert result.status == "missing" and result.reason_code == REASON_TOO_FEW_EDGES
+    assert result.n_voting > 0  # there were some lines, just too little evidence
+
+
+def test_region_px_must_fit_the_box():
+    with pytest.raises(ValueError, match="region_px"):
+        measure_alignment(S.line_stripes((16, 16)), None, P, region_px=16 * 16 + 1)
+
+
 def test_mask_of_the_wrong_shape_is_an_error():
     with pytest.raises(ValueError, match="does not match"):
         measure_alignment(S.line_stripes(), np.ones((10, 10), bool), P)

@@ -25,11 +25,15 @@ TIME_DECIMALS = 6
 
 @dataclass(frozen=True)
 class Region:
-    """A named box in the frame. `mask` is True where pixels are included."""
+    """A named box in the frame. `mask` is True where pixels are included.
+
+    For a circle region, `mask` holds the circle (minus anything excluded) and `region_px`
+    the circle's pixel count, so the usable-fraction gate is judged on the circle."""
 
     id: str
     box_px: tuple[int, int, int, int]  # x, y, width, height
     mask: Optional[np.ndarray] = None  # frame-sized or box-sized
+    region_px: Optional[int] = None  # None = the whole box
 
 
 @dataclass(frozen=True)
@@ -105,7 +109,7 @@ def analyse_sequence(
                     f"says {expected_size[1]}x{expected_size[0]}.",
                 )
             else:
-                result = measure_region(frame, region.box_px, region.mask, params)
+                result = measure_region(frame, region.box_px, region.mask, params, region.region_px)
             per_region[region.id].append(result)
 
     records: list[StepRecord] = []

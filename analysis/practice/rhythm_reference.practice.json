@@ -52,19 +52,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8904,
-      "alignment_raw": 0.8904,
+      "alignment": 0.89,
+      "alignment_raw": 0.89,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.3698,
-      "dominant_angle_deg": 18.8,
-      "long_fraction": 0.5274,
+      "usable_fraction": 0.3548,
+      "dominant_angle_deg": 19.0,
+      "long_fraction": 0.5275,
       "pulse_times": [
         0.0,
-        0.5274
+        0.5275
       ],
-      "long_interval": 0.5274,
-      "short_interval": 0.4726
+      "long_interval": 0.5275,
+      "short_interval": 0.4725
     },
     {
       "t": 1.0,
@@ -72,19 +72,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8894,
-      "alignment_raw": 0.887,
+      "alignment": 0.8898,
+      "alignment_raw": 0.8894,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.3458,
+      "usable_fraction": 0.3358,
       "dominant_angle_deg": 18.7,
-      "long_fraction": 0.52765,
+      "long_fraction": 0.52755,
       "pulse_times": [
         1.0,
-        1.52765
+        1.52755
       ],
-      "long_interval": 0.52765,
-      "short_interval": 0.47235
+      "long_interval": 0.52755,
+      "short_interval": 0.47245
     },
     {
       "t": 2.0,
@@ -92,19 +92,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8911,
-      "alignment_raw": 0.8951,
+      "alignment": 0.8913,
+      "alignment_raw": 0.8948,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.3595,
+      "usable_fraction": 0.3536,
       "dominant_angle_deg": 18.1,
-      "long_fraction": 0.527225,
+      "long_fraction": 0.527175,
       "pulse_times": [
         2.0,
-        2.527225
+        2.527175
       ],
-      "long_interval": 0.527225,
-      "short_interval": 0.472775
+      "long_interval": 0.527175,
+      "short_interval": 0.472825
     },
     {
       "t": 3.0,
@@ -112,19 +112,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8909,
-      "alignment_raw": 0.8906,
+      "alignment": 0.8898,
+      "alignment_raw": 0.8862,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.3643,
-      "dominant_angle_deg": 20.2,
-      "long_fraction": 0.527275,
+      "usable_fraction": 0.3366,
+      "dominant_angle_deg": 19.7,
+      "long_fraction": 0.52755,
       "pulse_times": [
         3.0,
-        3.527275
+        3.52755
       ],
-      "long_interval": 0.527275,
-      "short_interval": 0.472725
+      "long_interval": 0.52755,
+      "short_interval": 0.47245
     },
     {
       "t": 4.0,
@@ -132,19 +132,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8903,
-      "alignment_raw": 0.889,
+      "alignment": 0.8895,
+      "alignment_raw": 0.8886,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.3447,
-      "dominant_angle_deg": 18.2,
-      "long_fraction": 0.527425,
+      "usable_fraction": 0.3266,
+      "dominant_angle_deg": 18.0,
+      "long_fraction": 0.527625,
       "pulse_times": [
         4.0,
-        4.527425
+        4.527625
       ],
-      "long_interval": 0.527425,
-      "short_interval": 0.472575
+      "long_interval": 0.527625,
+      "short_interval": 0.472375
     },
     {
       "t": 5.0,
@@ -152,19 +152,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8903,
-      "alignment_raw": 0.8902,
+      "alignment": 0.89,
+      "alignment_raw": 0.8911,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.371,
-      "dominant_angle_deg": 19.4,
-      "long_fraction": 0.527425,
+      "usable_fraction": 0.3525,
+      "dominant_angle_deg": 19.5,
+      "long_fraction": 0.5275,
       "pulse_times": [
         5.0,
-        5.527425
+        5.5275
       ],
-      "long_interval": 0.527425,
-      "short_interval": 0.472575
+      "long_interval": 0.5275,
+      "short_interval": 0.4725
     },
     {
       "t": 6.0,
@@ -172,19 +172,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8924,
-      "alignment_raw": 0.8972,
+      "alignment": 0.8928,
+      "alignment_raw": 0.8995,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.3516,
-      "dominant_angle_deg": 18.2,
-      "long_fraction": 0.5269,
+      "usable_fraction": 0.3311,
+      "dominant_angle_deg": 18.6,
+      "long_fraction": 0.5268,
       "pulse_times": [
         6.0,
-        6.5269
+        6.5268
       ],
-      "long_interval": 0.5269,
-      "short_interval": 0.4731
+      "long_interval": 0.5268,
+      "short_interval": 0.4732
     },
     {
       "t": 7.0,
@@ -192,19 +192,19 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8971,
-      "alignment_raw": 0.9081,
+      "alignment": 0.8966,
+      "alignment_raw": 0.9053,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.3381,
-      "dominant_angle_deg": 19.0,
-      "long_fraction": 0.525725,
+      "usable_fraction": 0.3409,
+      "dominant_angle_deg": 19.1,
+      "long_fraction": 0.52585,
       "pulse_times": [
         7.0,
-        7.525725
+        7.52585
       ],
-      "long_interval": 0.525725,
-      "short_interval": 0.474275
+      "long_interval": 0.52585,
+      "short_interval": 0.47415
     },
     {
       "t": 0.0,
@@ -212,19 +212,19 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0575,
-      "alignment_raw": 0.0575,
+      "alignment": 0.0869,
+      "alignment_raw": 0.0869,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.4575,
-      "dominant_angle_deg": 34.0,
-      "long_fraction": 0.735625,
+      "usable_fraction": 0.4511,
+      "dominant_angle_deg": 44.9,
+      "long_fraction": 0.728275,
       "pulse_times": [
         0.0,
-        0.735625
+        0.728275
       ],
-      "long_interval": 0.735625,
-      "short_interval": 0.264375
+      "long_interval": 0.728275,
+      "short_interval": 0.271725
     },
     {
       "t": 1.0,
@@ -232,19 +232,19 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.047,
-      "alignment_raw": 0.0225,
+      "alignment": 0.0803,
+      "alignment_raw": 0.0647,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.4581,
-      "dominant_angle_deg": 38.4,
-      "long_fraction": 0.73825,
+      "usable_fraction": 0.4412,
+      "dominant_angle_deg": 59.5,
+      "long_fraction": 0.729925,
       "pulse_times": [
         1.0,
-        1.73825
+        1.729925
       ],
-      "long_interval": 0.73825,
-      "short_interval": 0.26175
+      "long_interval": 0.729925,
+      "short_interval": 0.270075
     },
     {
       "t": 2.0,
@@ -252,19 +252,19 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0522,
-      "alignment_raw": 0.0645,
+      "alignment": 0.0877,
+      "alignment_raw": 0.105,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.4714,
-      "dominant_angle_deg": 102.0,
-      "long_fraction": 0.73695,
+      "usable_fraction": 0.4623,
+      "dominant_angle_deg": 116.1,
+      "long_fraction": 0.728075,
       "pulse_times": [
         2.0,
-        2.73695
+        2.728075
       ],
-      "long_interval": 0.73695,
-      "short_interval": 0.26305
+      "long_interval": 0.728075,
+      "short_interval": 0.271925
     },
     {
       "t": 3.0,
@@ -306,19 +306,19 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0605,
-      "alignment_raw": 0.0605,
+      "alignment": 0.0745,
+      "alignment_raw": 0.0745,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.4634,
-      "dominant_angle_deg": 105.9,
-      "long_fraction": 0.734875,
+      "usable_fraction": 0.4442,
+      "dominant_angle_deg": 106.7,
+      "long_fraction": 0.731375,
       "pulse_times": [
         5.0,
-        5.734875
+        5.731375
       ],
-      "long_interval": 0.734875,
-      "short_interval": 0.265125
+      "long_interval": 0.731375,
+      "short_interval": 0.268625
     },
     {
       "t": 6.0,
@@ -326,19 +326,19 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.055,
-      "alignment_raw": 0.0422,
+      "alignment": 0.0761,
+      "alignment_raw": 0.0798,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.496,
-      "dominant_angle_deg": 22.2,
-      "long_fraction": 0.73625,
+      "usable_fraction": 0.4946,
+      "dominant_angle_deg": 12.4,
+      "long_fraction": 0.730975,
       "pulse_times": [
         6.0,
-        6.73625
+        6.730975
       ],
-      "long_interval": 0.73625,
-      "short_interval": 0.26375
+      "long_interval": 0.730975,
+      "short_interval": 0.269025
     },
     {
       "t": 7.0,
@@ -346,19 +346,19 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0746,
-      "alignment_raw": 0.1202,
+      "alignment": 0.1024,
+      "alignment_raw": 0.1637,
       "reason": null,
       "reason_code": null,
-      "usable_fraction": 0.4508,
+      "usable_fraction": 0.4536,
       "dominant_angle_deg": 169.4,
-      "long_fraction": 0.73135,
+      "long_fraction": 0.7244,
       "pulse_times": [
         7.0,
-        7.73135
+        7.7244
       ],
-      "long_interval": 0.73135,
-      "short_interval": 0.26865
+      "long_interval": 0.7244,
+      "short_interval": 0.2756
     }
   ],
   "events": {
@@ -371,21 +371,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8904,
-          "long_fraction": 0.5274,
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 0.5274,
+        "t": 0.5275,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8904,
-          "long_fraction": 0.5274,
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -397,21 +397,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8894,
-          "long_fraction": 0.52765,
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 1.52765,
+        "t": 1.52755,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8894,
-          "long_fraction": 0.52765,
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -423,21 +423,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8911,
-          "long_fraction": 0.527225,
+          "alignment": 0.8913,
+          "long_fraction": 0.527175,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 2.527225,
+        "t": 2.527175,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8911,
-          "long_fraction": 0.527225,
+          "alignment": 0.8913,
+          "long_fraction": 0.527175,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -449,21 +449,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8909,
-          "long_fraction": 0.527275,
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 3.527275,
+        "t": 3.52755,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8909,
-          "long_fraction": 0.527275,
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -475,21 +475,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8903,
-          "long_fraction": 0.527425,
+          "alignment": 0.8895,
+          "long_fraction": 0.527625,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 4.527425,
+        "t": 4.527625,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8903,
-          "long_fraction": 0.527425,
+          "alignment": 0.8895,
+          "long_fraction": 0.527625,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -501,21 +501,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8903,
-          "long_fraction": 0.527425,
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 5.527425,
+        "t": 5.5275,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8903,
-          "long_fraction": 0.527425,
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -527,21 +527,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8924,
-          "long_fraction": 0.5269,
+          "alignment": 0.8928,
+          "long_fraction": 0.5268,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 6.5269,
+        "t": 6.5268,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8924,
-          "long_fraction": 0.5269,
+          "alignment": 0.8928,
+          "long_fraction": 0.5268,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -553,21 +553,21 @@
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8971,
-          "long_fraction": 0.525725,
+          "alignment": 0.8966,
+          "long_fraction": 0.52585,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 7.525725,
+        "t": 7.52585,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "aligned_lines",
-          "alignment": 0.8971,
-          "long_fraction": 0.525725,
+          "alignment": 0.8966,
+          "long_fraction": 0.52585,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       }
@@ -581,21 +581,21 @@
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0575,
-          "long_fraction": 0.735625,
+          "alignment": 0.0869,
+          "long_fraction": 0.728275,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 0.735625,
+        "t": 0.728275,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0575,
-          "long_fraction": 0.735625,
+          "alignment": 0.0869,
+          "long_fraction": 0.728275,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -607,21 +607,21 @@
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.047,
-          "long_fraction": 0.73825,
+          "alignment": 0.0803,
+          "long_fraction": 0.729925,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 1.73825,
+        "t": 1.729925,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.047,
-          "long_fraction": 0.73825,
+          "alignment": 0.0803,
+          "long_fraction": 0.729925,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -633,21 +633,21 @@
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0522,
-          "long_fraction": 0.73695,
+          "alignment": 0.0877,
+          "long_fraction": 0.728075,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 2.73695,
+        "t": 2.728075,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0522,
-          "long_fraction": 0.73695,
+          "alignment": 0.0877,
+          "long_fraction": 0.728075,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -659,21 +659,21 @@
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0605,
-          "long_fraction": 0.734875,
+          "alignment": 0.0745,
+          "long_fraction": 0.731375,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 5.734875,
+        "t": 5.731375,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0605,
-          "long_fraction": 0.734875,
+          "alignment": 0.0745,
+          "long_fraction": 0.731375,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -685,21 +685,21 @@
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.055,
-          "long_fraction": 0.73625,
+          "alignment": 0.0761,
+          "long_fraction": 0.730975,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 6.73625,
+        "t": 6.730975,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.055,
-          "long_fraction": 0.73625,
+          "alignment": 0.0761,
+          "long_fraction": 0.730975,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
@@ -711,21 +711,21 @@
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0746,
-          "long_fraction": 0.73135,
+          "alignment": 0.1024,
+          "long_fraction": 0.7244,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       },
       {
-        "t": 7.73135,
+        "t": 7.7244,
         "voice": "earth",
         "pitch": 64,
         "dur": 0.08,
         "vel": 0.8,
         "why": {
           "region": "mixed_lines",
-          "alignment": 0.0746,
-          "long_fraction": 0.73135,
+          "alignment": 0.1024,
+          "long_fraction": 0.7244,
           "rule": "long_fraction = 0.75 - 0.25 * alignment"
         }
       }

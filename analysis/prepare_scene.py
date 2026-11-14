@@ -15,7 +15,8 @@ and writes
 
 Then Dev A measures it:
     cd analysis && python features.py --scene ../data/scene.json --out ../data/features.json \
-        --first-index 23000 --index-step 4
+        --rhythm-out ../data/rhythm_reference.json
+(the frame numbers 23000, 23004, ... are written into scene.json, so no extra flags)
 
 What it checks
     A bad input (missing dates file, broken regions file, circle off the map...) stops the run
@@ -240,6 +241,8 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
         scene_regions.append({
             "id": r["id"],
             "name": r["name"],
+            "center_px": [int(centre[0]), int(centre[1])],
+            "radius_px": int(radius),
             "box_px": [x, y, w, h],
             "mask": mask_rel,
             "description": f"A circle {2 * radius} pixels across, centred at x {centre[0]}, y {centre[1]} on the "
@@ -255,7 +258,7 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
             source[key] = asset[key]
     motion = asset.get("motion_check", {})
     scene = {
-        "schema_version": "0.1",
+        "schema_version": "0.2",
         "is_mock": False,
         "source": source,
         "frames": {
@@ -264,6 +267,8 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
             "count": len(indices),
             "pattern": pattern,
             "timestamps": [c.timestamp for c in checks],
+            "first_index": first,  # frame i is file number first + i * step
+            "index_step": step,
             "camera_static_check": (f"{motion['method']}: {motion['result']}" if motion
                                     else "see assets/source_manifest.json"),
         },
@@ -325,7 +330,7 @@ def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
     for c in bad:
         print(f"  frame {c.index} ({c.timestamp}) kept in place but unusable: {c.reason}")
     print(f"Next (Dev A): cd analysis && python features.py --scene ../{args.out.resolve().relative_to(root.resolve()).as_posix()} "
-          f"--out ../data/features.json --first-index {args.first} --index-step {args.step}")
+          f"--out ../data/features.json --rhythm-out ../data/rhythm_reference.json")
     return 0
 
 

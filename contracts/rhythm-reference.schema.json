@@ -80,7 +80,7 @@
           "alignment_raw": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "this frame alone, before smoothing" },
           "reason": { "type": ["string", "null"], "description": "sentence for people; null when ok" },
           "reason_code": { "type": ["string", "null"], "description": "for code: too_few_edges, all_masked, region_too_small, empty_region, frame_unreadable, frame_size_mismatch" },
-          "usable_fraction": { "type": "number", "minimum": 0, "maximum": 1, "description": "share of the region's pixels that voted" },
+          "usable_fraction": { "type": "number", "minimum": 0, "maximum": 1, "description": "share of the region's pixels that voted (the circle for a circle region, else the box)" },
           "dominant_angle_deg": { "type": ["number", "null"], "description": "on-screen line direction, 0 = horizontal, counter-clockwise, 0-180; only meaningful when alignment is well above 0" },
           "long_fraction": { "type": ["number", "null"], "description": "share of the beat before the second pulse; null when missing" },
           "pulse_times": { "type": "array", "items": { "type": "number", "minimum": 0 }, "description": "seconds from playback start; empty when missing" },

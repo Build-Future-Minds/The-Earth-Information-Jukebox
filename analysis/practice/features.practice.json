@@ -15,7 +15,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8904,
+      "alignment": 0.89,
       "reason": null
     },
     {
@@ -24,7 +24,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8894,
+      "alignment": 0.8898,
       "reason": null
     },
     {
@@ -33,7 +33,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8911,
+      "alignment": 0.8913,
       "reason": null
     },
     {
@@ -42,7 +42,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8909,
+      "alignment": 0.8898,
       "reason": null
     },
     {
@@ -51,7 +51,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8903,
+      "alignment": 0.8895,
       "reason": null
     },
     {
@@ -60,7 +60,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8903,
+      "alignment": 0.89,
       "reason": null
     },
     {
@@ -69,7 +69,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8924,
+      "alignment": 0.8928,
       "reason": null
     },
     {
@@ -78,7 +78,7 @@
       "source_time": null,
       "region": "aligned_lines",
       "status": "ok",
-      "alignment": 0.8971,
+      "alignment": 0.8966,
       "reason": null
     },
     {
@@ -87,7 +87,7 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0575,
+      "alignment": 0.0869,
       "reason": null
     },
     {
@@ -96,7 +96,7 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.047,
+      "alignment": 0.0803,
       "reason": null
     },
     {
@@ -105,7 +105,7 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0522,
+      "alignment": 0.0877,
       "reason": null
     },
     {
@@ -132,7 +132,7 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0605,
+      "alignment": 0.0745,
       "reason": null
     },
     {
@@ -141,7 +141,7 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.055,
+      "alignment": 0.0761,
       "reason": null
     },
     {
@@ -150,7 +150,7 @@
       "source_time": null,
       "region": "mixed_lines",
       "status": "ok",
-      "alignment": 0.0746,
+      "alignment": 0.1024,
       "reason": null
     }
   ]

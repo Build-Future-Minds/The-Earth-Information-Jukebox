@@ -40,7 +40,8 @@ class RhythmParams:
     pitch, dur, vel        MIDI note, note length in seconds, loudness 0-1. No data.
 
     The defaults for pitch, dur and vel are the app's (web/src/audio/earthVoice.ts).
-    Like the app, a note is shortened to 90% of the short gap if it would not fit.
+    Like the app, a note is shortened if it would not fit in the shortest gap the rule can
+    make (alignment 0): note_length() is the same for every alignment, so it carries no data.
     """
 
     beat_seconds: float = 1.0
@@ -122,6 +123,16 @@ def second_pulse_shift(a: float, b: float, params: RhythmParams = RhythmParams()
     return abs(beat_timing(a, params).long_interval - beat_timing(b, params).long_interval)
 
 
+def note_length(params: RhythmParams = RhythmParams()) -> float:
+    """Length of every Earth note in seconds, the same for every alignment.
+
+    Same as the app (earthVoice.ts): at most `dur`, and short enough to end before the next
+    pulse even in the shortest gap the rule can make, (1 - long_fraction_at_zero) of a beat.
+    """
+    shortest_gap = params.beat_seconds * (1.0 - params.long_fraction_at_zero)
+    return round(min(params.dur, 0.9 * shortest_gap), 6)
+
+
 def events_for_step(
     t: float, region: str, alignment: Optional[float], params: RhythmParams = RhythmParams()
 ) -> list[dict]:
@@ -135,8 +146,7 @@ def events_for_step(
         "long_fraction": round(timing.long_fraction, 6),
         "rule": rule_text(params),
     }
-    # Same as the app: never let a note run into the next pulse.
-    dur = round(min(params.dur, 0.9 * timing.short_interval), 6)
+    dur = note_length(params)
     return [
         {
             "t": round(float(t) + offset, 6),

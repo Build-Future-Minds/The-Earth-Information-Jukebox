@@ -240,7 +240,7 @@ def write_scene(tmp_path: Path, with_mask: bool = False) -> Path:
         cv2.imwrite(str(tmp_path / "TEST_INPUT_mask.png"), mask)
         mask_path = "TEST_INPUT_mask.png"
     scene = {
-        "schema_version": "0.1",
+        "schema_version": "0.2",
         "is_mock": True,
         "source": {
             "svs_id": None,
@@ -258,8 +258,10 @@ def write_scene(tmp_path: Path, with_mask: bool = False) -> Path:
             "timestamps": ["2007-03-25T12:00Z", "2007-03-25T16:00Z", "2007-03-25T20:00Z", "2007-03-26T00:00Z"],
         },
         "regions": [
-            {"id": "left", "name": "Left", "box_px": [0, 0, 128, 128], "mask": None, "description": "aligned"},
-            {"id": "right", "name": "Right", "box_px": [128, 0, 128, 128], "mask": mask_path, "description": "mixed"},
+            {"id": "left", "name": "Left", "center_px": [64, 64], "radius_px": 64,
+             "box_px": [0, 0, 128, 128], "mask": None, "description": "aligned"},
+            {"id": "right", "name": "Right", "center_px": [192, 64], "radius_px": 64,
+             "box_px": [128, 0, 128, 128], "mask": mask_path, "description": "mixed"},
         ],
     }
     jsonschema.validate(scene, schema("scene.schema.json"))
@@ -313,6 +315,94 @@ def test_command_reads_frame_files_numbered_in_steps(tmp_path):
     assert [s["status"] for s in without_step["steps"]] == ["ok", "missing", "missing"]
 
 
+def stepped_scene(tmp_path: Path, **frames_extra) -> Path:
+    """Three frames numbered 23000, 23004, 23008, like SVS 3912."""
+    frames_dir = tmp_path / "frames"
+    frames_dir.mkdir(exist_ok=True)
+    for i, number in enumerate((23000, 23004, 23008)):
+        cv2.imwrite(str(frames_dir / f"TEST_INPUT.{number}.png"), two_box_frame(i))
+    scene = {
+        "is_mock": True,
+        "frames": {"width": 256, "height": 128, "count": 3, "pattern": "frames/TEST_INPUT.{index}.png", **frames_extra},
+        "regions": [{"id": "left", "name": "Left", "box_px": [0, 0, 128, 128], "mask": None, "description": "x"}],
+    }
+    scene_path = tmp_path / "scene.json"
+    scene_path.write_text(json.dumps(scene), encoding="utf-8")
+    return scene_path
+
+
+def test_frame_numbering_is_read_from_the_scene(tmp_path):
+    """The scene alone says which file each frame came from; no command-line flags needed."""
+    scene_path = stepped_scene(tmp_path, first_index=23000, index_step=4)
+    document = features.run(scene_path, tmp_path / "f.json", root=tmp_path)
+    assert [s["status"] for s in document["steps"]] == ["ok", "ok", "ok"]
+
+
+def test_a_command_line_frame_number_must_agree_with_the_scene(tmp_path, capsys):
+    scene_path = stepped_scene(tmp_path, first_index=23000, index_step=4)
+    code = features.main(["--scene", str(scene_path), "--out", str(tmp_path / "f.json"),
+                          "--root", str(tmp_path), "--index-step", "1"])
+    assert code == 2 and "disagrees with frames.index_step" in capsys.readouterr().err
+    assert not (tmp_path / "f.json").exists()
+
+
+@pytest.mark.parametrize("timestamps", [["2007-03-25T12:00Z"], ["a", "b", "c", "d"]])
+def test_timestamps_must_have_one_entry_per_frame(tmp_path, capsys, timestamps):
+    """A short list would leave steps without a time; a long one hints at the wrong frames."""
+    scene_path = stepped_scene(tmp_path, first_index=23000, index_step=4, timestamps=timestamps)
+    code = features.main(["--scene", str(scene_path), "--out", str(tmp_path / "f.json"), "--root", str(tmp_path)])
+    err = capsys.readouterr().err
+    assert code == 2 and f"has {len(timestamps)} entries but frames.count is 3" in err
+
+
+def circle_scene(tmp_path: Path, frame: np.ndarray, regions: list[dict]) -> Path:
+    cv2.imwrite(str(tmp_path / "TEST_INPUT_c.png"), frame)
+    scene = {"is_mock": True, "regions": regions,
+             "frames": {"width": frame.shape[1], "height": frame.shape[0], "count": 1, "pattern": "TEST_INPUT_c.png"}}
+    path = tmp_path / "scene.json"
+    path.write_text(json.dumps(scene), encoding="utf-8")
+    return path
+
+
+def test_a_circle_region_ignores_the_corners_of_its_box(tmp_path):
+    """Strong lines in the four corners, outside the circle, must not change the result."""
+    from sonata_math.image_analysis import measure_alignment
+
+    clean = S.line_field((128, 128), n_lines=90, spread_deg=None, seed=7)
+    yy, xx = np.mgrid[0:128, 0:128]
+    circle = (xx - 64) ** 2 + (yy - 64) ** 2 <= 64**2
+    noisy = clean.copy()
+    noisy[~circle] = S.line_stripes((128, 128))[~circle]  # parallel stripes only in the corners
+    region = {"id": "c", "name": "C", "center_px": [64, 64], "radius_px": 64,
+              "box_px": [0, 0, 128, 128], "mask": None, "description": "x"}
+    document = features.run(circle_scene(tmp_path, noisy, [region]), tmp_path / "f.json", root=tmp_path,
+                             smoothing_alpha=1.0)
+    expected = measure_alignment(clean, circle, P).alignment
+    assert document["steps"][0]["alignment"] == pytest.approx(expected, abs=1e-4)
+    assert abs(measure_alignment(noisy, None, P).alignment - expected) > 0.05  # the corners would matter
+    # ...and the usable gate is judged on the circle's pixels, not the box's (Dev B's review).
+    (built,) = features.build_regions(json.loads((tmp_path / "scene.json").read_text(encoding="utf-8")), tmp_path)
+    assert built.region_px == int(circle.sum()) < 128 * 128
+
+
+def test_a_circle_must_match_its_box(tmp_path, capsys):
+    region = {"id": "c", "name": "C", "center_px": [64, 64], "radius_px": 60,
+              "box_px": [0, 0, 128, 128], "mask": None, "description": "x"}
+    path = circle_scene(tmp_path, np.zeros((128, 256), np.uint8), [region])
+    code = features.main(["--scene", str(path), "--out", str(tmp_path / "f.json"), "--root", str(tmp_path)])
+    assert code == 2 and "not the bounding square" in capsys.readouterr().err
+
+
+def test_circles_must_share_one_radius(tmp_path, capsys):
+    regions = [
+        {"id": "a", "name": "A", "center_px": [64, 64], "radius_px": 64, "box_px": [0, 0, 128, 128], "description": "x"},
+        {"id": "b", "name": "B", "center_px": [190, 64], "radius_px": 60, "box_px": [130, 4, 120, 120], "description": "x"},
+    ]
+    path = circle_scene(tmp_path, np.zeros((128, 256), np.uint8), regions)
+    code = features.main(["--scene", str(path), "--out", str(tmp_path / "f.json"), "--root", str(tmp_path)])
+    assert code == 2 and "same radius" in capsys.readouterr().err
+
+
 def test_command_gives_the_same_file_twice(tmp_path):
     scene_path = write_scene(tmp_path)
     a, b = tmp_path / "a.json", tmp_path / "b.json"
@@ -353,14 +443,8 @@ def test_committed_practice_files_are_what_the_engine_produces():
     jsonschema.validate(scene, schema("scene.schema.json"))
     assert committed["is_mock"] is True and scene["is_mock"] is True
 
-    frames, mask = [], None
-    for index in range(make_practice_scene.N_FRAMES):
-        frame, mask = make_practice_scene.make_frame(index)
-        frames.append(frame)
-    regions = [
-        Region("aligned_lines", make_practice_scene.BOX_ALIGNED, mask),
-        Region("mixed_lines", make_practice_scene.BOX_MIXED),
-    ]
+    frames = [make_practice_scene.make_frame(index)[0] for index in range(make_practice_scene.N_FRAMES)]
+    regions = features.build_regions(scene, PROJECT)  # circles + the committed mask, as features.py reads them
     norm = committed["normalisation"]
     params = replace(P, gradient_threshold=norm["gradient_threshold"], min_usable_fraction=norm["min_usable_fraction"])
     records = analyse_sequence(frames, regions, params, norm["smoothing_alpha"], committed["step_seconds"])

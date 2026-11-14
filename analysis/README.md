@@ -26,8 +26,8 @@ pip install -r requirements.txt
 | `python run_experiments.py` | Re-measures every verification experiment, redraws `docs/figures/math/`, rewrites the tables in `docs/science_review.md`, and writes two test-tone rhythms to `out/`. |
 | `python explore_regions.py --map` | Measures the draft circles in `assets/regions_draft.json` on the NASA frames and scores every circle position in the picture. Needs `bash tools/download_frames.sh` first. Writes only to `out/`. |
 
-For SVS 3912, whose frame files are numbered 23000, 23004, …, add `--first-index 23000 --index-step 4`
-to `features.py`.
+SVS 3912's frame files are numbered 23000, 23004, …. `prepare_scene.py` writes that into
+`scene.json` (`frames.first_index`, `frames.index_step`), so `features.py` needs no extra flags.
 
 `features.py --help` lists the settings. Paths inside a scene file are read relative to the
 repository root; change that with `--root`.
@@ -80,7 +80,7 @@ input stops with a message saying what to fix; an unusable frame keeps its place
 The output is checked against `contracts/scene.schema.json` before it is written. Then measure it:
 
     cd analysis && python features.py --scene ../data/scene.json --out ../data/features.json \
-        --first-index 23000 --index-step 4
+        --rhythm-out ../data/rhythm_reference.json
 
 Tests: `tests/test_prepare_scene.py` (good input, bad inputs, unusable frames end to end).
 

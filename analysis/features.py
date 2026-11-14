@@ -6,8 +6,17 @@ Run from the `analysis/` folder:
         --out practice/features.practice.json \
         --rhythm-out practice/rhythm_reference.practice.json
 
+For the NASA scene (frame numbers 23000, 23004, ... are read from scene.json):
+
+    python features.py --scene ../data/scene.json --out ../data/features.json \
+        --rhythm-out ../data/rhythm_reference.json
+
 Paths inside scene.json (frame pattern, masks) are read relative to --root, which
 defaults to the project folder that contains `analysis/`.
+
+A region with `center_px` and `radius_px` (scene schema 0.2) is measured on that circle
+only: its mask file, if any, is combined with the circle. All circles must have the same
+radius, and `box_px` must be the circle's bounding square.
 
 The numbers describe the rendered image. They are not water speed, turbulence or
 ocean health.
@@ -30,6 +39,7 @@ from sonata_math.image_analysis import (
     crop_box,
     load_image,
     load_mask,
+    region_mask,
 )
 from sonata_math.pipeline import FrameProblem, Region, analyse_sequence
 from sonata_math.rhythm import RhythmParams
@@ -46,17 +56,49 @@ def load_scene(path: Path) -> dict:
     return scene
 
 
+def circle_in_box(box: tuple[int, int, int, int], centre: tuple[int, int], radius: int) -> np.ndarray:
+    """Box-sized mask, True where pixel (x, y) has (x - cx)^2 + (y - cy)^2 <= r^2.
+
+    The same rule as prepare_scene.py and explore_regions.py, so a mask file that already
+    holds the circle is left unchanged when the two are combined.
+    """
+    x, y, w, h = box
+    yy, xx = np.mgrid[y : y + h, x : x + w]
+    return (xx - centre[0]) ** 2 + (yy - centre[1]) ** 2 <= radius**2
+
+
+def _circle(entry: dict, box: tuple[int, int, int, int]) -> Optional[tuple[tuple[int, int], int]]:
+    """The region's circle, or None for an old box-only region. A circle that does not
+    match its box stops the run, because the engine crops to box_px."""
+    has_centre, has_radius = "center_px" in entry, "radius_px" in entry
+    if not (has_centre or has_radius):
+        return None
+    if not (has_centre and has_radius):
+        raise ValueError(f"Region '{entry['id']}': give both center_px and radius_px, or neither.")
+    cx, cy = (int(v) for v in entry["center_px"])
+    r = int(entry["radius_px"])
+    expected = (cx - r, cy - r, 2 * r, 2 * r)
+    if box != expected:
+        raise ValueError(
+            f"Region '{entry['id']}': box_px {list(box)} is not the bounding square of the circle "
+            f"(centre {[cx, cy]}, radius {r}); it should be {list(expected)}."
+        )
+    return (cx, cy), r
+
+
 def build_regions(scene: dict, root: Path) -> list[Region]:
-    """Read region boxes and masks. A bad box or mask stops the run with a clear message."""
+    """Read region boxes, circles and masks. A bad one stops the run with a clear message."""
     frame_shape = (scene["frames"]["height"], scene["frames"]["width"])
     probe = np.zeros(frame_shape, dtype=np.uint8)
-    regions = []
+    regions, radii = [], {}
     for entry in scene["regions"]:
         box = tuple(int(v) for v in entry["box_px"])
         try:
             crop_box(probe, box)
         except ValueError as error:
             raise ValueError(f"Region '{entry['id']}': {error}") from None
+        circle = _circle(entry, box)
+        radii[entry["id"]] = None if circle is None else circle[1]
         mask = None
         if entry.get("mask"):
             mask = load_mask(root / entry["mask"])
@@ -66,8 +108,57 @@ def build_regions(scene: dict, root: Path) -> list[Region]:
                     f"pixels. It must be the frame size ({frame_shape[1]}x{frame_shape[0]}) or "
                     f"the region size ({box[2]}x{box[3]})."
                 )
-        regions.append(Region(id=entry["id"], box_px=box, mask=mask))
+        region_px = None
+        if circle is not None:
+            inside = circle_in_box(box, *circle)
+            mask = inside if mask is None else (region_mask(mask, frame_shape, box) > 0) & inside
+            region_px = int(inside.sum())  # the usable gate is judged on the circle
+        regions.append(Region(id=entry["id"], box_px=box, mask=mask, region_px=region_px))
+    if len(set(radii.values())) > 1:
+        shown = ", ".join(f"{k}: {'no circle' if v is None else f'{v} px'}" for k, v in radii.items())
+        raise ValueError(
+            f"Every region must be a circle of the same radius for a fair comparison ({shown})."
+        )
     return regions
+
+
+def frame_numbering(
+    scene: dict, first_index: Optional[int] = None, index_step: Optional[int] = None
+) -> tuple[int, int]:
+    """File number of the first frame and the gap between numbers.
+
+    Read from scene.json (frames.first_index, frames.index_step) so the scene alone says
+    which file each frame came from. A command-line value must agree with the scene.
+    """
+    frames = scene["frames"]
+    resolved = []
+    for key, given, default in (("first_index", first_index, 0), ("index_step", index_step, 1)):
+        in_scene = frames.get(key)
+        if given is not None and in_scene is not None and int(given) != int(in_scene):
+            raise ValueError(
+                f"--{key.replace('_', '-')} {given} disagrees with frames.{key} = {in_scene} in the "
+                "scene. Leave the option out to use the scene's value."
+            )
+        resolved.append(int(given if given is not None else in_scene if in_scene is not None else default))
+    first, step = resolved
+    if first < 0:
+        raise ValueError("first_index must be 0 or more")
+    if step < 1:
+        raise ValueError("index_step must be 1 or more")
+    return first, step
+
+
+def check_timestamps(scene: dict) -> Optional[list[str]]:
+    """One model time per frame, or none at all. A list of another length would silently
+    give some steps no time, or the wrong one, so it stops the run."""
+    timestamps = scene["frames"].get("timestamps") or None
+    count = scene["frames"]["count"]
+    if timestamps is not None and len(timestamps) != count:
+        raise ValueError(
+            f"frames.timestamps has {len(timestamps)} entries but frames.count is {count}. "
+            "Each frame needs exactly one model time; run prepare_scene.py again."
+        )
+    return timestamps
 
 
 def iter_frames(
@@ -103,15 +194,17 @@ def run(
     params: AnalysisParams = AnalysisParams(),
     smoothing_alpha: float = 0.3,
     step_seconds: float = 1.0,
-    first_index: int = 0,
-    index_step: int = 1,
+    first_index: Optional[int] = None,
+    index_step: Optional[int] = None,
 ) -> dict:
-    """Measure a scene and write the output file(s). Returns the features document."""
-    if index_step < 1:
-        raise ValueError("index_step must be 1 or more")
+    """Measure a scene and write the output file(s). Returns the features document.
+
+    first_index / index_step default to the scene's frames.first_index / frames.index_step
+    (then 0 and 1)."""
     scene = load_scene(scene_path)
+    first_index, index_step = frame_numbering(scene, first_index, index_step)
+    timestamps = check_timestamps(scene)
     regions = build_regions(scene, root)
-    timestamps = scene["frames"].get("timestamps") or None
     records = analyse_sequence(
         iter_frames(scene, root, first_index, index_step),
         regions,
@@ -156,10 +249,10 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--rhythm-out", type=Path, help="also write the rhythm check file here")
     parser.add_argument("--root", type=Path, default=PROJECT_ROOT, help="folder that scene paths are relative to")
     parser.add_argument("--step-seconds", type=float, default=1.0, help="playback seconds per frame (= one beat)")
-    parser.add_argument("--first-index", type=int, default=0, help="number of the first frame file")
-    parser.add_argument("--index-step", type=int, default=1, help="gap between frame file numbers (SVS 3912: 4)")
+    parser.add_argument("--first-index", type=int, help="number of the first frame file (default: the scene's frames.first_index, else 0)")
+    parser.add_argument("--index-step", type=int, help="gap between frame file numbers (default: the scene's frames.index_step, else 1)")
     parser.add_argument("--threshold", type=float, default=defaults.gradient_threshold, help="gradient threshold, grey levels per pixel")
-    parser.add_argument("--min-usable", type=float, default=defaults.min_usable_fraction, help="smallest share of pixels that must vote")
+    parser.add_argument("--min-usable", type=float, default=defaults.min_usable_fraction, help="smallest share of the region's pixels (the circle) that must vote")
     parser.add_argument("--alpha", type=float, default=0.3, help="smoothing alpha in (0, 1]; 1 = off")
     parser.add_argument("--gray-mode", choices=("value", "luma"), default=defaults.gray_mode)
     parser.add_argument("--blur-sigma", type=float, default=defaults.blur_sigma)

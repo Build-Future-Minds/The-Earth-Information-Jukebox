@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "is_mock": true,
   "source": {
     "svs_id": null,
@@ -21,12 +21,19 @@
     "count": 8,
     "pattern": "analysis/practice/frames/TEST_INPUT_frame_{index:05d}.png",
     "timestamps": [],
+    "first_index": 0,
+    "index_step": 1,
     "camera_static_check": "not applicable (synthetic test input)"
   },
   "regions": [
     {
       "id": "aligned_lines",
-      "name": "Aligned lines box (practice)",
+      "name": "Aligned lines circle (practice)",
+      "center_px": [
+        128,
+        128
+      ],
+      "radius_px": 112,
       "box_px": [
         16,
         16,
@@ -38,7 +45,12 @@
     },
     {
       "id": "mixed_lines",
-      "name": "Mixed lines box (practice)",
+      "name": "Mixed lines circle (practice)",
+      "center_px": [
+        384,
+        128
+      ],
+      "radius_px": 112,
       "box_px": [
         272,
         16,

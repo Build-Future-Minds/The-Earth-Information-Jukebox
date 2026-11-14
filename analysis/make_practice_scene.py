@@ -11,6 +11,8 @@ Left box  "aligned_lines": dashes that nearly share one direction, plus a fake l
           that the mask excludes.
 Right box "mixed_lines":   dashes in every direction. Frames 3 and 4 are blank there,
           so those steps come out `missing`.
+
+Each region is the circle inside its square box (scene schema 0.2, same radius for both).
 """
 
 from __future__ import annotations
@@ -30,6 +32,13 @@ FRAME_SIZE = (256, 512)  # height, width
 BOX_ALIGNED = (16, 16, 224, 224)  # x, y, width, height
 BOX_MIXED = (272, 16, 224, 224)
 BLANK_FRAMES = (3, 4)
+
+
+def circle_of(box: tuple[int, int, int, int]) -> tuple[list[int], int]:
+    """Centre and radius of the circle whose bounding square is `box`."""
+    x, y, w, h = box
+    assert w == h and w % 2 == 0, "a practice box must be a square of even size"
+    return [x + w // 2, y + h // 2], w // 2
 
 
 def make_frame(index: int) -> tuple[np.ndarray, np.ndarray]:
@@ -62,8 +71,9 @@ def main() -> None:
         cv2.imwrite(str(frames_dir / f"TEST_INPUT_frame_{index:05d}.png"), frame)
     cv2.imwrite(str(PRACTICE / "TEST_INPUT_mask_aligned.png"), mask.astype(np.uint8) * 255)
 
+    (aligned_centre, radius), (mixed_centre, _) = circle_of(BOX_ALIGNED), circle_of(BOX_MIXED)
     scene = {
-        "schema_version": "0.1",
+        "schema_version": "0.2",
         "is_mock": True,
         "source": {
             "svs_id": None,
@@ -85,19 +95,25 @@ def main() -> None:
             "count": N_FRAMES,
             "pattern": "analysis/practice/frames/TEST_INPUT_frame_{index:05d}.png",
             "timestamps": [],
+            "first_index": 0,
+            "index_step": 1,
             "camera_static_check": "not applicable (synthetic test input)",
         },
         "regions": [
             {
                 "id": "aligned_lines",
-                "name": "Aligned lines box (practice)",
+                "name": "Aligned lines circle (practice)",
+                "center_px": aligned_centre,
+                "radius_px": radius,
                 "box_px": list(BOX_ALIGNED),
                 "mask": "analysis/practice/TEST_INPUT_mask_aligned.png",
                 "description": "Dashes that nearly share one direction. A fake legend is masked out.",
             },
             {
                 "id": "mixed_lines",
-                "name": "Mixed lines box (practice)",
+                "name": "Mixed lines circle (practice)",
+                "center_px": mixed_centre,
+                "radius_px": radius,
                 "box_px": list(BOX_MIXED),
                 "mask": None,
                 "description": "Dashes pointing every which way. Blank in frames 3 and 4.",
