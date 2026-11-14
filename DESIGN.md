@@ -115,7 +115,7 @@ components:
 
 # Design System: Axis Specimen
 
-Scope: this file covers the listening game's world only, `tools/listening_game.html` and any future surface built in the same world. Developer B's React app in `web/` (styled by `web/src/styles.css`) is a separate world that the user chose to keep as Developer B built it; nothing here describes or governs it.
+Scope: this file covers the listening game's world, `tools/listening_game.html`, and since 14 Nov also Developer B's React app in `web/` (`web/src/styles.css`), agreed by Student B and Developer B. The app keeps its own single-column layout and controls; it takes this system's palette, type, shapes, focus ring, motion and the Weight Is the Value readout.
 
 ## Overview
 

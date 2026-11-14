@@ -29,9 +29,12 @@ export function SceneView({ scene, imageUrl, regionId }: Props) {
           const on = r.id === regionId;
           return (
             <g key={r.id} className={on ? 'box active' : 'box'}>
-              {/* The circle is the exact area measured (inside the mask). */}
-              <circle cx={cx} cy={cy} r={r.radius_px} />
-              <text x={cx} y={cy - r.radius_px - 14} textAnchor="middle">{regionLabel(scene.regions, r.id)}</text>
+              {/* The circle is the exact area measured (inside the mask). A light ring inside a dark
+                  outline reads on any part of the image (Axis Specimen, DESIGN.md "Shapes"). */}
+              <circle className="ring-outline" cx={cx} cy={cy} r={r.radius_px} />
+              <circle className="ring" cx={cx} cy={cy} r={r.radius_px} />
+              <rect className="tab" x={cx - 92} y={cy - r.radius_px - 66} width={184} height={50} rx={4} />
+              <text x={cx} y={cy - r.radius_px - 31} textAnchor="middle">{regionLabel(scene.regions, r.id)}</text>
             </g>
           );
         })}

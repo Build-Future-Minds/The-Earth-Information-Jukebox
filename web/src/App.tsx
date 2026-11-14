@@ -4,6 +4,7 @@ import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
 import { MelodyPad } from './components/MelodyPad';
+import { NowPlaying } from './components/NowPlaying';
 import { ExploreControls, regionLabel } from './components/ExploreControls';
 import { RhythmExplanation, stepAtSameMoment } from './components/RhythmExplanation';
 import { SceneView } from './components/SceneView';
@@ -120,6 +121,7 @@ export function App() {
         <SceneView scene={scene} imageUrl={imageUrl} regionId={regionId} />
 
         <p className="status" role="status">{status}</p>
+        <NowPlaying step={sounding} regionLabel={label} />
         {missing && playState !== 'stopped' && (
           <p className="missing" role="alert">
             Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
