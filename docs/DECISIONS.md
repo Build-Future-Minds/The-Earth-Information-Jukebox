@@ -60,7 +60,8 @@ We do not cut a sounding note, because each pulse rings out, so we use no fade.
 
 | WCAG 2.2 | Level | What it asks | How the app meets it |
 | --- | --- | --- | --- |
-| 2.1.1 Keyboard | A | All functions work from a keyboard | Real buttons; `1`/`2` choose a region; `Esc` stops |
+| 2.1.1 Keyboard | A | All functions work from a keyboard | Real buttons; arrow keys or `1`/`2` choose a region; `Esc` stops |
+| 2.1.4 Character Key Shortcuts | A | Single-character shortcuts can be turned off, remapped, or work only while their control has focus | See D8 |
 | 2.4.7 Focus Visible | AA | The keyboard focus can be seen | 3 px focus outline on every control |
 | 4.1.3 Status Messages | AA | Status changes are announced without moving focus | `role="status"` line; `role="alert"` for missing information |
 
@@ -106,6 +107,29 @@ a rhythm other than the one you hear. Missing steps make no notes and show their
 
 ---
 
+## D8. Melody keys and number shortcuts work only while their control has focus
+
+**Verified** standard + **Design choice**. Owner: Dev B. Code: `MelodyPad.tsx`, `App.tsx` (key handler).
+
+**What:** the melody keys `A S D F G H J K` play only while the melody pad has focus. `1`/`2`
+choose a region only while focus is on the Region choice. `Esc` (not a character key) stops
+everything from anywhere.
+
+**Why:** WCAG 2.2 SC 2.1.4 (Level A) says a shortcut made of only letter, punctuation, number or
+symbol characters needs a way to turn it off or remap it, or must be "only active when that
+component has focus". **Verified** [S5]. W3C's reason: "some of the software used by this user
+group [speech input] converts any speech into simulated key presses, which can lead to unintended
+activations." Our first version had page-wide `1`/`2` shortcuts, which did not meet this. They
+were narrowed to the Region choice on 14 Nov.
+
+**Our interpretation:** W3C's text does not discuss composite groups. We treat the radio group as
+the one control for "choose a region". The pad is one control.
+
+**Melody:** a separate `user` voice with its own synth and volume, played immediately rather than
+on the Earth schedule, so it cannot move an Earth note (`docs/CONTRACT.md`). Pentatonic scale, an
+octave above the Earth pulse: any combination sounds consonant, and the two voices stay distinct.
+Both are **Design choices**. Tabbing away from the pad, Stop or `Esc` silences the melody.
+
 ## Sources
 
 | ID | Citation | Link | Status | Used in |
@@ -114,7 +138,7 @@ a rhythm other than the one you hear. Missing steps make no notes and show their
 | S2 | ITU-R Recommendation BS.1116-3 (02/2015). *Methods for the subjective assessment of small impairments in audio systems.* | https://www.itu.int/rec/R-REC-BS.1116/en | Verified (read) | D1 |
 | S3 | Shneiderman, B. (1983). Direct Manipulation: A Step Beyond Programming Languages. *Computer*, 16(8), 57–69. | https://doi.org/10.1109/MC.1983.1654471 (readable copy: https://www.cl.cam.ac.uk/~pr10/iui/shneiderman83.pdf) | Verified (read) | D1 |
 | S4 | Chrome for Developers. *Autoplay policy changes.* | https://developer.chrome.com/blog/autoplay | Verified (read) | D2 |
-| S5 | W3C. *Understanding WCAG 2.2*: 1.4.2, 2.1.1, 2.4.7, 4.1.3. | https://www.w3.org/WAI/WCAG22/Understanding/ | Verified (read) | D2, D3 |
+| S5 | W3C. *Understanding WCAG 2.2*: 1.4.2, 2.1.1, 2.1.4, 2.4.7, 4.1.3. | https://www.w3.org/WAI/WCAG22/Understanding/ | Verified (read) | D2, D3, D8 |
 | S6 | Walker, B. N., & Nees, M. A. (2011). Theory of Sonification. In T. Hermann, A. Hunt & J. G. Neuhoff (Eds.), *The Sonification Handbook* (ch. 2). Logos, Berlin. | https://sonification.de/handbook/index.php/chapters/chapter2 | Unverified (exists; not read) | D4 |
 | S7 | Mardia, K. V., & Jupp, P. E. (2000). *Directional Statistics.* Wiley. ISBN 978-0-471-95333-3. | n/a | Unverified (publication details only) | D5 |
 | S8 | Bigün, J., & Granlund, G. H. (1987). Optimal orientation detection of linear symmetry. *Proc. 1st ICCV*, London, 433–438. | n/a | Unverified (publication details only) | D5 |

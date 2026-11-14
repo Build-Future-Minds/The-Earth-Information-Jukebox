@@ -102,3 +102,19 @@ select, input { font: inherit; }
 }
 footer { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 16px; font-size: 0.95rem; }
 a { color: var(--accent); }
+.melody { margin: 24px 0; display: grid; gap: 10px; }
+.melody h2, .melody p { margin: 0; }
+.pad {
+  border: 2px dashed var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+  cursor: pointer;
+  background: var(--panel);
+}
+.pad.active { border-style: solid; border-color: var(--accent); }
+.pad-hint { color: var(--muted); }
+.pad-keys { display: flex; flex-wrap: wrap; gap: 8px; }
+.pad-keys kbd { font-size: 1.1rem; min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; margin: 0; }
+.pad-keys kbd.down { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }

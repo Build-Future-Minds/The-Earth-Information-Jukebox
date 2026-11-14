@@ -36,7 +36,7 @@ The app picks them up automatically. Restart `npm run dev` after adding them.
 | --- | --- |
 | Tab / Shift+Tab | Move between controls |
 | Enter or Space | Press the focused button |
-| 1, 2 | Choose Region A or B (playback continues at the same moment) |
+| Arrow keys, or 1 / 2 | On the Region choice: choose Region A or B (playback continues at the same moment) |
 | Esc | Stop all sound |
 
 No sound plays until you press Start.
