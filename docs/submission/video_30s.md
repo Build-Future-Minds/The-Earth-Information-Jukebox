@@ -33,14 +33,37 @@ Captions should be short enough to read in the time shown. Fill in or rewrite.
 | Time | Clip | What we hear | Caption |
 | --- | --- | --- | --- |
 | 0–4 s | 1 | Silence | Earth Sonata: hear two regions of one NASA ocean image |
-| 4–11 s | 2 | Region A rhythm | Region A: ____ — lines line up, so the pulse is ____ |
-| 11–18 s | 3 | Region B rhythm | Region B: ____ — lines run many ways, so the pulse is ____ |
-| 18–24 s | 4 | Paused | Ask why: every rhythm explains itself |
+| 4–11 s | 2 | Region A rhythm | Region A: lines run in many directions — the less even pulse |
+| 11–18 s | 3 | Region B rhythm | Region B: lines partly line up — the more even pulse |
+| 18–24 s | 4 | Paused | Ask why: it explains each rhythm and compares the two regions |
 | 24–28 s | 1 or 5 | One closing rhythm | A model visualization. The rhythm rule is our choice. |
 | 28–30 s | end card | Silence | Credit: NASA/GSFC Scientific Visualization Studio · repo link |
 
-Before filling the blanks in rows 2 and 3, listen to the real app. Which region really sounds
-more even? ____ Write what is true, not what we expected.
+### What the real app says
+
+Checked on 14 Nov by running the app's own explanation code on the real data in Mr. E's pull
+request #8 (`data/features.json`, first frame). Region A is **Kuroshio eddies east of Japan**.
+Region B is **Equatorial Pacific streaks**. This is the app's text, not a recording of the screen,
+so **confirm it against Dev B's recording** before the captions are final.
+
+| Region | What the app says |
+| --- | --- |
+| A | "The pulse is short–long because the visible lines in this region run in many directions. Alignment is 0.08 (0 = every which way, 1 = all the same way), so the second pulse falls 73% of the way through the beat (rule: long_fraction = 0.75 - 0.25 * alignment). Compared with Region B at the same moment, this region is less even, more short–long (second pulse at 73% of the beat, against 58% for Region B)." |
+| B | "The pulse has a slight lilt because the visible lines in this region partly share a direction. Alignment is 0.67 (0 = every which way, 1 = all the same way), so the second pulse falls 58% of the way through the beat (rule: long_fraction = 0.75 - 0.25 * alignment). Compared with Region A at the same moment, this region is more even (second pulse at 58% of the beat, against 73% for Region A)." |
+
+- **Neither region says "even".** Real alignment values are about 0.08 and 0.67, and the app only
+  says "even" at about 0.76 or more. Do not caption either region as "even".
+- The captions use the comparison words "more even" and "less even" until Mr. E and Dev B choose
+  the name for the pulse.
+- The two rhythms differ by about 150 ms in where the second pulse lands (73% against 58% of a
+  1-second beat). Whether a listener can hear that is what the listening check measures
+  (`docs/ACCESSIBILITY_LOG.md`, "Listening task"). **Do not caption "you can hear the difference"
+  until there are counts to back it.**
+
+Check before the captions are final:
+
+- Do the words on Dev B's recording match the table above? ____
+- With the screen off, can you hear that the two rhythms differ? ____ (Your own impression is not a listening result.)
 
 ## Step 3 — Assemble (Sun 3–5 PM)
 

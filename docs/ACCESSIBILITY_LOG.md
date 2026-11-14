@@ -41,6 +41,40 @@ We do not claim WCAG conformance.
 A sighted person working with the screen off is not evidence of accessibility. If no blind or
 low-vision person tested the project, say exactly that.
 
-## Listening task (optional)
+## Listening task
 
-- Trials: __   Correct: __   Chance level: 50%
+**Set before anyone listened (14 Nov, Student B), so the pass mark cannot be moved afterwards.**
+The pass mark comes from Dev A's plan.
+
+- **Material:** the real pair from Mr. E's pull request #8: Region A, Kuroshio eddies (alignment
+  about 0.07), and Region B, Equatorial Pacific streaks (about 0.67). Made with
+  `python tools/build_listening_tasks.py data/features.json --seed 42 --out listening_tasks.json`.
+  Result: 30 questions, 0 left out. The two regions differ by 0.57 to 0.62 alignment in every
+  question, about 150 ms in where the second pulse lands at a 1-second beat. The 30 questions are
+  the same two regions at 30 moments, with the order shuffled, so they test one pair, not ocean
+  regions in general.
+- **Player:** `tools/listening_quiz_player.html`, not the game. The game's pitch and note length
+  follow alignment, which gives the answer away, and the game is not the app's sound.
+- **Question:** "Which one has the more even pulse, the first or the second?" Guessing gets 50%.
+- **Each listener answers 10 questions.** **9 or more correct counts as hearing the difference.**
+  Guessing reaches 9 or more about 1 time in 100 (11 in 1024, 1.1%).
+- **No names.** Team members and outside listeners are counted separately.
+
+### Team members
+
+| # | Assistive tech / listening setup | Correct of 10 | Heard the difference (9 or more)? | Notes |
+| --- | --- | --- | --- | --- |
+|  |  |  |  |  |
+
+### Outside listeners
+
+| # | Blind / low-vision / other | Assistive tech / listening setup | Correct of 10 | Heard the difference (9 or more)? | Notes |
+| --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |
+
+### Summary (fill with real numbers; zero is an acceptable answer)
+
+- Team members who listened: __   Heard the difference (9 or more of 10): __
+- Outside listeners: __   Heard the difference (9 or more of 10): __
+- Total questions asked: __   Correct: __   Chance level: 50%
+- What we did not test: __
