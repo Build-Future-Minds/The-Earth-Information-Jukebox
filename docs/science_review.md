@@ -2,8 +2,8 @@
 
 Owner: Developer A. This records what the math engine was expected to do and what it did.
 
-**Sections 1 to 7 use TEST INPUTS (synthetic images), not NASA data.** Section 9 holds the first
-measurements on NASA frames, for draft regions that are not approved yet. The tables between the
+**Sections 1 to 7 use TEST INPUTS (synthetic images), not NASA data.** Sections 9 and 10 use NASA
+frames: section 9 compares the draft circles, section 10 is the approved pair the app plays. The tables between the
 `table:` markers are written by
 `analysis/run_experiments.py` from the numbers it just measured; do not edit them by hand. Re-run
 that script after changing any setting.
@@ -24,8 +24,9 @@ m², no smoothing. Derivations are in `math_notes.md`.
 - `pytest` in `analysis/` passes, and tests fail when the engine is deliberately broken (squared
   score, no mask margin, 0 instead of missing, drifting tempo, smoothing across a gap).
 - Ten limitations were found. They are listed in section 6 with their evidence.
-- On 30 NASA frames the draft regions are far apart (0.60 against 0.22 and 0.07) and steady from
-  frame to frame. Most of the Southern Ocean's score comes from the map projection (section 9).
+- The approved regions, Equatorial Pacific and Kuroshio, measure 0.67 and 0.07 on 30 NASA frames.
+  After smoothing the smallest gap in any frame is 0.57, and no frame is `missing` (section 10).
+- The Southern Ocean draft was dropped: most of its score comes from the map projection (section 9).
 
 ## 1. Named test cases
 
@@ -356,7 +357,7 @@ the smoothed value restarts after the gap, and smoothing with α = 0.3 lags a fa
 | 1 | The score is one number for the whole box. Two organised line families at 90° score 0, like chaos. | Named cases; two-families table |
 | 2 | Any edge votes: labels, colour bars, coastlines, seams between patches. | Legend table |
 | 3 | Dash ends lower the score, so short dashes cannot reach 1. | Dash-length table |
-| 4 | Small boxes inflate the score and make it scatter. Regions must be large and equal in size. | Crop table; chance-level table |
+| 4 | Small boxes inflate the score and make it scatter. Regions must be large and equal in size. | Crop table; chance-level table. On NASA frames the Kuroshio circle scores 0.07 at radius 61 px but 0.17 and 0.18 at 40 and 90 px (section 9), so the radius is fixed. |
 | 5 | Near the edge threshold, dimmer lines score higher before going missing. | Contrast table |
 | 6 | The same pattern scores about ±0.02 differently depending on its angle to the pixel grid. | Rotation table |
 | 7 | An equirectangular map squeezes directions toward horizontal at high latitude. | Reasoned in `math_notes.md` section 1. Rough estimate on NASA frames in section 9: Southern Ocean 0.60 as drawn, about 0.16 with the stretch undone. |
@@ -382,39 +383,49 @@ the smoothed value restarts after the gap, and smoothing with α = 0.3 lags a fa
 
 ## 8. Not done yet
 
-- The regions are drafts. Developer A has not approved them, and `data/scene.json` does not exist.
-- The threshold (12) and minimum usable fraction (0.05) are still the practice values. They work
-  on the draft regions (section 9) but have not been frozen.
+- The threshold (12) and minimum usable fraction (0.05) are the practice values. `data/features.json`
+  uses them, and the approved pair passes the gate about ten times over (section 10). They are not
+  tuned to NASA frames.
 - No listening test. We do not know how small an alignment difference people can hear.
 - The map-projection figure in section 9 is a rough estimate, not a re-projection of the frames.
 - JPEG results are for synthetic line art only. The NASA frames we use are TIFF.
 - Only 30 frames (about 5 model days) have been measured.
 
-## 9. First measurements on NASA frames (draft regions)
+## 9. NASA frames: the draft and candidate circles
 
 Source: SVS 3912, `orig` 2048×1024 frames 23000 to 23116 in steps of 4 (30 frames, model time
-2007-03-25T12:00Z to 2007-03-30T11:42Z). Circles of radius 61 px from `assets/regions_draft.json`
-(Student A), plus one candidate added by Developer A. Mask = circle minus land. Default settings.
-Run on 2026-11-14 with `python explore_regions.py --map --also equatorial_pacific,271,504` in
-`analysis/`. These numbers describe the rendered image of ECCO2 model output.
+2007-03-25T12:00Z to 2007-03-30T11:42Z). Circles of radius 61 px: Student A's three drafts and one
+candidate added by Developer A. Mask = circle minus land. Default settings. Re-run on 2026-11-14
+after the usable-fraction change below, with
+`python explore_regions.py --map --also gulf_stream_offshore,641,328 --also southern_ocean_streaks,1080,833`
+in `analysis/` (the regions file now holds the approved pair). These numbers describe the rendered
+image of ECCO2 model output. The raw values per frame are shown; the app plays smoothed values (section 10).
 
 | Circle | Latitude | Alignment (mean of 30) | sd | Lowest to highest | Usable fraction | Beat split | With map stretch undone (rough) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `southern_ocean_streaks` (draft) | −56.4° | 0.601 | 0.013 | 0.578 to 0.623 | 0.208 | 60 / 40 | 0.162 |
-| `gulf_stream_offshore` (draft) | +32.3° | 0.217 | 0.015 | 0.196 to 0.243 | 0.372 | 70 / 30 | 0.071 |
-| `kuroshio_eddies` (draft) | +28.8° | 0.073 | 0.013 | 0.058 to 0.101 | 0.398 | 73 / 27 | 0.066 |
-| Equatorial Pacific, centre [271, 504] (candidate) | +1.4° | 0.671 | 0.011 | 0.652 to 0.689 | 0.380 | 58 / 42 | 0.671 |
+| `southern_ocean_streaks` (draft, dropped) | −56.4° | 0.601 | 0.013 | 0.578 to 0.623 | 0.265 | 60 / 40 | 0.162 |
+| `gulf_stream_offshore` (draft) | +32.3° | 0.217 | 0.015 | 0.196 to 0.243 | 0.475 | 70 / 30 | 0.071 |
+| `kuroshio_eddies` (**approved**) | +28.8° | 0.073 | 0.013 | 0.058 to 0.101 | 0.507 | 73 / 27 | 0.066 |
+| `equator_pacific`, centre [271, 504] (**approved**) | +1.4° | 0.671 | 0.011 | 0.652 to 0.689 | 0.484 | 58 / 42 | 0.671 |
 
 No frame was `missing` in any circle.
 
-**How far apart are the pairs?**
+The usable fraction is now the share of the **circle's** pixels with a clear edge (Dev B's review;
+`math_notes.md` section 6). The first run divided by the 122 × 122 box, which gave 0.208, 0.372,
+0.398 and 0.380. The alignment values did not change.
 
-| Pair | Mean gap | Smallest gap in any frame | Second pulse apart at a 1 s beat |
-| --- | --- | --- | --- |
-| Southern Ocean − Gulf Stream | 0.384 | 0.374 | 96 ms |
-| Southern Ocean − Kuroshio | 0.528 | 0.506 | 132 ms |
-| Equatorial Pacific − Gulf Stream | 0.454 | 0.412 | 113 ms |
-| Equatorial Pacific − Kuroshio | 0.598 | 0.551 | 149 ms |
+**How far apart are the pairs?** At a 1 s beat, a gap in alignment of g moves the second pulse
+by 0.25 × g seconds.
+
+| Pair | Mean gap | Smallest gap in any frame | Second pulse apart, mean gap | Second pulse apart, smallest gap |
+| --- | --- | --- | --- | --- |
+| Southern Ocean − Gulf Stream | 0.384 | 0.374 | 96 ms | 94 ms |
+| Southern Ocean − Kuroshio | 0.528 | 0.506 | 132 ms | 127 ms |
+| Equatorial Pacific − Gulf Stream | 0.454 | 0.412 | 113 ms | 103 ms |
+| Equatorial Pacific − Kuroshio | 0.598 | 0.551 | 149 ms | 138 ms |
+
+The first version of this table had only the mean-gap column. Dev B pointed out that a message
+paired the smallest gap (0.41) with the mean-gap time (113 ms); 0.41 gives 103 ms.
 
 **What the settings change** (mean alignment)
 
@@ -423,7 +434,7 @@ No frame was `missing` in any circle.
 | Default | 0.217 | 0.073 | 0.601 | 0.671 |
 | Grayscale = luma | 0.239 | 0.073 | missing in all 30 frames | 0.754 |
 | Threshold 8 | 0.210 | 0.071 | 0.536 | 0.644 |
-| Threshold 20 | 0.246 | 0.079 | 0.749 (5 frames missing) | 0.764 |
+| Threshold 20 | 0.246 | 0.079 | 0.751 (usable 0.072; 5 frames were missing when the gate used the box) | 0.764 |
 | No blur | 0.176 | 0.090 | 0.517 | 0.608 |
 | Weight m | 0.185 | 0.077 | 0.551 | 0.600 |
 
@@ -436,13 +447,14 @@ No frame was `missing` in any circle.
 | 90 px | 0.238 (27% land inside) | 0.184 | 0.622 | 0.601 |
 
 **The whole picture.** Scoring a radius-61 circle at every position that is at least 95% open
-water (540,263 positions): 5% of positions score below 0.147, the median is 0.332, 95% score
-below 0.603, and the highest is 0.676. The draft Southern Ocean circle is higher than 95% of
-positions; Kuroshio is higher than 1%; Gulf Stream is higher than 19%.
+water (540,874 positions with a usable score): 5% of positions score below 0.148, the median is
+0.332, 95% score below 0.603, and the highest is 0.676. The Equatorial Pacific circle (0.671) is
+next to the top; Kuroshio is higher than 1% of positions; the Southern Ocean draft is higher than
+95%; Gulf Stream is higher than 19%.
 
 **What this shows**
 
-1. The dim blue Southern Ocean lines are counted (usable fraction 0.21, minimum 0.05). With luma
+1. The dim blue Southern Ocean lines are counted (usable fraction 0.27, minimum 0.05). With luma
    grayscale they would be `missing` in every frame, so max(R, G, B) matters on real frames.
 2. The regions are well separated and steady. The smallest gap in any frame is 0.37, and each
    circle moves by about 0.01 from frame to frame.
@@ -464,3 +476,41 @@ positions; Kuroshio is higher than 1%; Gulf Stream is higher than 19%.
 - The whole-picture map and the engine agree at the draft centres to 3 × 10⁻¹⁶.
 - `features.py` on a draft scene built from the same circles gives the same means to four
   decimals, and its output passes the `features` and `scene` contract schemas.
+
+## 10. The approved pair: what the app plays
+
+Approved by Developer A on 14 Nov: **Equatorial Pacific** (lines that mostly share one direction)
+and **Kuroshio** (lines pointing many ways), circles of radius 61 px. Student A's
+`prepare_scene.py` wrote `data/scene.json` and the masks. Developer A's `features.py` wrote
+`data/features.json` and `data/rhythm_reference.json`, with the default settings and smoothing
+α = 0.3, one frame per 1 s beat:
+
+    cd analysis && python features.py --scene ../data/scene.json --out ../data/features.json \
+        --rhythm-out ../data/rhythm_reference.json
+
+| Region | Steps ok | Alignment the app plays (smoothed) | Raw mean | Usable fraction | Beat split |
+| --- | --- | --- | --- | --- | --- |
+| `equator_pacific` | 30 of 30 | 0.660 to 0.685, mean 0.672 | 0.671 | 0.464 to 0.494 | 58 / 42 |
+| `kuroshio_eddies` | 30 of 30 | 0.059 to 0.093, mean 0.072 | 0.073 | 0.496 to 0.517 | 73 / 27 |
+
+At the same moment, the gap between the two is 0.600 on average and never below 0.567. At a 1 s
+beat the second pulses land 150 ms apart on average and at least 142 ms apart. Every Earth note
+lasts 0.08 s, whatever the alignment.
+
+**Checks on these files**
+
+- All 30 timestamps in `data/scene.json` equal the model times in NASA's `flat_ecco2_dates.txt`
+  for frames 23000, 23004, …, 23116.
+- The masks are the circle exactly, except 27 pixels (0.2%) inside the Kuroshio circle that the
+  land test marks as land. The Equatorial Pacific circle has no land.
+- `npm test` in `web/` (Dev B's tests, scene schema 0.2): the files match the contract, and every
+  note the app makes equals `rhythm_reference.json`. Moving one Kuroshio pulse by 20 ms made that
+  test fail.
+- `pytest` in `analysis/`: 165 tests pass. Each fix from Dev B's review has a test that fails when
+  the fix is undone: circle pixels for the gate, circle applied to the mask, timestamp count,
+  `region_too_small`, note length, and the denominator Dev B suggested (a mostly masked circle
+  would then pass).
+
+**What to say about the pair.** "The Equatorial Pacific circle's lines share one direction much
+more than the Kuroshio circle's, in this rendering of ECCO2 model output." Not: calmer, more
+turbulent, faster or healthier.

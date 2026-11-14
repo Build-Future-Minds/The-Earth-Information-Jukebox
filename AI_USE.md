@@ -23,5 +23,6 @@ Rules:
 
 We used AI assistants for planning, drafting documentation, suggesting code and tests, and
 checking wording. All analysis and synthesis code was reviewed and tested by team members.
-The sonification itself uses explainable signal processing (optical flow statistics), not a
-trained model, and all audio is synthesised by our own code.
+The sonification itself uses explainable signal processing (a measure of how strongly the
+lines in each image share one direction), not a trained model, and all audio is synthesised by
+our own code.

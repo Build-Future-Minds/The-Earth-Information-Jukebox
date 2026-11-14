@@ -58,15 +58,16 @@ Pictures and timeline: `figures/math/02_test_gallery.png`, `figures/math/07_two_
 
 ### Missing information
 
-If too few pixels pass the threshold (blank, masked or featureless crop), the step is marked
+If fewer than 5% of the circle's pixels pass the threshold (blank, masked or featureless crop), the step is marked
 `missing` with a reason. The Earth voice goes **quiet** and the app shows a clear message.
 Never invent a rhythm and never report `A = 0` for missing data.
 
 ### Fair comparison
 
 Both regions use the same threshold, the same smoothing and the same sound settings, at the
-same source moment. The two boxes must also be the same size: small boxes score higher by
-chance (`science_review.md` section 3).
+same source moment. Both regions are circles of the same radius (61 px on the NASA frames):
+small regions score higher by chance (`science_review.md` section 3), and the Kuroshio score
+changes with the radius (section 9). Only pixels inside the circle are measured.
 
 ## Tests (practice images — TEST INPUTS, not NASA data)
 
@@ -82,7 +83,8 @@ chance (`science_review.md` section 3).
 Record expected and observed values for each in `science_review.md`.
 
 Status 14 Nov: all six pass on practice images (`science_review.md` section 1; `pytest` in
-`analysis/`). First run on NASA frames, for draft regions: `science_review.md` section 9.
+`analysis/`). Draft circles on NASA frames: `science_review.md` section 9. The approved pair,
+Equatorial Pacific and Kuroshio, and the files the app plays: section 10.
 
 ## What we do not claim
 

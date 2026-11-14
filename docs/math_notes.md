@@ -213,16 +213,31 @@ $C$ is a ratio, so it forgets *how much* evidence it was built from. A blank box
 $\varepsilon$ in the denominator that evaluates to 0, which would be read as "the lines disagree".
 That is the wrong statement. So we keep a second number that measures the amount of evidence:
 
-$$\text{usable fraction} = \frac{\text{pixels allowed by the mask with } m \ge \tau}{\text{all pixels in the box}}$$
+$$\text{usable fraction} = \frac{\text{pixels allowed by the mask with } m \ge \tau}{\text{all pixels in the region}}$$
 
-and decide before computing $C$:
+The region is the circle for a circle region, else the whole box. **Design choice**, changed on
+14 Nov after Dev B's review. Before, the denominator was always the box. For a circle of radius
+61 px that is 14,884 pixels instead of the circle's 11,679, so the 5% gate was 1.27× stricter
+than its wording.
+
+Dev B suggested dividing by the pixels actually measured instead (inside the mask, away from its
+edges). We kept the region instead, because this number measures the *amount* of evidence.
+Land the mask removes holds no evidence, so it still counts in the denominator. A circle that
+is mostly land then goes `missing` rather than giving a confident score from a sliver of water
+(`test_mostly_masked_region_is_missing`, `test_a_mostly_masked_circle_is_missing`).
+
+Then decide before computing $C$:
 
 | Condition | Result |
 | --- | --- |
 | Mask excludes every pixel | `missing`, `all_masked` |
+| Some pixels included, but none is far enough from the edges to measure | `missing`, `region_too_small` |
 | Usable fraction below `min_usable_fraction` (5%) | `missing`, `too_few_edges` |
 | Frame file absent or unreadable | `missing`, `frame_unreadable` |
 | Otherwise | `ok`, alignment in [0, 1] |
+
+The `region_too_small` row is also new since Dev B's review. Before, a mask with a few included
+pixels that the margin removed was reported as `all_masked`, which was not true.
 
 $\varepsilon$ only guards the division. It never decides anything. A missing value is `null` with a
 sentence explaining why, never 0. **Verified**: blank, masked, low-contrast and unreadable inputs
