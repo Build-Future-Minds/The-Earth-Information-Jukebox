@@ -13,7 +13,7 @@ export function SceneView({ scene, imageUrl, regionId }: Props) {
   const { width, height } = scene.frames;
   const active = scene.regions.find((r) => r.id === regionId);
   return (
-    <figure className="scene">
+    <figure className={imageUrl ? 'scene' : 'scene no-image'}>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"

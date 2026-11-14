@@ -28,6 +28,16 @@ describe('data matches the contract', () => {
       const ids = new Set(scene.regions.map((r) => r.id));
       expect(features.steps.filter((s) => !ids.has(s.region))).toEqual([]);
     });
+    it(`${name} every scene region has steps to play`, () => {
+      const used = new Set(features.steps.map((s) => s.region));
+      expect(scene.regions.map((r) => r.id).filter((id) => !used.has(id))).toEqual([]);
+    });
+    it(`${name} missing steps have a reason and no value; ok steps have a value`, () => {
+      const bad = features.steps.filter((s) =>
+        s.status === 'missing' ? !s.reason || s.alignment !== null : s.alignment === null || s.reason !== null,
+      );
+      expect(bad).toEqual([]);
+    });
     it(`${name} Earth notes are valid music events`, () => {
       for (const r of scene.regions) {
         for (const ev of buildEarthTrack(features, r.id).steps.flatMap((s) => s.events)) {
