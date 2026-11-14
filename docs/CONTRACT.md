@@ -18,8 +18,14 @@ model timestamp of each frame, the legend, and two regions: `id`, spoken `name`,
 mask file, one-line description.
 
 All regions are circles of the **same radius** (team decision, 14 Nov; schema 0.2). The engine
-crops to `box_px` and measures inside the mask; the app draws the circle. The app's tests check
-that `box_px` matches the circle and that the radii are equal.
+crops to `box_px` and measures only inside the circle and the mask; the app draws the circle. The
+app's tests and `features.py` both check that `box_px` matches the circle and that the radii are
+equal.
+
+Optional, proposed by Dev A on 14 Nov (needs Dev B's yes): `frames.first_index` and
+`frames.index_step` give the file number of frame i as `first_index + i × index_step` (SVS 3912:
+23000 and 4). Then the scene alone traces every frame to its file, and `features.py` needs no
+extra flags. `timestamps`, when given, has exactly one entry per frame.
 
 ## 2. `features.json` — what we measured (Developer A's code writes)
 
@@ -38,6 +44,19 @@ that `box_px` matches the circle and that the radii are equal.
 Each note carries `why`: the region, the alignment value, the pulse split it produced, and the
 rule. "Explain this rhythm" is written from `why`, so the explanation always matches the sound
 actually playing.
+
+## 4. `rhythm_reference.json` — check file (agreed by Dev A and Dev B, 14 Nov)
+
+Written by `features.py --rhythm-out`, next to `features.json` (`data/rhythm_reference.json`). The
+app does not need it to play, but `web/src/data/rhythmReference.test.ts` checks that every Earth
+note the app makes equals this file: time, pitch, length, loudness and `why`. It repeats `features.json`
+step for step and adds, for each step, the `long_fraction`, the two pulse times and the two gaps
+the rule produces, plus the list of Earth-voice notes per region. Use it to check that the live
+rhythm in the app matches the rule. Schema: `contracts/rhythm-reference.schema.json`. It changes
+no existing schema.
+
+Timing it assumes: one step is one beat of `step_seconds`; pulse 1 at `t`, pulse 2 at
+`t + long_fraction × step_seconds`.
 
 ## Where files go
 

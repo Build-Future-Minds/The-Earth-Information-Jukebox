@@ -1,0 +1,2816 @@
+{
+  "schema_version": "0.1",
+  "is_mock": false,
+  "generated_by": "earth-sonata math engine 0.1.0",
+  "scene": "data/scene.json",
+  "source": {
+    "svs_id": 3912,
+    "url": "https://svs.gsfc.nasa.gov/3912",
+    "title": "Global Sea Surface Currents and Temperature",
+    "credit": "NASA/Goddard Space Flight Center Scientific Visualization Studio",
+    "data_kind": "model_output"
+  },
+  "measurement": {
+    "what": "How strongly the visible lines in the rendered image share one direction (structure-tensor orientation coherence). Not a physical quantity.",
+    "gray_mode": "value",
+    "blur_sigma_px": 1.0,
+    "blur_radius_px": 4,
+    "gradient_operator": "sobel_3x3_div_8",
+    "weight_power": 2,
+    "gradient_threshold": 12.0,
+    "gradient_threshold_units": "grey levels (0-255 scale) per pixel",
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3,
+    "smoothing_rule": "exponential moving average over consecutive ok steps; starts again after a missing step",
+    "same_settings_for_all_regions": true
+  },
+  "rhythm": {
+    "rule": "long_fraction = 0.75 - 0.25 * alignment",
+    "beat_seconds": 1.0,
+    "pulses_per_beat": 2,
+    "long_fraction_at_alignment_0": 0.75,
+    "long_fraction_at_alignment_1": 0.5,
+    "voice": "earth",
+    "pitch": 64,
+    "dur": 0.08,
+    "vel": 0.8,
+    "carries_data": [
+      "position of the second pulse inside the beat"
+    ],
+    "fixed_no_data": [
+      "tempo",
+      "pitch",
+      "note length",
+      "loudness"
+    ],
+    "missing_rule": "a missing step has no pulses"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2007-03-25T12:00Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0795,
+      "alignment_raw": 0.0795,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5076,
+      "dominant_angle_deg": 7.5,
+      "long_fraction": 0.730125,
+      "pulse_times": [
+        0.0,
+        0.730125
+      ],
+      "long_interval": 0.730125,
+      "short_interval": 0.269875
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2007-03-25T16:07Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0797,
+      "alignment_raw": 0.0804,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5109,
+      "dominant_angle_deg": 6.7,
+      "long_fraction": 0.730075,
+      "pulse_times": [
+        1.0,
+        1.730075
+      ],
+      "long_interval": 0.730075,
+      "short_interval": 0.269925
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2007-03-25T20:15Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0804,
+      "alignment_raw": 0.0821,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5083,
+      "dominant_angle_deg": 6.2,
+      "long_fraction": 0.7299,
+      "pulse_times": [
+        2.0,
+        2.7299
+      ],
+      "long_interval": 0.7299,
+      "short_interval": 0.2701
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2007-03-26T00:23Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0807,
+      "alignment_raw": 0.0813,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5039,
+      "dominant_angle_deg": 6.6,
+      "long_fraction": 0.729825,
+      "pulse_times": [
+        3.0,
+        3.729825
+      ],
+      "long_interval": 0.729825,
+      "short_interval": 0.270175
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2007-03-26T04:30Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.08,
+      "alignment_raw": 0.0785,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5124,
+      "dominant_angle_deg": 5.7,
+      "long_fraction": 0.73,
+      "pulse_times": [
+        4.0,
+        4.73
+      ],
+      "long_interval": 0.73,
+      "short_interval": 0.27
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2007-03-26T08:38Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0785,
+      "alignment_raw": 0.0749,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5112,
+      "dominant_angle_deg": 6.5,
+      "long_fraction": 0.730375,
+      "pulse_times": [
+        5.0,
+        5.730375
+      ],
+      "long_interval": 0.730375,
+      "short_interval": 0.269625
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2007-03-26T12:46Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0764,
+      "alignment_raw": 0.0715,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5058,
+      "dominant_angle_deg": 6.0,
+      "long_fraction": 0.7309,
+      "pulse_times": [
+        6.0,
+        6.7309
+      ],
+      "long_interval": 0.7309,
+      "short_interval": 0.2691
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2007-03-26T16:53Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0737,
+      "alignment_raw": 0.0673,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5132,
+      "dominant_angle_deg": 5.0,
+      "long_fraction": 0.731575,
+      "pulse_times": [
+        7.0,
+        7.731575
+      ],
+      "long_interval": 0.731575,
+      "short_interval": 0.268425
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2007-03-26T21:01Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0706,
+      "alignment_raw": 0.0635,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5098,
+      "dominant_angle_deg": 4.8,
+      "long_fraction": 0.73235,
+      "pulse_times": [
+        8.0,
+        8.73235
+      ],
+      "long_interval": 0.73235,
+      "short_interval": 0.26765
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2007-03-27T01:09Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0683,
+      "alignment_raw": 0.0629,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5066,
+      "dominant_angle_deg": 4.2,
+      "long_fraction": 0.732925,
+      "pulse_times": [
+        9.0,
+        9.732925
+      ],
+      "long_interval": 0.732925,
+      "short_interval": 0.267075
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2007-03-27T05:16Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0668,
+      "alignment_raw": 0.0631,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5148,
+      "dominant_angle_deg": 3.0,
+      "long_fraction": 0.7333,
+      "pulse_times": [
+        10.0,
+        10.7333
+      ],
+      "long_interval": 0.7333,
+      "short_interval": 0.2667
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2007-03-27T09:24Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0649,
+      "alignment_raw": 0.0606,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5127,
+      "dominant_angle_deg": 2.5,
+      "long_fraction": 0.733775,
+      "pulse_times": [
+        11.0,
+        11.733775
+      ],
+      "long_interval": 0.733775,
+      "short_interval": 0.266225
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2007-03-27T13:32Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.063,
+      "alignment_raw": 0.0585,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.512,
+      "dominant_angle_deg": 1.1,
+      "long_fraction": 0.73425,
+      "pulse_times": [
+        12.0,
+        12.73425
+      ],
+      "long_interval": 0.73425,
+      "short_interval": 0.26575
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2007-03-27T17:39Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0621,
+      "alignment_raw": 0.0599,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5173,
+      "dominant_angle_deg": 2.0,
+      "long_fraction": 0.734475,
+      "pulse_times": [
+        13.0,
+        13.734475
+      ],
+      "long_interval": 0.734475,
+      "short_interval": 0.265525
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2007-03-27T21:47Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0608,
+      "alignment_raw": 0.0579,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.515,
+      "dominant_angle_deg": 2.3,
+      "long_fraction": 0.7348,
+      "pulse_times": [
+        14.0,
+        14.7348
+      ],
+      "long_interval": 0.7348,
+      "short_interval": 0.2652
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2007-03-28T01:55Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0599,
+      "alignment_raw": 0.0578,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5109,
+      "dominant_angle_deg": 3.3,
+      "long_fraction": 0.735025,
+      "pulse_times": [
+        15.0,
+        15.735025
+      ],
+      "long_interval": 0.735025,
+      "short_interval": 0.264975
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2007-03-28T06:02Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0594,
+      "alignment_raw": 0.0581,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5057,
+      "dominant_angle_deg": 5.3,
+      "long_fraction": 0.73515,
+      "pulse_times": [
+        16.0,
+        16.73515
+      ],
+      "long_interval": 0.73515,
+      "short_interval": 0.26485
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2007-03-28T10:10Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0601,
+      "alignment_raw": 0.0617,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5113,
+      "dominant_angle_deg": 6.6,
+      "long_fraction": 0.734975,
+      "pulse_times": [
+        17.0,
+        17.734975
+      ],
+      "long_interval": 0.734975,
+      "short_interval": 0.265025
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2007-03-28T14:18Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.06,
+      "alignment_raw": 0.0598,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5046,
+      "dominant_angle_deg": 7.9,
+      "long_fraction": 0.735,
+      "pulse_times": [
+        18.0,
+        18.735
+      ],
+      "long_interval": 0.735,
+      "short_interval": 0.265
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2007-03-28T18:25Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0613,
+      "alignment_raw": 0.0643,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4998,
+      "dominant_angle_deg": 8.9,
+      "long_fraction": 0.734675,
+      "pulse_times": [
+        19.0,
+        19.734675
+      ],
+      "long_interval": 0.734675,
+      "short_interval": 0.265325
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2007-03-28T22:33Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0635,
+      "alignment_raw": 0.0688,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.506,
+      "dominant_angle_deg": 9.2,
+      "long_fraction": 0.734125,
+      "pulse_times": [
+        20.0,
+        20.734125
+      ],
+      "long_interval": 0.734125,
+      "short_interval": 0.265875
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2007-03-29T02:41Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0663,
+      "alignment_raw": 0.0729,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5044,
+      "dominant_angle_deg": 10.5,
+      "long_fraction": 0.733425,
+      "pulse_times": [
+        21.0,
+        21.733425
+      ],
+      "long_interval": 0.733425,
+      "short_interval": 0.266575
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2007-03-29T06:48Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0696,
+      "alignment_raw": 0.0771,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4998,
+      "dominant_angle_deg": 11.5,
+      "long_fraction": 0.7326,
+      "pulse_times": [
+        22.0,
+        22.7326
+      ],
+      "long_interval": 0.7326,
+      "short_interval": 0.2674
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2007-03-29T10:56Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0728,
+      "alignment_raw": 0.0805,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5045,
+      "dominant_angle_deg": 10.3,
+      "long_fraction": 0.7318,
+      "pulse_times": [
+        23.0,
+        23.7318
+      ],
+      "long_interval": 0.7318,
+      "short_interval": 0.2682
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2007-03-29T15:04Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.076,
+      "alignment_raw": 0.0834,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5,
+      "dominant_angle_deg": 11.4,
+      "long_fraction": 0.731,
+      "pulse_times": [
+        24.0,
+        24.731
+      ],
+      "long_interval": 0.731,
+      "short_interval": 0.269
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2007-03-29T19:12Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0795,
+      "alignment_raw": 0.0876,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4957,
+      "dominant_angle_deg": 12.3,
+      "long_fraction": 0.730125,
+      "pulse_times": [
+        25.0,
+        25.730125
+      ],
+      "long_interval": 0.730125,
+      "short_interval": 0.269875
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2007-03-29T23:19Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0837,
+      "alignment_raw": 0.0934,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5063,
+      "dominant_angle_deg": 10.6,
+      "long_fraction": 0.729075,
+      "pulse_times": [
+        26.0,
+        26.729075
+      ],
+      "long_interval": 0.729075,
+      "short_interval": 0.270925
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2007-03-30T03:27Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0869,
+      "alignment_raw": 0.0944,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5,
+      "dominant_angle_deg": 12.5,
+      "long_fraction": 0.728275,
+      "pulse_times": [
+        27.0,
+        27.728275
+      ],
+      "long_interval": 0.728275,
+      "short_interval": 0.271725
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2007-03-30T07:35Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0898,
+      "alignment_raw": 0.0965,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4964,
+      "dominant_angle_deg": 12.4,
+      "long_fraction": 0.72755,
+      "pulse_times": [
+        28.0,
+        28.72755
+      ],
+      "long_interval": 0.72755,
+      "short_interval": 0.27245
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2007-03-30T11:42Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0932,
+      "alignment_raw": 0.1013,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.5031,
+      "dominant_angle_deg": 11.2,
+      "long_fraction": 0.7267,
+      "pulse_times": [
+        29.0,
+        29.7267
+      ],
+      "long_interval": 0.7267,
+      "short_interval": 0.2733
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2007-03-25T12:00Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.674,
+      "alignment_raw": 0.674,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.494,
+      "dominant_angle_deg": 179.2,
+      "long_fraction": 0.5815,
+      "pulse_times": [
+        0.0,
+        0.5815
+      ],
+      "long_interval": 0.5815,
+      "short_interval": 0.4185
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2007-03-25T16:07Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.675,
+      "alignment_raw": 0.6773,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4916,
+      "dominant_angle_deg": 179.2,
+      "long_fraction": 0.58125,
+      "pulse_times": [
+        1.0,
+        1.58125
+      ],
+      "long_interval": 0.58125,
+      "short_interval": 0.41875
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2007-03-25T20:15Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6763,
+      "alignment_raw": 0.6795,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4914,
+      "dominant_angle_deg": 179.1,
+      "long_fraction": 0.580925,
+      "pulse_times": [
+        2.0,
+        2.580925
+      ],
+      "long_interval": 0.580925,
+      "short_interval": 0.419075
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2007-03-26T00:23Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6789,
+      "alignment_raw": 0.6848,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4887,
+      "dominant_angle_deg": 179.1,
+      "long_fraction": 0.580275,
+      "pulse_times": [
+        3.0,
+        3.580275
+      ],
+      "long_interval": 0.580275,
+      "short_interval": 0.419725
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2007-03-26T04:30Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6808,
+      "alignment_raw": 0.6853,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4929,
+      "dominant_angle_deg": 179.2,
+      "long_fraction": 0.5798,
+      "pulse_times": [
+        4.0,
+        4.5798
+      ],
+      "long_interval": 0.5798,
+      "short_interval": 0.4202
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2007-03-26T08:38Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6828,
+      "alignment_raw": 0.6873,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4911,
+      "dominant_angle_deg": 179.1,
+      "long_fraction": 0.5793,
+      "pulse_times": [
+        5.0,
+        5.5793
+      ],
+      "long_interval": 0.5793,
+      "short_interval": 0.4207
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2007-03-26T12:46Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6845,
+      "alignment_raw": 0.6887,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.493,
+      "dominant_angle_deg": 179.1,
+      "long_fraction": 0.578875,
+      "pulse_times": [
+        6.0,
+        6.578875
+      ],
+      "long_interval": 0.578875,
+      "short_interval": 0.421125
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2007-03-26T16:53Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6852,
+      "alignment_raw": 0.6867,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.493,
+      "dominant_angle_deg": 179.1,
+      "long_fraction": 0.5787,
+      "pulse_times": [
+        7.0,
+        7.5787
+      ],
+      "long_interval": 0.5787,
+      "short_interval": 0.4213
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2007-03-26T21:01Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6853,
+      "alignment_raw": 0.6855,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4887,
+      "dominant_angle_deg": 179.1,
+      "long_fraction": 0.578675,
+      "pulse_times": [
+        8.0,
+        8.578675
+      ],
+      "long_interval": 0.578675,
+      "short_interval": 0.421325
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2007-03-27T01:09Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6835,
+      "alignment_raw": 0.6794,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4871,
+      "dominant_angle_deg": 179.1,
+      "long_fraction": 0.579125,
+      "pulse_times": [
+        9.0,
+        9.579125
+      ],
+      "long_interval": 0.579125,
+      "short_interval": 0.420875
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2007-03-27T05:16Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.681,
+      "alignment_raw": 0.6752,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4923,
+      "dominant_angle_deg": 179.2,
+      "long_fraction": 0.57975,
+      "pulse_times": [
+        10.0,
+        10.57975
+      ],
+      "long_interval": 0.57975,
+      "short_interval": 0.42025
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2007-03-27T09:24Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6795,
+      "alignment_raw": 0.676,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4907,
+      "dominant_angle_deg": 179.3,
+      "long_fraction": 0.580125,
+      "pulse_times": [
+        11.0,
+        11.580125
+      ],
+      "long_interval": 0.580125,
+      "short_interval": 0.419875
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2007-03-27T13:32Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6788,
+      "alignment_raw": 0.6773,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4855,
+      "dominant_angle_deg": 179.4,
+      "long_fraction": 0.5803,
+      "pulse_times": [
+        12.0,
+        12.5803
+      ],
+      "long_interval": 0.5803,
+      "short_interval": 0.4197
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2007-03-27T17:39Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6776,
+      "alignment_raw": 0.6745,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4902,
+      "dominant_angle_deg": 179.5,
+      "long_fraction": 0.5806,
+      "pulse_times": [
+        13.0,
+        13.5806
+      ],
+      "long_interval": 0.5806,
+      "short_interval": 0.4194
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2007-03-27T21:47Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6765,
+      "alignment_raw": 0.6742,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.488,
+      "dominant_angle_deg": 179.5,
+      "long_fraction": 0.580875,
+      "pulse_times": [
+        14.0,
+        14.580875
+      ],
+      "long_interval": 0.580875,
+      "short_interval": 0.419125
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2007-03-28T01:55Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6746,
+      "alignment_raw": 0.6701,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4898,
+      "dominant_angle_deg": 179.7,
+      "long_fraction": 0.58135,
+      "pulse_times": [
+        15.0,
+        15.58135
+      ],
+      "long_interval": 0.58135,
+      "short_interval": 0.41865
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2007-03-28T06:02Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6705,
+      "alignment_raw": 0.661,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4883,
+      "dominant_angle_deg": 179.7,
+      "long_fraction": 0.582375,
+      "pulse_times": [
+        16.0,
+        16.582375
+      ],
+      "long_interval": 0.582375,
+      "short_interval": 0.417625
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2007-03-28T10:10Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6659,
+      "alignment_raw": 0.655,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4916,
+      "dominant_angle_deg": 179.7,
+      "long_fraction": 0.583525,
+      "pulse_times": [
+        17.0,
+        17.583525
+      ],
+      "long_interval": 0.583525,
+      "short_interval": 0.416475
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2007-03-28T14:18Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.663,
+      "alignment_raw": 0.6562,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4865,
+      "dominant_angle_deg": 179.9,
+      "long_fraction": 0.58425,
+      "pulse_times": [
+        18.0,
+        18.58425
+      ],
+      "long_interval": 0.58425,
+      "short_interval": 0.41575
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2007-03-28T18:25Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6614,
+      "alignment_raw": 0.6577,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4821,
+      "dominant_angle_deg": 179.8,
+      "long_fraction": 0.58465,
+      "pulse_times": [
+        19.0,
+        19.58465
+      ],
+      "long_interval": 0.58465,
+      "short_interval": 0.41535
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2007-03-28T22:33Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6604,
+      "alignment_raw": 0.6581,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4857,
+      "dominant_angle_deg": 179.8,
+      "long_fraction": 0.5849,
+      "pulse_times": [
+        20.0,
+        20.5849
+      ],
+      "long_interval": 0.5849,
+      "short_interval": 0.4151
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2007-03-29T02:41Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6597,
+      "alignment_raw": 0.6581,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4813,
+      "dominant_angle_deg": 180.0,
+      "long_fraction": 0.585075,
+      "pulse_times": [
+        21.0,
+        21.585075
+      ],
+      "long_interval": 0.585075,
+      "short_interval": 0.414925
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2007-03-29T06:48Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6602,
+      "alignment_raw": 0.6612,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4767,
+      "dominant_angle_deg": 180.0,
+      "long_fraction": 0.58495,
+      "pulse_times": [
+        22.0,
+        22.58495
+      ],
+      "long_interval": 0.58495,
+      "short_interval": 0.41505
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2007-03-29T10:56Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6617,
+      "alignment_raw": 0.6652,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4796,
+      "dominant_angle_deg": 179.9,
+      "long_fraction": 0.584575,
+      "pulse_times": [
+        23.0,
+        23.584575
+      ],
+      "long_interval": 0.584575,
+      "short_interval": 0.415425
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2007-03-29T15:04Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6634,
+      "alignment_raw": 0.6672,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4735,
+      "dominant_angle_deg": 179.9,
+      "long_fraction": 0.58415,
+      "pulse_times": [
+        24.0,
+        24.58415
+      ],
+      "long_interval": 0.58415,
+      "short_interval": 0.41585
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2007-03-29T19:12Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6645,
+      "alignment_raw": 0.6672,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4663,
+      "dominant_angle_deg": 179.8,
+      "long_fraction": 0.583875,
+      "pulse_times": [
+        25.0,
+        25.583875
+      ],
+      "long_interval": 0.583875,
+      "short_interval": 0.416125
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2007-03-29T23:19Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6651,
+      "alignment_raw": 0.6666,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4708,
+      "dominant_angle_deg": 179.8,
+      "long_fraction": 0.583725,
+      "pulse_times": [
+        26.0,
+        26.583725
+      ],
+      "long_interval": 0.583725,
+      "short_interval": 0.416275
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2007-03-30T03:27Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6648,
+      "alignment_raw": 0.6639,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4678,
+      "dominant_angle_deg": 179.8,
+      "long_fraction": 0.5838,
+      "pulse_times": [
+        27.0,
+        27.5838
+      ],
+      "long_interval": 0.5838,
+      "short_interval": 0.4162
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2007-03-30T07:35Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6632,
+      "alignment_raw": 0.6596,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4636,
+      "dominant_angle_deg": 179.8,
+      "long_fraction": 0.5842,
+      "pulse_times": [
+        28.0,
+        28.5842
+      ],
+      "long_interval": 0.5842,
+      "short_interval": 0.4158
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2007-03-30T11:42Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6599,
+      "alignment_raw": 0.6521,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4689,
+      "dominant_angle_deg": 179.9,
+      "long_fraction": 0.585025,
+      "pulse_times": [
+        29.0,
+        29.585025
+      ],
+      "long_interval": 0.585025,
+      "short_interval": 0.414975
+    }
+  ],
+  "events": {
+    "kuroshio_eddies": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0795,
+          "long_fraction": 0.730125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.730125,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0795,
+          "long_fraction": 0.730125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0797,
+          "long_fraction": 0.730075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.730075,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0797,
+          "long_fraction": 0.730075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0804,
+          "long_fraction": 0.7299,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.7299,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0804,
+          "long_fraction": 0.7299,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0807,
+          "long_fraction": 0.729825,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.729825,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0807,
+          "long_fraction": 0.729825,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.08,
+          "long_fraction": 0.73,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.73,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.08,
+          "long_fraction": 0.73,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0785,
+          "long_fraction": 0.730375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.730375,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0785,
+          "long_fraction": 0.730375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0764,
+          "long_fraction": 0.7309,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.7309,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0764,
+          "long_fraction": 0.7309,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0737,
+          "long_fraction": 0.731575,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.731575,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0737,
+          "long_fraction": 0.731575,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0706,
+          "long_fraction": 0.73235,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.73235,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0706,
+          "long_fraction": 0.73235,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0683,
+          "long_fraction": 0.732925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.732925,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0683,
+          "long_fraction": 0.732925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0668,
+          "long_fraction": 0.7333,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.7333,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0668,
+          "long_fraction": 0.7333,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0649,
+          "long_fraction": 0.733775,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.733775,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0649,
+          "long_fraction": 0.733775,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.063,
+          "long_fraction": 0.73425,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.73425,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.063,
+          "long_fraction": 0.73425,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0621,
+          "long_fraction": 0.734475,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.734475,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0621,
+          "long_fraction": 0.734475,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0608,
+          "long_fraction": 0.7348,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.7348,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0608,
+          "long_fraction": 0.7348,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0599,
+          "long_fraction": 0.735025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.735025,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0599,
+          "long_fraction": 0.735025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0594,
+          "long_fraction": 0.73515,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.73515,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0594,
+          "long_fraction": 0.73515,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0601,
+          "long_fraction": 0.734975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.734975,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0601,
+          "long_fraction": 0.734975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.06,
+          "long_fraction": 0.735,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.735,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.06,
+          "long_fraction": 0.735,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0613,
+          "long_fraction": 0.734675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.734675,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0613,
+          "long_fraction": 0.734675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0635,
+          "long_fraction": 0.734125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.734125,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0635,
+          "long_fraction": 0.734125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0663,
+          "long_fraction": 0.733425,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.733425,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0663,
+          "long_fraction": 0.733425,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0696,
+          "long_fraction": 0.7326,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.7326,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0696,
+          "long_fraction": 0.7326,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0728,
+          "long_fraction": 0.7318,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.7318,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0728,
+          "long_fraction": 0.7318,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.076,
+          "long_fraction": 0.731,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.731,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.076,
+          "long_fraction": 0.731,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0795,
+          "long_fraction": 0.730125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.730125,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0795,
+          "long_fraction": 0.730125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0837,
+          "long_fraction": 0.729075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.729075,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0837,
+          "long_fraction": 0.729075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0869,
+          "long_fraction": 0.728275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.728275,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0869,
+          "long_fraction": 0.728275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0898,
+          "long_fraction": 0.72755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.72755,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0898,
+          "long_fraction": 0.72755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0932,
+          "long_fraction": 0.7267,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.7267,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "kuroshio_eddies",
+          "alignment": 0.0932,
+          "long_fraction": 0.7267,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ],
+    "equator_pacific": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.674,
+          "long_fraction": 0.5815,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.5815,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.674,
+          "long_fraction": 0.5815,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.675,
+          "long_fraction": 0.58125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.58125,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.675,
+          "long_fraction": 0.58125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6763,
+          "long_fraction": 0.580925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.580925,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6763,
+          "long_fraction": 0.580925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6789,
+          "long_fraction": 0.580275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.580275,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6789,
+          "long_fraction": 0.580275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6808,
+          "long_fraction": 0.5798,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.5798,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6808,
+          "long_fraction": 0.5798,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6828,
+          "long_fraction": 0.5793,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.5793,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6828,
+          "long_fraction": 0.5793,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6845,
+          "long_fraction": 0.578875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.578875,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6845,
+          "long_fraction": 0.578875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6852,
+          "long_fraction": 0.5787,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.5787,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6852,
+          "long_fraction": 0.5787,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6853,
+          "long_fraction": 0.578675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.578675,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6853,
+          "long_fraction": 0.578675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6835,
+          "long_fraction": 0.579125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.579125,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6835,
+          "long_fraction": 0.579125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.681,
+          "long_fraction": 0.57975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.57975,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.681,
+          "long_fraction": 0.57975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6795,
+          "long_fraction": 0.580125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.580125,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6795,
+          "long_fraction": 0.580125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6788,
+          "long_fraction": 0.5803,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.5803,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6788,
+          "long_fraction": 0.5803,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6776,
+          "long_fraction": 0.5806,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.5806,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6776,
+          "long_fraction": 0.5806,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6765,
+          "long_fraction": 0.580875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.580875,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6765,
+          "long_fraction": 0.580875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6746,
+          "long_fraction": 0.58135,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.58135,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6746,
+          "long_fraction": 0.58135,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6705,
+          "long_fraction": 0.582375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.582375,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6705,
+          "long_fraction": 0.582375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6659,
+          "long_fraction": 0.583525,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.583525,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6659,
+          "long_fraction": 0.583525,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.663,
+          "long_fraction": 0.58425,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.58425,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.663,
+          "long_fraction": 0.58425,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6614,
+          "long_fraction": 0.58465,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.58465,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6614,
+          "long_fraction": 0.58465,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6604,
+          "long_fraction": 0.5849,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.5849,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6604,
+          "long_fraction": 0.5849,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6597,
+          "long_fraction": 0.585075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.585075,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6597,
+          "long_fraction": 0.585075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6602,
+          "long_fraction": 0.58495,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.58495,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6602,
+          "long_fraction": 0.58495,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6617,
+          "long_fraction": 0.584575,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.584575,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6617,
+          "long_fraction": 0.584575,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6634,
+          "long_fraction": 0.58415,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.58415,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6634,
+          "long_fraction": 0.58415,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6645,
+          "long_fraction": 0.583875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.583875,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6645,
+          "long_fraction": 0.583875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6651,
+          "long_fraction": 0.583725,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.583725,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6651,
+          "long_fraction": 0.583725,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6648,
+          "long_fraction": 0.5838,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.5838,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6648,
+          "long_fraction": 0.5838,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6632,
+          "long_fraction": 0.5842,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.5842,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6632,
+          "long_fraction": 0.5842,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6599,
+          "long_fraction": 0.585025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.585025,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "equator_pacific",
+          "alignment": 0.6599,
+          "long_fraction": 0.585025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ]
+  }
+}

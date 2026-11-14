@@ -1,0 +1,734 @@
+{
+  "schema_version": "0.1",
+  "is_mock": true,
+  "generated_by": "earth-sonata math engine 0.1.0",
+  "scene": "analysis/practice/scene.practice.json",
+  "source": {
+    "svs_id": null,
+    "url": "about:mock",
+    "title": "PRACTICE SCENE - TEST INPUT - NOT NASA DATA",
+    "credit": "Synthetic test input made by the Earth Sonata team (analysis/make_practice_scene.py)",
+    "data_kind": "synthetic_test_input"
+  },
+  "measurement": {
+    "what": "How strongly the visible lines in the rendered image share one direction (structure-tensor orientation coherence). Not a physical quantity.",
+    "gray_mode": "value",
+    "blur_sigma_px": 1.0,
+    "blur_radius_px": 4,
+    "gradient_operator": "sobel_3x3_div_8",
+    "weight_power": 2,
+    "gradient_threshold": 12.0,
+    "gradient_threshold_units": "grey levels (0-255 scale) per pixel",
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3,
+    "smoothing_rule": "exponential moving average over consecutive ok steps; starts again after a missing step",
+    "same_settings_for_all_regions": true
+  },
+  "rhythm": {
+    "rule": "long_fraction = 0.75 - 0.25 * alignment",
+    "beat_seconds": 1.0,
+    "pulses_per_beat": 2,
+    "long_fraction_at_alignment_0": 0.75,
+    "long_fraction_at_alignment_1": 0.5,
+    "voice": "earth",
+    "pitch": 64,
+    "dur": 0.08,
+    "vel": 0.8,
+    "carries_data": [
+      "position of the second pulse inside the beat"
+    ],
+    "fixed_no_data": [
+      "tempo",
+      "pitch",
+      "note length",
+      "loudness"
+    ],
+    "missing_rule": "a missing step has no pulses"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.89,
+      "alignment_raw": 0.89,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3548,
+      "dominant_angle_deg": 19.0,
+      "long_fraction": 0.5275,
+      "pulse_times": [
+        0.0,
+        0.5275
+      ],
+      "long_interval": 0.5275,
+      "short_interval": 0.4725
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8898,
+      "alignment_raw": 0.8894,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3358,
+      "dominant_angle_deg": 18.7,
+      "long_fraction": 0.52755,
+      "pulse_times": [
+        1.0,
+        1.52755
+      ],
+      "long_interval": 0.52755,
+      "short_interval": 0.47245
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8913,
+      "alignment_raw": 0.8948,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3536,
+      "dominant_angle_deg": 18.1,
+      "long_fraction": 0.527175,
+      "pulse_times": [
+        2.0,
+        2.527175
+      ],
+      "long_interval": 0.527175,
+      "short_interval": 0.472825
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8898,
+      "alignment_raw": 0.8862,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3366,
+      "dominant_angle_deg": 19.7,
+      "long_fraction": 0.52755,
+      "pulse_times": [
+        3.0,
+        3.52755
+      ],
+      "long_interval": 0.52755,
+      "short_interval": 0.47245
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8895,
+      "alignment_raw": 0.8886,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3266,
+      "dominant_angle_deg": 18.0,
+      "long_fraction": 0.527625,
+      "pulse_times": [
+        4.0,
+        4.527625
+      ],
+      "long_interval": 0.527625,
+      "short_interval": 0.472375
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.89,
+      "alignment_raw": 0.8911,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3525,
+      "dominant_angle_deg": 19.5,
+      "long_fraction": 0.5275,
+      "pulse_times": [
+        5.0,
+        5.5275
+      ],
+      "long_interval": 0.5275,
+      "short_interval": 0.4725
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8928,
+      "alignment_raw": 0.8995,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3311,
+      "dominant_angle_deg": 18.6,
+      "long_fraction": 0.5268,
+      "pulse_times": [
+        6.0,
+        6.5268
+      ],
+      "long_interval": 0.5268,
+      "short_interval": 0.4732
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": null,
+      "region": "aligned_lines",
+      "status": "ok",
+      "alignment": 0.8966,
+      "alignment_raw": 0.9053,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3409,
+      "dominant_angle_deg": 19.1,
+      "long_fraction": 0.52585,
+      "pulse_times": [
+        7.0,
+        7.52585
+      ],
+      "long_interval": 0.52585,
+      "short_interval": 0.47415
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0869,
+      "alignment_raw": 0.0869,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4511,
+      "dominant_angle_deg": 44.9,
+      "long_fraction": 0.728275,
+      "pulse_times": [
+        0.0,
+        0.728275
+      ],
+      "long_interval": 0.728275,
+      "short_interval": 0.271725
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0803,
+      "alignment_raw": 0.0647,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4412,
+      "dominant_angle_deg": 59.5,
+      "long_fraction": 0.729925,
+      "pulse_times": [
+        1.0,
+        1.729925
+      ],
+      "long_interval": 0.729925,
+      "short_interval": 0.270075
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0877,
+      "alignment_raw": 0.105,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4623,
+      "dominant_angle_deg": 116.1,
+      "long_fraction": 0.728075,
+      "pulse_times": [
+        2.0,
+        2.728075
+      ],
+      "long_interval": 0.728075,
+      "short_interval": 0.271925
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "missing",
+      "alignment": null,
+      "alignment_raw": null,
+      "reason": "Too few visible lines: 0.0% of the region has clear edges; at least 5.0% is needed.",
+      "reason_code": "too_few_edges",
+      "usable_fraction": 0.0,
+      "dominant_angle_deg": null,
+      "long_fraction": null,
+      "pulse_times": [],
+      "long_interval": null,
+      "short_interval": null
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "missing",
+      "alignment": null,
+      "alignment_raw": null,
+      "reason": "Too few visible lines: 0.0% of the region has clear edges; at least 5.0% is needed.",
+      "reason_code": "too_few_edges",
+      "usable_fraction": 0.0,
+      "dominant_angle_deg": null,
+      "long_fraction": null,
+      "pulse_times": [],
+      "long_interval": null,
+      "short_interval": null
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0745,
+      "alignment_raw": 0.0745,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4442,
+      "dominant_angle_deg": 106.7,
+      "long_fraction": 0.731375,
+      "pulse_times": [
+        5.0,
+        5.731375
+      ],
+      "long_interval": 0.731375,
+      "short_interval": 0.268625
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.0761,
+      "alignment_raw": 0.0798,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4946,
+      "dominant_angle_deg": 12.4,
+      "long_fraction": 0.730975,
+      "pulse_times": [
+        6.0,
+        6.730975
+      ],
+      "long_interval": 0.730975,
+      "short_interval": 0.269025
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": null,
+      "region": "mixed_lines",
+      "status": "ok",
+      "alignment": 0.1024,
+      "alignment_raw": 0.1637,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4536,
+      "dominant_angle_deg": 169.4,
+      "long_fraction": 0.7244,
+      "pulse_times": [
+        7.0,
+        7.7244
+      ],
+      "long_interval": 0.7244,
+      "short_interval": 0.2756
+    }
+  ],
+  "events": {
+    "aligned_lines": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.5275,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.52755,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8913,
+          "long_fraction": 0.527175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.527175,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8913,
+          "long_fraction": 0.527175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.52755,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8898,
+          "long_fraction": 0.52755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8895,
+          "long_fraction": 0.527625,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.527625,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8895,
+          "long_fraction": 0.527625,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.5275,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.89,
+          "long_fraction": 0.5275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8928,
+          "long_fraction": 0.5268,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.5268,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8928,
+          "long_fraction": 0.5268,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8966,
+          "long_fraction": 0.52585,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.52585,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aligned_lines",
+          "alignment": 0.8966,
+          "long_fraction": 0.52585,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ],
+    "mixed_lines": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0869,
+          "long_fraction": 0.728275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.728275,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0869,
+          "long_fraction": 0.728275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0803,
+          "long_fraction": 0.729925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.729925,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0803,
+          "long_fraction": 0.729925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0877,
+          "long_fraction": 0.728075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.728075,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0877,
+          "long_fraction": 0.728075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0745,
+          "long_fraction": 0.731375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.731375,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0745,
+          "long_fraction": 0.731375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0761,
+          "long_fraction": 0.730975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.730975,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.0761,
+          "long_fraction": 0.730975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.1024,
+          "long_fraction": 0.7244,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.7244,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "mixed_lines",
+          "alignment": 0.1024,
+          "long_fraction": 0.7244,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ]
+  }
+}

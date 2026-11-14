@@ -1,0 +1,42 @@
+{
+  "_about": "DRAFT region proposal for SVS 3912 'orig' 2048x1024 frames. Not scene.json. Owner: Student A.",
+  "status": "regions chosen by Dev A on 2026-11-14; Student A checked land",
+  "date": "2026-11-14",
+  "shape": "Circles, radius 61 px, same radius for both regions (Dev A).",
+  "map": "Equirectangular 2048x1024. x = (lon + 180) * 2048 / 360, y = (90 - lat) * 1024 / 180. See map_geometry in source_manifest.json.",
+  "how_measured": "analysis/explore_regions.py (Dev A's engine, default settings), frames 23000-23116 step 4 (30 frames). Land mask: grey land in most frames plus a 3 px coast margin.",
+  "for_scene_json": "box_px is the square around the circle [cx-r, cy-r, 2r, 2r]. The mask is white inside the circle and black on land.",
+  "regions": [
+    {
+      "id": "kuroshio_eddies",
+      "role": "swirly (short-long beat)",
+      "name": "Kuroshio eddies east of Japan",
+      "shape": "circle",
+      "center_px": [1872, 348],
+      "radius_px": 61,
+      "box_px": [1811, 287, 122, 122],
+      "center_lonlat": [149.1, 28.8],
+      "land_share": 0.002,
+      "alignment": { "mean": 0.073, "min": 0.058, "max": 0.101, "ok_frames": 30, "missing_frames": 0 }
+    },
+    {
+      "id": "equator_pacific",
+      "role": "aligned (even beat)",
+      "name": "Equatorial Pacific streaks",
+      "shape": "circle",
+      "center_px": [271, 504],
+      "radius_px": 61,
+      "box_px": [210, 443, 122, 122],
+      "center_lonlat": [-132.4, 1.4],
+      "land_share": 0.0,
+      "land_check": "No land in the circle in any of the 30 frames (it spans about 143W-122W, 9S-12N; the Marquesas at about 139.5W 9S lie just outside).",
+      "overlay_check": "No labels, colour bar or date text in the circle in any of the 30 frames: 0 white or neutral-grey pixels (the colours of text and colour bars) inside it, and 0 in the whole frame. The 'orig' frame set has no overlays; SVS provides the colour bar separately (sst_ecco2_cbar.png) and a separate 'with_colorbar' set. Checked 2026-11-14 by Student A, also by eye on frames 23000, 23060, 23116.",
+      "alignment": { "mean": 0.671, "min": 0.652, "max": 0.689, "ok_frames": 30, "missing_frames": 0 }
+    }
+  ],
+  "pair": { "mean_gap": 0.598, "smallest_gap": 0.551 },
+  "replaced": [
+    { "id": "southern_ocean_streaks", "center_px": [1080, 833], "why": "Looks aligned mostly because the map stretches east-west near the poles: 0.601 as drawn, about 0.16 with east-west distances corrected (cos 56.4S = 0.55)." },
+    { "id": "gulf_stream_offshore", "center_px": [641, 328], "why": "Not chosen; Kuroshio is swirlier (0.073 vs 0.217) and has less land." }
+  ]
+}

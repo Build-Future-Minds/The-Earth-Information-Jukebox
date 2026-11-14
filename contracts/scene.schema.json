@@ -34,7 +34,9 @@
         "height": { "type": "integer", "minimum": 1 },
         "count": { "type": "integer", "minimum": 1 },
         "pattern": { "type": "string", "description": "e.g. assets/frames/svs3912/frame_{index:05d}.jpg" },
-        "timestamps": { "type": "array", "items": { "type": "string" }, "description": "Model time per frame, from the source's date file" },
+        "timestamps": { "type": "array", "items": { "type": "string" }, "description": "Model time per frame, from the source's date file. One entry per frame, or none" },
+        "first_index": { "type": "integer", "minimum": 0, "description": "File number of the first frame ({index} in pattern). Default 0. SVS 3912: 23000" },
+        "index_step": { "type": "integer", "minimum": 1, "description": "Gap between consecutive frame file numbers. Default 1. SVS 3912: 4" },
         "camera_static_check": { "type": "string", "description": "How the fixed-camera assumption was tested and the result" }
       }
     },

@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.2",
+  "is_mock": true,
+  "source": {
+    "svs_id": null,
+    "url": "about:mock",
+    "title": "PRACTICE SCENE - TEST INPUT - NOT NASA DATA",
+    "credit": "Synthetic test input made by the Earth Sonata team (analysis/make_practice_scene.py)",
+    "data_kind": "synthetic_test_input",
+    "model_or_instrument": "none",
+    "data_start": null,
+    "data_end": null,
+    "limitations": [
+      "Computer-drawn dashes for testing the math engine. It describes no real data.",
+      "Frames 3 and 4 are blank in the right-hand box on purpose, to practise missing information."
+    ]
+  },
+  "frames": {
+    "width": 512,
+    "height": 256,
+    "count": 8,
+    "pattern": "analysis/practice/frames/TEST_INPUT_frame_{index:05d}.png",
+    "timestamps": [],
+    "first_index": 0,
+    "index_step": 1,
+    "camera_static_check": "not applicable (synthetic test input)"
+  },
+  "regions": [
+    {
+      "id": "aligned_lines",
+      "name": "Aligned lines circle (practice)",
+      "center_px": [
+        128,
+        128
+      ],
+      "radius_px": 112,
+      "box_px": [
+        16,
+        16,
+        224,
+        224
+      ],
+      "mask": "analysis/practice/TEST_INPUT_mask_aligned.png",
+      "description": "Dashes that nearly share one direction. A fake legend is masked out."
+    },
+    {
+      "id": "mixed_lines",
+      "name": "Mixed lines circle (practice)",
+      "center_px": [
+        384,
+        128
+      ],
+      "radius_px": 112,
+      "box_px": [
+        272,
+        16,
+        224,
+        224
+      ],
+      "mask": null,
+      "description": "Dashes pointing every which way. Blank in frames 3 and 4."
+    }
+  ]
+}
