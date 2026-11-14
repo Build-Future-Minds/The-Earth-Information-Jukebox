@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earth Sonata Listening Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:wght@200..800&display=swap" rel="stylesheet">
+<!--
+  Practice listening game on a real NASA image. Owner: Student B.
+
+  Image: NASA SVS 3912 still "flat_global_ecco2_2028x1024.25000.jpg" (model time 2007-06-19T12:00Z,
+  from flat_ecco2_dates.txt). Credit: NASA/Goddard Space Flight Center Scientific Visualization Studio.
+  Download it into assets/frames/svs3912/ (git-ignored); see tools/README.md.
+
+  Measurement (practice only, made in the browser, not Dev A's checked features.py): the
+  mapping_spec.md alignment, A = |sum m (cos 2θ, sin 2θ)| / sum m, over pixels whose gradient is
+  stronger than the 60th percentile, after a light blur. Patches touching land are skipped; patches
+  with under 5 % usable pixels count as missing and are skipped.
+
+  Sound: the rhythm rule and timing of Dev B's app (web/src/audio/earthVoice.ts): beat 0.5 s at
+  speed 1, pulses at 0 and long_fraction × beat, long_fraction = 0.75 − 0.25 × A.
+  Each beat is a low pulse then a high pulse; those two pitches are the same for every patch and
+  carry no data. The optional pitch hint raises both pitches with alignment. It is a practice aid,
+  not part of the team's rule, and its rounds are scored separately.
+
+  Run from the earth-sonata folder:  python -m http.server 8000 --bind 127.0.0.1
+  then open http://localhost:8000/tools/listening_game.html
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #f6f7f8; --ink: #111214; --ink-2: #4b515a; --rule: #d9dce1; --rule-2: #eceef1;
+    --signal: #ff5a1f; --signal-ink: #111214; --well: #2a2a2a;
+    --sans: "Atkinson Hyperlegible Next", system-ui, "Segoe UI", sans-serif;
+    --mono: "Atkinson Hyperlegible Mono", ui-monospace, Consolas, monospace;
+    --snap: 90ms steps(2, jump-end);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scrollbar-color: var(--ink-2) var(--rule-2); }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18px/1.5 var(--sans);
+         caret-color: var(--signal); }
+  ::selection { background: var(--signal); color: var(--signal-ink); }
+  :focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+
+  .app { display: grid; grid-template-columns: 400px 1fr; grid-template-rows: auto 1fr;
+         grid-template-areas: "top main" "bottom main"; min-height: 100vh; }
+  @media (max-width: 960px) { .app { grid-template-columns: 1fr; grid-template-rows: none;
+         grid-template-areas: "top" "main" "bottom"; } }
+
+  /* ---------- left rail ---------- */
+  .rail { border-right: 1px solid var(--rule); padding: 32px 28px 28px; display: flex;
+          flex-direction: column; gap: 22px; }
+  .rail-top { grid-area: top; padding-bottom: 0; }
+  .rail-bottom { grid-area: bottom; padding-top: 22px; }
+  main { grid-area: main; }
+  @media (max-width: 960px) {
+    .rail { border-right: 0; padding: 24px 16px; }
+    .rail-top { padding-bottom: 4px; }
+    .rail-bottom { border-top: 1px solid var(--rule); padding-top: 24px; }
+  }
+  h1 { font-size: 1.9rem; font-weight: 750; line-height: 1.1; letter-spacing: -0.015em; margin: 0; }
+  .lede { margin: 8px 0 0; color: var(--ink-2); font-size: 1rem; }
+  .map { position: relative; margin: 0; background: var(--well); border-radius: 4px; overflow: hidden; }
+  .map img { display: block; width: 100%; height: auto; }
+  .box { position: absolute; border: 2px solid #fff; outline: 2px solid #000; }
+  .box span { position: absolute; left: -2px; top: -2px; transform: translateY(-100%); background: #fff;
+              color: #000; font: 700 0.8rem/1.3 var(--sans); padding: 0 5px; }
+  .credit { font-size: 0.8rem; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
+  .credit a { color: var(--ink); text-underline-offset: 2px; }
+
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .actions .primary { grid-column: 1 / -1; justify-content: space-between; }
+  .actions button { justify-content: space-between; }
+  button { font: 700 1rem/1 var(--sans); min-height: 48px; padding: 0 16px; border-radius: 4px;
+           border: 2px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer;
+           display: inline-flex; align-items: center; gap: 10px; }
+  button:hover:not(:disabled) { background: var(--rule-2); }
+  button.primary { background: var(--ink); color: var(--paper); }
+  button.primary:hover:not(:disabled) { background: #2a2c31; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  kbd { font: 600 0.8rem/1.4 var(--mono); border: 1.5px solid currentColor; border-radius: 3px; padding: 0 5px; }
+
+  .axis { display: grid; gap: 6px; }
+  .axis label, .axis .label { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.95rem; font-weight: 600; }
+  .axis output, .axis .readout { font: 400 0.9rem var(--mono); color: var(--ink-2); }
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; margin: 0;
+                        background: transparent; cursor: pointer; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: var(--ink-2); }
+  input[type="range"]::-moz-range-track { height: 2px; background: var(--ink-2); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -8px;
+                        background: var(--ink); border: 0; border-radius: 4px; }
+  input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: var(--ink); border: 0; border-radius: 4px; }
+  input[type="range"]:focus-visible::-webkit-slider-thumb { background: var(--signal); }
+  input[type="range"]:focus-visible::-moz-range-thumb { background: var(--signal); }
+  .switch { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; }
+  .switch input { width: 22px; height: 22px; accent-color: var(--signal); margin: 0; }
+  .switch-state { margin-left: auto; font: 400 0.9rem var(--mono); color: var(--ink-2); }
+  .hint-note { font-size: 0.85rem; color: var(--ink-2); margin: 0; }
+
+  .score-head { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px solid var(--rule); padding-top: 18px; }
+  .score-head h2 { font-size: 1.05rem; margin: 0; }
+  .score-big { font: 400 1.6rem/1 var(--mono); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 5px 8px 5px 0; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 600; color: var(--ink-2); }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .empty-row td { color: var(--ink-2); }
+  .reset-area { padding-top: 12px; }
+  @media (min-width: 961px) { .reset-area { margin-top: auto; padding-top: 28px; } }
+  .reset-area button { border-color: var(--rule); color: var(--ink-2); font-weight: 600; }
+
+  /* ---------- main ---------- */
+  main { padding: 32px 40px 40px; display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+  @media (max-width: 960px) { main { padding: 24px 16px 40px; } }
+  .status { font-size: 1.35rem; font-weight: 650; line-height: 1.3; margin: 0; min-height: 1.3em; max-width: 46ch; text-wrap: balance; }
+  .sub { margin: -14px 0 0; color: var(--ink-2); max-width: 60ch; }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 640px) { .pair { gap: 14px; } }
+  .patch { margin: 0; min-width: 0; }
+  .patch canvas { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; border-radius: 4px;
+                  background: var(--well); }
+  .numeral { display: block; font: 500 clamp(4.5rem, 10vw, 9rem)/0.78 var(--sans); letter-spacing: -0.04em;
+             margin: -0.32em 0 0 0.06em; position: relative; color: var(--ink);
+             -webkit-text-stroke: 0.06em var(--paper); paint-order: stroke fill; transition: font-weight var(--snap); }
+  .patch.revealed .numeral { color: var(--ink); }
+  .readout { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 10px 0 12px;
+             font: 400 0.9rem var(--mono); color: var(--ink-2); min-height: 3.2rem; }
+  .readout .value { font: 500 2.6rem/1 var(--sans); color: var(--ink); letter-spacing: -0.02em;
+                    font-variant-numeric: tabular-nums; transition: font-weight var(--snap); }
+  .readout .value small { font: 400 0.9rem var(--mono); color: var(--ink-2); margin-left: 8px; letter-spacing: 0; }
+  .pick { width: 100%; justify-content: space-between; min-height: 60px; font-size: 1.1rem; }
+  .pick[aria-disabled="true"] { cursor: default; }
+  @media (max-width: 640px) {
+    .readout { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .readout .value { font-size: 1.9rem; }
+    .readout .value small { display: block; margin: 4px 0 0; }
+  }
+  .pick[aria-disabled="true"]:hover { background: transparent; }
+  .pick.chosen { background: var(--signal); border-color: var(--signal); color: var(--signal-ink); }
+  .pick.answer:not(.chosen) { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .where { font-size: 0.9rem; color: var(--ink-2); margin: 8px 0 0; }
+
+  .plot { border-top: 1px solid var(--rule); padding-top: 16px; }
+  .plot h2 { font-size: 1.05rem; margin: 0 0 4px; }
+  .plot p { margin: 0 0 10px; color: var(--ink-2); font-size: 0.95rem; }
+  .plot-row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: center; gap: 12px; height: 52px; }
+  .plot-row b { font-weight: 650; }
+  .plot svg { display: block; width: 100%; height: 40px; }
+  .plot .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--ink-2); margin-top: 8px; }
+  .swatch { display: inline-block; width: 4px; height: 16px; vertical-align: -3px; margin-right: 8px; }
+
+  details { border-top: 1px solid var(--rule); padding-top: 14px; max-width: 70ch; }
+  summary { cursor: pointer; font-weight: 650; list-style: none; display: flex; align-items: center; gap: 12px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--ink);
+                    border-bottom: 2px solid var(--ink); transform: rotate(-45deg); }
+  details[open] summary::before { transform: rotate(45deg); }
+  details p { color: var(--ink-2); }
+  .error { border: 2px solid var(--ink); border-radius: 4px; padding: 16px; background: #fff; }
+  .error h2 { margin: 0 0 8px; font-size: 1.15rem; }
+  .error code { font: 0.85rem var(--mono); word-break: break-all; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail rail-top" aria-label="Map and playback">
+    <div>
+      <h1>Which patch made this rhythm?</h1>
+      <p class="lede">An Earth Sonata: Play the Planet practice game. Hear one rhythm, then pick the patch that made it.</p>
+    </div>
+
+    <figure class="map" id="mapFigure">
+      <img id="world" src="../assets/frames/svs3912/flat_global_ecco2_2028x1024.25000.jpg"
+           alt="NASA visualization of global sea surface currents, coloured by modelled temperature: blue cold, green mild, yellow and red warm.">
+      <div class="box" id="box0" hidden aria-hidden="true"><span>1</span></div>
+      <div class="box" id="box1" hidden aria-hidden="true"><span>2</span></div>
+    </figure>
+    <p class="credit" style="margin-top:-14px">Visualization: NASA/Goddard Space Flight Center Scientific Visualization Studio,
+      <a href="https://svs.gsfc.nasa.gov/3912">SVS 3912</a>. ECCO2 model output, model time 19 June 2007. Not a photo.</p>
+
+    <div class="actions">
+      <button class="primary" id="newRound" disabled>New round <kbd>P</kbd></button>
+      <button id="replay" disabled>Replay <kbd>R</kbd></button>
+      <button id="stop">Stop <kbd>Esc</kbd></button>
+    </div>
+  </aside>
+
+  <aside class="rail rail-bottom" aria-label="Sound settings and score">
+    <div class="axis">
+      <label for="speed">Speed <output id="speedOut" for="speed">1.00×</output></label>
+      <input type="range" id="speed" min="0" max="2" step="1" value="2" aria-valuetext="1 times">
+    </div>
+    <div class="axis">
+      <label for="volume">Volume <output id="volumeOut" for="volume">0.70</output></label>
+      <input type="range" id="volume" min="0" max="1" step="0.05" value="0.7">
+    </div>
+    <div class="axis">
+      <label class="switch"><input type="checkbox" id="hint"> Pitch hint <span class="switch-state" id="hintOut">off</span></label>
+      <p class="hint-note">On: higher pitch means more lined-up lines. A practice aid, not part of the team's rule. Scored separately.</p>
+    </div>
+
+    <div>
+      <div class="score-head"><h2>Score</h2><span class="score-big" id="score">0 / 0</span></div>
+      <table aria-label="Right answers by sound and by alignment difference">
+        <thead><tr><th>Sound</th><th>Difference</th><th class="num">Right</th><th class="num">Played</th></tr></thead>
+        <tbody id="statsBody"></tbody>
+      </table>
+    </div>
+
+    <div class="reset-area"><button id="reset">Reset score</button></div>
+  </aside>
+
+  <main>
+    <div id="loadError" class="error" hidden>
+      <h2>The NASA image is not here yet</h2>
+      <p>Put <code>flat_global_ecco2_2028x1024.25000.jpg</code> in <code>assets/frames/svs3912/</code>. From the <code>earth-sonata</code> folder:</p>
+      <p><code>curl -o assets/frames/svs3912/flat_global_ecco2_2028x1024.25000.jpg https://svs.gsfc.nasa.gov/vis/a000000/a003900/a003912/flat_global_ecco2_2028x1024.25000.jpg</code></p>
+      <p>Then reload this page through the local server, not by double-clicking the file.</p>
+    </div>
+
+    <p class="status" id="status" aria-live="polite">Measuring the NASA image…</p>
+    <p class="sub" id="sub">Lined-up streaks make an even pulse. Swirls make a short–long pulse.</p>
+
+    <div class="pair" id="pair">
+      <figure class="patch" id="patch0">
+        <canvas id="canvas0" width="576" height="360" role="img" aria-label="Patch 1, not chosen yet."></canvas>
+        <span class="numeral" id="num0" aria-hidden="true">1</span>
+        <div class="readout"><span id="align0"></span><span id="wght0"></span></div>
+        <button class="pick" id="pick0" disabled aria-label="Patch 1 made it"><span id="label0">Patch 1</span> <kbd>1</kbd></button>
+        <p class="where" id="where0"></p>
+      </figure>
+      <figure class="patch" id="patch1">
+        <canvas id="canvas1" width="576" height="360" role="img" aria-label="Patch 2, not chosen yet."></canvas>
+        <span class="numeral" id="num1" aria-hidden="true">2</span>
+        <div class="readout"><span id="align1"></span><span id="wght1"></span></div>
+        <button class="pick" id="pick1" disabled aria-label="Patch 2 made it"><span id="label1">Patch 2</span> <kbd>2</kbd></button>
+        <p class="where" id="where1"></p>
+      </figure>
+    </div>
+
+    <section class="plot" aria-labelledby="plotTitle">
+      <h2 id="plotTitle">Both rhythms, one time line</h2>
+      <p id="plotNote">Appears after you answer, so the screen never gives the answer away.</p>
+      <div id="plotRows" hidden>
+        <div class="plot-row"><b>Patch 1</b><svg id="plot0" viewBox="0 0 600 40" preserveAspectRatio="none" role="img"></svg></div>
+        <div class="plot-row"><b>Patch 2</b><svg id="plot1" viewBox="0 0 600 40" preserveAspectRatio="none" role="img"></svg></div>
+      </div>
+      <div class="legend" id="plotLegend" hidden><span><i class="swatch" style="background:var(--ink)"></i>Low pulse, on the beat</span>
+        <span><i class="swatch" style="background:var(--signal)"></i>High pulse</span></div>
+    </section>
+
+    <details>
+      <summary>How the rhythm is made</summary>
+      <p>Every bit of visible line in a patch votes for its direction. If most lines run the same way,
+        alignment is near 1 and the two pulses in each beat are evenly spaced. If they run every which way,
+        alignment is near 0 and the second pulse comes late: short–long.</p>
+      <p>Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat. After you answer, the big
+        numerals take a font weight from the alignment: thin means swirly, heavy means lined up. The weight
+        scale is stretched across this image's measured range, so the least lined-up patch found is
+        weight 200 and the most lined-up is weight 800.</p>
+      <p>The numbers here are a quick practice measurement made in your browser, not the team's checked
+        numbers. The rule is a choice the team made. It describes the picture, not water speed,
+        turbulence or ocean health.</p>
+    </details>
+  </main>
+</div>
+
+<script>
+  // ---------- settings ----------
+  const IMAGE_W = 2048, IMAGE_H = 1024;
+  const PATCH_W = 96, PATCH_H = 60;          // patch size in image pixels
+  const CANDIDATES = 700;                    // random patches measured per page load
+  const MAX_LAND = 0.02;                     // skip patches with more than 2 % land
+  const MIN_USABLE = 0.05;                   // under 5 % usable pixels = missing
+  const STRONG_PERCENTILE = 0.60;            // pixels stronger than this vote
+  const MIN_PAIR_DIFFERENCE = 0.30;          // keep rounds audible
+  const BEAT_S = 0.5, BEATS = 8;             // Dev B's app: step_seconds 0.5
+  const LOW_HZ = 329.6, HIGH_HZ = 659.3;     // E4 and E5: fixed, carry no data
+  const SPEEDS = [0.5, 0.75, 1];
+  const WGHT_MIN = 200, WGHT_MAX = 800;      // font weight range = alignment 0 to 1
+
+  const $ = (id) => document.getElementById(id);
+  const longFraction = (a) => 0.75 - 0.25 * Math.min(1, Math.max(0, a));  // earthVoice.ts
+  let A_LOW = 0, A_HIGH = 1;                 // set from the measured pool
+  const weightFor = (a) => {
+    const t = Math.min(1, Math.max(0, (a - A_LOW) / Math.max(1e-6, A_HIGH - A_LOW)));
+    return Math.round(WGHT_MIN + (WGHT_MAX - WGHT_MIN) * t);
+  };
+
+  // ---------- measuring the image ----------
+  function boxBlur(src, w, h, r) {
+    const tmp = new Float32Array(src.length), out = new Float32Array(src.length), n = 2 * r + 1;
+    for (let y = 0; y < h; y++) {
+      let s = 0; const row = y * w;
+      for (let x = -r; x <= r; x++) s += src[row + Math.min(w - 1, Math.max(0, x))];
+      for (let x = 0; x < w; x++) {
+        tmp[row + x] = s / n;
+        s += src[row + Math.min(w - 1, x + r + 1)] - src[row + Math.max(0, x - r)];
+      }
+    }
+    for (let x = 0; x < w; x++) {
+      let s = 0;
+      for (let y = -r; y <= r; y++) s += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+      for (let y = 0; y < h; y++) {
+        out[y * w + x] = s / n;
+        s += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x];
+      }
+    }
+    return out;
+  }
+
+  function measureImage(img) {
+    const c = document.createElement("canvas"); c.width = IMAGE_W; c.height = IMAGE_H;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    g.drawImage(img, 0, 0, IMAGE_W, IMAGE_H);
+    const px = g.getImageData(0, 0, IMAGE_W, IMAGE_H).data;
+    const n = IMAGE_W * IMAGE_H, lum = new Float32Array(n), land = new Uint8Array(n);
+    for (let i = 0; i < n; i++) {
+      const r = px[4 * i], gr = px[4 * i + 1], b = px[4 * i + 2];
+      lum[i] = 0.299 * r + 0.587 * gr + 0.114 * b;
+      land[i] = Math.max(r, gr, b) - Math.min(r, gr, b) < 12 && (r + gr + b) / 3 > 25 ? 1 : 0;
+    }
+    const L = boxBlur(boxBlur(lum, IMAGE_W, IMAGE_H, 1), IMAGE_W, IMAGE_H, 1);
+    const m = new Float32Array(n), vc = new Float32Array(n), vs = new Float32Array(n);
+    for (let y = 1; y < IMAGE_H - 1; y++) {
+      for (let x = 1; x < IMAGE_W - 1; x++) {
+        const i = y * IMAGE_W + x, up = i - IMAGE_W, dn = i + IMAGE_W;
+        const gx = (L[up + 1] + 2 * L[i + 1] + L[dn + 1]) - (L[up - 1] + 2 * L[i - 1] + L[dn - 1]);
+        const gy = (L[dn - 1] + 2 * L[dn] + L[dn + 1]) - (L[up - 1] + 2 * L[up] + L[up + 1]);
+        const mag = Math.hypot(gx, gy);
+        m[i] = mag;
+        if (mag > 0) { vc[i] = (gx * gx - gy * gy) / mag; vs[i] = (2 * gx * gy) / mag; }
+      }
+    }
+    const sample = [];
+    for (let k = 0; k < 60000; k++) { const i = Math.floor(Math.random() * n); if (!land[i]) sample.push(m[i]); }
+    sample.sort((a, b) => a - b);
+    const threshold = sample[Math.floor(sample.length * STRONG_PERCENTILE)];
+
+    const patches = []; let missing = 0, onLand = 0;
+    for (let k = 0; k < CANDIDATES; k++) {
+      const x0 = Math.floor(Math.random() * (IMAGE_W - PATCH_W - 2)) + 1;
+      const y0 = Math.floor(40 + Math.random() * (IMAGE_H - PATCH_H - 80));
+      let landCount = 0, used = 0, sumC = 0, sumS = 0, sumM = 0;
+      for (let y = y0; y < y0 + PATCH_H; y++) {
+        for (let x = x0; x < x0 + PATCH_W; x++) {
+          const i = y * IMAGE_W + x;
+          if (land[i]) { landCount++; continue; }
+          if (m[i] > threshold) { used++; sumC += vc[i]; sumS += vs[i]; sumM += m[i]; }
+        }
+      }
+      const area = PATCH_W * PATCH_H;
+      if (landCount / area > MAX_LAND) { onLand++; continue; }
+      if (used / area < MIN_USABLE) { missing++; continue; }
+      patches.push({ x: x0, y: y0, alignment: Math.hypot(sumC, sumS) / sumM });
+    }
+    patches.sort((a, b) => a.alignment - b.alignment);
+    return { patches, missing, onLand };
+  }
+
+  function where(p) {   // equirectangular map, left edge about 180° W
+    const lon = -180 + 360 * (p.x + PATCH_W / 2) / IMAGE_W;
+    const lat = 90 - 180 * (p.y + PATCH_H / 2) / IMAGE_H;
+    return `About ${Math.abs(Math.round(lat))}° ${lat >= 0 ? "N" : "S"}, ${Math.abs(Math.round(lon))}° ${lon >= 0 ? "E" : "W"}`;
+  }
+
+  // ---------- sound ----------
+  let ctx = null, master = null, sources = [], timers = [];
+
+  function ensureAudio() {
+    if (!ctx) {
+      ctx = new AudioContext();
+      master = ctx.createGain();
+      master.gain.value = Number($("volume").value);
+      master.connect(ctx.destination);
+    }
+    if (ctx.state === "suspended") ctx.resume();
+  }
+
+  function pulse(t, hz, peak) {   // short drum-like hit: quick pitch drop, then decay
+    const osc = ctx.createOscillator(), env = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(hz * 3, t);
+    osc.frequency.exponentialRampToValueAtTime(hz, t + 0.012);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(peak, t + 0.002);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+    osc.connect(env).connect(master);
+    osc.start(t); osc.stop(t + 0.17);
+    sources.push(osc);
+  }
+
+  function stopAll() {
+    sources.forEach((s) => { try { s.stop(); } catch (e) {} });
+    sources = []; timers.forEach(clearTimeout); timers = [];
+  }
+
+  function play(p, startText, endText) {
+    stopAll(); ensureAudio();
+    const beat = BEAT_S / SPEEDS[Number($("speed").value)], lf = longFraction(p.alignment);
+    const shift = $("hint").checked ? Math.pow(2, p.alignment) : 1;   // pitch hint only
+    const start = ctx.currentTime + 0.1;
+    for (let b = 0; b < BEATS; b++) {
+      pulse(start + b * beat, LOW_HZ * shift, 1.0);
+      pulse(start + (b + lf) * beat, HIGH_HZ * shift, 0.75);
+    }
+    setStatus(startText);
+    timers.push(setTimeout(() => setStatus(endText), (BEATS * beat + 0.2) * 1000));
+  }
+
+  // ---------- drawing ----------
+  let image = null;
+
+  function drawPatch(side, p) {
+    const c = $("canvas" + side), g = c.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(image, p.x, p.y, PATCH_W, PATCH_H, 0, 0, c.width, c.height);
+    const box = $("box" + side);
+    Object.assign(box.style, {
+      left: (100 * p.x / IMAGE_W) + "%", top: (100 * p.y / IMAGE_H) + "%",
+      width: (100 * PATCH_W / IMAGE_W) + "%", height: (100 * PATCH_H / IMAGE_H) + "%",
+    });
+    box.hidden = false;
+    $("where" + side).textContent = where(p);
+  }
+
+  function drawRow(svg, p, n) {      // two beats of one rhythm; both rows share the same time axis
+    const W = 600, pad = 4, span = W - 2 * pad, lf = longFraction(p.alignment);
+    let s = `<line x1="${pad}" x2="${W - pad}" y1="20" y2="20" stroke="#d9dce1" stroke-width="2"/>`;
+    for (let b = 0; b <= 2; b++) s += `<line x1="${pad + b / 2 * span}" x2="${pad + b / 2 * span}" y1="0" y2="40" stroke="#d9dce1" stroke-width="2"/>`;
+    for (let b = 0; b < 2; b++) {
+      s += `<rect x="${pad + b / 2 * span - 3}" y="4" width="6" height="32" fill="#111214"/>`;
+      s += `<rect x="${pad + (b + lf) / 2 * span - 3}" y="8" width="6" height="24" fill="#ff5a1f"/>`;
+    }
+    svg.innerHTML = s;
+    svg.setAttribute("aria-label", `Patch ${n}: the second pulse lands ${Math.round(lf * 100)} percent of the way through each beat.`);
+  }
+
+  function drawPlot(left, right) {
+    drawRow($("plot0"), left, 1); drawRow($("plot1"), right, 2);
+    $("plotRows").hidden = false; $("plotLegend").hidden = false;
+    $("plotNote").textContent = "Black marks are the beat. Orange marks are the second pulse: the closer to halfway, the more even.";
+  }
+
+  function clearPlot() {
+    $("plotRows").hidden = true; $("plotLegend").hidden = true;
+    $("plotNote").textContent = "Appears after you answer, so the screen never gives the answer away.";
+  }
+
+  function setStatus(text) {
+    $("status").textContent = text;
+  }
+
+  // ---------- game ----------
+  let pool = [], shown = null, target = null, guessed = true;
+  const stats = {};          // "rhythm|0.30–0.39" -> { right, played }
+  let right = 0, total = 0;
+  const pick = (list) => list[Math.floor(Math.random() * list.length)];
+
+  function choosePair() {
+    const third = Math.max(1, Math.floor(pool.length * 0.3));
+    const low = pool.slice(0, third), high = pool.slice(-third);
+    for (let tries = 0; tries < 200; tries++) {
+      const a = pick(low), b = pick(high);
+      if (b.alignment - a.alignment >= MIN_PAIR_DIFFERENCE) return [a, b];
+    }
+    return [pool[0], pool[pool.length - 1]];
+  }
+
+  function resetPatchView(side) {
+    $("num" + side).style.fontWeight = 500;   // neutral weight: gives nothing away
+    $("align" + side).textContent = ""; $("wght" + side).textContent = "";
+    $("pick" + side).classList.remove("chosen", "answer");
+    $("pick" + side).disabled = false;
+    $("pick" + side).removeAttribute("aria-disabled");
+    $("label" + side).textContent = `Patch ${side + 1}`;
+    $("pick" + side).setAttribute("aria-label", `Patch ${side + 1} made it`);
+    $("patch" + side).classList.remove("revealed");
+  }
+
+  function newRound() {
+    if (!pool.length) return;
+    const pair = choosePair();
+    shown = Math.random() < 0.5 ? pair : [pair[1], pair[0]];
+    target = pick(shown);
+    guessed = false;
+    [0, 1].forEach((side) => {
+      drawPatch(side, shown[side]);
+      resetPatchView(side);
+      $("canvas" + side).setAttribute("aria-label", `Patch ${side + 1}, ${where(shown[side]).toLowerCase()}.`);
+    });
+    clearPlot();
+    $("replay").disabled = false;
+    $("sub").textContent = $("hint").checked
+      ? "Pitch hint is on: this round counts in the pitch-hint score."
+      : "Listen to the spacing between the low and high pulse.";
+    play(target, "Listen…", "Which patch made it? Press 1 or 2.");
+  }
+
+  function guess(side) {
+    if (guessed || !shown) return;
+    guessed = true; total++;
+    timers.forEach(clearTimeout); timers = [];
+    const answer = shown[0] === target ? 0 : 1, correct = side === answer;
+    if (correct) right++;
+    const diff = Math.abs(shown[0].alignment - shown[1].alignment);
+    const bucket = diff >= 0.5 ? "0.50+" : diff >= 0.4 ? "0.40–0.49" : "0.30–0.39";
+    const key = ($("hint").checked ? "With pitch hint" : "Rhythm only") + "|" + bucket;
+    stats[key] = stats[key] || { right: 0, played: 0 };
+    stats[key].played++; if (correct) stats[key].right++;
+
+    [0, 1].forEach((s) => {
+      const p = shown[s];
+      $("num" + s).style.fontWeight = weightFor(p.alignment);
+      $("align" + s).innerHTML = `<span class="value" style="font-weight:${weightFor(p.alignment)}">${p.alignment.toFixed(2)}<small>alignment</small></span>`;
+      $("wght" + s).textContent = `wght ${weightFor(p.alignment)}`;
+      $("pick" + s).setAttribute("aria-disabled", "true");
+      $("patch" + s).classList.add("revealed");
+    });
+    $("pick" + side).classList.add("chosen");
+    $("pick" + answer).classList.add("answer");
+    if (correct) {
+      $("label" + side).textContent = "Your pick made it";
+    } else {
+      $("label" + side).textContent = "Your pick";
+      $("label" + answer).textContent = "Made this rhythm";
+    }
+    [0, 1].forEach((s) => $("pick" + s).setAttribute("aria-label", `Patch ${s + 1}: ${$("label" + s).textContent}`));
+    drawPlot(shown[0], shown[1]);
+
+    const kind = longFraction(target.alignment) < longFraction(shown[1 - answer].alignment) ? "more even" : "more short–long";
+    setStatus((correct ? "Right. " : "Not this time. ") + `Patch ${answer + 1} made it: its rhythm is the ${kind} one.`);
+    $("sub").textContent = "Thin numeral: swirly lines. Heavy numeral: lined-up lines. Press P for the next round.";
+    updateScore();
+    $("newRound").focus();
+  }
+
+  function updateScore() {
+    $("score").textContent = `${right} / ${total}`;
+    const keys = Object.keys(stats).sort();
+    $("statsBody").innerHTML = keys.length
+      ? keys.map((k) => { const [mode, b] = k.split("|");
+          return `<tr><td>${mode}</td><td class="mono">${b}</td><td class="num">${stats[k].right}</td><td class="num">${stats[k].played}</td></tr>`; }).join("")
+      : `<tr class="empty-row"><td colspan="4">No rounds yet. Press New round.</td></tr>`;
+  }
+
+  // ---------- wiring ----------
+  $("newRound").addEventListener("click", newRound);
+  $("replay").addEventListener("click", () => target &&
+    play(target, "Replaying…", guessed ? "Done. Press P for the next round." : "Which patch made it? Press 1 or 2."));
+  $("stop").addEventListener("click", () => { stopAll(); setStatus("Stopped."); });
+  $("pick0").addEventListener("click", () => guess(0));
+  $("pick1").addEventListener("click", () => guess(1));
+  $("reset").addEventListener("click", () => { right = 0; total = 0; for (const k in stats) delete stats[k]; updateScore(); });
+  $("volume").addEventListener("input", (e) => {
+    $("volumeOut").textContent = Number(e.target.value).toFixed(2);
+    if (master) master.gain.value = Number(e.target.value);
+  });
+  $("speed").addEventListener("input", (e) => {
+    const s = SPEEDS[Number(e.target.value)];
+    $("speedOut").textContent = s.toFixed(2) + "×";
+    e.target.setAttribute("aria-valuetext", `${s} times`);
+  });
+  $("hint").addEventListener("change", (e) => { $("hintOut").textContent = e.target.checked ? "on" : "off"; });
+
+  document.addEventListener("keydown", (e) => {
+    const t = e.target;
+    const typing = t.tagName === "TEXTAREA" || t.tagName === "SELECT" ||
+                   (t.tagName === "INPUT" && !["range", "checkbox"].includes(t.type));
+    if (typing && e.key !== "Escape") return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (k === "escape") $("stop").click();
+    else if (k === "p") newRound();
+    else if (k === "r") $("replay").click();
+    else if (k === "1") guess(0);
+    else if (k === "2") guess(1);
+  });
+
+  updateScore();
+
+  const world = $("world");
+  function onImage() {
+    image = world;
+    setTimeout(() => {
+      const result = measureImage(world);
+      pool = result.patches;
+      if (pool.length) { A_LOW = pool[0].alignment; A_HIGH = pool[pool.length - 1].alignment; }
+      $("newRound").disabled = pool.length < 2;
+      if (pool.length < 2) { setStatus("Not enough usable ocean patches were found in this image."); return; }
+      setStatus("Ready. Press New round to hear the first rhythm.");
+      $("sub").textContent = `${pool.length} ocean patches measured. ${result.onLand} touched land and ${result.missing} were too blank, so they are left out.`;
+    }, 30);
+  }
+  if (world.complete && world.naturalWidth) onImage();
+  else {
+    world.addEventListener("load", onImage);
+    world.addEventListener("error", () => {
+      $("loadError").hidden = false; $("mapFigure").hidden = true; $("pair").hidden = true;
+      setStatus("The NASA image could not be loaded.");
+    });
+  }
+</script>
+</body>
+</html>
