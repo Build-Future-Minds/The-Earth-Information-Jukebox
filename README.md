@@ -5,7 +5,9 @@ NASA Space Apps Challenge 2026 — *The Earth Information Jukebox*
 **Our goal:** a small app that lets a visitor compare two regions of a NASA ocean
 visualization by hearing a rhythm, then understand which image pattern produced the sound.
 
-**Status:** planning and starter kit. No application code yet.
+**Status:** app runs on practice data (Checkpoint 1). Setup: [`web/README.md`](web/README.md).
+
+**Try it:** `cd web && npm ci && npm run dev`
 
 ## Read in this order
 

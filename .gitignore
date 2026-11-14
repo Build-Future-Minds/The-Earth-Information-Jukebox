@@ -24,3 +24,6 @@ Thumbs.db
 
 # Local recordings (upload final demo elsewhere)
 recordings/
+
+# Browser test artefacts
+.playwright-mcp/
