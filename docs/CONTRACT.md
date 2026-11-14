@@ -34,6 +34,11 @@ Each note carries `why`: the region, the alignment value, the pulse split it pro
 rule. "Explain this rhythm" is written from `why`, so the explanation always matches the sound
 actually playing.
 
+## Where files go
+
+The approved `scene.json`, `features.json` and one `preview` image go in `data/` at the repo root.
+The app uses them as soon as both JSON files are there (`data/README.md`). Practice files stay in `fixtures/mock/`.
+
 ## Rules
 
 - A practice file has `is_mock: true` and the app shows a PRACTICE DATA banner. Never in the demo.
