@@ -110,6 +110,25 @@ export class Transport {
     this.part = this.buildPart(track);
   }
 
+  /** Where playback is inside the current region's loop, in track seconds at speed 1, read from
+   *  the real audio clock (not Tone.now(), which runs 0.1 s ahead). For the beat visualizer. */
+  loopPosition(): number {
+    if (!this.track || this.state === 'stopped') return 0;
+    const transport = Tone.getTransport();
+    const ticks = transport.getTicksAtTime(Tone.immediate());
+    const loop = ticksOf(this.track.length);
+    const inLoop = ((ticks % loop) + loop) % loop;
+    return (inLoop * 60) / (BASE_BPM * transport.PPQ);
+  }
+
+  /** Jump to a point in the current region's loop (track seconds at speed 1). Playing or paused only. */
+  seek(trackSeconds: number): void {
+    if (!this.track || this.state === 'stopped') return;
+    const t = Math.min(this.track.length, Math.max(0, trackSeconds));
+    this.silencePending(); // drop pulses already queued for the old position
+    Tone.getTransport().ticks = ticksOf(t);
+  }
+
   setSpeed(speed: number): void {
     this.speed = speed;
     Tone.getTransport().bpm.value = BASE_BPM * speed;
@@ -195,7 +214,9 @@ export class Transport {
 }
 
 /** Seconds at speed 1 (120 bpm, so 1 beat = 0.5 s) to transport ticks. */
+function ticksOf(seconds: number): number {
+  return Math.round((seconds * BASE_BPM * Tone.getTransport().PPQ) / 60);
+}
 function toTicks(seconds: number): Tone.Unit.Time {
-  const ppq = Tone.getTransport().PPQ;
-  return `${Math.round((seconds * BASE_BPM * ppq) / 60)}i`;
+  return `${ticksOf(seconds)}i`;
 }

@@ -229,6 +229,81 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 }
 .pad-keys kbd.down { background: var(--signal); color: var(--ink); }
 
+/* ---------- Brought in from Student B's listening game (tools/listening_game.html) ---------- */
+.small { font-size: 0.9rem; }
+
+/* Beat visualizer: the "Now playing" lane. */
+.track { display: grid; gap: 6px; }
+.track-head { display: flex; justify-content: space-between; gap: 12px; font: 400 0.85rem var(--mono);
+              color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.track-hint { font-size: 0.85rem; color: var(--ink-2); max-width: 70ch; }
+.track-lane { position: relative; height: 64px; margin-top: 8px; background: var(--rule-2); border-radius: var(--r);
+              cursor: ew-resize; touch-action: none; user-select: none; -webkit-user-select: none; }
+.track-lane.idle { cursor: default; }
+.track-lane svg { display: block; width: 100%; height: 100%; }
+.track .note { opacity: 0.16; }
+.track .note.played { opacity: 1; }
+.track .note.live { stroke: var(--ink); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+.playline { position: absolute; top: -6px; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: var(--signal); }
+.playline::before { content: ""; position: absolute; top: -4px; left: 50%; width: 14px; height: 14px;
+                    transform: translateX(-50%); background: var(--signal); border-radius: var(--r-key); }
+.dot { position: absolute; top: 50%; left: 0; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%;
+       background: var(--signal); border: 2px solid var(--paper); box-sizing: content-box; }
+.dot, .playline { pointer-events: none; }
+.track-lane.idle .dot, .track-lane.idle .playline { display: none; }
+
+/* Shared marks for the lane and the plot (DESIGN.md "Rhythm plot"). */
+svg .beat { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+svg .baseline { stroke: var(--rule); stroke-width: 2; vector-effect: non-scaling-stroke; }
+svg .note.lo { fill: var(--ink); }
+svg .note.hi { fill: var(--signal); }
+svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+
+/* "What you are looking at" */
+.intro { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: flex-start;
+         border-top: 1px solid var(--rule); padding-top: var(--sm); }
+.intro > div:first-child { flex: 1 1 28ch; min-width: 0; display: grid; gap: 8px; max-width: 68ch; }
+.intro p { color: var(--ink-2); font-size: 0.95rem; }
+.key { display: flex; gap: 14px; }
+.key figure { margin: 0; display: grid; gap: 4px; font-size: 0.8rem; color: var(--ink-2); }
+.key svg { display: block; width: 150px; height: 64px; background: var(--well); border-radius: var(--r); }
+
+/* Region close-ups: the patch columns with giant numerals. */
+.closeups { display: grid; gap: var(--sm); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--lg); }
+.patch { margin: 0; min-width: 0; }
+.patch canvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: var(--r); background: var(--well); }
+.numeral { display: block; font: 500 clamp(4.5rem, 10vw, 9rem)/0.78 var(--font); letter-spacing: -0.04em;
+           margin: -0.32em 0 0 0.06em; position: relative; color: var(--ink);
+           -webkit-text-stroke: 0.06em var(--paper); paint-order: stroke fill; transition: font-weight var(--snap); }
+.patch-readout { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 10px 0 12px;
+                 font: 400 0.9rem/1.5 var(--mono); color: var(--ink-2); }
+.patch-readout .value { font: 500 2.6rem/1 var(--font); color: var(--ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.patch-readout .value small { font: 400 0.9rem var(--mono); color: var(--ink-2); margin-left: 8px; letter-spacing: 0; }
+.hear { width: 100%; justify-content: space-between; border-color: var(--ink-2); font-weight: 600; }
+.hear[aria-pressed='true'] { background: var(--signal); border-color: var(--ink); color: var(--ink); }
+.where { font-size: 0.9rem; color: var(--ink-2); margin: 8px 0 0; }
+
+/* "Both rhythms, one time line" */
+.plot { border-top: 1px solid var(--rule); padding-top: var(--sm); display: grid; gap: 6px; }
+.plot p { color: var(--ink-2); font-size: 0.95rem; max-width: 70ch; }
+.plot-row { display: grid; grid-template-columns: 5.5rem 1fr 4.5rem; align-items: center; gap: 12px; height: 56px; }
+.plot-row b { font-weight: 650; }
+.plot-row.current b { box-shadow: inset 0 -3px 0 var(--signal); justify-self: start; }
+.plot-row svg { display: block; width: 100%; height: 40px; }
+.plot-split { font: 400 0.9rem var(--mono); color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--ink-2); margin-top: 4px; }
+.swatch { display: inline-block; width: 4px; height: 16px; vertical-align: -3px; margin-right: 8px; }
+.swatch.hatch { width: 16px; background: var(--rule-2); outline: 1px dashed var(--ink-2); outline-offset: -1px; }
+
+@media (max-width: 640px) {
+  .pair { gap: 14px; }
+  .patch-readout { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .patch-readout .value { font-size: 1.9rem; }
+  .plot-row { grid-template-columns: 4.5rem 1fr; }
+  .plot-split { display: none; }
+}
+
 footer { border-top: 1px solid var(--rule); padding-top: var(--sm); font-size: 0.95rem; display: grid; gap: var(--xs); }
 footer ul { margin: 0; padding-left: 1.2rem; color: var(--ink-2); }
 
