@@ -1,0 +1,26 @@
+# NASA source media (download locally; do not commit)
+assets/frames/
+assets/video/
+*.mp4
+*.webm
+*.exr
+*.tif
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Node
+node_modules/
+web/dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local recordings (upload final demo elsewhere)
+recordings/

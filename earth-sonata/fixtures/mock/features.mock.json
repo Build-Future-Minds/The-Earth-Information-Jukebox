@@ -1,0 +1,157 @@
+{
+  "schema_version": "0.2",
+  "is_mock": true,
+  "scene": "fixtures/mock/scene.mock.json",
+  "step_seconds": 0.5,
+  "normalisation": {
+    "gradient_threshold": 12.0,
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.82,
+      "reason": null
+    },
+    {
+      "t": 0.5,
+      "frame": 1,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.85,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 2,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.8,
+      "reason": null
+    },
+    {
+      "t": 1.5,
+      "frame": 3,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.84,
+      "reason": null
+    },
+    {
+      "t": 2.0,
+      "frame": 4,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.83,
+      "reason": null
+    },
+    {
+      "t": 2.5,
+      "frame": 5,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.81,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 6,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.86,
+      "reason": null
+    },
+    {
+      "t": 3.5,
+      "frame": 7,
+      "source_time": null,
+      "region": "boundary_current",
+      "status": "ok",
+      "alignment": 0.82,
+      "reason": null
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "ok",
+      "alignment": 0.24,
+      "reason": null
+    },
+    {
+      "t": 0.5,
+      "frame": 1,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "ok",
+      "alignment": 0.3,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 2,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "ok",
+      "alignment": 0.21,
+      "reason": null
+    },
+    {
+      "t": 1.5,
+      "frame": 3,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "missing",
+      "alignment": null,
+      "reason": "too few visible lines after masking (mock)"
+    },
+    {
+      "t": 2.0,
+      "frame": 4,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "missing",
+      "alignment": null,
+      "reason": "too few visible lines after masking (mock)"
+    },
+    {
+      "t": 2.5,
+      "frame": 5,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "ok",
+      "alignment": 0.27,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 6,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "ok",
+      "alignment": 0.33,
+      "reason": null
+    },
+    {
+      "t": 3.5,
+      "frame": 7,
+      "source_time": null,
+      "region": "gyre_interior",
+      "status": "ok",
+      "alignment": 0.25,
+      "reason": null
+    }
+  ]
+}

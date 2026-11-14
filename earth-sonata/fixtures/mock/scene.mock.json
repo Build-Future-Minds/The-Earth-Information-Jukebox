@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1",
+  "is_mock": true,
+  "source": {
+    "svs_id": null,
+    "url": "about:mock",
+    "title": "MOCK SCENE - TEST INPUT - NOT NASA DATA",
+    "credit": "Synthetic fixture made by the Earth Sonata team",
+    "data_kind": "synthetic_test_input",
+    "model_or_instrument": "none",
+    "data_start": null,
+    "data_end": null,
+    "limitations": [
+      "This file is a mock for building against. It describes no real data.",
+      "Region boxes are placeholders shaped like the planned real ones; Student A replaces them."
+    ]
+  },
+  "frames": {
+    "width": 2048,
+    "height": 1024,
+    "count": 8,
+    "pattern": "fixtures/mock/frames/mock_{index:05d}.png",
+    "timestamps": [],
+    "camera_static_check": "not applicable (mock)"
+  },
+  "legend": {
+    "quantity": "mock colour band",
+    "units": "none",
+    "stops": [
+      { "colour": "blue", "value": "cold" },
+      { "colour": "green", "value": "mild" },
+      { "colour": "red", "value": "warm" }
+    ]
+  },
+  "regions": [
+    {
+      "id": "boundary_current",
+      "name": "Boundary current box (mock)",
+      "box_px": [569, 256, 171, 85],
+      "mask": null,
+      "description": "Placeholder for a box over a strong, organised current."
+    },
+    {
+      "id": "gyre_interior",
+      "name": "Gyre interior box (mock)",
+      "box_px": [683, 330, 170, 68],
+      "mask": null,
+      "description": "Placeholder for a box over quieter open water."
+    }
+  ]
+}

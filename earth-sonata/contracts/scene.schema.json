@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "earth-sonata/scene.schema.json",
+  "title": "Scene",
+  "description": "What source we are looking at and where the regions are. Written by Student A.",
+  "type": "object",
+  "required": ["schema_version", "is_mock", "source", "frames", "regions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "is_mock": { "type": "boolean", "description": "true only for synthetic fixtures" },
+    "source": {
+      "type": "object",
+      "required": ["svs_id", "url", "title", "credit", "data_kind", "limitations"],
+      "additionalProperties": false,
+      "properties": {
+        "svs_id": { "type": ["integer", "null"] },
+        "url": { "type": "string" },
+        "title": { "type": "string" },
+        "credit": { "type": "string", "minLength": 1 },
+        "data_kind": { "enum": ["model_output", "observation", "artistic_rendering", "synthetic_test_input"] },
+        "model_or_instrument": { "type": "string" },
+        "data_start": { "type": ["string", "null"], "description": "ISO 8601" },
+        "data_end": { "type": ["string", "null"], "description": "ISO 8601" },
+        "limitations": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
+    "frames": {
+      "type": "object",
+      "required": ["width", "height", "count", "pattern"],
+      "additionalProperties": false,
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "count": { "type": "integer", "minimum": 1 },
+        "pattern": { "type": "string", "description": "e.g. assets/frames/svs3912/frame_{index:05d}.jpg" },
+        "timestamps": { "type": "array", "items": { "type": "string" }, "description": "Model time per frame, from the source's date file" },
+        "camera_static_check": { "type": "string", "description": "How the fixed-camera assumption was tested and the result" }
+      }
+    },
+    "legend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "quantity": { "type": "string" },
+        "units": { "type": "string" },
+        "stops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["colour", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "colour": { "type": "string" },
+              "value": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "regions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "box_px", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "name": { "type": "string", "description": "Spoken name" },
+          "box_px": {
+            "type": "array",
+            "description": "[x, y, width, height] in frame pixels",
+            "items": { "type": "integer", "minimum": 0 },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "mask": { "type": ["string", "null"], "description": "Optional mask image path; white = included" },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  }
+}

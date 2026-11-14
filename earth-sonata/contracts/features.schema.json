@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "earth-sonata/features.schema.json",
+  "title": "Features",
+  "description": "Measured alignment per region per time step (version one: one rhythm rule). Written by analysis/features.py, read by the app.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "is_mock",
+    "scene",
+    "step_seconds",
+    "normalisation",
+    "steps"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.2"
+    },
+    "is_mock": {
+      "type": "boolean"
+    },
+    "scene": {
+      "type": "string",
+      "description": "Path or id of the scene these features describe"
+    },
+    "step_seconds": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "normalisation": {
+      "type": "object",
+      "required": [
+        "gradient_threshold",
+        "min_usable_fraction",
+        "smoothing_alpha"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gradient_threshold": {
+          "type": "number",
+          "description": "pixels weaker than this do not vote"
+        },
+        "min_usable_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "below this the step is missing"
+        },
+        "smoothing_alpha": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "t",
+          "region",
+          "status",
+          "alignment",
+          "reason"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "t": {
+            "type": "number",
+            "minimum": 0,
+            "description": "seconds from playback start"
+          },
+          "frame": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source_time": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "model timestamp of the frame, from the source date file"
+          },
+          "region": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "missing"
+            ]
+          },
+          "alignment": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1,
+            "description": "0-1; null when missing"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "why the step is missing; null when ok"
+          }
+        }
+      }
+    }
+  }
+}

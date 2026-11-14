@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "earth-sonata/music-event.schema.json",
+  "title": "MusicEvent",
+  "description": "One note, generated live in the app. A missing step produces no Earth-voice events at all (silence plus a message).",
+  "type": "object",
+  "required": [
+    "t",
+    "voice",
+    "pitch",
+    "dur",
+    "vel"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "t": {
+      "type": "number",
+      "minimum": 0,
+      "description": "seconds"
+    },
+    "voice": {
+      "enum": [
+        "earth",
+        "user"
+      ],
+      "description": "user events never alter earth events"
+    },
+    "pitch": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 127,
+      "description": "MIDI note. For the Earth voice: fixed, carries no data."
+    },
+    "dur": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "vel": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "why": {
+      "type": "object",
+      "description": "Required for Earth-voice events. 'Explain this rhythm' reads it.",
+      "required": [
+        "region",
+        "alignment",
+        "long_fraction",
+        "rule"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "region": {
+          "type": "string"
+        },
+        "alignment": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "long_fraction": {
+          "type": "number",
+          "description": "share of the beat before the second pulse, 0.5 = even"
+        },
+        "rule": {
+          "type": "string",
+          "description": "e.g. long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "voice": {
+            "const": "earth"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "why"
+        ]
+      }
+    }
+  ]
+}

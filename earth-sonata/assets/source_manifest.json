@@ -1,0 +1,63 @@
+{
+  "_about": "Every NASA asset we inspect or use. Owner: Student A. 'verified' means a team member or the planning pass read it on the source page on the date given. Anything not verified must not be stated as fact.",
+  "assets": [
+    {
+      "svs_id": 3912,
+      "url": "https://svs.gsfc.nasa.gov/3912",
+      "title": "Global Sea Surface Currents and Temperature",
+      "role": "primary source",
+      "media_kind": "animation",
+      "data_kind": "model_output",
+      "model_or_instrument": "ECCO2 (MIT/JPL), surface flows only",
+      "data_start": "2007-03-25T12:00Z",
+      "data_end": "2008-03-03T12:00Z",
+      "credit": "NASA/Goddard Space Flight Center Scientific Visualization Studio",
+      "legend": "Flow lines coloured by modelled sea surface temperature: blue 0 C, green 10-20 C, yellow about 25 C, red 32 C. Colorbar file: sst_ecco2_cbar.png",
+      "downloads_to_use": [
+        "2048x1024 frame set 'orig' (2002 frames)",
+        "flat_ecco2_dates.txt (per-frame date and time)",
+        "sst_ecco2_cbar.png"
+      ],
+      "limitations": [
+        "Model output, not observation.",
+        "Flow lines are a rendering; values between model grid points are interpolated.",
+        "Equirectangular map: pixel scale varies with latitude.",
+        "Covers one modelled year; not a climate trend."
+      ],
+      "verified": "2026-11-14 (planning pass, source page)",
+      "todo": [
+        "Confirm this page is listed in the EIC gallery: https://svs.gsfc.nasa.gov/gallery/earth-information-center/",
+        "Confirm the flat frame set has no camera motion, fades or overlays (land-pixel difference test)",
+        "Confirm which longitude is at the map centre before setting region boxes"
+      ]
+    },
+    {
+      "svs_id": 5425,
+      "url": "https://svs.gsfc.nasa.gov/5425",
+      "title": "Perpetual Ocean 2: Western Boundary Currents",
+      "role": "rejected as first input; possible context",
+      "media_kind": "animation",
+      "data_kind": "model_output",
+      "model_or_instrument": "ECCO-2",
+      "data_start": "2021-01-15",
+      "data_end": "2023-12-25",
+      "credit": "NASA's Scientific Visualization Studio",
+      "legend": "Beauty version: flows surface to 600 m white; deeper flows blue-cyan-white (about -3 to 22 C). Separate temperature and salinity versions exist.",
+      "limitations": [
+        "Camera moves: rotating globe, zooms to Kuroshio, Agulhas, Gulf Stream. Optical flow would measure the camera.",
+        "Beauty colours encode depth, chosen for appearance.",
+        "Particle trails are 3-day (above 600 m) and 6-day (deeper)."
+      ],
+      "verified": "2026-11-14 (planning pass, source page)",
+      "todo": []
+    },
+    { "svs_id": 5313, "url": "https://svs.gsfc.nasa.gov/5313/", "title": "Night Lights, 2012-2023, EIC", "role": "candidate second source", "verified": null, "todo": ["Inspect page. Brief says animations include transitions and zooms."] },
+    { "svs_id": 5669, "url": "https://svs.gsfc.nasa.gov/5669/", "title": "GEOS Aerosols", "role": "candidate", "verified": null, "todo": ["Inspect page. Brief says this page provides a still image."] },
+    { "svs_id": 5533, "url": "https://svs.gsfc.nasa.gov/5533/", "title": "Air Quality Model Runs", "role": "candidate", "verified": null, "todo": ["Inspect page."] },
+    { "svs_id": 5196, "url": "https://svs.gsfc.nasa.gov/5196/", "title": "DYAMOND CO2", "role": "candidate", "verified": null, "todo": ["Inspect page."] },
+    { "svs_id": 5011, "url": "https://svs.gsfc.nasa.gov/5011/", "title": "ISS Lightning", "role": "candidate", "verified": null, "todo": ["Inspect page. Brief says it uses a 10-day roving window."] },
+    { "svs_id": 4960, "url": "https://svs.gsfc.nasa.gov/4960/", "title": "Atmospheric River", "role": "candidate", "verified": null, "todo": ["Inspect page."] },
+    { "svs_id": 4950, "url": "https://svs.gsfc.nasa.gov/4950/", "title": "GEDI Forest Height", "role": "candidate", "verified": null, "todo": ["Inspect page. Brief says animations are not a time series of forest growth."] },
+    { "svs_id": 13786, "url": "https://svs.gsfc.nasa.gov/13786/", "title": "Caldwell 73 sonification", "role": "method inspiration only", "verified": null, "todo": ["Inspect page."] }
+  ]
+}
