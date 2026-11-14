@@ -46,8 +46,8 @@ export function ExploreControls(p: Props) {
         </button>
       </div>
 
-      <fieldset className="row">
-        <legend>Region (keys 1–{p.regions.length})</legend>
+      <fieldset className="row region-group">
+        <legend>Region (arrow keys, or 1–{p.regions.length})</legend>
         {p.regions.map((r) => (
           <label key={r.id} className="region-choice">
             <input

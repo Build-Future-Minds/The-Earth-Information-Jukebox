@@ -3,13 +3,17 @@
 export interface Region {
   id: string;
   name: string;
+  /** All regions are circles (scene schema 0.2). */
+  center_px: [number, number];
+  radius_px: number;
+  /** Bounding square of the circle, [cx - r, cy - r, 2r, 2r]: the engine crops to it. */
   box_px: [number, number, number, number];
   mask?: string | null;
   description: string;
 }
 
 export interface Scene {
-  schema_version: '0.1';
+  schema_version: '0.2';
   is_mock: boolean;
   source: {
     svs_id: number | null;

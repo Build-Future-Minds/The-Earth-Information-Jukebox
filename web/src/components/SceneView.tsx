@@ -25,12 +25,13 @@ export function SceneView({ scene, imageUrl, regionId }: Props) {
           <rect width={width} height={height} className="frame-placeholder" />
         )}
         {scene.regions.map((r) => {
-          const [x, y, w, h] = r.box_px;
+          const [cx, cy] = r.center_px;
           const on = r.id === regionId;
           return (
             <g key={r.id} className={on ? 'box active' : 'box'}>
-              <rect x={x} y={y} width={w} height={h} />
-              <text x={x + 8} y={y - 12}>{regionLabel(scene.regions, r.id)}</text>
+              {/* The circle is the exact area measured (inside the mask). */}
+              <circle cx={cx} cy={cy} r={r.radius_px} />
+              <text x={cx} y={cy - r.radius_px - 14} textAnchor="middle">{regionLabel(scene.regions, r.id)}</text>
             </g>
           );
         })}
