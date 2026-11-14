@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.2",
+  "is_mock": true,
+  "scene": "MOCK practice pairs for listening questions - TEST INPUT - NOT NASA DATA",
+  "step_seconds": 0.5,
+  "normalisation": {
+    "gradient_threshold": 12.0,
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3
+  },
+  "steps": [
+    { "t": 0.0, "frame": 0, "source_time": null, "region": "region_a", "status": "ok", "alignment": 0.9, "reason": null },
+    { "t": 0.0, "frame": 0, "source_time": null, "region": "region_b", "status": "ok", "alignment": 0.2, "reason": null },
+
+    { "t": 0.5, "frame": 1, "source_time": null, "region": "region_a", "status": "ok", "alignment": 0.15, "reason": null },
+    { "t": 0.5, "frame": 1, "source_time": null, "region": "region_b", "status": "ok", "alignment": 0.85, "reason": null },
+
+    { "t": 1.0, "frame": 2, "source_time": null, "region": "region_a", "status": "ok", "alignment": 0.5, "reason": null },
+    { "t": 1.0, "frame": 2, "source_time": null, "region": "region_b", "status": "ok", "alignment": 0.5, "reason": null },
+
+    { "t": 1.5, "frame": 3, "source_time": null, "region": "region_a", "status": "ok", "alignment": 0.6, "reason": null },
+    { "t": 1.5, "frame": 3, "source_time": null, "region": "region_b", "status": "ok", "alignment": 0.52, "reason": null },
+
+    { "t": 2.0, "frame": 4, "source_time": null, "region": "region_a", "status": "ok", "alignment": 0.7, "reason": null },
+    { "t": 2.0, "frame": 4, "source_time": null, "region": "region_b", "status": "missing", "alignment": null, "reason": "too few visible lines after masking (mock)" },
+
+    { "t": 2.5, "frame": 5, "source_time": null, "region": "region_a", "status": "ok", "alignment": 0.3, "reason": null },
+    { "t": 2.5, "frame": 5, "source_time": null, "region": "region_b", "status": "ok", "alignment": 0.55, "reason": null }
+  ]
+}
