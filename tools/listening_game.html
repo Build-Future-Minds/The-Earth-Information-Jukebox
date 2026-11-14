@@ -245,7 +245,7 @@
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="musical" checked> Musical sound</label>
-      <p class="hint-note">On: a soft piano-like tone with a little room echo, over a quiet held chord. The chord is the same for every patch, so it gives nothing away. Off: the plain test tone, for a strict listening test.</p>
+      <p class="hint-note">On: the patch plays the melody in a soft piano-like tone, over a band: chords that move C, Am, F, G and home to C, and a bass on every beat. The band is the same for every patch, so it gives nothing away. Off: the plain test tone, for a strict listening test.</p>
     </div>
     <div class="axis">
       <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
@@ -617,33 +617,86 @@
     [body, shine].forEach((o) => { o.start(t); o.stop(end + fade + 0.02); bin.push(o); });
   }
 
-  // A quiet held C chord under whatever is playing. It is the same for every patch and has no
-  // rhythm of its own, so it carries no answer; it only makes the notes sit in a key. One chord is
-  // shared by all sounds playing, so two sounds do not double it.
-  let pad = null;
-  function padOn() {
-    if (pad || !musical()) return;
-    const now = ctx.currentTime, level = ctx.createGain(), soft = ctx.createBiquadFilter();
-    soft.type = "lowpass"; soft.frequency.value = 1100;
-    level.gain.setValueAtTime(0.0001, now);
-    level.gain.exponentialRampToValueAtTime(0.07, now + 0.8);
-    level.connect(soft).connect(master);
-    const oscs = [65.41, 130.81, 196.0, 329.63].map((hz, i) => {   // C2, C3, G3, E4
+  // ---------- the band (Musical sound) ----------
+  // Under the patch's notes, which become the melody, a band plays a short song phrase: chords that
+  // move C, Am, F, G and back home to C (two beats each, 10 beats), and a plucked bass on every beat
+  // (the chord's root, then its fifth). The band is the same for every patch, so it carries no
+  // answer. Its bass lands on the beat, where the first note of each beat already is, so it never
+  // blurs where the second note falls. One band is shared by all sounds playing: a sound that joins
+  // extends it instead of starting a second one.
+  const PHRASE = ["C", "C", "Am", "Am", "F", "F", "G", "G", "C", "C"];
+  const CHORDS = {
+    C:  { root: 130.81, fifth: 196.00, tones: [261.63, 329.63, 392.00] },   // C3 bass; C4 E4 G4
+    Am: { root: 110.00, fifth: 164.81, tones: [220.00, 261.63, 329.63] },   // A2 bass; A3 C4 E4
+    F:  { root:  87.31, fifth: 130.81, tones: [174.61, 220.00, 261.63] },   // F2 bass; F3 A3 C4
+    G:  { root:  98.00, fifth: 146.83, tones: [196.00, 246.94, 293.66] },   // G2 bass; G3 B3 D4
+  };
+  let band = null;   // { start, beat, upTo: beats scheduled so far, bus, sources }
+
+  function bandChord(t, tones, length, ring) {
+    const env = ctx.createGain(), soft = ctx.createBiquadFilter();
+    soft.type = "lowpass"; soft.frequency.value = 1400;
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(0.05, t + 0.08);
+    env.gain.setValueAtTime(0.05, t + length);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + length + ring);
+    env.connect(soft).connect(band.bus);
+    tones.forEach((hz, i) => {
       const o = ctx.createOscillator();
-      o.type = i ? "triangle" : "sine"; o.frequency.value = hz; o.detune.value = i % 2 ? 5 : -5;
-      o.connect(level); o.start(now);
-      return o;
+      o.type = "triangle"; o.frequency.value = hz; o.detune.value = [-6, 0, 6][i];
+      o.connect(env); o.start(t); o.stop(t + length + ring + 0.05);
+      band.sources.push(o);
     });
-    pad = { level, oscs };
   }
-  function padOff(seconds = 0.6) {
-    if (!pad) return;
-    const now = ctx.currentTime, g = pad.level.gain;
-    g.cancelScheduledValues(now);
-    g.setValueAtTime(Math.max(0.0001, g.value), now);
-    g.exponentialRampToValueAtTime(0.0001, now + seconds);
-    pad.oscs.forEach((o) => o.stop(now + seconds + 0.05));
-    pad = null;
+
+  function bandBass(t, hz, length) {
+    const env = ctx.createGain(), soft = ctx.createBiquadFilter(), o = ctx.createOscillator();
+    soft.type = "lowpass"; soft.frequency.value = 700;
+    o.type = "triangle"; o.frequency.value = hz;
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(0.26, t + 0.01);
+    env.gain.exponentialRampToValueAtTime(0.12, t + Math.min(length, 0.2));
+    env.gain.setValueAtTime(0.12, t + length);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + length + 0.08);
+    o.connect(env).connect(soft).connect(band.bus);
+    o.start(t); o.stop(t + length + 0.1);
+    band.sources.push(o);
+  }
+
+  // Schedules the band's beats up to `until` (audio time), continuing the phrase where it left off.
+  function bandExtend(until) {
+    const last = Math.ceil((until - band.start) / band.beat - 1e-6);
+    for (let b = band.upTo; b < last; b++) {
+      const t = band.start + b * band.beat, ch = CHORDS[PHRASE[b % PHRASE.length]];
+      if (b % 2 === 0 || b === band.upTo) {
+        const beats = Math.min(2 - (b % 2), last - b), home = b + beats >= last;
+        bandChord(t, ch.tones, beats * band.beat, home ? 0.8 : 0.25);   // the last chord rings out
+      }
+      bandBass(t, b % 2 ? ch.fifth : ch.root, 0.8 * band.beat);
+    }
+    band.upTo = Math.max(band.upTo, last);
+  }
+
+  // A sound starting from silence starts a new band on its beat; a sound joining one already
+  // playing keeps that band going until it ends too.
+  function bandFor(v, joined) {
+    if (!musical()) return;
+    if (!joined || !band) {
+      bandStop(0.05);
+      const bus = ctx.createGain();
+      bus.connect(master);
+      band = { start: v.start, beat: v.beat, upTo: 0, bus, sources: [] };
+    }
+    bandExtend(v.end);
+  }
+
+  function bandStop(seconds) {
+    if (!band) return;
+    const now = ctx.currentTime, g = band.bus.gain;
+    g.setValueAtTime(g.value, now);
+    g.linearRampToValueAtTime(0, now + seconds);
+    band.sources.forEach((o) => { try { o.stop(now + seconds + 0.02); } catch (e) {} });
+    band = null;
   }
 
   // Plain sound (Musical sound off): the original test tone. A quick attack, held for `length`
@@ -674,7 +727,7 @@
   function stopAll() {
     voices.forEach((v) => silence(v.sources)); voices = [];
     silence(loose); loose = [];
-    padOff(0.08);
+    bandStop(0.05);
     timers.forEach(clearTimeout); timers = [];
     cancelAnimationFrame(anim);
     $("track").querySelectorAll(".note.live").forEach((r) => r.classList.remove("live"));
@@ -704,7 +757,7 @@
     notesFor(p, variant).forEach((n) =>
       pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat, v.sources));
     voices.push(v);
-    padOn();
+    bandFor(v, anchor);
     followVoices();
     return { v, joined: anchor };
   }
@@ -762,7 +815,6 @@
     const frame = () => {
       const live = liveVoices();
       if (!live.length) {
-        padOff();
         if (track && track.voice) paintTrack(BEATS);
         if (track) track.rects.forEach((r) => r.classList.remove("live"));
         return;
@@ -1021,7 +1073,7 @@
   $("musical").addEventListener("change", (e) => {
     if (!ctx) return;
     roomSend.gain.setTargetAtTime(e.target.checked ? ROOM_LEVEL : 0, ctx.currentTime, 0.05);
-    if (e.target.checked) { if (liveVoices().length) padOn(); } else padOff(0.2);
+    if (!e.target.checked) bandStop(0.2);   // switched on mid-sound, the band joins from the next sound
   });
   $("hear0").addEventListener("click", () => playPatch(0));
   $("hear1").addEventListener("click", () => playPatch(1));
