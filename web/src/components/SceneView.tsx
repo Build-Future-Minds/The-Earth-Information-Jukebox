@@ -29,14 +29,20 @@ export function SceneView({ scene, imageUrl, regionId }: Props) {
           const on = r.id === regionId;
           return (
             <g key={r.id} className={on ? 'box active' : 'box'}>
-              {/* The circle is the exact area measured (inside the mask). */}
-              <circle cx={cx} cy={cy} r={r.radius_px} />
-              <text x={cx} y={cy - r.radius_px - 14} textAnchor="middle">{regionLabel(scene.regions, r.id)}</text>
+              {/* The circle is the exact area measured (inside the mask). Black and white only, never a
+                  colour on the NASA image (DESIGN.md "Don't tint the imagery"); the live region's tab
+                  is inverted to ink. */}
+              <circle className="ring-outline" cx={cx} cy={cy} r={r.radius_px} />
+              <circle className="ring" cx={cx} cy={cy} r={r.radius_px} />
+              <rect className="tab" x={cx - 92} y={cy - r.radius_px - 66} width={184} height={50} rx={4} />
+              <text x={cx} y={cy - r.radius_px - 31} textAnchor="middle">{regionLabel(scene.regions, r.id)}</text>
             </g>
           );
         })}
       </svg>
       <figcaption>
+        {/* DESIGN.md: keep the NASA credit directly under the image it credits. */}
+        <span className="credit">Visualization: {scene.source.credit}</span>
         {active && (
           <>
             <strong>{regionLabel(scene.regions, active.id)}: {active.name}.</strong> {active.description}
