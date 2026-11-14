@@ -5,6 +5,10 @@ import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
 import { MelodyPad } from './components/MelodyPad';
 import { NowPlaying } from './components/NowPlaying';
+import { BeatTrack } from './components/BeatTrack';
+import { LookingAt } from './components/LookingAt';
+import { RegionCloseups } from './components/RegionCloseups';
+import { RhythmsPlot } from './components/RhythmsPlot';
 import { ExploreControls, regionLabel } from './components/ExploreControls';
 import { RhythmExplanation, stepAtSameMoment } from './components/RhythmExplanation';
 import { SceneView } from './components/SceneView';
@@ -57,6 +61,14 @@ export function App() {
   );
   const onMelodyNoteOff = useCallback((note: number, source: InputSource) => melody.current?.noteOff(note, source), []);
   const onMelodyAllOff = useCallback(() => melody.current?.allOff(), []);
+  // Beat visualizer (Student B's lane): read the audio clock, and jump within the loop.
+  const getPosition = useCallback(() => transport.current?.loopPosition() ?? 0, []);
+  const seek = useCallback((t: number) => transport.current?.seek(t), []);
+  // "Listen to Region A/B" in the close-ups: choose the region, and start if nothing is playing.
+  const listenTo = useCallback((id: string) => {
+    setRegionId(id);
+    if (transport.current?.getState() !== 'playing') void transport.current?.start();
+  }, []);
 
   // Keyboard shortcuts on top of the normal Tab / Enter / Space controls.
   useEffect(() => {
@@ -151,6 +163,14 @@ export function App() {
 
           <p className="status" role="status">{status}</p>
           <NowPlaying step={sounding} regionLabel={label} />
+          <BeatTrack
+            track={track}
+            regionLabel={label}
+            playState={playState}
+            speed={speed}
+            getPosition={getPosition}
+            onSeek={seek}
+          />
           {missing && playState !== 'stopped' && (
             <p className="missing" role="alert">
               Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
@@ -158,6 +178,16 @@ export function App() {
           )}
 
           {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} other={other} />}
+
+          <LookingAt />
+          <RegionCloseups
+            scene={scene}
+            features={features}
+            imageUrl={imageUrl}
+            regionId={regionId}
+            onListen={listenTo}
+          />
+          <RhythmsPlot features={features} regions={scene.regions} activeRegionId={regionId} />
 
           <MelodyPad
             heldNotes={heldNotes}
