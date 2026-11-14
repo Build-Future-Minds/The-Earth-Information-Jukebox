@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "is_mock": true,
   "source": {
     "svs_id": null,
@@ -12,7 +12,7 @@
     "data_end": null,
     "limitations": [
       "This file is a mock for building against. It describes no real data.",
-      "Region boxes are placeholders shaped like the planned real ones; Student A replaces them."
+      "Region circles are placeholders shaped like the planned real ones; Student A replaces them."
     ]
   },
   "frames": {
@@ -35,17 +35,21 @@
   "regions": [
     {
       "id": "boundary_current",
-      "name": "Boundary current box (mock)",
-      "box_px": [569, 256, 171, 85],
+      "name": "Boundary current circle (mock)",
+      "center_px": [654, 298],
+      "radius_px": 43,
+      "box_px": [611, 255, 86, 86],
       "mask": null,
-      "description": "Placeholder for a box over a strong, organised current."
+      "description": "Placeholder for a circle over a strong, organised current."
     },
     {
       "id": "gyre_interior",
-      "name": "Gyre interior box (mock)",
-      "box_px": [683, 330, 170, 68],
+      "name": "Gyre interior circle (mock)",
+      "center_px": [768, 364],
+      "radius_px": 43,
+      "box_px": [725, 321, 86, 86],
       "mask": null,
-      "description": "Placeholder for a box over quieter open water."
+      "description": "Placeholder for a circle over quieter open water."
     }
   ]
 }

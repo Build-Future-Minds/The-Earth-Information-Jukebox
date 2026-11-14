@@ -40,7 +40,9 @@ export function stepToEvents(step: Step, t: number, beatSeconds: number): MusicE
   if (step.status !== 'ok') return [];
   const lf = longFraction(step.alignment);
   const why = { region: step.region, alignment: step.alignment, long_fraction: lf, rule: RULE_TEXT };
-  const dur = Math.min(PULSE_SECONDS, beatSeconds * (1 - lf) * 0.9);
+  // Same length for every alignment, so note length never carries data: sized for the shortest
+  // gap the rule can make (A = 0), and capped at PULSE_SECONDS.
+  const dur = Math.min(PULSE_SECONDS, beatSeconds * (1 - LONG_AT_A0) * 0.9);
   return [
     { t, voice: 'earth', pitch: EARTH_PITCH, dur, vel: EARTH_VELOCITY, why },
     { t: t + lf * beatSeconds, voice: 'earth', pitch: EARTH_PITCH, dur, vel: EARTH_VELOCITY, why },

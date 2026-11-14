@@ -35,6 +35,21 @@ describe('stepToEvents', () => {
     });
   });
 
+  it('note length is the same for every alignment, even on short beats (it carries no data)', () => {
+    for (const beat of [0.2, 0.3, 0.5, 1.0]) {
+      const lengths = new Set([0, 0.3, 0.7, 1].map((a) => stepToEvents({ ...ok, alignment: a }, 0, beat)[0].dur));
+      expect(lengths.size, `beat ${beat}s`).toBe(1);
+    }
+  });
+
+  it('a pulse always ends before the next one starts', () => {
+    for (const beat of [0.2, 0.5, 1.0]) {
+      const [p1, p2] = stepToEvents(ok, 0, beat); // A = 0: shortest second gap
+      expect(p1.t + p1.dur).toBeLessThan(p2.t);
+      expect(p2.t + p2.dur).toBeLessThan(beat);
+    }
+  });
+
   it('a missing step makes no Earth notes at all (quiet, not A = 0)', () => {
     expect(stepToEvents(missing, 0, 0.5)).toEqual([]);
   });
