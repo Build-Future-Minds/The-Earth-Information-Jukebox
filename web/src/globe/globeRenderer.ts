@@ -256,8 +256,8 @@ export class GlobeRenderer {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   }
 
-  /** time: seconds, for the stars' twinkle (pass a constant to keep them still). */
-  draw(view: View, frame: { width: number; height: number }, spot: SpotUniform, time = 0) {
+  /** time: seconds, for the stars' twinkle (pass a constant to keep them still). zoom: 1 = whole globe. */
+  draw(view: View, frame: { width: number; height: number }, spot: SpotUniform, time = 0, zoom = 1) {
     const gl = this.gl;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = Math.round(this.canvas.clientWidth * dpr);
@@ -269,7 +269,7 @@ export class GlobeRenderer {
     gl.viewport(0, 0, w, h);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    const size = 0.86;
+    const size = 0.86 * zoom;
     const scale = w >= h ? [(size * h) / w, size] : [size, (size * w) / h];
     const rotation = viewRotation(view);
 

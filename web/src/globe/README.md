@@ -10,6 +10,8 @@ After a merge to `main` it is also published at `.../globe.html` next to the app
 
 - The NASA frame (`data/preview.jpg`) wrapped on a 3D globe. Drag it, or focus it and use the arrow
   keys (Shift for bigger steps). It only moves when you move it.
+- Zoom from 0.6× to 6×: mouse wheel or trackpad, two-finger pinch, `+` / `-` keys (`0` resets) or the
+  buttons on the globe. Turning slows down as you zoom in.
 - A **spotlight**: a candidate region. Sliders set its longitude, latitude and radius. Buttons jump to
   the two approved regions and show their measured alignment from `data/features.json`.
 - The spotlight is a **brighter patch** covering the **exact pixel circle** that would be measured
@@ -31,7 +33,7 @@ After a merge to `main` it is also published at `.../globe.html` next to the app
 | --- | --- |
 | `src/globe/geo.ts` | Map maths: lon/lat ↔ pixels, bounding square, slider limits, land share, region JSON. Tested in `geo.test.ts`. |
 | `src/globe/globeRenderer.ts` | The WebGL globe, the spotlight shader and the night sky |
-| `src/globe/GlobeView.tsx` | React component: drag and arrow keys. Props: `imageUrl`, `frame`, `spot`, `faceSpotToken`, `label` |
+| `src/globe/GlobeView.tsx` | React component: drag, arrow keys and zoom. Props: `imageUrl`, `frame`, `spot`, `faceSpotToken`, `label` |
 | `src/globe/GlobePage.tsx` | The prototype page: sliders, presets, readout |
 
 ## For Dev B

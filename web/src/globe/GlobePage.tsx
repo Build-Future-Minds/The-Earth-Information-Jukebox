@@ -91,7 +91,7 @@ export function GlobePage() {
           <p className="readout">PROTOTYPE · not in the app yet</p>
           <h1>Globe spotlight</h1>
         </div>
-        <p>Drag the globe, or focus it and use the arrow keys. The brighter patch is the spotlight: exactly the part of the picture that would be measured and played.</p>
+        <p>Drag the globe, or focus it and use the arrow keys. Zoom with the mouse wheel, a pinch, the + and − keys or the buttons on the globe (0 resets). The brighter patch is the spotlight: exactly the part of the picture that would be measured and played.</p>
 
         <fieldset>
           <legend>Approved regions</legend>
