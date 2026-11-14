@@ -27,3 +27,7 @@ recordings/
 
 # Browser test artefacts
 .playwright-mcp/
+
+# Playwright output
+web/test-results/
+web/playwright-report/

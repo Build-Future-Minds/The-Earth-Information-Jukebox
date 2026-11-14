@@ -6,6 +6,20 @@ observed. Practice data only (`fixtures/mock/`). **Not yet tested on real NASA m
 Run on 14 Nov 2026 with Chrome via Playwright (automated browser) on macOS, dev build and
 production build.
 
+## Rerun these checks yourself
+
+```bash
+cd web
+npm test            # unit tests (32)
+npm run test:e2e    # browser tests (20), real key presses; first time: npx playwright install chromium
+```
+
+Both run automatically on every pull request (`.github/workflows/ci.yml`). The browser tests
+passed 60/60 when each was repeated 3 times (14 Nov), so they are not flaky on this machine.
+Two of the bugs listed below were put back on purpose, and the tests failed each time. The first
+tables were recorded by hand with one-off browser scripts before the suite existed. The suite now
+covers every row (`web/e2e/`).
+
 ## How the sound was checked, not just the screen
 
 In development builds only, `transport.ts` records every Earth note it sends to the synth, with
@@ -32,15 +46,18 @@ the log; that was checked below.
 | Setup instructions work from a clean copy | Fresh clone → `npm ci && npm test && npm run build` | **Pass** for Dev B. **Still to do:** Student A follows `web/README.md` alone |
 | Unit tests | `npm test` | **Pass, 19/19** |
 
-## Optional melody (branch `devb/melody`)
+## Optional melody (branch `devb/melody`): automated in `web/e2e/melody.e2e.ts` and `src/audio/userVoice.test.ts`
 
 | Check | How tested | Result |
 | --- | --- | --- |
-| Melody leaves the Earth rhythm unchanged | One Earth loop recorded without melody, then one while playing 15 melody notes; times, values and pulse order compared | **Pass.** 16 vs 16 Earth notes, identical to 0.1 ms |
-| Melody keys play only in the pad | Pressed all 8 keys with focus on a button (synth already running), then one key in the pad; counted active melody voices | **Pass.** 0 voices outside, 1 inside |
-| Leaving the pad releases held notes | Held `D`, moved focus away | **Pass.** 0 voices after |
-| Stop / `Esc` silences the melody | Held `F`, pressed `Esc` | **Pass.** 0 voices; Earth voice stopped |
-| `1`/`2` only on the Region choice (WCAG 2.1.4) | Real key presses: `2` on Start; `2` on the radio group; ArrowLeft; `2` inside the pad | **Pass.** Ignored on Start; B selected and focus moved to it; ArrowLeft back to A; ignored in the pad |
+| Melody leaves the Earth rhythm unchanged | 15 melody key presses during playback; every Earth note checked against the schedule (position in the loop, beat grid, split) | **Pass** |
+| Letter keys play only in the pad | All 8 keys pressed with focus on Start (synth already running), then one in the pad; active melody voices counted | **Pass.** 0 outside, 1 inside |
+| Quick first tap, held key (auto-repeat), Esc while holding then auto-repeat | Real key presses; voices counted after release | **Pass.** 0 stuck notes in each |
+| On-screen keys play with the mouse | Mouse down/up on a key; voices and highlight checked | **Pass** |
+| Keyboard + mouse on the same note | Key held, mouse press/release on the same key | **Pass.** The note keeps playing until the key is released |
+| Leaving the pad releases notes | Held `H`, pressed Tab | **Pass.** 0 voices |
+| `1`/`2` only on the Region choice (WCAG 2.1.4) | Real key presses: `2` on Start; `2` on the radio group; ArrowLeft | **Pass.** Ignored on Start; B selected and focus moved; ArrowLeft back to A |
+| Not tested | Screen readers with the pad (`role="application"`); touch screens; a real MIDI piano | Student B's log; demo machine |
 
 ## Bugs found and fixed during testing
 
@@ -55,7 +72,14 @@ were missed by the first round of browser tests:
    updates queued for cancelled sound now carry a generation number and are ignored once
    cancelled.
 3. **Double-pressing Start on first use could create two synths.** Fixed by sharing one setup step.
-4. **Page-wide `1`/`2` shortcuts did not meet WCAG 2.1.4.** Found while designing the melody keys;
+4. **Melody notes could get stuck (three ways).** A second code review of the melody found them.
+   (a) Tone's `releaseAll` leaves voices unmarked, so after Stop a re-pressed note could not be
+   released. (b) Tap, release, tap while audio was starting played two notes. (c) Releasing the
+   mouse on a note still held by the keyboard silenced it. Also found while rewriting: a quick
+   first tap could start a note after its release. Fix: the melody voice now tracks which input
+   holds each note, releases notes one by one, and gives each press a token.
+   Each case is now a unit test, and two were confirmed by putting the bug back.
+5. **Page-wide `1`/`2` shortcuts did not meet WCAG 2.1.4.** Found while designing the melody keys;
    now active only on the Region choice. Focus also moves to the chosen region, so arrow keys
    continue from it.
 

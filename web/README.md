@@ -21,7 +21,8 @@ until real data is connected.
 
 | Command | What it does |
 | --- | --- |
-| `npm test` | Unit tests: the rhythm rule, missing steps, replay, and data against `contracts/` |
+| `npm test` | Unit tests: the rhythm rule, missing steps, replay, melody note handling, and data against `contracts/` |
+| `npm run test:e2e` | Browser tests: drives the real app with real key presses and checks the actual sound schedule (about 1 minute). First time only: `npx playwright install chromium` |
 | `npm run build` | Type-check and build to `web/dist/` |
 | `npm run preview` | Serve the built `dist/` locally (this is the **local fallback** for the demo) |
 
@@ -54,8 +55,8 @@ No sound plays until you press Start.
 
 ## Deploy
 
-Every push to `main` runs the tests, builds, and publishes to GitHub Pages
-(`.github/workflows/pages.yml`).
+Every pull request runs the unit tests, the build and the browser tests (`.github/workflows/ci.yml`).
+Every push to `main` also publishes to GitHub Pages (`.github/workflows/pages.yml`).
 
 ## Troubleshooting
 

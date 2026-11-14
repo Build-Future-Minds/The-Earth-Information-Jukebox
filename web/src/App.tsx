@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
-import { UserVoice } from './audio/userVoice';
+import { UserVoice, type InputSource } from './audio/userVoice';
 import { MelodyPad } from './components/MelodyPad';
 import { ExploreControls, regionLabel } from './components/ExploreControls';
 import { RhythmExplanation } from './components/RhythmExplanation';
@@ -18,6 +18,7 @@ export function App() {
   const [speed, setSpeed] = useState(1);
   const [volumeDb, setVolumeDb] = useState(-6);
   const [melodyDb, setMelodyDb] = useState(-10);
+  const [heldNotes, setHeldNotes] = useState<ReadonlySet<number>>(new Set());
   const transport = useRef<Transport | null>(null);
   const melody = useRef<UserVoice | null>(null);
   const explanationRef = useRef<HTMLElement>(null);
@@ -26,7 +27,7 @@ export function App() {
 
   useEffect(() => {
     const t = new Transport({ onStep: setSounding, onState: setPlayState });
-    const m = new UserVoice();
+    const m = new UserVoice(setHeldNotes);
     transport.current = t;
     melody.current = m;
     return () => {
@@ -49,8 +50,11 @@ export function App() {
   }, []);
   const replay = useCallback(() => void transport.current?.replay(), []);
   // Melody inputs (keyboard, on-screen keys, later MIDI) all send MIDI note numbers.
-  const onMelodyNoteOn = useCallback((note: number) => void melody.current?.noteOn(note), []);
-  const onMelodyNoteOff = useCallback((note: number) => melody.current?.noteOff(note), []);
+  const onMelodyNoteOn = useCallback(
+    (note: number, source: InputSource) => void melody.current?.noteOn(note, 0.7, source),
+    [],
+  );
+  const onMelodyNoteOff = useCallback((note: number, source: InputSource) => melody.current?.noteOff(note, source), []);
   const onMelodyAllOff = useCallback(() => melody.current?.allOff(), []);
 
   // Keyboard shortcuts on top of the normal Tab / Enter / Space controls.
@@ -140,6 +144,7 @@ export function App() {
         {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} />}
 
         <MelodyPad
+          heldNotes={heldNotes}
           volumeDb={melodyDb}
           onNoteOn={onMelodyNoteOn}
           onNoteOff={onMelodyNoteOff}

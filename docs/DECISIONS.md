@@ -128,7 +128,13 @@ the one control for "choose a region". The pad is one control.
 **Melody:** a separate `user` voice with its own synth and volume, played immediately rather than
 on the Earth schedule, so it cannot move an Earth note (`docs/CONTRACT.md`). Pentatonic scale, an
 octave above the Earth pulse: any combination sounds consonant, and the two voices stay distinct.
-Both are **Design choices**. Tabbing away from the pad, Stop or `Esc` silences the melody.
+Both are **Design choices**. Tabbing away from the pad, switching windows, Stop or `Esc` silences the melody.
+
+**Ready for a MIDI piano:** the melody voice takes MIDI note numbers and the name of the input
+(`key`, `pointer`, later `midi`). A note stops only when every input holding it lets go. A Web MIDI
+input can call the same `noteOn` / `noteOff` with no other change. Web MIDI needs https or
+localhost and a permission prompt, and Safari does not support it. **Unverified for our demo
+browser.** Test on the demo machine before relying on it.
 
 ## Sources
 

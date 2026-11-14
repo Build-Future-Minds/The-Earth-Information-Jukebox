@@ -3,12 +3,14 @@
 // the pad has focus, so they stay free for screen readers and speech input (docs/DECISIONS.md D8).
 // Inputs send MIDI note numbers, so a MIDI piano can later call the same onNoteOn / onNoteOff.
 import { useEffect, useState } from 'react';
-import { KEYBOARD_NOTES } from '../audio/userVoice';
+import { KEYBOARD_NOTES, type InputSource } from '../audio/userVoice';
 
 interface Props {
+  /** Notes held right now by any input (from UserVoice), so the highlight matches the sound. */
+  heldNotes: ReadonlySet<number>;
   volumeDb: number;
-  onNoteOn: (note: number) => void;
-  onNoteOff: (note: number) => void;
+  onNoteOn: (note: number, source: InputSource) => void;
+  onNoteOff: (note: number, source: InputSource) => void;
   onAllOff: () => void;
   onVolume: (db: number) => void;
 }
@@ -16,42 +18,16 @@ interface Props {
 const KEYS = Object.keys(KEYBOARD_NOTES);
 
 export function MelodyPad(p: Props) {
-  const [down, setDown] = useState<Set<string>>(new Set());
   const [active, setActive] = useState(false);
   const { onAllOff } = p;
 
-  const press = (k: string) => {
-    const note = KEYBOARD_NOTES[k];
-    if (note === undefined) return false;
-    setDown((s) => new Set(s).add(k));
-    p.onNoteOn(note);
-    return true;
-  };
-  const release = (k: string) => {
-    const note = KEYBOARD_NOTES[k];
-    if (note === undefined) return false;
-    setDown((s) => {
-      const n = new Set(s);
-      n.delete(k);
-      return n;
-    });
-    p.onNoteOff(note);
-    return true;
-  };
-  const releaseAll = () => {
-    setDown(new Set());
-    onAllOff();
-  };
-
   // Switching windows while holding a key never delivers the key-up: release everything.
   useEffect(() => {
-    const onWindowBlur = () => {
-      setDown(new Set());
-      onAllOff();
-    };
-    window.addEventListener('blur', onWindowBlur);
-    return () => window.removeEventListener('blur', onWindowBlur);
+    window.addEventListener('blur', onAllOff);
+    return () => window.removeEventListener('blur', onAllOff);
   }, [onAllOff]);
+
+  const fromKey = (e: React.KeyboardEvent) => (e.ctrlKey || e.metaKey || e.altKey ? undefined : KEYBOARD_NOTES[e.key.toLowerCase()]);
 
   return (
     <section className="melody" aria-labelledby="melody-heading">
@@ -66,35 +42,43 @@ export function MelodyPad(p: Props) {
         onFocus={() => setActive(true)}
         onBlur={() => {
           setActive(false);
-          releaseAll();
+          onAllOff();
         }}
         onKeyDown={(e) => {
-          if (e.ctrlKey || e.metaKey || e.altKey) return;
-          if (press(e.key.toLowerCase())) e.preventDefault();
+          const note = fromKey(e);
+          if (note === undefined) return;
+          e.preventDefault();
+          p.onNoteOn(note, 'key');
         }}
         onKeyUp={(e) => {
-          if (release(e.key.toLowerCase())) e.preventDefault();
+          const note = KEYBOARD_NOTES[e.key.toLowerCase()];
+          if (note === undefined) return;
+          e.preventDefault();
+          p.onNoteOff(note, 'key');
         }}
       >
         <span className="pad-hint">
           {active ? 'Playing: press the keys below, or click them' : 'Tab here and press the keys, or click a key'}
         </span>
         <span className="pad-keys" aria-hidden="true">
-          {KEYS.map((k) => (
-            <kbd
-              key={k}
-              data-key={k}
-              className={down.has(k) ? 'down' : ''}
-              onPointerDown={(e) => {
-                e.currentTarget.setPointerCapture?.(e.pointerId);
-                press(k);
-              }}
-              onPointerUp={() => release(k)}
-              onPointerCancel={() => release(k)}
-            >
-              {k.toUpperCase()}
-            </kbd>
-          ))}
+          {KEYS.map((k) => {
+            const note = KEYBOARD_NOTES[k];
+            return (
+              <kbd
+                key={k}
+                data-key={k}
+                className={p.heldNotes.has(note) ? 'down' : ''}
+                onPointerDown={(e) => {
+                  e.currentTarget.setPointerCapture?.(e.pointerId);
+                  p.onNoteOn(note, 'pointer');
+                }}
+                onPointerUp={() => p.onNoteOff(note, 'pointer')}
+                onPointerCancel={() => p.onNoteOff(note, 'pointer')}
+              >
+                {k.toUpperCase()}
+              </kbd>
+            );
+          })}
         </span>
       </div>
       <label>
