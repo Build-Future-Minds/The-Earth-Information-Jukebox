@@ -1,0 +1,553 @@
+{
+  "schema_version": "0.2",
+  "is_mock": false,
+  "scene": "data/scene.json",
+  "step_seconds": 1.0,
+  "normalisation": {
+    "gradient_threshold": 12.0,
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2007-03-25T12:00Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0795,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2007-03-25T16:07Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0797,
+      "reason": null
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2007-03-25T20:15Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0804,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2007-03-26T00:23Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0807,
+      "reason": null
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2007-03-26T04:30Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.08,
+      "reason": null
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2007-03-26T08:38Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0785,
+      "reason": null
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2007-03-26T12:46Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0764,
+      "reason": null
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2007-03-26T16:53Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0737,
+      "reason": null
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2007-03-26T21:01Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0706,
+      "reason": null
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2007-03-27T01:09Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0683,
+      "reason": null
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2007-03-27T05:16Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0668,
+      "reason": null
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2007-03-27T09:24Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0649,
+      "reason": null
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2007-03-27T13:32Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.063,
+      "reason": null
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2007-03-27T17:39Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0621,
+      "reason": null
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2007-03-27T21:47Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0608,
+      "reason": null
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2007-03-28T01:55Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0599,
+      "reason": null
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2007-03-28T06:02Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0594,
+      "reason": null
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2007-03-28T10:10Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0601,
+      "reason": null
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2007-03-28T14:18Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.06,
+      "reason": null
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2007-03-28T18:25Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0613,
+      "reason": null
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2007-03-28T22:33Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0635,
+      "reason": null
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2007-03-29T02:41Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0663,
+      "reason": null
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2007-03-29T06:48Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0696,
+      "reason": null
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2007-03-29T10:56Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0728,
+      "reason": null
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2007-03-29T15:04Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.076,
+      "reason": null
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2007-03-29T19:12Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0795,
+      "reason": null
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2007-03-29T23:19Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0837,
+      "reason": null
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2007-03-30T03:27Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0869,
+      "reason": null
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2007-03-30T07:35Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0898,
+      "reason": null
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2007-03-30T11:42Z",
+      "region": "kuroshio_eddies",
+      "status": "ok",
+      "alignment": 0.0932,
+      "reason": null
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2007-03-25T12:00Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.674,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2007-03-25T16:07Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.675,
+      "reason": null
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2007-03-25T20:15Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6763,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2007-03-26T00:23Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6789,
+      "reason": null
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2007-03-26T04:30Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6808,
+      "reason": null
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2007-03-26T08:38Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6828,
+      "reason": null
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2007-03-26T12:46Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6845,
+      "reason": null
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2007-03-26T16:53Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6852,
+      "reason": null
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2007-03-26T21:01Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6853,
+      "reason": null
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2007-03-27T01:09Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6835,
+      "reason": null
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2007-03-27T05:16Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.681,
+      "reason": null
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2007-03-27T09:24Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6795,
+      "reason": null
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2007-03-27T13:32Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6788,
+      "reason": null
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2007-03-27T17:39Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6776,
+      "reason": null
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2007-03-27T21:47Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6765,
+      "reason": null
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2007-03-28T01:55Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6746,
+      "reason": null
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2007-03-28T06:02Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6705,
+      "reason": null
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2007-03-28T10:10Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6659,
+      "reason": null
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2007-03-28T14:18Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.663,
+      "reason": null
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2007-03-28T18:25Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6614,
+      "reason": null
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2007-03-28T22:33Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6604,
+      "reason": null
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2007-03-29T02:41Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6597,
+      "reason": null
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2007-03-29T06:48Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6602,
+      "reason": null
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2007-03-29T10:56Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6617,
+      "reason": null
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2007-03-29T15:04Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6634,
+      "reason": null
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2007-03-29T19:12Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6645,
+      "reason": null
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2007-03-29T23:19Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6651,
+      "reason": null
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2007-03-30T03:27Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6648,
+      "reason": null
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2007-03-30T07:35Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6632,
+      "reason": null
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2007-03-30T11:42Z",
+      "region": "equator_pacific",
+      "status": "ok",
+      "alignment": 0.6599,
+      "reason": null
+    }
+  ]
+}

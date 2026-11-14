@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "is_mock": false,
   "source": {
     "svs_id": 3912,
@@ -54,6 +54,8 @@
       "2007-03-30T07:35Z",
       "2007-03-30T11:42Z"
     ],
+    "first_index": 23000,
+    "index_step": 4,
     "camera_static_check": "analysis/check_motion.py (land-pixel difference test): PASS: land in only one frame 0.58% / 0.32%, mean land change 1.29 / 0.23 (0-255). A 5 px shifted copy fails (9.44%)."
   },
   "legend": {
@@ -82,6 +84,11 @@
     {
       "id": "kuroshio_eddies",
       "name": "Kuroshio eddies east of Japan",
+      "center_px": [
+        1872,
+        348
+      ],
+      "radius_px": 61,
       "box_px": [
         1811,
         287,
@@ -94,6 +101,11 @@
     {
       "id": "equator_pacific",
       "name": "Equatorial Pacific streaks",
+      "center_px": [
+        271,
+        504
+      ],
+      "radius_px": 61,
       "box_px": [
         210,
         443,
