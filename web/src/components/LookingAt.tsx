@@ -1,9 +1,9 @@
 // "What you are looking at": Student B's explainer and tick key from tools/listening_game.html,
 // reworded for the app's two circles.
-const agree = [-6, 4, -2, 8, 2, -8, 6, -4];
-const scatter = [20, 100, 150, 60, 130, 10, 80, 170];
+export const agree = [-6, 4, -2, 8, 2, -8, 6, -4];
+export const scatter = [20, 100, 150, 60, 130, 10, 80, 170];
 
-function Key({ degrees }: { degrees: number[] }) {
+export function Key({ degrees }: { degrees: number[] }) {
   return (
     <svg viewBox="0 0 150 64" aria-hidden="true">
       {degrees.map((deg, i) => {

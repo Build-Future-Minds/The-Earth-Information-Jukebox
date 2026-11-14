@@ -304,6 +304,25 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
   .plot-split { display: none; }
 }
 
+/* "Practice: test your ear": launch section for Student B's listening game. */
+.practice { display: flex; flex-wrap: wrap; gap: var(--md) var(--lg); align-items: center;
+            border-top: 1px solid var(--rule); padding-top: var(--sm); }
+.practice-text { flex: 1 1 32ch; min-width: 0; display: grid; gap: var(--xs); max-width: 68ch; justify-items: start; }
+.practice-preview { display: flex; align-items: center; gap: 12px; }
+.practice-preview figure { margin: 0; display: grid; gap: 4px; font-size: 0.8rem; color: var(--ink-2); }
+.practice-preview svg { display: block; width: 120px; height: 52px; background: var(--well); border-radius: var(--r); }
+.practice-q { font: 300 2.6rem/1 var(--font); color: var(--ink-2); }
+/* A link that looks like a DESIGN.md button. */
+.button-link {
+  display: inline-flex; align-items: center; gap: var(--xs); min-height: 48px; padding: 0 var(--sm);
+  border: 2px solid var(--ink); border-radius: var(--r); font: 700 1rem/1 var(--font); text-decoration: none; color: var(--ink);
+  transition: background-color var(--snap);
+}
+.button-link:hover { background: var(--rule-2); }
+.button-link.primary { background: var(--ink); color: var(--paper); }
+.button-link.primary:hover { background: var(--ink-hover); }
+.button-link .small { font-weight: 400; font-size: 0.85rem; opacity: 0.8; }
+
 footer { border-top: 1px solid var(--rule); padding-top: var(--sm); font-size: 0.95rem; display: grid; gap: var(--xs); }
 footer ul { margin: 0; padding-left: 1.2rem; color: var(--ink-2); }
 
