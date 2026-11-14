@@ -30,6 +30,7 @@
       "center_lonlat": [-132.4, 1.4],
       "land_share": 0.0,
       "land_check": "No land in the circle in any of the 30 frames (it spans about 143W-122W, 9S-12N; the Marquesas at about 139.5W 9S lie just outside).",
+      "overlay_check": "No labels, colour bar or date text in the circle in any of the 30 frames: 0 white or neutral-grey pixels (the colours of text and colour bars) inside it, and 0 in the whole frame. The 'orig' frame set has no overlays; SVS provides the colour bar separately (sst_ecco2_cbar.png) and a separate 'with_colorbar' set. Checked 2026-11-14 by Student A, also by eye on frames 23000, 23060, 23116.",
       "alignment": { "mean": 0.671, "min": 0.652, "max": 0.689, "ok_frames": 30, "missing_frames": 0 }
     }
   ],
