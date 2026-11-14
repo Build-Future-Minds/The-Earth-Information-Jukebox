@@ -244,6 +244,10 @@
       <p class="hint-note">Two sounds can play at once: press Q, W or R while another sound is playing. On: the new sound waits for the next beat of the one already playing and keeps its speed, so the pulses line up. Off: it starts the moment you press.</p>
     </div>
     <div class="axis">
+      <label class="switch"><input type="checkbox" id="musical" checked> Musical sound</label>
+      <p class="hint-note">On: a soft piano-like tone with a little room echo, over a quiet held chord. The chord is the same for every patch, so it gives nothing away. Off: the plain test tone, for a strict listening test.</p>
+    </div>
+    <div class="axis">
       <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
       <p class="hint-note">Unless Rhythm only is on, the notes' pitch and length change with the patch. Both are this game's choice; the team's rule keeps pitch fixed until Dev A decides.</p>
     </div>
@@ -548,7 +552,19 @@
   // `voices` are the sounds playing now (a patch or the mystery sound), oldest first, at most
   // MAX_VOICES. `loose` holds single notes played by dragging the timeline.
   const MAX_VOICES = 2;
-  let ctx = null, master = null, voices = [], loose = [], timers = [];
+  let ctx = null, master = null, roomSend = null, voices = [], loose = [], timers = [];
+  const musical = () => $("musical").checked;
+  const ROOM_LEVEL = 0.22;
+
+  // A short room echo, made from decaying noise, so the notes ring a little like a real instrument.
+  function roomImpulse(seconds) {
+    const len = Math.floor(ctx.sampleRate * seconds), buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    }
+    return buf;
+  }
 
   function ensureAudio() {
     if (!ctx) {
@@ -561,12 +577,78 @@
       limiter.threshold.value = -3; limiter.knee.value = 0; limiter.ratio.value = 20;
       limiter.attack.value = 0.002; limiter.release.value = 0.1;
       master.connect(limiter).connect(ctx.destination);
+      const room = ctx.createConvolver();
+      room.buffer = roomImpulse(1.8);
+      roomSend = ctx.createGain();
+      roomSend.gain.value = musical() ? ROOM_LEVEL : 0;
+      master.connect(roomSend).connect(room).connect(limiter);
     }
     if (ctx.state === "suspended") ctx.resume();
   }
 
-  // One note: a quick attack, held for `length` seconds, then a short release.
+  // One note. Timing, pitch and length are set by the caller from the patch's alignment; this only
+  // decides what the note sounds like, the same way for every patch.
   function pulse(t, hz, peak, length, bin = loose) {
+    if (musical()) return musicalPulse(t, hz, peak, length, bin);
+    plainPulse(t, hz, peak, length, bin);
+  }
+
+  // Musical sound: a soft, piano-like tone (a round fundamental plus a quiet octave, through a filter
+  // that closes as the note rings), held for `length` seconds, then a short natural release.
+  function musicalPulse(t, hz, peak, length, bin) {
+    peak *= 0.8;   // the octave and the room add level; this keeps one sound as loud as the plain tone
+    const end = t + Math.max(0.08, length), fade = 0.12;
+    const env = ctx.createGain(), tone = ctx.createBiquadFilter();
+    tone.type = "lowpass"; tone.Q.value = 0.7;
+    tone.frequency.setValueAtTime(Math.min(16000, hz * 10), t);
+    tone.frequency.exponentialRampToValueAtTime(Math.min(12000, hz * 3), t + 0.3);
+    const settle = Math.min(t + 0.18, end);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(peak, t + 0.006);
+    env.gain.exponentialRampToValueAtTime(peak * 0.65, settle);
+    env.gain.setValueAtTime(peak * 0.65, end);
+    env.gain.exponentialRampToValueAtTime(0.0001, end + fade);
+    const body = ctx.createOscillator(), shine = ctx.createOscillator(), shineLevel = ctx.createGain();
+    body.type = "sine"; body.frequency.value = hz;
+    shine.type = "triangle"; shine.frequency.value = hz * 2; shine.detune.value = 4;
+    shineLevel.gain.value = 0.35;
+    body.connect(env); shine.connect(shineLevel).connect(env);
+    env.connect(tone).connect(master);
+    [body, shine].forEach((o) => { o.start(t); o.stop(end + fade + 0.02); bin.push(o); });
+  }
+
+  // A quiet held C chord under whatever is playing. It is the same for every patch and has no
+  // rhythm of its own, so it carries no answer; it only makes the notes sit in a key. One chord is
+  // shared by all sounds playing, so two sounds do not double it.
+  let pad = null;
+  function padOn() {
+    if (pad || !musical()) return;
+    const now = ctx.currentTime, level = ctx.createGain(), soft = ctx.createBiquadFilter();
+    soft.type = "lowpass"; soft.frequency.value = 1100;
+    level.gain.setValueAtTime(0.0001, now);
+    level.gain.exponentialRampToValueAtTime(0.07, now + 0.8);
+    level.connect(soft).connect(master);
+    const oscs = [65.41, 130.81, 196.0, 329.63].map((hz, i) => {   // C2, C3, G3, E4
+      const o = ctx.createOscillator();
+      o.type = i ? "triangle" : "sine"; o.frequency.value = hz; o.detune.value = i % 2 ? 5 : -5;
+      o.connect(level); o.start(now);
+      return o;
+    });
+    pad = { level, oscs };
+  }
+  function padOff(seconds = 0.6) {
+    if (!pad) return;
+    const now = ctx.currentTime, g = pad.level.gain;
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(Math.max(0.0001, g.value), now);
+    g.exponentialRampToValueAtTime(0.0001, now + seconds);
+    pad.oscs.forEach((o) => o.stop(now + seconds + 0.05));
+    pad = null;
+  }
+
+  // Plain sound (Musical sound off): the original test tone. A quick attack, held for `length`
+  // seconds, then a short release.
+  function plainPulse(t, hz, peak, length, bin) {
     const osc = ctx.createOscillator(), env = ctx.createGain();
     const end = t + Math.max(0.06, length);
     osc.type = "triangle";
@@ -592,6 +674,7 @@
   function stopAll() {
     voices.forEach((v) => silence(v.sources)); voices = [];
     silence(loose); loose = [];
+    padOff(0.08);
     timers.forEach(clearTimeout); timers = [];
     cancelAnimationFrame(anim);
     $("track").querySelectorAll(".note.live").forEach((r) => r.classList.remove("live"));
@@ -621,6 +704,7 @@
     notesFor(p, variant).forEach((n) =>
       pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat, v.sources));
     voices.push(v);
+    padOn();
     followVoices();
     return { v, joined: anchor };
   }
@@ -678,6 +762,7 @@
     const frame = () => {
       const live = liveVoices();
       if (!live.length) {
+        padOff();
         if (track && track.voice) paintTrack(BEATS);
         if (track) track.rects.forEach((r) => r.classList.remove("live"));
         return;
@@ -933,6 +1018,11 @@
   $("showLines").addEventListener("change", () => { if (shown) [0, 1].forEach((s) => drawPatch(s, shown[s])); });
   ["rhythmOnly", "stretchTiming"].forEach((id) =>
     $(id).addEventListener("change", () => { if (shown && guessed) drawPlot(shown[0], shown[1]); }));
+  $("musical").addEventListener("change", (e) => {
+    if (!ctx) return;
+    roomSend.gain.setTargetAtTime(e.target.checked ? ROOM_LEVEL : 0, ctx.currentTime, 0.05);
+    if (e.target.checked) { if (liveVoices().length) padOn(); } else padOff(0.2);
+  });
   $("hear0").addEventListener("click", () => playPatch(0));
   $("hear1").addEventListener("click", () => playPatch(1));
   $("showNotes").addEventListener("change", (e) => $("track").classList.toggle("hide-notes", !e.target.checked));
