@@ -3,7 +3,7 @@ import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { ExploreControls, regionLabel } from './components/ExploreControls';
-import { RhythmExplanation } from './components/RhythmExplanation';
+import { RhythmExplanation, stepAtSameMoment } from './components/RhythmExplanation';
 import { SceneView } from './components/SceneView';
 
 const { scene, features, imageUrl } = ACTIVE;
@@ -59,6 +59,14 @@ export function App() {
   }, [explaining]);
 
   const label = regionLabel(scene.regions, regionId);
+  // For the comparison line: the other region's measurement at the same source moment (two regions only).
+  const otherRegion = scene.regions.length === 2 ? scene.regions.find((r) => r.id !== regionId) : undefined;
+  const other = otherRegion
+    ? {
+        label: regionLabel(scene.regions, otherRegion.id),
+        step: sounding ? stepAtSameMoment(features.steps, sounding.step, otherRegion.id) : null,
+      }
+    : null;
   const missing = sounding?.step.status === 'missing' ? sounding.step.reason : null;
   // Changes only on real transitions, so the live region does not chatter every beat.
   const status =
@@ -117,7 +125,7 @@ export function App() {
           }}
         />
 
-        {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} />}
+        {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} other={other} />}
 
         <footer>
           <h2>Source and credit</h2>
