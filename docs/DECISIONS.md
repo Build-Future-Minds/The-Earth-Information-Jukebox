@@ -31,9 +31,10 @@ That means the same source moment, on the same beat grid. It does not restart fr
   exclusively on short-term memory. This is best done if a near-instantaneous switching...
   method is used." It also says listeners should "switch freely". **Verified** [S2].
   It is written for codec testing, so it is a precedent for us, not proof about our app.
-- **Responsive controls feel better.** Shneiderman (1983) on direct manipulation: rapid, reversible
-  actions with immediately visible results. **Unverified** [S3]: the publication details are
-  confirmed, but the wording has not yet been read in the paper.
+- **Responsive controls feel better.** Shneiderman (1983) lists, as a property of interfaces
+  that attract "enthusiastic users": "Rapid, incremental, reversible operations whose impact on
+  the object of interest is immediately visible." **Verified** [S3]. Pressing `1`/`2` is that kind
+  of action: the rhythm you hear changes on the next beat, and pressing again undoes it.
 
 **Measured:** in the browser, pressing `2` about 1.2 s into the loop led to Region B's missing
 step 0.5 s later, at loop position ~1.5 s. A restart would have put it 1.5 s later.
@@ -111,7 +112,7 @@ a rhythm other than the one you hear. Missing steps make no notes and show their
 | --- | --- | --- | --- | --- |
 | S1 | Darwin, C. J., Turvey, M. T., & Crowder, R. G. (1972). An auditory analogue of the Sperling partial report procedure: Evidence for brief auditory storage. *Cognitive Psychology*, 3(2), 255–267. | https://doi.org/10.1016/0010-0285(72)90007-2 | Verified (read) | D1 |
 | S2 | ITU-R Recommendation BS.1116-3 (02/2015). *Methods for the subjective assessment of small impairments in audio systems.* | https://www.itu.int/rec/R-REC-BS.1116/en | Verified (read) | D1 |
-| S3 | Shneiderman, B. (1983). Direct Manipulation: A Step Beyond Programming Languages. *Computer*, 16(8), 57–69. | https://doi.org/10.1109/MC.1983.1654471 | Unverified (publication details only) | D1 |
+| S3 | Shneiderman, B. (1983). Direct Manipulation: A Step Beyond Programming Languages. *Computer*, 16(8), 57–69. | https://doi.org/10.1109/MC.1983.1654471 (readable copy: https://www.cl.cam.ac.uk/~pr10/iui/shneiderman83.pdf) | Verified (read) | D1 |
 | S4 | Chrome for Developers. *Autoplay policy changes.* | https://developer.chrome.com/blog/autoplay | Verified (read) | D2 |
 | S5 | W3C. *Understanding WCAG 2.2*: 1.4.2, 2.1.1, 2.4.7, 4.1.3. | https://www.w3.org/WAI/WCAG22/Understanding/ | Verified (read) | D2, D3 |
 | S6 | Walker, B. N., & Nees, M. A. (2011). Theory of Sonification. In T. Hermann, A. Hunt & J. G. Neuhoff (Eds.), *The Sonification Handbook* (ch. 2). Logos, Berlin. | https://sonification.de/handbook/index.php/chapters/chapter2 | Unverified (exists; not read) | D4 |
