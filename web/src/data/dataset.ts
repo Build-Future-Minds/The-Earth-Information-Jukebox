@@ -32,6 +32,10 @@ export interface Dataset {
 }
 
 function pick(): Dataset {
+  // Browser tests set VITE_DATASET=practice: their expected rhythms come from the practice files.
+  if (import.meta.env.VITE_DATASET === 'practice') {
+    return { scene: mockScene, features: mockFeatures, imageUrl: null, origin: 'fixtures/mock/' };
+  }
   const scene = realJson['../../../data/scene.json']?.default as Scene | undefined;
   const features = realJson['../../../data/features.json']?.default as Features | undefined;
   if (scene && features) {

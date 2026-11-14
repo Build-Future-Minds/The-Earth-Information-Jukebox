@@ -17,6 +17,8 @@ export default defineConfig({
   webServer: {
     command: 'npx vite --port 5174 --strictPort',
     url: 'http://localhost:5174',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false, // a running dev server may be showing real data
+    // Always the practice data, even when real files are in data/: the expected rhythms are theirs.
+    env: { VITE_DATASET: 'practice' },
   },
 });
