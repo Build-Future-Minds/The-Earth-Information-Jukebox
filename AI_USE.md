@@ -13,6 +13,8 @@ Rules:
 | Date | Role | Tool | What it was used for | Human review |
 | --- | --- | --- | --- | --- |
 | 2026-11-14 | Team lead | Claude | Planning documents, task breakdown, JSON schemas, practice fixtures, submission worksheets, source-page fact checks | Team reads and corrects the plan; unverified items are flagged |
+| 2026-11-14 | Dev B | Claude Code | Wrote the app code in `web/` (transport, Earth voice, controls v1, explanation v1), tests, the Pages workflow and setup instructions. Chose the region-switch behaviour with Dev B | Dev B reviewed it. 19 unit tests, clean-clone install/test/build, and keyboard-only browser run all passed (PR #2). Teammate review pending |
+| 2026-11-14 | Dev B | Claude Code (research sub-agent) | Fetched and quoted sources for `docs/DECISIONS.md`. Flagged sources it could not read | Dev B checked the quotes. Sources not yet read are tagged Unverified |
 |  |  |  |  |  |
 
 ## Summary for the submission form (edit before submitting)
