@@ -45,6 +45,11 @@ no existing schema.
 Timing it assumes: one step is one beat of `step_seconds`; pulse 1 at `t`, pulse 2 at
 `t + long_fraction × step_seconds`.
 
+## Where files go
+
+The approved `scene.json`, `features.json` and one `preview` image go in `data/` at the repo root.
+The app uses them as soon as both JSON files are there (`data/README.md`). Practice files stay in `fixtures/mock/`.
+
 ## Rules
 
 - A practice file has `is_mock: true` and the app shows a PRACTICE DATA banner. Never in the demo.

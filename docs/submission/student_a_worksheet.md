@@ -14,10 +14,10 @@ Start from `assets/source_manifest.json`. List only what the finished app actual
 | --- | --- |
 | Title of the visualization | Global Sea Surface Currents and Temperature |
 | NASA SVS ID and link | 3912 — https://svs.gsfc.nasa.gov/3912 |
-| Is it in the Earth Information Center collection? Paste the link where you saw it. | ____ |
+| Is it in the Earth Information Center collection? Paste the link where you saw it. | Yes — listed under "EIC Beauty Pieces" at https://svs.gsfc.nasa.gov/gallery/earth-information-center/ (entry links to https://svs.gsfc.nasa.gov/3912/#media_group_349716; checked 2026-11-14) |
 | Is it an observation, model output, or artistic rendering? | Model output (ECCO2) |
 | What dates does the model run cover? | 25 Mar 2007 – 3 Mar 2008 |
-| Exact file or frame set we downloaded | ____ |
+| Exact file or frame set we downloaded | `orig` (2048x1024) frame set, `flat_global_ecco2_2028x1024.NNNNN.tif`, frames 23000–23116 (30 frames) + 25000; plus `flat_ecco2_dates.txt` and `sst_ecco2_cbar.png` |
 | Which frames we used (first, last, how many) | ____ |
 | Region A: name and pixel box | ____ |
 | Region B: name and pixel box | ____ |

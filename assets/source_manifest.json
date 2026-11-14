@@ -25,11 +25,26 @@
         "Covers one modelled year; not a climate trend."
       ],
       "verified": "2026-11-14 (planning pass, source page)",
-      "todo": [
-        "Confirm this page is listed in the EIC gallery: https://svs.gsfc.nasa.gov/gallery/earth-information-center/",
-        "Confirm the flat frame set has no camera motion, fades or overlays (land-pixel difference test)",
-        "Confirm which longitude is at the map centre before setting region boxes"
-      ]
+      "eic_gallery": {
+        "gallery_url": "https://svs.gsfc.nasa.gov/gallery/earth-information-center/",
+        "section": "EIC Beauty Pieces",
+        "entry_url": "https://svs.gsfc.nasa.gov/3912/#media_group_349716",
+        "verified": "2026-11-14 (Student A clicked the gallery entry; it opens SVS 3912)"
+      },
+      "motion_check": {
+        "method": "analysis/check_motion.py (land-pixel difference test)",
+        "frames_compared": ["23000 vs 25000", "23000 vs 23116"],
+        "result": "PASS: land in only one frame 0.58% / 0.32%, mean land change 1.29 / 0.23 (0-255). A 5 px shifted copy fails (9.44%).",
+        "verified": "2026-11-14"
+      },
+      "map_geometry": {
+        "projection": "equirectangular, 2048x1024 px",
+        "longitude": "180W at x=0, 0 at x=1024, 180E at right edge; x = (lon + 180) * 2048 / 360",
+        "latitude": "90N at y=0, 90S at y=1024; y = (90 - lat) * 1024 / 180",
+        "scale": "about 0.176 degrees per pixel",
+        "verified": "2026-11-14 (Student A checked a grid overlay on frame 23000: 0 line passes London and the Ghana coast)"
+      },
+      "todo": []
     },
     {
       "svs_id": 5425,
