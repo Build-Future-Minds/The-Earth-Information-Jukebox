@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "is_mock": false,
   "source": {
     "svs_id": 3912,
@@ -82,6 +82,11 @@
     {
       "id": "kuroshio_eddies",
       "name": "Kuroshio eddies east of Japan",
+      "center_px": [
+        1872,
+        348
+      ],
+      "radius_px": 61,
       "box_px": [
         1811,
         287,
@@ -94,6 +99,11 @@
     {
       "id": "equator_pacific",
       "name": "Equatorial Pacific streaks",
+      "center_px": [
+        271,
+        504
+      ],
+      "radius_px": 61,
       "box_px": [
         210,
         443,

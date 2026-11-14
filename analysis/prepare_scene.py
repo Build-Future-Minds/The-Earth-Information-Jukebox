@@ -240,6 +240,8 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
         scene_regions.append({
             "id": r["id"],
             "name": r["name"],
+            "center_px": list(centre),
+            "radius_px": radius,
             "box_px": [x, y, w, h],
             "mask": mask_rel,
             "description": f"A circle {2 * radius} pixels across, centred at x {centre[0]}, y {centre[1]} on the "
@@ -255,7 +257,7 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
             source[key] = asset[key]
     motion = asset.get("motion_check", {})
     scene = {
-        "schema_version": "0.1",
+        "schema_version": "0.2",
         "is_mock": False,
         "source": source,
         "frames": {

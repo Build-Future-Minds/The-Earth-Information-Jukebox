@@ -81,6 +81,12 @@ def test_good_input_writes_a_valid_scene(project: Path) -> None:
 
     assert scene["frames"]["count"] == len(INDICES)
     assert scene["frames"]["width"] == W and scene["frames"]["height"] == H
+    assert scene["schema_version"] == "0.2"
+    for region, given in zip(scene["regions"], REGIONS):
+        cx, cy = given["center_px"]
+        r = given["radius_px"]
+        assert region["center_px"] == [cx, cy] and region["radius_px"] == r
+        assert region["box_px"] == [cx - r, cy - r, 2 * r, 2 * r]   # schema 0.2: the bounding square
     assert [r["box_px"] for r in scene["regions"]] == [[36, 16, 48, 48], [166, 56, 48, 48]]
 
 
