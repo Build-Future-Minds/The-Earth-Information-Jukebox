@@ -82,7 +82,7 @@ Ask each teammate what they actually used. Delete anything we did not use in the
 - Languages: Python, TypeScript, HTML and CSS, GLSL (the globe's shaders), Bash (frame download script)
 - Python libraries: NumPy, OpenCV, Matplotlib, Pillow, pytest, jsonschema
 - Web libraries: Tone.js, React; Atkinson Hyperlegible Next and Mono fonts; build and test with Vite, Vitest, Ajv, Playwright
-- Hardware (only if it is in the final demo): NOT CHECKED YET (ask Dev B whether the MIDI piano is in the final demo)
+- Hardware (only if it is in the final demo): none. The MIDI piano is not in the final demo (Dev B, 15 Nov).
 - Other tools (recording, editing, design): Git and GitHub, GitHub Pages, VS Code. Recording and editing: NOT CHECKED YET (ask Student B)
 
 ## Part 4 — Your contribution (final Sun 4 PM)
