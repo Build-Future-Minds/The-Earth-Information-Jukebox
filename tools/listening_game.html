@@ -214,7 +214,7 @@
     <div>
       <a class="back" href="../">← Back to Earth Sonata</a>
       <h1>Which patch made this rhythm?</h1>
-      <p class="lede">An Earth Sonata: Play the Planet practice game. Hear one sound, then pick the patch that made it.</p>
+      <p class="lede">Hear a sound, pick the patch that made it.</p>
     </div>
 
     <figure class="map" id="mapFigure">
@@ -223,8 +223,7 @@
       <div class="box" id="box0" hidden aria-hidden="true"><span>1</span></div>
       <div class="box" id="box1" hidden aria-hidden="true"><span>2</span></div>
     </figure>
-    <p class="credit" style="margin-top:-14px">Visualization: NASA/Goddard Space Flight Center Scientific Visualization Studio,
-      <a href="https://svs.gsfc.nasa.gov/3912">SVS 3912</a>. ECCO2 model output, model time 19 June 2007. Not a photo.</p>
+    <p class="credit" style="margin-top:-14px">NASA SVS <a href="https://svs.gsfc.nasa.gov/3912">3912</a>, ECCO2 model, not a photo.</p>
 
     <div class="actions">
       <button class="primary" id="newRound" disabled>New round <kbd>P</kbd></button>
@@ -244,30 +243,39 @@
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="grooveLock" checked> Groove lock</label>
-      <p class="hint-note">Two sounds can play at once: press Q, W or R while another sound is playing. On: the new sound waits for the next beat of the one already playing and keeps its speed, so the pulses line up. Off: it starts the moment you press.</p>
+      <p class="hint-note">Two sounds lock to one beat.</p>
     </div>
     <div class="axis">
-      <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
-      <p class="hint-note">Unless Rhythm only is on, the notes' pitch and length change with the patch. Both are this game's choice; the team's rule keeps pitch fixed until Dev A decides.</p>
+      <label class="switch"><input type="checkbox" id="musical"> Musical sound</label>
+      <p class="hint-note">Off for a strict test.</p>
+    </div>
+    <div class="axis">
+      <label for="instrument">Instrument</label>
+      <select id="instrument">
+        <option value="piano" selected>Piano</option>
+        <option value="marimba">Marimba</option>
+        <option value="bells">Music box</option>
+        <option value="synth">Soft synth</option>
+      </select>
+      <label class="switch"><input type="checkbox" id="keepMusic" checked> Keep the music playing</label>
+      <p class="hint-note">With Musical sound on. Stop or Esc ends it.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="showNotes" checked> Show notes while playing</label>
-      <p class="hint-note">Off: only the moving dot shows, so a listening test is judged by ear alone.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="showLines" checked> Show line directions</label>
-      <p class="hint-note">White ticks show which way the visible lines run in each part of a patch. The sound is made from how much they agree. They always appear after you answer.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="rhythmOnly"> Rhythm only</label>
-      <p class="hint-note">On: every patch plays the same two notes (G4 then D5), so pitch gives nothing away and the spacing of the pulses carries the answer. This is close to the team's rule but not the same: each note here is held for half its gap, so note length still follows the spacing, while the app uses one pitch and one note length.</p>
+      <p class="hint-note">Same notes for every patch.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="stretchTiming" checked> Stretch the pulse spacing</label>
-      <p class="hint-note">On: the spacing uses the whole range this image has, so the difference is easier to hear (up to about 125 ms). Off: the team's exact rule, where real patches differ by only about 44 ms. Turn it off for a test of the team's rule.</p>
+      <p class="hint-note">Off: the team\'s exact rule.</p>
     </div>
     <div class="axis">
-      <label for="difficulty">Rounds <span class="switch-state">how far apart</span></label>
+      <label for="difficulty">Rounds</label>
       <select id="difficulty">
         <option value="easy" selected>Easy: patches far apart</option>
         <option value="medium">Medium</option>
@@ -296,16 +304,15 @@
     </div>
 
     <p class="status" id="status" aria-live="polite">Measuring the NASA image…</p>
-    <p class="sub" id="sub">Listen to the sound, then pick the patch you think made it.</p>
+    <p class="sub" id="sub"></p>
 
     <div class="intro">
       <div>
-        <p><strong>What you are looking at.</strong> The NASA picture draws ocean currents as thin bright streaks. Each patch below is a small window onto the map. The white ticks show which way the streaks run in each part of the window. When the ticks mostly agree, the streaks are lined up. When they point every which way, the water is swirly.</p>
-        <p>The sound is made from how much the ticks agree. Use Hear patch 1 and Hear patch 2 to learn what each one sounds like.</p>
+        <p>White ticks show which way the current streaks run. The sound comes from how much they agree.</p>
       </div>
       <div class="key" aria-hidden="true">
-        <figure><svg viewBox="0 0 150 64" id="keyAgree"></svg><figcaption>Ticks agree: lined up</figcaption></figure>
-        <figure><svg viewBox="0 0 150 64" id="keyScatter"></svg><figcaption>Ticks scatter: swirly</figcaption></figure>
+        <figure><svg viewBox="0 0 150 64" id="keyAgree"></svg><figcaption>Lined up</figcaption></figure>
+        <figure><svg viewBox="0 0 150 64" id="keyScatter"></svg><figcaption>Swirly</figcaption></figure>
       </div>
     </div>
 
@@ -329,8 +336,7 @@
     </div>
 
     <div class="track" id="track">
-      <div class="track-head"><span id="trackLabel">Now playing</span><span id="trackTime">Press New round to hear a sound</span></div>
-      <p class="track-hint">Drag the line, or press the left and right arrow keys, to hear the sound at that point.</p>
+      <div class="track-head"><span id="trackLabel">Now playing</span><span id="trackTime"></span></div>
       <div class="track-lane" id="lane" tabindex="0" role="slider" aria-label="Sound timeline" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" aria-valuetext="Start">
         <svg id="trackSvg" viewBox="0 0 600 64" preserveAspectRatio="none"></svg>
         <span class="playline" id="playline"></span>
@@ -340,7 +346,7 @@
 
     <section class="plot" aria-labelledby="plotTitle">
       <h2 id="plotTitle">Both rhythms, one time line</h2>
-      <p id="plotNote">Appears after you answer, so the screen never gives the answer away.</p>
+      <p id="plotNote">Shows after you answer.</p>
       <div id="plotRows" hidden>
         <div class="plot-row"><b>Patch 1</b><svg id="plot0" viewBox="0 0 600 64" preserveAspectRatio="none" role="img"></svg></div>
         <div class="plot-row"><b>Patch 2</b><svg id="plot1" viewBox="0 0 600 64" preserveAspectRatio="none" role="img"></svg></div>
@@ -351,26 +357,12 @@
 
     <details>
       <summary>How the rhythm is made</summary>
-      <p>Every bit of visible line in a patch votes for its direction. If most lines run the same way,
-        alignment is near 1 and the two pulses in each beat are evenly spaced. If they run every which way,
-        alignment is near 0 and the second pulse comes late: long–short.</p>
-      <p>The white ticks on each patch show which way the visible lines run in each part of it. When most
-        ticks point the same way, the patch is lined up. When they point every which way, it is swirly.</p>
-      <p>Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat. Real patches only span about
-        0.15 to 0.50 alignment, so that moves the pulse by only about 44 ms. With Stretch the pulse spacing
-        on, the game uses where the patch sits in this image's range instead of the raw alignment.</p>
-      <p>The same rule, in more detail: After you answer, the big
-        numerals take a font weight from the alignment: thin means swirly, heavy means lined up. The scale
-        is stretched across the middle 80 % of patches measured in this image: the most swirly tenth all
-        read as weight 200 and the most lined-up tenth as weight 800. The notes use the same scale.</p>
-      <p>Pitch and note length follow alignment too, on a four-octave scale. Lined-up patches play
-        steady, high notes held almost until the next one, so the sound keeps going like a line. Swirly
-        patches play lower notes that jump around in pitch and stop short at random lengths, like lines
-        running every which way. The more swirly the patch, the more the notes jump. That is this game's
-        choice; the team's rule keeps pitch fixed until Dev A decides.</p>
-      <p>The numbers here are a quick practice measurement made in your browser, not the team's checked
-        numbers. The rule is a choice the team made. It describes the picture, not water speed,
-        turbulence or ocean health.</p>
+      <p>Lines that run the same way give alignment near 1: two evenly spaced pulses per beat.
+        Lines that run every which way give alignment near 0: long–short.
+        Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat.</p>
+      <p>In this game, pitch and note length also follow alignment, and Stretch widens the spacing.
+        The team's rule keeps pitch fixed. Numbers here are a quick browser measurement, not the team's.
+        It describes the picture, not water speed or ocean health.</p>
     </details>
   </main>
 </div>
@@ -551,7 +543,20 @@
   // `voices` are the sounds playing now (a patch or the mystery sound), oldest first, at most
   // MAX_VOICES. `loose` holds single notes played by dragging the timeline.
   const MAX_VOICES = 2;
-  let ctx = null, master = null, voices = [], loose = [], timers = [];
+  let ctx = null, master = null, roomSend = null, voices = [], loose = [], timers = [];
+  let roomOut = null, roomBuffer = null, roomLimiter = null;
+  const musical = () => $("musical").checked;
+  const ROOM_LEVEL = 0.22;
+
+  // A short room echo, made from decaying noise, so the notes ring a little like a real instrument.
+  function roomImpulse(seconds) {
+    const len = Math.floor(ctx.sampleRate * seconds), buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    }
+    return buf;
+  }
 
   function ensureAudio() {
     if (!ctx) {
@@ -564,12 +569,233 @@
       limiter.threshold.value = -3; limiter.knee.value = 0; limiter.ratio.value = 20;
       limiter.attack.value = 0.002; limiter.release.value = 0.1;
       master.connect(limiter).connect(ctx.destination);
+      roomBuffer = roomImpulse(1.8);
+      roomLimiter = limiter;
+      freshRoom();
     }
     if (ctx.state === "suspended") ctx.resume();
   }
 
-  // One note: a quick attack, held for `length` seconds, then a short release.
+  // A new echo chain. The old one fades out and is unplugged, so its tail can't ring on.
+  function freshRoom() {
+    if (roomSend) {
+      const oldSend = roomSend, oldOut = roomOut;
+      master.disconnect(oldSend);
+      oldOut.gain.setTargetAtTime(0, ctx.currentTime, 0.03);
+      setTimeout(() => oldOut.disconnect(), 200);
+    }
+    const room = ctx.createConvolver();
+    room.buffer = roomBuffer;
+    roomSend = ctx.createGain();
+    roomSend.gain.value = musical() ? ROOM_LEVEL : 0;
+    roomOut = ctx.createGain();
+    master.connect(roomSend).connect(room).connect(roomOut).connect(roomLimiter);
+  }
+
+  // One note. Timing, pitch and length are set by the caller from the patch's alignment; this only
+  // decides what the note sounds like, the same way for every patch.
   function pulse(t, hz, peak, length, bin = loose) {
+    if (musical()) return musicalPulse(t, hz, peak, length, bin);
+    plainPulse(t, hz, peak, length, bin);
+  }
+
+  // ---------- the music's tone (Musical sound) ----------
+  // One note, made in the browser: a warm, struck tone with rich overtones, played on two strings
+  // tuned a hair apart (a slow shimmer), struck softly (a short knock),
+  // bright at first and mellowing as it rings, and fading on its own the way a struck string does.
+  // Low notes ring longer than high ones. When the key is let go, the damper stops it in about a
+  // fifth of a second, so the note's length is still heard. Louder notes are also brighter.
+  let pianoWave = null, hammerNoise = null;
+  const PIANO_LEVEL = 0.5;
+
+  function pianoNote(t, hz, velocity, length, dest, bin, damper = 0.06) {
+    if (!pianoWave) {
+      const h = [0, 1, 0.6, 0.35, 0.24, 0.14, 0.1, 0.07, 0.045, 0.03, 0.02, 0.014, 0.01];
+      pianoWave = ctx.createPeriodicWave(new Float32Array(h), new Float32Array(h.length));
+      hammerNoise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.05), ctx.sampleRate);
+      const d = hammerNoise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const end = t + Math.max(0.08, length), peak = velocity * PIANO_LEVEL;
+    const ring = Math.min(5, Math.max(0.6, 2.4 * Math.pow(261.63 / hz, 0.6)));   // seconds; low notes ring longer
+    const tone = ctx.createBiquadFilter(), env = ctx.createGain(), pan = ctx.createStereoPanner();
+    tone.type = "lowpass"; tone.Q.value = 0.4;
+    tone.frequency.setValueAtTime(Math.min(18000, hz * (5 + 12 * velocity)), t);
+    tone.frequency.setTargetAtTime(Math.min(9000, hz * 2.5 + 500), t + 0.01, 0.35);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(peak, t + 0.003);
+    env.gain.setTargetAtTime(peak * 0.4, t + 0.003, 0.12);           // the quick drop after the strike
+    if (end > t + 0.35) env.gain.setTargetAtTime(0, t + 0.35, ring);  // then the long, slow fade
+    env.gain.setTargetAtTime(0, end, damper);                        // key let go: the damper
+    pan.pan.value = Math.max(-0.45, Math.min(0.45, 0.25 * Math.log2(hz / 261.63)));   // low left, high right
+    tone.connect(env).connect(pan).connect(dest);
+    [-1.3, 1.3].forEach((cents) => {
+      const o = ctx.createOscillator();
+      o.setPeriodicWave(pianoWave); o.frequency.value = hz; o.detune.value = cents;
+      o.connect(tone);
+      o.start(t); o.stop(end + 8 * damper + 0.05);
+      trackSource(bin, o);
+    });
+    const knock = ctx.createBufferSource(), felt = ctx.createBiquadFilter(), knockEnv = ctx.createGain();
+    knock.buffer = hammerNoise;
+    felt.type = "lowpass"; felt.frequency.value = Math.min(4000, hz * 6);
+    knockEnv.gain.setValueAtTime(peak * 0.06, t);
+    knockEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.02);
+    knock.connect(felt).connect(knockEnv).connect(pan);
+    knock.start(t); knock.stop(t + 0.04);
+    trackSource(bin, knock);
+  }
+
+  // ---------- more instruments (all made in the browser, no recordings) ----------
+  // Same signature as pianoNote: start time, pitch, how hard, how long, where to, and the list that
+  // collects the sources so Stop can silence them. Every instrument stops at the end of `length`
+  // (the damper), so the note's length is still heard.
+  const panFor = (hz) => Math.max(-0.45, Math.min(0.45, 0.25 * Math.log2(hz / 261.63)));
+
+  // Sine partials with their own decay times: the shared engine of the marimba and the music box.
+  function partialsNote(t, hz, velocity, length, dest, bin, damper, level, partials) {
+    const end = t + Math.max(0.08, length), peak = velocity * level;
+    const out = ctx.createGain(), pan = ctx.createStereoPanner();
+    out.gain.setValueAtTime(1, t);
+    out.gain.setTargetAtTime(0, end, damper);                       // key let go: the damper
+    pan.pan.value = panFor(hz);
+    out.connect(pan).connect(dest);
+    partials.forEach(([ratio, amp, decay]) => {
+      if (hz * ratio > 16000) return;
+      const o = ctx.createOscillator(), env = ctx.createGain();
+      o.type = "sine"; o.frequency.value = hz * ratio;
+      env.gain.setValueAtTime(0.0001, t);
+      env.gain.linearRampToValueAtTime(peak * amp, t + 0.002);
+      env.gain.setTargetAtTime(0, t + 0.002, decay);
+      o.connect(env).connect(out);
+      o.start(t); o.stop(end + 8 * damper + 0.05);
+      trackSource(bin, o);
+    });
+  }
+
+  // Marimba: a wooden bar struck with a soft mallet. A strong fundamental, a bar overtone near
+  // four times the pitch that dies fast, and a short knock. Low bars ring a little longer.
+  function marimbaNote(t, hz, velocity, length, dest, bin, damper = 0.06) {
+    const ring = Math.min(1.1, Math.max(0.25, 0.6 * Math.pow(261.63 / hz, 0.5)));
+    partialsNote(t, hz, velocity, length, dest, bin, damper, 0.62,
+      [[1, 1, ring], [3.93, 0.32, ring * 0.22], [9.2, 0.07, ring * 0.08]]);
+  }
+
+  // Music box / bells: a bright metal tine. Bell-like overtones that are not whole multiples of the
+  // pitch, so it chimes, and a long gentle ring.
+  function bellNote(t, hz, velocity, length, dest, bin, damper = 0.06) {
+    const ring = Math.min(2.2, Math.max(0.6, 1.5 * Math.pow(261.63 / hz, 0.3)));
+    partialsNote(t, hz, velocity, length, dest, bin, Math.max(damper, 0.1), 0.42,
+      [[1, 1, ring], [2.76, 0.42, ring * 0.45], [5.4, 0.22, ring * 0.2], [8.93, 0.1, ring * 0.1]]);
+  }
+
+  // Soft synth: two gently detuned saw waves through a warm filter that closes a little after the
+  // start. It holds for the whole note, then fades out quickly.
+  function synthNote(t, hz, velocity, length, dest, bin, damper = 0.06, attack = 0.012, level = 0.3) {
+    const end = t + Math.max(0.08, length), peak = velocity * level;
+    const tone = ctx.createBiquadFilter(), env = ctx.createGain(), pan = ctx.createStereoPanner();
+    tone.type = "lowpass"; tone.Q.value = 0.7;
+    tone.frequency.setValueAtTime(Math.min(12000, hz * 7), t);
+    tone.frequency.setTargetAtTime(Math.min(6000, hz * 3 + 300), t + attack, 0.25);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(peak, t + attack);
+    env.gain.setTargetAtTime(peak * 0.75, t + attack, 0.2);
+    env.gain.setTargetAtTime(0, end, damper * 1.5);
+    pan.pan.value = panFor(hz);
+    tone.connect(env).connect(pan).connect(dest);
+    [-7, 7].forEach((cents) => {
+      const o = ctx.createOscillator();
+      o.type = "sawtooth"; o.frequency.value = hz; o.detune.value = cents;
+      o.connect(tone);
+      o.start(t); o.stop(end + 12 * damper + 0.05);
+      trackSource(bin, o);
+    });
+  }
+
+  const INSTRUMENTS = { piano: pianoNote, marimba: marimbaNote, bells: bellNote, synth: synthNote };
+  const instrumentNote = (...args) => (INSTRUMENTS[$("instrument").value] || pianoNote)(...args);
+
+  // The melody: the patch's own notes, on the chosen instrument. Timing, pitch and length are unchanged.
+  function musicalPulse(t, hz, peak, length, bin) {
+    instrumentNote(t, hz, peak, length, master, bin, 0.07);
+  }
+
+  // ---------- the chords (Musical sound) ----------
+  // Under the melody, chords play a short phrase: C, Am7, Fmaj7, Gsus and home to C,
+  // two beats each (10 beats). Every chord is built only from the melody's own notes (C, D, E, G, A),
+  // so no melody note ever clashes with it, and each chord moves to the next by the smallest step
+  // (C to Am7 keeps all three notes, then one note moves at a time), so the harmony flows instead of
+  // jumping. On the first beat of each chord the bass note sounds with the chord; on the second beat
+  // the chord is touched again, softly. The sustain pedal holds each chord until the next one, so
+  // they connect. Everything lands on the beat, where the melody's first note already is, so it never
+  // blurs where the second note falls; it is the same for every patch, so it carries no answer.
+  // One set of chords is shared by all sounds playing: a sound that joins extends it.
+  const PHRASE = ["C", "C", "Am7", "Am7", "Fmaj7", "Fmaj7", "Gsus", "Gsus", "C", "C"];
+  const CHORDS = {
+    C:     { bass: 65.41, chord: [196.00, 261.63, 329.63] },   // C2;  G3 C4 E4
+    Am7:   { bass: 55.00, chord: [196.00, 261.63, 329.63] },   // A1;  G3 C4 E4 (same hands, new bass)
+    Fmaj7: { bass: 87.31, chord: [220.00, 261.63, 329.63] },   // F2;  A3 C4 E4 (G3 steps up to A3)
+    Gsus:  { bass: 98.00, chord: [196.00, 261.63, 293.66] },   // G2;  G3 C4 D4 (A3 down to G3, E4 down to D4)
+  };
+  let band = null;   // { start, beat, upTo: beats scheduled so far, bus, sources }
+
+  // Schedules the chords' beats up to `until` (audio time), continuing the phrase where it left off.
+  function bandExtend(until) {
+    let last = Math.ceil((until - band.start) / band.beat - 1e-6);
+    if (band.rolling) last += last % 2;   // music kept going: always whole chords, so no bass re-strikes mid-chord
+    for (let b = band.upTo; b < last; b++) {
+      const t = band.start + b * band.beat, ch = CHORDS[PHRASE[b % PHRASE.length]];
+      const first = b % 2 === 0 || b === band.upTo;
+      const beats = first ? Math.min(2 - (b % 2), last - b) : 1, home = b + beats >= last;
+      const held = home ? beats * band.beat + 1.5 : beats * band.beat + 0.04;   // pedal; the home chord rings
+      if (first) {
+        instrumentNote(t, ch.bass * 2, 0.34, held, band.bus, band.sources, 0.12);      // bass
+        instrumentNote(t, ch.bass, 0.22, held, band.bus, band.sources, 0.12);          // and its low octave
+        ch.chord.forEach((hz) => instrumentNote(t, hz, 0.13, held, band.bus, band.sources, 0.12));
+        // The background: a soft held pad of the same chord, swelling in slowly and fading into the
+        // next one. It starts on the beat and makes no new notes in between, so it never marks a time.
+        ch.chord.forEach((hz) => synthNote(t, hz, 0.5, beats * band.beat + 0.3, band.bus, band.sources, 0.25, 0.35, 0.05));
+      } else {
+        ch.chord.forEach((hz) => instrumentNote(t, hz, 0.08, band.beat + 0.04, band.bus, band.sources, 0.12));
+      }
+    }
+    band.upTo = Math.max(band.upTo, last);
+  }
+
+  // "Keep the music playing": after a sound ends the chords roll on, two beats at a time, until
+  // Stop or Esc, so the game sounds like one piece of music. A new sound joins on the band's beat.
+  const keepMusic = () => musical() && $("keepMusic").checked;
+  setInterval(() => {
+    if (!ctx || !band || !keepMusic()) return;
+    band.rolling = true;
+    bandExtend(ctx.currentTime + 3);
+  }, 500);
+
+  // A sound starting from silence starts new chords on its beat; a sound joining one already
+  // playing keeps it going until it ends too.
+  function bandFor(v, joined) {
+    if (!musical()) return;
+    if (!joined || !band) {
+      bandStop(0.05);
+      const bus = ctx.createGain();
+      bus.connect(master);
+      band = { start: v.start, beat: v.beat, upTo: 0, bus, sources: [] };
+    }
+    bandExtend(v.end);
+  }
+
+  function bandStop(seconds) {
+    if (!band) return;
+    const now = ctx.currentTime, g = band.bus.gain;
+    g.setValueAtTime(g.value, now);
+    g.linearRampToValueAtTime(0, now + seconds);
+    band.sources.forEach((o) => { try { o.stop(now + seconds + 0.02); } catch (e) {} });
+    band = null;
+  }
+
+  // Plain sound (Musical sound off): the original test tone. A quick attack, held for `length`
+  // seconds, then a short release.
+  function plainPulse(t, hz, peak, length, bin) {
     const osc = ctx.createOscillator(), env = ctx.createGain();
     const end = t + Math.max(0.06, length);
     osc.type = "triangle";
@@ -582,10 +808,17 @@
     env.gain.exponentialRampToValueAtTime(0.0001, end);
     osc.connect(env).connect(master);
     osc.start(t); osc.stop(end + 0.02);
-    bin.push(osc);
+    trackSource(bin, osc);
   }
 
-  const silence = (list) => list.forEach((s) => { try { s.stop(); } catch (e) {} });
+  const silence = (list) => [...list].forEach((s) => { try { s.stop(); } catch (e) {} });
+
+  // Keeps a source in its list only while it plays: a finished note removes itself, so the rolling
+  // music ("Keep the music playing") does not pile up sources until Stop.
+  function trackSource(bin, node) {
+    bin.push(node);
+    node.onended = () => { const i = bin.indexOf(node); if (i >= 0) bin.splice(i, 1); };
+  }
 
   function stopVoice(v) {
     silence(v.sources);
@@ -595,6 +828,8 @@
   function stopAll() {
     voices.forEach((v) => silence(v.sources)); voices = [];
     silence(loose); loose = [];
+    bandStop(0.05);
+    if (ctx) freshRoom();
     timers.forEach(clearTimeout); timers = [];
     cancelAnimationFrame(anim);
     $("track").querySelectorAll(".note.live").forEach((r) => r.classList.remove("live"));
@@ -614,7 +849,8 @@
     const again = voices.find((v) => v.key === key);
     if (again) stopVoice(again);
     while (voices.length >= MAX_VOICES) stopVoice(voices[0]);
-    const anchor = voices[0] || null;
+    // With the music kept playing and no sound on, the rolling chords are the beat to join.
+    const anchor = voices[0] || (band && keepMusic() ? band : null);
     let beat = BEAT_S / SPEEDS[Number($("speed").value)], start = now + 0.1;
     if (anchor && $("grooveLock").checked) {
       beat = anchor.beat;
@@ -624,6 +860,7 @@
     notesFor(p, variant).forEach((n) =>
       pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat, v.sources));
     voices.push(v);
+    bandFor(v, anchor && $("grooveLock").checked ? anchor : null);
     followVoices();
     return { v, joined: anchor };
   }
@@ -804,12 +1041,12 @@
   function drawPlot(left, right) {
     drawRow($("plot0"), left, 1); drawRow($("plot1"), right, 2);
     $("plotRows").hidden = false; $("plotLegend").hidden = false;
-    $("plotNote").textContent = "Each bar is a note: higher up is a higher note, longer is held longer. Steady, long, high bars: lined up. Jumpy, short, low bars: swirly.";
+    $("plotNote").textContent = "Each bar is a note. Steady, long, high: lined up. Jumpy, short, low: swirly.";
   }
 
   function clearPlot() {
     $("plotRows").hidden = true; $("plotLegend").hidden = true;
-    $("plotNote").textContent = "Appears after you answer, so the screen never gives the answer away.";
+    $("plotNote").textContent = "Shows after you answer.";
   }
 
   function setStatus(text) {
@@ -861,7 +1098,7 @@
     clearPlot();
     $("replay").disabled = false;
     $("hear0").disabled = false; $("hear1").disabled = false;
-    $("sub").textContent = "Listen to the mystery sound. Use Hear patch 1 and Hear patch 2 to learn how each patch sounds (press both to hear them together), then pick the patch that made the mystery sound.";
+    $("sub").textContent = "Compare with Hear patch 1 and 2, then pick.";
     playRound("Which patch made this sound? Press 1 or 2.", true);
   }
 
@@ -903,7 +1140,7 @@
 
     const kind = target.alignment > shown[1 - answer].alignment ? "higher, longer and more even" : "lower, shorter and more long–short";
     setStatus((correct ? "Right. " : "Not this time. ") + `Patch ${answer + 1} made this sound: it was the ${kind} one.`);
-    $("sub").textContent = "Thin numeral: swirly lines. Heavy numeral: lined-up lines. Press P for the next round.";
+    $("sub").textContent = "Thin number: swirly. Heavy: lined up.";
     updateScore();
     $("newRound").focus();
   }
@@ -936,6 +1173,17 @@
   $("showLines").addEventListener("change", () => { if (shown) [0, 1].forEach((s) => drawPatch(s, shown[s])); });
   ["rhythmOnly", "stretchTiming"].forEach((id) =>
     $(id).addEventListener("change", () => { if (shown && guessed) drawPlot(shown[0], shown[1]); }));
+  $("musical").addEventListener("change", (e) => {
+    if (!ctx) return;
+    roomSend.gain.setTargetAtTime(e.target.checked ? ROOM_LEVEL : 0, ctx.currentTime, 0.05);
+    if (!e.target.checked) bandStop(0.2);   // switched on mid-sound, the band joins from the next sound
+  });
+  $("rhythmOnly").addEventListener("change", (e) => {
+    if (e.target.checked && $("musical").checked) {
+      $("musical").checked = false;
+      $("musical").dispatchEvent(new Event("change"));
+    }
+  });
   $("hear0").addEventListener("click", () => playPatch(0));
   $("hear1").addEventListener("click", () => playPatch(1));
   $("showNotes").addEventListener("change", (e) => $("track").classList.toggle("hide-notes", !e.target.checked));
@@ -987,7 +1235,7 @@
       $("newRound").disabled = pool.length < 2;
       if (pool.length < 2) { setStatus("Not enough usable ocean patches were found in this image."); return; }
       setStatus("Ready. Press New round to hear a sound.");
-      $("sub").textContent = `${pool.length} ocean patches measured. ${result.onLand} touched land and ${result.missing} were too blank, so they are left out.`;
+      $("sub").textContent = `${pool.length} ocean patches measured.`;
     }, 30);
   }
   if (world.complete && world.naturalWidth) onImage();
