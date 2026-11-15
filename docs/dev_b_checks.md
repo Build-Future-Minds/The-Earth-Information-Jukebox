@@ -1,7 +1,9 @@
 # Developer B: evidence of the main checks
 
 The checks come from `docs/roles/developer-b.md`. Each row says how it was tested and what was
-observed. Practice data only (`fixtures/mock/`). **Not yet tested on real NASA material.**
+observed. Updated Sat 14 Nov, 3:30 PM. The app runs on **real NASA data** (`data/`, PR #8). The
+browser tests run on the practice data (`fixtures/mock/`), because their expected rhythms come
+from it, and the real data was checked in the browser by hand (below).
 
 Run on 14 Nov 2026 with Chrome via Playwright (automated browser) on macOS, dev build and
 production build.
@@ -10,8 +12,8 @@ production build.
 
 ```bash
 cd web
-npm test            # unit tests (32)
-npm run test:e2e    # browser tests (20), real key presses; first time: npx playwright install chromium
+npm test            # unit tests (67)
+npm run test:e2e    # browser tests (26), real key presses; first time: npx playwright install chromium
 ```
 
 Both run automatically on every pull request (`.github/workflows/ci.yml`). The browser tests
@@ -43,8 +45,30 @@ the log; that was checked below.
 | Speed changes tempo, not the rhythm's shape | 0.5×: beat length and the split within each beat | **Pass.** Beat 1.000 s; split equals the rule (0.682/0.682, 0.667/0.667, 0.688/0.688) |
 | Works with Wi-Fi off | Production build (`npm run preview`); all network requests listed; bundle scanned for URLs | **Pass (local).** Only `localhost` requests plus one in-memory audio worklet. The bundle's URLs are XML namespaces and error-message links, none fetched. **Still to do:** a real Wi-Fi-off run on the demo laptop |
 | Test log absent in production | `window.__earthNotes` in the production build | **Pass.** Not present |
-| Setup instructions work from a clean copy | Fresh clone → `npm ci && npm test && npm run build` | **Pass** for Dev B. **Still to do:** Student A follows `web/README.md` alone |
-| Unit tests | `npm test` | **Pass, 19/19** |
+| Setup instructions work from a clean copy | Fresh clone → `npm ci && npm test && npm run build` | **Pass**: Dev B, GitHub's clean machine on every PR, and **Student A on their own** (npm ci, test, build, dev and preview all worked) |
+| Unit tests | `npm test` | **Pass, 67** (1 skipped placeholder) |
+| App plays exactly what the engine computed | `rhythmReference.test.ts`: every Earth note against Dev A's `data/rhythm_reference.json` | **Pass.** All notes match within 0.1 ms. Moving one real pulse by 20 ms makes it fail |
+
+## Real NASA data (PR #8): checked in the browser
+
+| Check | Result |
+| --- | --- |
+| Circles in the right places on frame 23000 | **Pass.** Region A Kuroshio (east of Japan), Region B Equatorial Pacific |
+| PRACTICE banner gone; NASA credit under the image and in the footer | **Pass** |
+| Replay gives the same rhythm | **Pass.** Identical note times and values |
+| Rhythm and explanation | Region A 73/27 "short–long", Region B 58/42 "slight lilt"; the comparison line says which is more even |
+| Missing information | Can't be checked on real data, because no real frame is missing. Covered by the practice-data tests |
+
+## Student B's visuals in the app (PRs #13, #17, #19): automated in `web/e2e/visuals.e2e.ts`
+
+| Check | Result |
+| --- | --- |
+| Beat lane idle until Start, then follows the audio clock | **Pass.** The playhead advances with the sound and pulses light up as they play |
+| Clicking the lane moves playback | **Pass.** Click at 60% of a 4 s loop → the next pulse is the one at 2.5 s |
+| Arrow keys / Home on the lane step through beats | **Pass** |
+| Both rhythms on one time line, from the same code as the sound | **Pass.** Practice data shows 2 missing beats; real data 73/27 against 58/42 |
+| Close-ups: line ticks match the picture | **Pass** on test pictures (horizontal, vertical and diagonal lines, blank, inside the circle only: `lineTicks.test.ts`). On real data Region A's 52 ticks scatter and Region B's 52 run parallel |
+| Listen buttons and the game launch section | **Pass.** Listen picks and plays a region; the game links point to `tools/` |
 
 ## Optional melody (branch `devb/melody`): automated in `web/e2e/melody.e2e.ts` and `src/audio/userVoice.test.ts`
 
@@ -79,13 +103,18 @@ were missed by the first round of browser tests:
    first tap could start a note after its release. Fix: the melody voice now tracks which input
    holds each note, releases notes one by one, and gives each press a token.
    Each case is now a unit test, and two were confirmed by putting the bug back.
-5. **Page-wide `1`/`2` shortcuts did not meet WCAG 2.1.4.** Found while designing the melody keys;
+5. **Note length could carry data on short beats** (Dev A's catch). For beats shorter than about
+   0.36 s the pulse length depended on `long_fraction`. It is now the same for every alignment
+   (`earthVoice.test.ts`).
+6. **Page-wide `1`/`2` shortcuts did not meet WCAG 2.1.4.** Found while designing the melody keys;
    now active only on the Region choice. Focus also moves to the chosen region, so arrow keys
    continue from it.
 
 ## Not tested yet
 
-- Real NASA scene and features (Checkpoint 2)
-- Listening by ear on the demo machine's speakers, Safari and Firefox
-- Screen readers: Student B's log in `docs/ACCESSIBILITY_LOG.md`
+- **Whether people can hear the difference.** The quiz player and pass mark (9 of 10) are ready
+  (`docs/ACCESSIBILITY_LOG.md`), but there are no sessions yet
+- Screen readers, including the new beat lane (a slider) and the close-ups (canvases): Student B's log
+- The demo laptop: speakers, a Wi-Fi-off run of `npm run preview`
+- Safari and Firefox; touch dragging on the beat lane
 - A person outside the team trying the core steps (Checkpoint 3)
