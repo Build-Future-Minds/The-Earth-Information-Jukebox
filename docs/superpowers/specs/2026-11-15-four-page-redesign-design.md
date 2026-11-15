@@ -72,7 +72,10 @@ be clear at a glance: **more buttons, less text, and every visual explains itsel
   becomes "<View> · Earth Sonata". Scroll goes to the top.
 - **Page links sit in the rail under the title, on every view.** The current view's link is marked
   with `aria-current="page"`, shown with weight and the signal underline. Tab order on Listen:
-  page links, then Start. This replaces DESIGN.md's "Start is the first Tab stop".
+  page links, then the picture choice (only when there are two sources), then Play. This replaces
+  DESIGN.md's "Start is the first Tab stop". *(Dev B's call: Tab order follows the screen order.)*
+- **The spoken status line and the missing-data warning live in the shared shell,** on every view,
+  because sound can start on Compare and Play along too. *(Dev B's call, for goal 7.)*
 - The theme switch from #34 stays at the bottom of the rail on every view.
 
 ### Sources (Ocean / Aerosols)
@@ -121,8 +124,10 @@ be clear at a glance: **more buttons, less text, and every visual explains itsel
 
 - Rail: title, page links, source choice, theme switch.
 - Main: for each region of the chosen source, side by side: the enlarged close-up with direction
-  ticks, the giant weighted numeral (DESIGN.md "Weight Is the Value"), the alignment value, and a
-  ▶ button that plays that region from this view.
+  ticks, the giant weighted numeral (DESIGN.md "Weight Is the Value"), the alignment value, a
+  ▶ / ■ toggle that plays or stops that region from this view, and the region's rhythm row (its
+  pulses on the shared clock), so picture, number and rhythm line up. *(Dev B's call: the rows stay,
+  as the planning page's items 12 and 13 say.)*
 - Below: #34's tide table and tide curves for the chosen source. A one-frame source draws **one dot
   per region labelled "one moment"**, no line.
 - No paragraphs. The close-up note about "Dev A's measurement (features.json)" goes.
@@ -169,15 +174,18 @@ section for each of the four views.
   - The visuals tests move to the view that now shows each thing.
   - "First Tab reaches Start" becomes "page links, then Start".
 - Browser (new): page links switch views and change the URL; a view change stops the sound; Esc
-  still stops everywhere; Aerosols shows C and D with neutral styling and no ocean numbers; Compare
-  shows the tide table for the chosen source only.
+  still stops everywhere; Compare shows the tide table and a play toggle per region.
+- Browser tests always run on the practice data (one source), so the aerosol rules (C and D, neutral
+  style, no cross-source comparison, one-frame loop) are proven by unit tests. *(Dev B's call.)*
 
 ## Order of work
 
 0. **Blocking:** Student B moves #34's app part to `main` (steps already sent).
-1. DESIGN.md additions PR (Dev B; Student B reviews). It can start now.
-2. Shared sources module, letters, styles, the no-cross-comparison test (Dev B).
-3. View shell: hash views, page links, stop on view change, focus and title (Dev B).
+1. Now, on `main`: the shared sources module (letters, styles, no-cross-comparison test, aerosol
+   contract test) and views from the hash (Dev B).
+2. After the split lands (the Tide Table DESIGN.md is in it): view shell (page links, stop on view
+   change, focus and title, status line in the shell).
+3. Icon buttons and the DESIGN.md additions (Dev B; Student B reviews).
 4. Listen. 5. Compare. 6. How it's made. 7. Play along with the lazy globe (Dev B).
 8. Browser tests updated and added (Dev B).
 9. Student B's content drops in when ready (Explain picture, N1 strip, title line, numerals, game
