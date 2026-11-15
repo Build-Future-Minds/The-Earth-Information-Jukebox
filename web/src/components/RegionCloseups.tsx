@@ -3,7 +3,8 @@ import type { CSSProperties } from 'react';
 // Each region circle is shown enlarged from the NASA preview frame, with white-over-black ticks for
 // the line directions (illustration: lineTicks.ts) and a giant numeral whose weight is the region's
 // alignment in this frame (DESIGN.md). The letter takes the region's colour; the ticks stay black and white.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { shapeWord } from './compare';
 import { longFraction } from '../audio/earthVoice';
 import { lineTicks, type Tick } from '../data/lineTicks';
 import type { Features, Region, Scene } from '../data/types';
@@ -19,6 +20,8 @@ interface Props {
   /** True while the Earth voice plays; the current region's button then stops it. */
   playing: boolean;
   onStop: () => void;
+  /** Each region's rhythm row, drawn under its card (Compare). */
+  rowFor?: (regionId: string) => ReactNode;
   /** First letter and neutral style of this picture's regions. */
   look?: RegionLook;
 }
@@ -27,7 +30,7 @@ const SCALE = 3; // canvas pixels per image pixel
 const CELL = 15; // tick cell, in image pixels
 const TICK_LEN = 30; // canvas pixels
 
-export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, playing, onStop, look = {} }: Props) {
+export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, playing, onStop, rowFor, look = {} }: Props) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   useEffect(() => {
     if (!imageUrl) return;
@@ -41,8 +44,7 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, 
   const frameNote = scene.frames.timestamps?.[0] ? `model time ${scene.frames.timestamps[0]}` : 'first frame';
 
   return (
-    <section className="closeups" aria-labelledby="closeups-title">
-      <h2 id="closeups-title">The two regions, up close</h2>
+    <section className="closeups" aria-label="The two regions, up close">
       <div className="pair">
         {scene.regions.map((r) => (
           <Closeup
@@ -59,12 +61,13 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, 
             onListen={() => onListen(r.id)}
             live={playing && r.id === regionId}
             onStop={onStop}
+            badge={regionLabel(scene.regions, r.id, look.firstLetter).replace('Region ', '')}
+            row={rowFor?.(r.id)}
           />
         ))}
       </div>
-      <p className="muted small">
-        Ticks are drawn in your browser; the rhythm uses Dev A&apos;s measurement of every frame.
-      </p>
+      {/* Student B: the key appears once on the page. */}
+      <p className="numeral-key">thin = swirly · heavy = lined up</p>
     </section>
   );
 }
@@ -82,9 +85,11 @@ interface CloseupProps {
   onListen: () => void;
   live: boolean;
   onStop: () => void;
+  badge: string;
+  row?: ReactNode;
 }
 
-function Closeup({ region, label, colour, step, image, frameWidth, threshold, current, frameNote, onListen, live, onStop }: CloseupProps) {
+function Closeup({ region, label, colour, step, image, frameWidth, threshold, current, frameNote, onListen, live, onStop, badge, row }: CloseupProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ticks, setTicks] = useState<Tick[]>([]);
   const [x0, y0, w, h] = region.box_px;
@@ -126,37 +131,38 @@ function Closeup({ region, label, colour, step, image, frameWidth, threshold, cu
   const a = ok ? step!.alignment : null;
   return (
     <figure className={current ? 'patch current' : 'patch'} style={colour}>
-      <canvas
-        ref={canvasRef}
-        width={w * SCALE}
-        height={h * SCALE}
-        role="img"
-        aria-label={
-          image
-            ? `${label}, ${region.name}, enlarged with ${ticks.length} line-direction ticks.`
-            : `${label}: no picture available for practice data.`
-        }
-      />
-      <span className="numeral" aria-hidden="true" style={{ fontWeight: a === null ? 500 : weightFor(a) }}>
-        {label.replace('Region ', '')}
-      </span>
-      <div className="patch-readout">
-        <span className="value">
-          {a === null ? '–' : a.toFixed(2)}
-          <small>alignment</small>
-        </span>
-        <span>
-          <span className="nw">{a === null ? 'missing in this frame' : `second pulse at ${Math.round(longFraction(a) * 100)}%`}</span>
-          <br />
-          {/* "model time" may wrap; the timestamp itself never breaks. */}
-          {frameNote.split(' ').slice(0, -1).join(' ')} <span className="nw">{frameNote.split(' ').slice(-1)[0]}</span>
-        </span>
+      <figcaption className="patch-head">
+        <span className="region-badge" aria-hidden="true">{badge}</span>
+        <b>{region.name}</b>
+        <span className="muted small">{frameNote}</span>
+      </figcaption>
+      <div className="patch-body">
+        <canvas
+          ref={canvasRef}
+          width={w * SCALE}
+          height={h * SCALE}
+          role="img"
+          aria-label={
+            image
+              ? `${label}, ${region.name}, enlarged with ${ticks.length} line-direction ticks.`
+              : `${label}: no picture available for practice data.`
+          }
+        />
+        <div className="patch-info">
+          {/* Student B's numeral: the alignment, its weight from 200 (swirly) to 800 (lined up). */}
+          <span className={a === null ? 'numeral missing' : 'numeral'} style={{ fontWeight: a === null ? 500 : weightFor(a) }}>
+            {a === null ? 'no data' : a.toFixed(2)}
+          </span>
+          <span className="patch-word">
+            {a === null ? 'Missing in this frame, never shown as a number' : `${shapeWord(a)} · second pulse at ${Math.round(longFraction(a) * 100)}% of the beat`}
+          </span>
+          {/* A toggle, so Compare has a visible Stop: Esc alone is no help on a phone. */}
+          <button type="button" className="hear" onClick={live ? onStop : onListen} aria-pressed={live}>
+            {live ? `Stop ${label}` : `Listen to ${label}`}
+          </button>
+        </div>
       </div>
-      {/* A toggle, so Compare has a visible Stop: Esc alone is no help on a phone. */}
-      <button type="button" className="hear" onClick={live ? onStop : onListen} aria-pressed={live}>
-        {live ? `Stop ${label}` : `Listen to ${label}`}
-      </button>
-      <figcaption className="where">{region.name}</figcaption>
+      {row}
     </figure>
   );
 }

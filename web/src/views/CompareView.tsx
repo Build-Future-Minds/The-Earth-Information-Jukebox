@@ -2,7 +2,8 @@
 // curves, for the current picture only. Task 8 lays these out per region.
 import type { PlayState } from '../audio/transport';
 import { RegionCloseups } from '../components/RegionCloseups';
-import { RhythmsPlot } from '../components/RhythmsPlot';
+import { RhythmRow, RhythmsPlot } from '../components/RhythmsPlot';
+import { buildEarthTrack } from '../audio/earthVoice';
 import type { RegionLook } from '../components/ExploreControls';
 import type { Features, Scene } from '../data/types';
 
@@ -19,10 +20,15 @@ interface Props {
 }
 
 export function CompareView(p: Props) {
+  // Every row on one clock: the longest region's loop.
+  const length = Math.max(...p.scene.regions.map((r) => buildEarthTrack(p.features, r.id).length));
   return (
     <>
       <RegionCloseups scene={p.scene} features={p.features} imageUrl={p.imageUrl} regionId={p.regionId} onListen={p.onListen}
-        playing={p.playState === 'playing'} onStop={p.onStop} look={p.look} />
+        playing={p.playState === 'playing'} onStop={p.onStop} look={p.look}
+        rowFor={(id) => (
+          <RhythmRow features={p.features} regions={p.scene.regions} regionId={id} activeRegionId={p.regionId} look={p.look} length={length} />
+        )} />
       <RhythmsPlot
         features={p.features}
         regions={p.scene.regions}
@@ -30,6 +36,7 @@ export function CompareView(p: Props) {
         playState={p.playState}
         getPosition={p.getPosition}
         look={p.look}
+        showRows={false}
       />
     </>
   );
