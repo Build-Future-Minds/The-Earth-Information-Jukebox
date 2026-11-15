@@ -78,7 +78,7 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 - [x] **SA** `analysis/test_prepare_scene.py`: a good input, a bad file (actionable error), an unusable frame (kept in place, marked missing with a reason) — *11 tests pass; needs review*
 - [x] **A** All six test cases in `mapping_spec.md` pass; results in `science_review.md` — *practice images; on `a/math-engine`*
 - [ ] **A + SA** Checked measurements for both regions — *`data/features.json`: means 0.672 and 0.072, 30 of 30 frames ok, timestamps match NASA's dates file (`science_review.md` section 10); Student A still to go through them with Dev A*
-- [ ] **B** Real material in the app; missing information shows a message and silences the Earth voice; replay gives the same rhythm — *real files in Dev A's PR; the app's tests pass on them; Dev B to check in the browser*
+- [x] **B** Real material in the app; missing information shows a message and silences the Earth voice; replay gives the same rhythm — *real data live (PR #8), checked in the browser by Dev B; missing info and replay covered by tests (`docs/dev_b_checks.md`)*
 - [ ] **SB** Region, replay, stop and explanation controls, reviewed with Dev B
 - [ ] **SB** Listening questions exclude ties, weak differences and missing information — *built and tested on practice cases, not pushed*
 - [ ] **B** Record a backup capture of the working app with its actual sound
@@ -91,7 +91,7 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 - [ ] **SB** Keyboard and screen-reader checks logged in `docs/ACCESSIBILITY_LOG.md`
 - [x] **SA** 7-slide backup deck drafted from `docs/submission/slides_7.md` — *slides 1, 2, 3 and 7 drafted; 4, 5, 6 wait on the rule wording (Dev A), app screenshot (Dev B) and test counts (Student B); team name from Mr. E*
 - [ ] **SB** Detailed description drafted in `docs/submission/project_page_draft.md`
-- [x] **B** After the core passes: optional keyboard melody with its own volume. MIDI only after that. — *melody in PR #4, needs review; MIDI not built*
+- [x] **B** After the core passes: optional keyboard melody with its own volume. MIDI only after that. — *melody merged in PR #4 (Earth rhythm proven unchanged); MIDI not built, recommend skipping*
 
 ## Checkpoint 3 — Rehearse it (Sun 2:00 PM) — feature freeze
 
