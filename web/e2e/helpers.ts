@@ -21,9 +21,9 @@ export async function openApp(page: Page, view: 'listen' | 'compare' | 'how' | '
   await expect(page.getByRole('heading', { name: /Earth Sonata/ })).toBeVisible();
 }
 
-/** Start playback with the keyboard: focus Start, press Enter. (Tab order has its own test.) */
+/** Start playback with the keyboard: focus Play, press Enter. (Tab order has its own test.) */
 export async function startWithKeyboard(page: Page) {
-  await page.getByRole('button', { name: 'Start' }).focus();
+  await page.getByRole('button', { name: 'Play', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('status')).toHaveText(/Playing/);
 }

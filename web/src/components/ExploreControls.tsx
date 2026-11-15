@@ -1,4 +1,6 @@
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
+import { IconButton } from './IconButton';
+import { ExplainIcon, PauseIcon, PlayIcon, ReplayIcon, SoundIcon, StopIcon } from './icons';
 // Owner: Student B (v1 by Dev B — refine wording, order and labels; review together).
 // Real <button>s and form controls only, so everything works with Tab / Enter / Space.
 import type { Region } from '../data/types';
@@ -22,6 +24,11 @@ interface Props {
 }
 
 export const SPEEDS = [0.5, 0.75, 1, 1.25];
+/** Speed buttons say ½× ¾× 1× 1¼×, not decimals. */
+export const SPEED_LABEL: Record<number, string> = { 0.5: '½×', 0.75: '¾×', 1: '1×', 1.25: '1¼×' };
+
+/** Volume as a share of the slider, for screen readers; no decibel numbers on screen. */
+export const volumeText = (db: number) => `${Math.round(((db + 36) / 36) * 100)}%`;
 
 /** A region's colour token: Region A violet, Region B rose (styles.css). */
 export function regionColour(regions: Region[], id: string): string {
@@ -42,21 +49,19 @@ export function regionLabel(regions: Region[], id: string, firstLetter = 'A'): s
 
 export function ExploreControls(p: Props) {
   const playing = p.playState === 'playing';
+  const [soundOpen, setSoundOpen] = useState(false);
   return (
     <section className="controls" aria-label="Playback controls">
-      <div className="row">
+      <div className="row icon-row">
         {playing ? (
-          <button type="button" onClick={p.onPause}>Pause</button>
+          <IconButton icon={PauseIcon} label="Pause" onClick={p.onPause} />
         ) : (
-          <button type="button" onClick={p.onStart} className="primary">
-            {p.playState === 'paused' ? 'Resume' : 'Start'}
-          </button>
+          <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary />
         )}
-        <button type="button" onClick={p.onStop}>Stop <kbd>Esc</kbd></button>
-        <button type="button" onClick={p.onReplay}>Replay</button>
-        <button type="button" onClick={p.onExplain} aria-expanded={p.explaining}>
-          Explain this rhythm
-        </button>
+        <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" />
+        <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />
+        <IconButton icon={ExplainIcon} label="Explain" onClick={p.onExplain} expanded={p.explaining} />
+        <IconButton icon={SoundIcon} label="Sound" onClick={() => setSoundOpen((o) => !o)} expanded={soundOpen} controls="sound-settings" />
       </div>
 
       <fieldset className="row region-group">
@@ -79,19 +84,17 @@ export function ExploreControls(p: Props) {
         ))}
       </fieldset>
 
-      <div className="row">
-        <label>
-          Speed{' '}
-          <select value={p.speed} onChange={(e) => p.onSpeed(Number(e.target.value))}>
-            {SPEEDS.map((s) => (
-              <option key={s} value={s}>{s}×</option>
-            ))}
-          </select>
-        </label>
+      <div id="sound-settings" className="sound-settings" hidden={!soundOpen}>
+        <div className="row" role="group" aria-label="Speed">
+          {SPEEDS.map((v) => (
+            <button key={v} type="button" className="speed" aria-pressed={p.speed === v} onClick={() => p.onSpeed(v)}>
+              {SPEED_LABEL[v]}
+            </button>
+          ))}
+        </div>
         <label className="range">
           <span className="range-row">
-            <span>Earth volume</span>
-            <span className="readout" aria-hidden="true">{p.volumeDb} dB</span>
+            <span>Volume</span>
           </span>
           <input
             type="range"
@@ -100,7 +103,7 @@ export function ExploreControls(p: Props) {
             step={1}
             value={p.volumeDb}
             onChange={(e) => p.onVolume(Number(e.target.value))}
-            aria-valuetext={`${p.volumeDb} decibels`}
+            aria-valuetext={volumeText(p.volumeDb)}
           />
         </label>
       </div>

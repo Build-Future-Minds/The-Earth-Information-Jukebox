@@ -16,13 +16,16 @@ interface Props {
   imageUrl: string | null;
   regionId: string;
   onListen: (regionId: string) => void;
+  /** True while the Earth voice plays; the current region's button then stops it. */
+  playing: boolean;
+  onStop: () => void;
 }
 
 const SCALE = 3; // canvas pixels per image pixel
 const CELL = 15; // tick cell, in image pixels
 const TICK_LEN = 30; // canvas pixels
 
-export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }: Props) {
+export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, playing, onStop }: Props) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   useEffect(() => {
     if (!imageUrl) return;
@@ -52,6 +55,8 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }
             current={r.id === regionId}
             frameNote={frameNote}
             onListen={() => onListen(r.id)}
+            live={playing && r.id === regionId}
+            onStop={onStop}
           />
         ))}
       </div>
@@ -73,9 +78,11 @@ interface CloseupProps {
   current: boolean;
   frameNote: string;
   onListen: () => void;
+  live: boolean;
+  onStop: () => void;
 }
 
-function Closeup({ region, label, colour, step, image, frameWidth, threshold, current, frameNote, onListen }: CloseupProps) {
+function Closeup({ region, label, colour, step, image, frameWidth, threshold, current, frameNote, onListen, live, onStop }: CloseupProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ticks, setTicks] = useState<Tick[]>([]);
   const [x0, y0, w, h] = region.box_px;
@@ -143,8 +150,9 @@ function Closeup({ region, label, colour, step, image, frameWidth, threshold, cu
           {frameNote.split(' ').slice(0, -1).join(' ')} <span className="nw">{frameNote.split(' ').slice(-1)[0]}</span>
         </span>
       </div>
-      <button type="button" className="hear" onClick={onListen} aria-pressed={current}>
-        {current ? `Listening to ${label}` : `Listen to ${label}`}
+      {/* A toggle, so Compare has a visible Stop: Esc alone is no help on a phone. */}
+      <button type="button" className="hear" onClick={live ? onStop : onListen} aria-pressed={live}>
+        {live ? `Stop ${label}` : `Listen to ${label}`}
       </button>
       <figcaption className="where">{region.name}</figcaption>
     </figure>

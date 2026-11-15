@@ -13,12 +13,14 @@ interface Props {
   playState: PlayState;
   getPosition: () => number;
   onListen: (regionId: string) => void;
+  onStop: () => void;
 }
 
 export function CompareView(p: Props) {
   return (
     <>
-      <RegionCloseups scene={p.scene} features={p.features} imageUrl={p.imageUrl} regionId={p.regionId} onListen={p.onListen} />
+      <RegionCloseups scene={p.scene} features={p.features} imageUrl={p.imageUrl} regionId={p.regionId} onListen={p.onListen}
+        playing={p.playState === 'playing'} onStop={p.onStop} />
       <RhythmsPlot
         features={p.features}
         regions={p.scene.regions}

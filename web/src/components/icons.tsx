@@ -1,0 +1,25 @@
+// Line icons for the icon buttons (DESIGN.md "Icon button"): 20px, drawn in currentColor so they
+// follow the button's ink in both themes. Decorative only: the visible word names the button.
+import type { ReactNode } from 'react';
+
+function Icon({ children }: { children: ReactNode }) {
+  return (
+    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      {children}
+    </svg>
+  );
+}
+
+export const PlayIcon = () => <Icon><path d="M6 4l10 6-10 6z" /></Icon>;
+export const PauseIcon = () => <Icon><path d="M7 4v12M13 4v12" /></Icon>;
+export const StopIcon = () => <Icon><rect x="4.5" y="4.5" width="11" height="11" rx="1" /></Icon>;
+export const ReplayIcon = () => <Icon><path d="M4 10a6 6 0 1 0 1.8-4.3M4 3v3.5h3.5" /></Icon>;
+export const ExplainIcon = () => (
+  <Icon>
+    <circle cx="10" cy="10" r="7.5" />
+    <path d="M7.8 8a2.3 2.3 0 1 1 3.3 2c-.7.4-1.1.8-1.1 1.6" />
+    <path d="M10 14.2v.1" />
+  </Icon>
+);
+export const SoundIcon = () => <Icon><path d="M3 8h3l4-3v10l-4-3H3zM13.5 7.5a3.5 3.5 0 0 1 0 5M15.8 5.2a6.8 6.8 0 0 1 0 9.6" /></Icon>;

@@ -56,14 +56,14 @@ for (const view of ['listen', 'play'] as const) {
   });
 }
 
-test('Tab order on Listen: page links, then Start, and Enter starts', async ({ page }) => {
+test('Tab order on Listen: page links, then Play, and Enter starts', async ({ page }) => {
   await openApp(page);
   for (const name of ['Listen', 'Compare', "How it's made", 'Play along']) {
     await page.keyboard.press('Tab');
     await expect(pages(page).getByRole('link', { name })).toBeFocused();
   }
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('button', { name: 'Start' })).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('status')).toHaveText(/Playing/);
   await notesAfter(page, 0, 2);
@@ -73,4 +73,17 @@ test('status line on every view', async ({ page }) => {
   await openApp(page, 'play');
   await startWithKeyboard(page);
   await expect(page.getByRole('status')).toHaveText(/Playing Region A/);
+});
+
+test('on Compare, the playing region\'s button stops it (no keyboard needed)', async ({ page }) => {
+  await openApp(page, 'compare');
+  await page.getByRole('button', { name: 'Listen to Region B' }).click();
+  await expect(page.getByRole('status')).toHaveText(/Playing Region B/);
+  const stopB = page.getByRole('button', { name: 'Stop Region B' });
+  await expect(stopB).toHaveAttribute('aria-pressed', 'true');
+  await stopB.click();
+  await expect(page.getByRole('status')).toHaveText(/Stopped/);
+  await settle(page);
+  expect(await earthPeakAhead(page)).toBeLessThan(0.05);
+  await expect(page.getByRole('button', { name: 'Listen to Region B' })).toHaveAttribute('aria-pressed', 'false');
 });

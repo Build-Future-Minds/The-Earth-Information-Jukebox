@@ -217,6 +217,7 @@ export function App() {
               playState={playState}
               getPosition={getPosition}
               onListen={listenTo}
+              onStop={stop}
             />
           )}
           {view === 'how' && <HowView scene={scene} />}
