@@ -194,14 +194,26 @@ export class GlobeRenderer {
   private count: number;
   private texture: WebGLTexture | null = null;
   private loc: Record<string, WebGLUniformLocation | null>;
+  private buffers: WebGLBuffer[] = [];
+  private shaders: WebGLShader[] = [];
 
   constructor(private canvas: HTMLCanvasElement) {
     const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
     if (!gl) throw new Error('This browser cannot draw the 3D globe (WebGL2 is off or not supported).');
     this.gl = gl;
+    const shader = (type: number, source: string) => {
+      const s = compile(gl, type, source);
+      this.shaders.push(s);
+      return s;
+    };
+    const buffer = () => {
+      const b = gl.createBuffer()!;
+      this.buffers.push(b);
+      return b;
+    };
     const program = gl.createProgram()!;
-    gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, VERTEX));
-    gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, FRAGMENT));
+    gl.attachShader(program, shader(gl.VERTEX_SHADER, VERTEX));
+    gl.attachShader(program, shader(gl.FRAGMENT_SHADER, FRAGMENT));
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Globe shaders did not link.');
     this.program = program;
@@ -211,7 +223,7 @@ export class GlobeRenderer {
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
     const attribute = (name: string, data: Float32Array, size: number) => {
-      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer());
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
       const where = gl.getAttribLocation(program, name);
       gl.enableVertexAttribArray(where);
@@ -219,7 +231,7 @@ export class GlobeRenderer {
     };
     attribute('aPos', mesh.positions, 3);
     attribute('aUv', mesh.uvs, 2);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer());
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.indices, gl.STATIC_DRAW);
 
     this.loc = Object.fromEntries(
@@ -229,8 +241,8 @@ export class GlobeRenderer {
     gl.depthFunc(gl.LESS);
 
     const sky = gl.createProgram()!;
-    gl.attachShader(sky, compile(gl, gl.VERTEX_SHADER, SKY_VERTEX));
-    gl.attachShader(sky, compile(gl, gl.FRAGMENT_SHADER, SKY_FRAGMENT));
+    gl.attachShader(sky, shader(gl.VERTEX_SHADER, SKY_VERTEX));
+    gl.attachShader(sky, shader(gl.FRAGMENT_SHADER, SKY_FRAGMENT));
     gl.linkProgram(sky);
     if (!gl.getProgramParameter(sky, gl.LINK_STATUS)) throw new Error('Sky shaders did not link.');
     this.sky = sky;
@@ -244,8 +256,25 @@ export class GlobeRenderer {
 
   private globeVao: WebGLVertexArrayObject | null;
 
+  /** Free every GPU resource this globe made (call when the component unmounts).
+   *  The context itself is left alone: React may mount the same canvas again. */
+  dispose() {
+    const gl = this.gl;
+    if (this.texture) gl.deleteTexture(this.texture);
+    this.texture = null;
+    this.buffers.forEach((b) => gl.deleteBuffer(b));
+    this.buffers = [];
+    gl.deleteVertexArray(this.globeVao);
+    gl.deleteVertexArray(this.skyVao);
+    this.shaders.forEach((s) => gl.deleteShader(s));
+    this.shaders = [];
+    gl.deleteProgram(this.program);
+    gl.deleteProgram(this.sky);
+  }
+
   setImage(image: TexImageSource) {
     const gl = this.gl;
+    if (this.texture) gl.deleteTexture(this.texture);
     this.texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);

@@ -18,3 +18,4 @@ button[aria-pressed='true'] { background: var(--signal); color: var(--ink); bord
 .globe-zoom button:hover { background: var(--rule-2); }
 .globe-zoom button:disabled { opacity: 0.45; cursor: default; }
 .globe-zoom .globe-zoom-level { font: 600 0.85rem/1 var(--mono); }
+.globe-source { display: grid; gap: 4px; }
