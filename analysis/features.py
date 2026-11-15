@@ -186,6 +186,12 @@ def _relative_to_root(path: Path, root: Path) -> str:
         return path.as_posix()
 
 
+class NoUsableSteps(ValueError):
+    """Every step of every region was missing, so there is nothing worth writing.
+
+    Raised before any file is written, so a good features.json is never replaced by an empty one."""
+
+
 def run(
     scene_path: Path,
     out_path: Path,
@@ -200,7 +206,7 @@ def run(
     """Measure a scene and write the output file(s). Returns the features document.
 
     first_index / index_step default to the scene's frames.first_index / frames.index_step
-    (then 0 and 1)."""
+    (then 0 and 1). Raises NoUsableSteps, and writes nothing, if no step of any region is usable."""
     scene = load_scene(scene_path)
     first_index, index_step = frame_numbering(scene, first_index, index_step)
     timestamps = check_timestamps(scene)
@@ -223,6 +229,14 @@ def run(
         params=params,
         smoothing_alpha=smoothing_alpha,
     )
+    steps = features["steps"]
+    if not any(s["status"] == "ok" for s in steps):
+        reason = next((s["reason"] for s in steps if s.get("reason")), "no reason given")
+        raise NoUsableSteps(
+            f"no step is usable (all {len(steps)} were missing), so nothing was written. "
+            f"First reason: {reason}. Check that the frame files exist (tools/download_frames.sh "
+            "fetches them) and that --threshold and --min-usable are not too strict."
+        )
     write_json(out_path, features)
     if rhythm_out_path is not None:
         source = scene.get("source") or {}
