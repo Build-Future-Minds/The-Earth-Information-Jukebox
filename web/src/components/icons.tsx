@@ -23,3 +23,9 @@ export const ExplainIcon = () => (
   </Icon>
 );
 export const SoundIcon = () => <Icon><path d="M3 8h3l4-3v10l-4-3H3zM13.5 7.5a3.5 3.5 0 0 1 0 5M15.8 5.2a6.8 6.8 0 0 1 0 9.6" /></Icon>;
+
+// Tab icons: what each view is for.
+export const ListenIcon = () => <Icon><path d="M4 12v-1a6 6 0 0 1 12 0v1M4 12h2.5v4H4zM13.5 12H16v4h-2.5z" /></Icon>;
+export const CompareIcon = () => <Icon><circle cx="6" cy="10" r="3.5" /><circle cx="14" cy="10" r="3.5" /></Icon>;
+export const HowIcon = () => <Icon><path d="M3 15h4l2-10 2 10h6" /><path d="M3 5h14" /></Icon>;
+export const PlayAlongIcon = () => <Icon><rect x="3" y="4" width="14" height="12" rx="1" /><path d="M7.5 4v7M12.5 4v7M10 11v5" /></Icon>;

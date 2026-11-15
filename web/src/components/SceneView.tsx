@@ -27,7 +27,7 @@ export function SceneView({ scene, imageUrl, regionId, look = {}, onSelect }: Pr
   const { width, height } = scene.frames;
   const active = scene.regions.find((r) => r.id === regionId);
   return (
-    <figure className={imageUrl ? 'scene' : 'scene no-image'}>
+    <figure className={imageUrl ? 'scene' : 'scene no-image'} style={{ ['--aspect' as string]: width / height }}>
       <div className="chart">
       <svg
         viewBox={`0 0 ${width} ${height}`}
@@ -90,11 +90,8 @@ export function SceneView({ scene, imageUrl, regionId, look = {}, onSelect }: Pr
       <figcaption>
         {/* DESIGN.md: keep the NASA credit directly under the image it credits. */}
         <span className="credit">Visualization: {scene.source.credit}</span>
-        {active && (
-          <>
-            <strong>{regionLabel(scene.regions, active.id, look.firstLetter)}: {active.name}.</strong> {active.description}
-          </>
-        )}
+        {/* The selected region's name is in the region choice right above; screen readers get it
+            from the picture's label. */}
       </figcaption>
     </figure>
   );
