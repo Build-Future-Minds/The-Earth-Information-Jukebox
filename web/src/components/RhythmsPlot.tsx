@@ -30,8 +30,7 @@ export function RhythmsPlot({ features, regions, activeRegionId }: Props) {
     <section className="plot" aria-labelledby="plot-title">
       <h2 id="plot-title">Both rhythms, one time line</h2>
       <p>
-        Every pulse of both regions, on the same clock. The closer each orange mark sits to the middle of its beat, the
-        more even the pulse.
+        Orange marks nearer the middle of the beat mean a more even pulse.
       </p>
       {tracks.map(({ region, track }) => {
         const label = regionLabel(regions, region.id);

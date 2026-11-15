@@ -84,8 +84,7 @@ export function BeatTrack({ track, regionLabel, playState, speed, getPosition, o
         <span>{timeText}</span>
       </div>
       <p className="track-hint">
-        Each mark is a pulse: tall ink for the first pulse of a beat, short orange for the second. Drag the line, or
-        press the left and right arrow keys, to move through the rhythm.
+        Tall mark: first pulse. Orange: second. Drag or use arrow keys.
       </p>
       <div
         ref={laneRef}
