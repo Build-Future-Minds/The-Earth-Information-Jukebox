@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { IconButton } from './IconButton';
 import { ExplainIcon, PauseIcon, PlayIcon, ReplayIcon, SoundIcon, StopIcon } from './icons';
 // Owner: Student B (v1 by Dev B — refine wording, order and labels; review together).
@@ -7,26 +7,6 @@ import { thumbCss } from '../data/selection';
 import type { Region } from '../data/types';
 import type { PlayState } from '../audio/transport';
 
-interface Props {
-  regions: Region[];
-  regionId: string;
-  playState: PlayState;
-  explaining: boolean;
-  speed: number;
-  volumeDb: number;
-  onStart: () => void;
-  onPause: () => void;
-  onStop: () => void;
-  onReplay: () => void;
-  onRegion: (id: string) => void;
-  onExplain: () => void;
-  onSpeed: (speed: number) => void;
-  onVolume: (db: number) => void;
-  look?: RegionLook;
-  /** The picture, for a round crop of each region in the region choice. */
-  imageUrl?: string | null;
-  frame?: { width: number; height: number };
-}
 
 export const SPEEDS = [0.5, 0.75, 1, 1.25];
 /** Speed buttons say ½× ¾× 1× 1¼×, not decimals. */
@@ -60,47 +40,44 @@ export function regionLabel(regions: Region[], id: string, firstLetter = 'A'): s
   return `Region ${String.fromCharCode(firstLetter.charCodeAt(0) + i)}`;
 }
 
-export function ExploreControls(p: Props) {
+interface PlayerProps {
+  playState: PlayState;
+  explaining: boolean;
+  speed: number;
+  volumeDb: number;
+  onStart: () => void;
+  onPause: () => void;
+  onStop: () => void;
+  onReplay: () => void;
+  onExplain: () => void;
+  onSpeed: (speed: number) => void;
+  onVolume: (db: number) => void;
+  /** The beat timeline, shown inside the bar like a music player's progress line. */
+  children?: ReactNode;
+}
+
+/** One framed bar under the picture: Play, Stop, Replay, the timeline, Explain and Sound. */
+export function PlayerBar(p: PlayerProps) {
   const playing = p.playState === 'playing';
   const [soundOpen, setSoundOpen] = useState(false);
   return (
-    <section className="controls" aria-label="Playback controls">
-      <div className="row icon-row">
-        {playing ? (
-          <IconButton icon={PauseIcon} label="Pause" onClick={p.onPause} />
-        ) : (
-          <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary />
-        )}
-        <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" />
-        <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />
-        <IconButton icon={ExplainIcon} label="Explain" onClick={p.onExplain} expanded={p.explaining} />
-        <IconButton icon={SoundIcon} label="Sound" onClick={() => setSoundOpen((o) => !o)} expanded={soundOpen} controls="sound-settings" />
+    <section className="player" aria-label="Playback controls">
+      <div className="player-row">
+        <div className="player-buttons">
+          {playing ? (
+            <IconButton icon={PauseIcon} label="Pause" onClick={p.onPause} primary />
+          ) : (
+            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary />
+          )}
+          <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" hint="Esc" />
+          <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />
+        </div>
+        <div className="player-track">{p.children}</div>
+        <div className="player-buttons">
+          <IconButton icon={ExplainIcon} label="Explain" onClick={p.onExplain} expanded={p.explaining} />
+          <IconButton icon={SoundIcon} label="Sound" onClick={() => setSoundOpen((o) => !o)} expanded={soundOpen} controls="sound-settings" />
+        </div>
       </div>
-
-      <fieldset className="row region-group">
-        <legend>Region (arrow keys, or 1–{p.regions.length})</legend>
-        {p.regions.map((r) => (
-          <label key={r.id} className="region-choice">
-            <input
-              type="radio"
-              name="region"
-              value={r.id}
-              checked={p.regionId === r.id}
-              onChange={() => p.onRegion(r.id)}
-            />
-            {p.imageUrl && p.frame && (
-              <span className="region-thumb" aria-hidden="true"
-                style={{ backgroundImage: `url(${p.imageUrl})`, ...thumbCss(r, p.frame, 44), ...regionStyle(p.regions, r.id, p.look) }} />
-            )}
-            <span className="region-badge" aria-hidden="true" style={regionStyle(p.regions, r.id, p.look)}>
-              {regionLabel(p.regions, r.id, p.look?.firstLetter).replace('Region ', '')}
-            </span>
-            {regionLabel(p.regions, r.id, p.look?.firstLetter)}: {r.name}
-            <kbd aria-hidden="true">{p.regions.indexOf(r) + 1}</kbd>
-          </label>
-        ))}
-      </fieldset>
-
       <div id="sound-settings" className="sound-settings" hidden={!soundOpen}>
         <div className="row" role="group" aria-label="Speed">
           {SPEEDS.map((v) => (
@@ -125,5 +102,40 @@ export function ExploreControls(p: Props) {
         </label>
       </div>
     </section>
+  );
+}
+
+interface RegionProps {
+  regions: Region[];
+  regionId: string;
+  onRegion: (id: string) => void;
+  look?: RegionLook;
+  /** The picture, for a round crop of each region. */
+  imageUrl?: string | null;
+  frame?: { width: number; height: number };
+}
+
+/** Which region to hear: a round crop of each circle, its letter and short name. Arrow keys or 1/2. */
+export function RegionChoice(p: RegionProps) {
+  return (
+    <fieldset className="region-group">
+      <legend>Region</legend>
+      <div className="row">
+        {p.regions.map((r) => (
+          <label key={r.id} className="region-choice">
+            <input type="radio" name="region" value={r.id} checked={p.regionId === r.id} onChange={() => p.onRegion(r.id)} />
+            {p.imageUrl && p.frame && (
+              <span className="region-thumb" aria-hidden="true"
+                style={{ backgroundImage: `url(${p.imageUrl})`, ...thumbCss(r, p.frame, 44), ...regionStyle(p.regions, r.id, p.look) }} />
+            )}
+            <span className="region-badge" aria-hidden="true" style={regionStyle(p.regions, r.id, p.look)}>
+              {regionLabel(p.regions, r.id, p.look?.firstLetter).replace('Region ', '')}
+            </span>
+            <span className="region-name">{regionLabel(p.regions, r.id, p.look?.firstLetter)}: {r.name}</span>
+            <kbd aria-hidden="true">{p.regions.indexOf(r) + 1}</kbd>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }

@@ -433,15 +433,6 @@ footer ul { margin: 0; padding-left: 1.2rem; color: var(--ink-2); }
   * { transition: none !important; }
 }
 
-/* Page links (four views), in the rail on every view. The current page is bold with the signal
-   underline (DESIGN.md "Live Only": it marks what is chosen). */
-.page-links ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
-.page-links a { display: inline-block; padding: 8px 0; color: var(--ink); text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; }
-.page-links a:hover { border-bottom-color: var(--rule); }
-.page-links a[aria-current='page'] { font-weight: 800; border-bottom-color: var(--signal); }
-.view-title { font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
-.view-title:focus { outline: none; }
-.view-title:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
 
 /* Icon button (DESIGN.md): a 20px line icon over a one-word label, same border, hover, pressed and
    focus states as other buttons. */
@@ -467,3 +458,69 @@ button.speed[aria-pressed='true'] { background: var(--ink); color: var(--paper);
 /* Region choice thumbnail: the region's real circle, cropped from the picture. */
 .region-thumb { display: inline-block; width: 44px; height: 44px; border-radius: 50%; background-repeat: no-repeat;
   outline: 3px solid var(--region, var(--ink)); flex: none; }
+
+/* ---- Layout after Dev B saw it live: top bar with tabs, one main column, a player bar ---- */
+.topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: var(--md);
+  padding: 10px 24px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.brand { display: grid; gap: 2px; min-width: 0; }
+.brand h1 { font-size: 1.3rem; line-height: 1.1; margin: 0; }
+.brand .lede { font-size: 0.9rem; }
+.topbar .theme-switch { margin-left: auto; }
+.stage { max-width: 1240px; margin: 0 auto; width: 100%; padding: 14px 24px 24px; gap: 12px; }
+.stage > * { max-width: none; }
+
+/* Tabs: a joined strip of buttons; the current one is filled in ink, so it reads as "you are here". */
+.page-links ul { list-style: none; margin: 0; padding: 0; display: flex; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; }
+.page-links li + li { border-left: 2px solid var(--ink); }
+.page-links a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; color: var(--ink);
+  text-decoration: none; font-weight: 700; white-space: nowrap; }
+.page-links a:hover { background: var(--rule-2); }
+.page-links a[aria-current='page'] { background: var(--ink); color: var(--paper); }
+
+/* The view heading is the focus target on a view change; visually hidden (the tab shows the view). */
+.view-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.pickers { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sm) var(--lg); }
+.region-group { border: 0; padding: 0; margin: 0; }
+.region-group legend { font-weight: 600; font-size: 0.95rem; padding: 0; margin-bottom: 6px; }
+.region-choice { display: inline-flex; align-items: center; gap: 8px; }
+.status { font-size: 1.05rem; margin: 0; }
+
+/* Picture: capped to the screen so Listen fits one screen (--aspect = width / height). */
+figure.scene { max-width: min(100%, calc((100svh - 470px) * var(--aspect, 2) + 44px)); margin: 0 auto; width: 100%; }
+figure.scene figcaption { font-size: 0.85rem; }
+
+/* Player bar: one framed strip like a music player, the timeline in the middle. */
+.player { border: 2px solid var(--ink); border-radius: 10px; padding: 8px 10px; background: var(--paper); display: grid; gap: 8px; }
+.player-row { display: flex; align-items: center; gap: 10px; }
+.player-buttons { display: flex; gap: 6px; flex: none; }
+.player-track { flex: 1; min-width: 0; }
+.player-track .track { margin: 0; }
+.player-track .track-hint, .player-track .track-head { font-size: 0.75rem; margin: 0; }
+.player .icon-button { min-height: 52px; min-width: 56px; }
+.player .icon-button.primary { min-width: 64px; }
+.key-hint { font: 600 0.65rem/1 var(--mono); color: inherit; opacity: 0.75; border: 0; padding: 0; background: none; }
+
+@media (max-width: 900px) {
+  .brand .lede { display: none; }
+  .page-links a { padding: 10px 12px; }
+}
+/* Phones: tabs in a fixed bottom bar, like an app; the player bar sticks just above them. */
+@media (max-width: 640px) {
+  .topbar { padding: 8px 16px; }
+  .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
+    border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .page-links li + li { border-left: 1px solid var(--rule); }
+  .page-links a { flex-direction: column; gap: 2px; padding: 8px 2px; font-size: 0.72rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
+  body { padding-bottom: 72px; }
+  .stage { padding: 10px 16px 16px; }
+  .player { position: sticky; bottom: 72px; z-index: 15; }
+  /* All five buttons in one row under the timeline, so the sticky bar stays short. */
+  .player-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .player-buttons { display: contents; }
+  .player-track { grid-column: 1 / -1; order: -1; }
+  .player-track .track-hint { display: none; }
+  .player .icon-button, .player .icon-button.primary { min-width: 0; min-height: 48px; padding: 4px 2px; }
+  figure.scene { max-width: 100%; }
+}

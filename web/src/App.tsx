@@ -3,7 +3,8 @@ import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
-import { ExploreControls, regionLabel, regionStyle } from './components/ExploreControls';
+import { BeatTrack } from './components/BeatTrack';
+import { PlayerBar, RegionChoice, regionLabel, regionStyle } from './components/ExploreControls';
 import { PageLinks } from './components/PageLinks';
 import { ThemeSwitch } from './components/ThemeSwitch';
 import { stepAtSameMoment } from './components/RhythmExplanation';
@@ -156,85 +157,92 @@ export function App() {
           PRACTICE DATA — test input, not NASA data
         </div>
       )}
-      {/* Layout: a fixed rail with the title, theme switch and the
-          controls, and a main column. The NASA image stays large in the main column: in a 400 px rail
-          each region circle would be about 10 px across. Below 960 px the rail stacks on top. */}
-      <div className="layout">
-        <div className="rail">
-          <header>
-            <h1>Earth Sonata: Play the Planet</h1>
-            {/* Student B's title line (docs/design/student_b_pictures.html), made picture-neutral
-                now that the app plays three pictures. */}
-            <p className="lede">Hear two regions. Lined-up streaks play an even pulse.</p>
-          </header>
-
-          <PageLinks current={view} />
-
-          {(view === 'listen' || view === 'compare') && (
-            <SourceChoice sources={SOURCES} current={sourceKey} onChoose={chooseSource} />
-          )}
-
-          {view === 'listen' && (
-            <ExploreControls
-              regions={scene.regions}
-              look={look}
-              imageUrl={imageUrl}
-              frame={scene.frames}
-              regionId={regionId}
-              playState={playState}
-              explaining={explaining}
-              speed={speed}
-              volumeDb={volumeDb}
-              onStart={start}
-              onPause={pause}
-              onStop={stop}
-              onReplay={replay}
-              onRegion={setRegionId}
-              onExplain={() => setExplaining((x) => !x)}
-              onSpeed={(s) => {
-                setSpeed(s);
-                transport.current?.setSpeed(s);
-              }}
-              onVolume={(db) => {
-                setVolumeDb(db);
-                transport.current?.setVolume(db);
-              }}
-            />
-          )}
-
-          <ThemeSwitch />
+      {/* Layout (Dev B, after seeing it live): a sticky top bar with the title, four tabs and the
+          theme switch (on phones the tabs move to a fixed bottom bar), then one main column. */}
+      <header className="topbar">
+        <div className="brand">
+          <h1>Earth Sonata</h1>
+          {/* Student B's title line (docs/design/student_b_pictures.html), made picture-neutral
+              now that the app plays three pictures. */}
+          <p className="lede">Hear two regions. Lined-up streaks play an even pulse.</p>
         </div>
+        <PageLinks current={view} />
+        <ThemeSwitch />
+      </header>
 
-        <main className="stage">
-          <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
-          {/* In the shell, on every view: sound can start on Listen, Compare and Play along. */}
-          <p className="status" role="status">{status}</p>
-          {missing && playState !== 'stopped' && (
-            <p className="missing" role="alert">
-              Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
-            </p>
-          )}
+      <main className="stage">
+        {/* Focus target on a view change, announced by screen readers; the tab already shows it. */}
+        <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
 
-          {view === 'listen' && (
-            <ListenView
-              scene={scene}
-              imageUrl={imageUrl}
-              regionId={regionId}
-              label={label}
-              look={look}
-              onSelect={setRegionId}
-              colour={regionStyle(scene.regions, regionId, look)}
-              track={track}
-              sounding={sounding}
-              playState={playState}
-              speed={speed}
-              getPosition={getPosition}
-              onSeek={seek}
-              explaining={explaining}
-              explanationRef={explanationRef}
-              other={other}
-            />
-          )}
+        {(view === 'listen' || view === 'compare') && (
+          <div className="pickers">
+            <SourceChoice sources={SOURCES} current={sourceKey} onChoose={chooseSource} />
+            {view === 'listen' && (
+              <RegionChoice
+                regions={scene.regions}
+                regionId={regionId}
+                onRegion={setRegionId}
+                look={look}
+                imageUrl={imageUrl}
+                frame={scene.frames}
+              />
+            )}
+          </div>
+        )}
+
+        {/* In the shell, on every view: sound can start on Listen, Compare and Play along. */}
+        <p className="status" role="status">{status}</p>
+        {missing && playState !== 'stopped' && (
+          <p className="missing" role="alert">
+            Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
+          </p>
+        )}
+
+        {view === 'listen' && (
+          <ListenView
+            scene={scene}
+            imageUrl={imageUrl}
+            regionId={regionId}
+            label={label}
+            look={look}
+            onSelect={setRegionId}
+            sounding={sounding}
+            explaining={explaining}
+            explanationRef={explanationRef}
+            other={other}
+            player={
+              <PlayerBar
+                playState={playState}
+                explaining={explaining}
+                speed={speed}
+                volumeDb={volumeDb}
+                onStart={start}
+                onPause={pause}
+                onStop={stop}
+                onReplay={replay}
+                onExplain={() => setExplaining((x) => !x)}
+                onSpeed={(s) => {
+                  setSpeed(s);
+                  transport.current?.setSpeed(s);
+                }}
+                onVolume={(db) => {
+                  setVolumeDb(db);
+                  transport.current?.setVolume(db);
+                }}
+              >
+                <BeatTrack
+                  track={track}
+                  colour={regionStyle(scene.regions, regionId, look)}
+                  regionLabel={label}
+                  playState={playState}
+                  speed={speed}
+                  getPosition={getPosition}
+                  onSeek={seek}
+                />
+              </PlayerBar>
+            }
+          />
+        )}
           {view === 'compare' && (
             <CompareView
               scene={scene}
@@ -266,8 +274,7 @@ export function App() {
               }}
             />
           )}
-        </main>
-      </div>
+      </main>
     </>
   );
 }
