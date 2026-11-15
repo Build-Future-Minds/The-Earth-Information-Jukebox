@@ -27,7 +27,7 @@ or on test images, with the engine's default settings.
 ## Rules for every task
 
 - One short branch per task (`role/short-task`), a pull request, one teammate reviews. `main` always runs.
-- Feature freeze is Sunday 2:00 PM. Anything not reviewed and merged by then waits.
+- There is no feature freeze (removed Sun 9 AM), but anything not reviewed and merged before Dev B's final recording is not in the video.
 - Roles, not names, in files, commits and screenshots.
 - Made-up data says `MOCK` or `TEST INPUT` in its file name or first line.
 - Write only results you measured. If a check was not run, write "not run".
