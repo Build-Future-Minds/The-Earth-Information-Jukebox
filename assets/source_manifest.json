@@ -201,7 +201,7 @@
       "svs_id": 4285,
       "url": "https://svs.gsfc.nasa.gov/4285/",
       "title": "Near Real-Time Global Precipitation from the Global Precipitation Measurement Constellation",
-      "role": "third source (proposed 15 Nov; for Dev A to approve), 30 hourly frames",
+      "role": "third source (regions approved by Dev A, 15 Nov), 30 hourly frames",
       "eic_gallery": "Yes: listed in the Earth Information Center 'Daily Visualizations' dashboard (gallery/daily-visualizations), part of the EIC content.",
       "media_kind": "frame set",
       "data_kind": "observation",
@@ -242,9 +242,7 @@
         "first_pick_replaced": "a first pick at 110W 20S passed the numbers but the band only clipped its edge (6-9% of pixels voting), so it was replaced"
       },
       "verified": "2026-11-15 (Student A, source page, colour bars and the saved frames)",
-      "todo": [
-        "Dev A to approve the regions"
-      ]
+      "todo": []
     }
   ]
 }
