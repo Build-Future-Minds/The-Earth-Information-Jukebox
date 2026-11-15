@@ -6,7 +6,11 @@ It describes the rendered image. It does not measure water speed, turbulence or 
 ## Version one: one rule
 
 **We measure how strongly visible lines line up along a common angle.**
-More alignment gives more even pulse spacing. Less alignment gives stronger short–long spacing.
+More alignment gives more even pulse spacing. Less alignment gives stronger long–short spacing.
+
+"Long–short" names the order you hear: a long gap after the first pulse, then a short gap. The
+Team Briefing and drafts before 15 Nov call it "short–long"; that was renamed on 15 Nov (words
+only: no number, sound or file changed).
 
 ### Measurement: alignment `A`, 0 to 1
 
@@ -37,7 +41,7 @@ Each beat is split into two pulses. `A` sets where the second pulse falls.
 | --- | --- | --- |
 | 1.0 | 50 / 50 | Even |
 | 0.5 | about 62 / 38 | Slight lilt |
-| 0.0 | 75 / 25 | Strong short–long |
+| 0.0 | 75 / 25 | Strong long–short |
 
 Starting formula: `long_fraction = 0.75 − 0.25 × A`. Tune the end points by ear, then freeze them.
 Tempo, pitch, timbre and loudness stay fixed and carry no data.
@@ -52,7 +56,7 @@ Measured by the engine, with a 1-second beat:
 | Picture | `A` | `long_fraction` | Pulses in the beat | Gaps | Sounds like |
 | --- | --- | --- | --- | --- | --- |
 | Parallel lines | 1.00 | 0.50 | 0.00 s and 0.50 s | 0.50 s, 0.50 s | Even |
-| Dashes at random angles | 0.09 | 0.73 | 0.00 s and 0.73 s | 0.73 s, 0.27 s | Strong short–long |
+| Dashes at random angles | 0.09 | 0.73 | 0.00 s and 0.73 s | 0.73 s, 0.27 s | Strong long–short |
 
 Pictures and timeline: `figures/math/02_test_gallery.png`, `figures/math/07_two_rhythms.png`.
 
@@ -74,7 +78,7 @@ changes with the radius (section 9). Only pixels inside the circle are measured.
 | Case | Expected |
 | --- | --- |
 | Aligned: parallel stripes | `A` near 1; even pulses |
-| Mixed: lines at random angles | `A` near 0; strong short–long |
+| Mixed: lines at random angles | `A` near 0; strong long–short |
 | Reversed: stripes flipped 180° | Same `A` as aligned |
 | Blank image | `missing`, reason given, Earth voice quiet |
 | Masked: everything excluded | `missing`, reason given |

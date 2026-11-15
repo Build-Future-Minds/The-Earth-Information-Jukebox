@@ -4,7 +4,7 @@
 
 import type { Features, MusicEvent, Step } from '../data/types';
 
-/** Share of the beat before the second pulse when alignment A = 0 (strong short–long). */
+/** Share of the beat before the second pulse when alignment A = 0 (strong long–short). */
 export const LONG_AT_A0 = 0.75;
 /** Share of the beat before the second pulse when alignment A = 1 (even). */
 export const LONG_AT_A1 = 0.5;

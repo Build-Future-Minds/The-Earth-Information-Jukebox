@@ -30,7 +30,7 @@ monospace live readouts.
 
 STORY: The tester sees where the two patches are on the real map, hears one rhythm, picks 1 or 2,
 then sees the answer drawn: the weights of the two numerals and one shared plot of both rhythms.
-They leave knowing that lined-up streaks sound even and swirls sound short then long.
+They leave knowing that lined-up streaks sound even and swirls sound long then short.
 
 FIRST VIEWPORT: Left rail 400px: title, NASA map with boxes 1 and 2, credit, New round / Replay /
 Stop, Speed and Volume sliders with readouts, a Pitch line, score and by-difference table, Reset score

@@ -93,7 +93,8 @@ def gaps_for(alignment):
     """The two gaps between pulses, in seconds, at base speed.
 
     Team Briefing page 2: d = (1 - Cs) / 2, gaps are T(1 - d) and T(1 + d).
-    Alignment 1.0 gives 0.5 s and 0.5 s (even); 0.0 gives 0.25 s and 0.75 s (short-long).
+    Alignment 1.0 gives 0.5 s and 0.5 s (even); 0.0 gives 0.25 s and 0.75 s, which the app
+    and the quiz player play long gap first (long-short).
     """
     d = (1 - alignment) / 2
     return {

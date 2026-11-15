@@ -29,7 +29,7 @@ Your briefing page is page 5 of `docs/briefing/Earth_Sonata_Team_Briefing.pdf`. 
 ## Explanation wording (starting point — make it clearer)
 
 - "The pulse is even because most visible lines in this region run the same way."
-- "The pulse is short–long because the visible lines in this region run in many directions."
+- "The pulse is long–short because the visible lines in this region run in many directions."
 - "There is not enough visible detail here to make a rhythm, so the Earth voice is quiet."
 - Always available: "This is a visualization of a computer model. The rhythm rule is our choice.
   It describes the image, not water speed, turbulence or ocean health."

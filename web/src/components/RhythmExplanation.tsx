@@ -42,13 +42,13 @@ export function compareLine(step: TrackStep | null, other?: OtherRegion | null):
     // Says only what the numbers show. Whether people can hear the difference is for the listening test to find out.
     return `${lead} is about as even as ${other.label} (${numbers}; the two alignments differ by less than ${SAME_BELOW.toFixed(2)}).`;
   }
-  return `${lead} is ${gap > 0 ? 'more even' : 'less even, more short–long'} (${numbers}).`;
+  return `${lead} is ${gap > 0 ? 'more even' : 'less even, more long–short'} (${numbers}).`;
 }
 
 /** Words for the split. Design choice; Dev A to confirm the cut points. */
-export function describeSplit(longFraction: number): 'even' | 'slight lilt' | 'short–long' {
+export function describeSplit(longFraction: number): 'even' | 'slight lilt' | 'long–short' {
   if (longFraction <= 0.56) return 'even';
-  if (longFraction >= 0.66) return 'short–long';
+  if (longFraction >= 0.66) return 'long–short';
   return 'slight lilt';
 }
 
@@ -63,7 +63,7 @@ export function explain(step: TrackStep | null, other?: OtherRegion | null): str
   const because =
     kind === 'even'
       ? 'most visible lines in this region run the same way'
-      : kind === 'short–long'
+      : kind === 'long–short'
         ? 'the visible lines in this region run in many directions'
         : 'the visible lines in this region partly share a direction';
   const pulse = kind === 'slight lilt' ? 'has a slight lilt' : `is ${kind}`;

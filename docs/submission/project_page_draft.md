@@ -44,7 +44,7 @@ Ahead of time, we measured how strongly the visible current lines inside two cir
 direction, from 0 (every which way) to 1 (all the same way), in 30 frames of the NASA video. In the
 browser, each frame becomes one beat with two pulses: the more the lines line up, the more evenly
 the two pulses are spaced. Region A, the Kuroshio eddies east of Japan, has lines running in many
-directions and plays a short–long pulse; Region B, streaks in the Equatorial Pacific, has lines
+directions and plays a long–short pulse; Region B, streaks in the Equatorial Pacific, has lines
 that partly line up and plays a more even pulse.
 
 **How a visitor uses it** (Student B — the four steps: start and listen, compare, ask why, add a melody if it works)

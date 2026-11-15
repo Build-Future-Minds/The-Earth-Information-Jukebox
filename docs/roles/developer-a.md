@@ -11,7 +11,7 @@ Your briefing page is page 2 of `docs/briefing/Earth_Sonata_Team_Briefing.pdf`. 
 
 ## Start here
 
-Finish `docs/mapping_spec.md` with one even and one short–long example. Review Student A's
+Finish `docs/mapping_spec.md` with one even and one long–short example. Review Student A's
 proposed source and two regions.
 
 ## Tests to pass
