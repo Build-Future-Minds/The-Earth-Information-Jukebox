@@ -1,0 +1,39 @@
+{
+  "_about": "Regions for SVS 4285 IMERG near real-time precipitation (30 hourly frames, 14 Nov 00:00 to 15 Nov 05:00 UTC). Owner: Student A. Default threshold 12, no setting change. Checks in source_manifest.json.",
+  "status": "proposed by Student A, 15 Nov 2026; for Dev A to approve",
+  "shape": "Circles, radius 100 px, same for both regions.",
+  "regions": [
+    {
+      "id": "imerg_band_south_pacific",
+      "role": "aligned (even beat)",
+      "name": "Long rain band in the South Pacific",
+      "center_px": [
+        425,
+        1075
+      ],
+      "radius_px": 100,
+      "center_lonlat": [
+        -137.5,
+        -17.5
+      ],
+      "description": "Open ocean in the South Pacific, where a long band of rain runs through the circle, so its lines mostly share one direction.",
+      "alignment_mean_at_12": 0.33
+    },
+    {
+      "id": "imerg_showers_equator",
+      "role": "swirly (long-short beat)",
+      "name": "Scattered showers on the equator in the central Pacific",
+      "center_px": [
+        300,
+        900
+      ],
+      "radius_px": 100,
+      "center_lonlat": [
+        -150.0,
+        0.0
+      ],
+      "description": "Open ocean on the equator in the central Pacific, where tropical showers pop up in small patches pointing every way.",
+      "alignment_mean_at_12": 0.07
+    }
+  ]
+}
