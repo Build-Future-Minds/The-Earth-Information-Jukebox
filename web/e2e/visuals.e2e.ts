@@ -35,7 +35,7 @@ test('clicking the lane moves playback to that point', async ({ page }) => {
 
 test('the arrow keys on the lane step through beats', async ({ page }) => {
   await startWithKeyboard(page);
-  await page.getByRole('button', { name: 'Pause' }).click();
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await lane(page).focus();
   await page.keyboard.press('Home');
   await expect(lane(page)).toHaveAttribute('aria-valuenow', '0');
@@ -64,7 +64,7 @@ test('the explainer and close-ups are present; Listen picks a region and plays i
   await expect(page.locator('.patch')).toHaveCount(2);
   await page.getByRole('button', { name: 'Listen to Region B' }).click();
   await expect(page.getByRole('status')).toHaveText(/Playing Region B/);
-  await expect(page.getByRole('button', { name: 'Listening to Region B' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Stop Region B' })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('Play along links to Student B\'s listening game, labelled as a separate practice tool', async ({ page }) => {

@@ -28,7 +28,7 @@ test('letter keys play only while the pad has focus', async ({ page }) => {
   await pad(page).focus();
   await page.keyboard.press('a'); // starts the melody synth
   await settle(page);
-  await page.getByRole('button', { name: 'Start' }).focus();
+  await page.getByRole('button', { name: 'Play', exact: true }).focus();
   for (const k of 'asdfghjk') await page.keyboard.down(k);
   expect(await melodyVoices(page)).toBe(0);
   for (const k of 'asdfghjk') await page.keyboard.up(k);

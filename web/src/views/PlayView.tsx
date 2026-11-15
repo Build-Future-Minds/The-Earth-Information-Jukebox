@@ -2,6 +2,8 @@
 // The Earth voice has its own Start/Stop here, because changing view stops the sound.
 import type { PlayState } from '../audio/transport';
 import type { InputSource } from '../audio/userVoice';
+import { IconButton } from '../components/IconButton';
+import { PauseIcon, PlayIcon, StopIcon } from '../components/icons';
 import { MelodyPad } from '../components/MelodyPad';
 import { PracticeGame } from '../components/PracticeGame';
 
@@ -23,15 +25,13 @@ export function PlayView(p: Props) {
   return (
     <>
       <section className="controls" aria-label="Earth rhythm">
-        <div className="row">
+        <div className="row icon-row">
           {playing ? (
-            <button type="button" onClick={p.onPause}>Pause</button>
+            <IconButton icon={PauseIcon} label="Pause" onClick={p.onPause} />
           ) : (
-            <button type="button" onClick={p.onStart} className="primary">
-              {p.playState === 'paused' ? 'Resume' : 'Start'}
-            </button>
+            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary />
           )}
-          <button type="button" onClick={p.onStop}>Stop <kbd>Esc</kbd></button>
+          <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" />
         </div>
       </section>
       <MelodyPad

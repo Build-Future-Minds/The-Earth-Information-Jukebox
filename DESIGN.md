@@ -123,7 +123,7 @@ Earth Sonata reads like a tide table printed on a sea chart. The NASA picture si
 
 Two editions of one print. Light is almanac white with navy ink and tide-blue actions. Dark is the night edition: deep navy ground with the same inks lifted. The theme follows the saved choice, else the system setting, and is set before first paint so there is no flash. One red-orange, the signal, is the only loud colour and it means live, chosen or focused, nothing else.
 
-The system is keyboard-first. Start is the first Tab stop, so the theme switch sits under the playback controls in the rail. Colour is never the only cue: every region mark carries its letter.
+The system is keyboard-first. On Listen the Tab order is: the page links, the picture choice (when there is more than one picture), then Play. The theme switch sits under the controls in the rail. Colour is never the only cue: every region mark carries its letter.
 
 **Key Characteristics:**
 - One face, Atkinson Hyperlegible Next. Atkinson Hyperlegible Mono only for numbers, coordinates and readouts.
@@ -157,7 +157,7 @@ Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the side
 
 ### Named Rules
 **The Live Only Rule.** Signal red-orange appears only on something live, chosen or focused. If it is decoration, it is wrong.
-**The Off-Scale Rule.** Region colours stay violet and rose. Never blue, red, orange or yellow, because the NASA picture already uses that range for temperature.
+**The Off-Scale Rule.** A region colour must not be a colour the picture itself uses for data. On the ocean picture (blue-to-red temperature) the regions are violet and rose, never blue, red, orange or yellow. Pictures whose own colours include those hues get neutral regions: the aerosol picture (regions C and D; blue sea salt, pink dust, orange-red smoke, green sulfates) and the rain picture (regions E and F; a blue-to-red rain scale). Neutral means an ink ring inside a white outline and an ink badge with a paper letter, in both themes.
 **The Letter Rule.** A region colour never travels alone; its letter badge or end label goes with it.
 
 ## Typography
@@ -183,7 +183,7 @@ Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the side
 
 ## Layout
 
-A fixed 400px rail on the left with a 1px rule on its right (padding 32px 28px, sticky, scrolls on its own), and a fluid main column (padding 32px 40px 40px, content capped at 1100px). Rail order: title, playback buttons (Start first), region choice with badges, then the theme switch. Below 960px the rail stacks on top with a 16px gutter and a bottom rule; at 640px and below the chart margin tightens, alternate longitude labels drop, and the map tag collapses to its badge.
+A fixed 400px rail on the left with a 1px rule on its right (padding 32px 28px, sticky, scrolls on its own), and a fluid main column (padding 32px 40px 40px, content capped at 1100px). Rail order: title, page links, picture choice (Listen and Compare, when there is more than one picture), the view's controls (Listen: play buttons, region choice, Sound), then the theme switch. See "Views" below for each view. Below 960px the rail stacks on top with a 16px gutter and a bottom rule; at 640px and below the chart margin tightens, alternate longitude labels drop, and the map tag collapses to its badge.
 
 Spacing scale: 10, 16, 22, 28, 40px. Sections are separated by a 1px top rule with 16px padding, not by gaps alone. The NASA picture sits in a chart frame (1px ink neatline, margin 22px top and 44px left) with ticks every 10 degrees, labelled every 30, and the credit directly under it. The rhythm section holds the tide table, the tide curves and the per-region beat rows, left to right on one shared time line.
 
@@ -208,6 +208,20 @@ Plain, bordered, confident.
 - **Pressed / expanded:** ink fill, paper text.
 - **Focus:** a 3px signal outline offset 3px, global to every focusable element.
 - **Motion:** two 90 ms steps, no easing (`--snap`), none under reduced motion.
+
+### Icon button
+A line icon over a one-word label. Team rule (15 Nov): more buttons, less text.
+- **Shape:** the Buttons border, corners, hover, pressed and focus states; 56px minimum height, 64px minimum width, 6px 10px padding.
+- **Icon:** 20px, 2px stroke in `currentColor`, round caps, decorative (`aria-hidden`).
+- **Label:** one word under the icon, 0.85rem, weight 700. The word is the button's accessible name: Play, Pause, Stop, Replay, Explain, Sound.
+- **Primary:** Play uses the tide-blue fill, like Start before it.
+- **Stop** carries `aria-keyshortcuts="Escape"`; Esc stops from anywhere.
+
+### Page links
+Four text links under the title, in the rail on every view: Listen, Compare, How it's made, Play along. Weight 600, 8px vertical padding, a 3px transparent bottom border. The current page is weight 800 with a signal underline and `aria-current="page"`. Hover shows a hairline underline.
+
+### Sound settings
+One Sound icon button shows and hides the speed buttons (½× ¾× 1× 1¼×, mono, the chosen one pressed in ink) and a Volume slider. No decibel numbers on screen; screen readers hear a percentage.
 
 ### Theme switch
 Two joined buttons (Light, Dark) with 16px line icons, 2px ink frame, the chosen one filled in ink. 40px minimum height. Sits under the controls, never before Start in Tab order.
@@ -238,6 +252,19 @@ A 2px ink-bordered pad of 48px key caps; the active pad border and the held key 
 ### Practice and missing states
 Hairline sections, not cards. Missing information is a 2px ink box stated plainly, never red.
 
+### One-moment pictures
+A picture with a single frame (aerosols) has one value per region. Its tide curve is one 4px dot per region labelled "one moment", never an empty line. Its beat timeline repeats one beat as a steady rhythm, with its one date under it.
+
+## Views
+
+The app has four views, one per page link. Changing view stops all sound, moves focus to the view's heading, and changes the tab title to "<view> · Earth Sonata".
+- **Listen (home):** rail with the title line, page links, picture choice, play buttons, region choice and Sound. Main: the picture in its chart frame with the credit under it, the status line, the beat timeline with dates under the beats, and the Explain picture when opened.
+- **Compare:** for the chosen picture only, its two regions side by side: close-up with ticks, the giant numeral, the value, a Play/Stop toggle and the region's rhythm row; then the tide table and curves.
+- **How it's made:** the three-picture strip (picture, ticks, pulses), the rule in one line, the three honesty lines, and a credit block for each picture.
+- **Play along:** its own Play and Stop for the Earth rhythm, the melody keys, the game card and the globe.
+
+The status line and the missing-information message sit at the top of the main column on every view.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -248,7 +275,7 @@ Hairline sections, not cards. Missing information is a 2px ink box stated plainl
 - **Do** let font weight (200 to 800) carry alignment on the numeral and live value.
 - **Do** draw a missing frame as a break or hatched gap.
 - **Do** give both themes the same structure; only the inks lift.
-- **Do** keep Start the first Tab stop.
+- **Do** keep the Listen Tab order: page links, picture choice, then Play.
 
 ### Don't:
 - **Don't** put content in boxes, cards or floating panels, or add side stripes.

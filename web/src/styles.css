@@ -439,3 +439,14 @@ footer ul { margin: 0; padding-left: 1.2rem; color: var(--ink-2); }
 .view-title { font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
 .view-title:focus { outline: none; }
 .view-title:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+
+/* Icon button (DESIGN.md): a 20px line icon over a one-word label, same border, hover, pressed and
+   focus states as other buttons. */
+.icon-row { gap: var(--xs); }
+.icon-button { display: inline-grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; min-width: 64px; padding: 6px 10px; }
+.icon-button svg { display: block; }
+.icon-label { font-size: 0.85rem; font-weight: 700; line-height: 1; }
+.sound-settings { display: grid; gap: var(--sm); }
+.sound-settings[hidden] { display: none; }
+button.speed { min-width: 56px; font-family: var(--mono); }
+button.speed[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
