@@ -76,7 +76,7 @@ export function GlobePage() {
   const preset = scene.regions.find(
     (r) => r.center_px[0] === spot.center_px[0] && r.center_px[1] === spot.center_px[1] && r.radius_px === radius,
   );
-  const land = pixels ? landShare(pixels, frame.width, frame.height, spot, source.landRule) : null;
+  const land = pixels && source.landRule ? landShare(pixels, frame.width, frame.height, spot, source.landRule) : null;
   const json = JSON.stringify(regionJson('candidate', 'Spotlight candidate', spot, frame.width, frame.height));
 
   const goTo = (center: [number, number], r: number) => {
@@ -190,7 +190,8 @@ export function GlobePage() {
             <dt>box_px</dt><dd>[{boxFor(spot).join(', ')}]</dd>
             <dt>land</dt>
             <dd>
-              {land === null ? 'checking…' : `about ${(land * 100).toFixed(0)}% of the circle`}
+              {!source.landRule ? 'not checked here (the land in this picture is a photo); prepare_scene.py checks it'
+                : land === null ? 'checking…' : `about ${(land * 100).toFixed(0)}% of the circle`}
               {land !== null && land > 0.5 ? ' (too much: prepare_scene.py would stop)' : ''}
             </dd>
           </dl>

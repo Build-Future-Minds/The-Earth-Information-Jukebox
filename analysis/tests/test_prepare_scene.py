@@ -222,3 +222,31 @@ def test_single_still_source_writes_one_frame_with_its_fixed_time(tmp_path: Path
 def test_ocean_is_still_the_default_source() -> None:
     assert P.SOURCES["svs3912"].frame_name == P.FRAME_NAME
     assert P.SOURCES["svs3912"].dates_file == "flat_ecco2_dates.txt"
+
+
+# ------------------------------------------------------------- 5. a source whose land is a photo
+
+def test_reference_land_uses_the_ocean_outline_and_static_bright_pixels(tmp_path: Path) -> None:
+    """TEST INPUT: land is taken from the reference outline, plus a bright mark that never moves."""
+    ref = np.zeros((32, 64, 3), np.uint8)
+    ref[:, :16] = (49, 49, 49)                                   # grey land on the left quarter
+    path = tmp_path / P.REFERENCE_LAND_FRAME
+    path.parent.mkdir(parents=True)
+    cv2.imwrite(str(path), ref)
+    frames = []
+    for i in range(3):
+        f = np.zeros((64, 128, 3), np.uint8)
+        f[60:63, 120:126] = 255                                   # a static bright corner mark
+        f[30:34, 60 + i * 5:70 + i * 5] = (0, 200, 255)           # rain that moves
+        frames.append(f)
+    land = P.reference_land_mask(tmp_path, frames, (45, 255, 3))
+    assert land.shape == (64, 128)
+    assert land[30, 10] and not land[30, 100]                     # the outline, scaled up
+    assert land[61, 122]                                          # the static mark
+    assert not land[32, 75]                                       # moving rain is not land
+
+
+def test_imerg_preset_reads_its_dates_file() -> None:
+    src = P.SOURCES["svs4285"]
+    assert src.land_mode == "reference" and src.dates_file == "imerg_dates.txt"
+    assert (src.first, src.last, src.step) == (0, 29, 1)
