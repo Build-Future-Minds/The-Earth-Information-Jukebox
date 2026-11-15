@@ -68,7 +68,8 @@ numbers that made it.
 - Three honesty lines in public material: it is a visualization of a computer model (ECCO2), not a
   photo; the rhythm rule is a choice the team made; it describes the rendered image, not water
   speed, turbulence or ocean health.
-- No AI-generated images, music or video in the product or demo.
+- No images, music or video produced by a generative AI model in the product or demo. Sound is
+  synthesised by our own code; AI help with that code is listed in `AI_USE.md`.
 
 ## Evidence on Hand
 

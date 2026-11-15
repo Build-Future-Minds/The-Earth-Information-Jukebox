@@ -364,6 +364,7 @@ the smoothed value restarts after the gap, and smoothing with α = 0.3 lags a fa
 | 8 | Camera smear and zoom change the score. | Camera-smear and zoom tables |
 | 9 | Strong noise is reported as a low score, not as missing. | Noise table, last column |
 | 10 | Bright lines count more than faint ones (weight m²). | Weighting table |
+| 11 | Each region is a circle on the flat map, not on the Earth. On the ground it covers 10.7° of latitude (about 1,190 km) north–south but 10.7° × cos(latitude) east–west, so the Kuroshio circle (28.8° N) is about 12% narrower east–west than north–south. The Equatorial Pacific circle (1.4° N) is a true circle. **Design choice (15 Nov):** keep flat circles in version one; true circles on the globe wait for the next version, together with the map-stretch correction (row 7). | Geometry from the map scale in `assets/source_manifest.json` (0.176° per pixel, both axes). The effect of the shape on the score is **not measured**. |
 
 ## 7. Wording
 
@@ -409,6 +410,10 @@ image of ECCO2 model output. The raw values per frame are shown; the app plays s
 | `equator_pacific`, centre [271, 504] (**approved**) | +1.4° | 0.671 | 0.011 | 0.652 to 0.689 | 0.484 | 58 / 42 | 0.671 |
 
 No frame was `missing` in any circle.
+
+**Rerun on 15 Nov, 12 AM**, on `main` with the same command (without `--map`): every number in
+this table, the map-stretch estimates and the pair gaps below came out the same to 3 decimals.
+The joint check with Student A is still to do.
 
 The usable fraction is now the share of the **circle's** pixels with a clear edge (Dev B's review;
 `math_notes.md` section 6). The first run divided by the 122 × 122 box, which gave 0.208, 0.372,
