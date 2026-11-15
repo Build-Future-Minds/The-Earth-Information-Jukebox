@@ -32,6 +32,15 @@ Write 2–3 sentences for the form:
 > temperature, from the ECCO2 model for March 2007 to March 2008. We used 30 frames (25–30 March 2007)
 > and compared two regions: eddies east of Japan in the Kuroshio and streaks in the equatorial Pacific.
 
+### Other sources used (added 15 Nov)
+
+| Source | What we used | Regions | Listed by the hackathon as |
+| --- | --- | --- | --- |
+| SVS 5669 GEOS Aerosols (model) | one lossless still, 19 Aug 2025 20:00 UTC | Vanuatu streaks (168°E 19°S), SE Pacific cells (105°W 17°S), radius 110 px | challenge resource (not EIC) |
+| SVS 4285 GPM IMERG rain (observation) | 30 hourly frames, 14 Nov 00:00 – 15 Nov 05:00 UTC, saved copy | South Pacific rain band (138°W 18°S), equator showers (150°W 0°), radius 100 px | EIC "Daily Visualizations" |
+
+Full checks for both are in `assets/source_manifest.json`.
+
 ## Part 2 — References (draft Sat 6 PM, final Sun 4 PM)
 
 Every outside thing in the project. Ask Developer B for the library list (`web/package.json`)
@@ -40,6 +49,8 @@ and Developer A for the Python list (`requirements.txt`).
 | Name | What it is | Link | Licence or credit | Used for |
 | --- | --- | --- | --- | --- |
 | SVS 3912 | NASA visualization | https://svs.gsfc.nasa.gov/3912 | NASA/Goddard Space Flight Center Scientific Visualization Studio | Source images |
+| SVS 5669 | NASA visualization (GEOS Aerosols) | https://svs.gsfc.nasa.gov/5669/ | NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS) | Second source (one still) |
+| SVS 4285 | NASA visualization (GPM IMERG precipitation) | https://svs.gsfc.nasa.gov/4285/ | NASA's Scientific Visualization Studio | Third source (30 hourly frames) |
 | Tone.js 15.1.22 | Web Audio library | https://tonejs.github.io | MIT | Synthesising and timing every sound in the app |
 | React 19.3.1 | UI library | https://react.dev | MIT | The app's interface |
 | Atkinson Hyperlegible Next 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next | SIL Open Font License 1.1, © The Atkinson Hyperlegible Next Project Authors | Text in the app and listening game |
@@ -78,8 +89,9 @@ Ask each teammate what they actually used. Delete anything we did not use in the
 
 Two sentences, no name:
 
-> Student A wrote `prepare_scene.py`, which turns 30 NASA frames and the two approved circles into
-> the scene file and masks that the measurement and the app both read. It was tested by 11
+> Student A wrote `prepare_scene.py`, which turns NASA frames and approved circles into the scene
+> files and masks that the measurement and the app read, for three sources (ocean currents, aerosols
+> and rain), and checked each source for camera movement, land, labels and dates. It was tested by 11
 > automated tests (a good input, six bad inputs, and broken frames run all the way through the
 > measurement) and catches missing or broken input files, circles off the map or on land, and
 > unusable frames, which keep their place and become a clear "missing" step.

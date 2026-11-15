@@ -1,6 +1,6 @@
 {
   "_about": "Regions for SVS 4285 IMERG near real-time precipitation (30 hourly frames, 14 Nov 00:00 to 15 Nov 05:00 UTC). Owner: Student A. Default threshold 12, no setting change. Checks in source_manifest.json.",
-  "status": "proposed by Student A, 15 Nov 2026; for Dev A to approve",
+  "status": "approved by Dev A, 15 Nov 2026",
   "shape": "Circles, radius 100 px, same for both regions.",
   "regions": [
     {
