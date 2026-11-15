@@ -13,7 +13,7 @@ that shows the image, no student names or photos.
 
 | # | Slide | What goes on it | Your notes |
 | --- | --- | --- | --- |
-| 1 | Title | Earth Sonata: Play the Planet · team name · challenge: The Earth Information Jukebox | Drafted. Team name: ____ (ask Mr. E) |
+| 1 | Title | Earth Sonata: Play the Planet · team name · challenge: The Earth Information Jukebox | Drafted. Team name: Interstellar Sonata |
 | 2 | The question | Can you hear the difference between two regions of one NASA image? Why that matters for people who cannot see it. | Drafted (text below) |
 | 3 | The source | Screenshot of SVS 3912 with the two regions outlined. "ECCO2 model visualization, 2007–2008." Credit line. | Drafted. Region A: Kuroshio eddies east of Japan (`stills/kuroshio_eddies_23000.png`). Region B: Equatorial Pacific streaks (`stills/equator_pacific_23000.png`) |
 | 4 | The rule | "Lines line up → even pulse. Lines run many ways → long–short pulse." One picture of each. "This is a rule we chose." | Placeholder: wording not decided yet. Ask Dev A for the wording and the two example pictures |
@@ -27,7 +27,7 @@ Live deck: https://claude.ai/artifact/KtpvPqrUymfSP1yz6jMUeW (shared with anyone
 Slides 1, 2, 3, 5 and 7 are drafted; 4 and 6 are marked placeholders. The text on each slide:
 
 1. **Title.** NASA SPACE APPS · THE EARTH INFORMATION JUKEBOX. *Earth Sonata: Play the Planet.*
-   [Team name]. "Two regions of one NASA ocean picture, turned into two rhythms you can compare by
+   Team Interstellar Sonata. "Two regions of one NASA ocean picture, turned into two rhythms you can compare by
    ear." A colour strip in the picture's temperature colours.
 2. **The question.** "Can you hear the difference between two parts of one NASA picture?" "A map of
    ocean currents says nothing to someone who cannot see it. We measure how the drawn lines run in
