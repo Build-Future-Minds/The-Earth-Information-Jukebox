@@ -107,14 +107,14 @@ Open each link in a private window, signed out. Then on a phone.
 
 | Link | Opens signed out? | Opens on phone? | Checked at |
 | --- | --- | --- | --- |
-| Project repo | ____ | ____ | ____ |
-| Demo video or slides | ____ | ____ | ____ |
-| Live app (if any) | ____ | ____ | ____ |
+| Project repo | Yes | Yes | 15 Nov 2026 |
+| Demo video or slides | Slides: yes (https://claude.ai/artifact/KtpvPqrUymfSP1yz6jMUeW). Video: not made yet | Yes | 15 Nov 2026 |
+| Live app (if any) | Yes (app and globe page) | Yes | 15 Nov 2026 |
 
 - [ ] Video length is 30 seconds or less (check the file itself)
-- [ ] NASA credit is visible in the app and in the demo
+- [x] NASA credit is visible in the app and in the demo (app and globe under the image; slides 3 and 5)
 - [ ] No student names, faces or voices anywhere
-- [ ] Told Mr. E the result
+- [x] Told Mr. E the result
 
 ## Also yours: the 7-slide backup deck
 
