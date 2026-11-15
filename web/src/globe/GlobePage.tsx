@@ -91,7 +91,7 @@ export function GlobePage() {
           <p className="readout">PROTOTYPE · not in the app yet</p>
           <h1>Globe spotlight</h1>
         </div>
-        <p>Drag the globe, or focus it and use the arrow keys. Zoom with the mouse wheel, a pinch, the + and − keys or the buttons on the globe (0 resets). The brighter patch is the spotlight: exactly the part of the picture that would be measured and played.</p>
+        <p id="globe-help">Drag the globe, or focus it and use the arrow keys. Zoom with the mouse wheel, a pinch, the + and − keys or the buttons on the globe (0 resets). The brighter patch is the spotlight: exactly the part of the picture that would be measured and played.</p>
 
         <fieldset>
           <legend>Approved regions</legend>
@@ -139,7 +139,7 @@ export function GlobePage() {
         </p>
         <figure className="globe-figure">
           <GlobeView imageUrl={imageUrl} frame={frame} spot={spot}
-            faceSpotToken={faceToken} label={`Globe of ${scene.source.title}. ${where}`} />
+            faceSpotToken={faceToken} describedBy="globe-help" label={`Globe of ${scene.source.title}. ${where}`} />
           <figcaption>
             <span className="credit">Visualization: {scene.source.credit}</span> SVS {scene.source.svs_id}, first frame of the run
             ({scene.frames.timestamps?.[0] ?? 'model time unknown'}). ECCO2 model output.

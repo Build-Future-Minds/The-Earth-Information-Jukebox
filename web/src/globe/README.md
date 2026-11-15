@@ -25,6 +25,10 @@ After a merge to `main` it is also published at `.../globe.html` next to the app
 - A night sky behind the globe (stars, a faint Milky Way, a blue atmosphere glow). It is decoration,
   not data. The stars turn with the globe when you drag it and twinkle gently, except when the
   system asks for reduced motion.
+- Drawn on demand: a frame only when something changes. The stars twinkle at about 6 frames a
+  second, and not at all when the tab is hidden, the globe is off screen or reduced motion is on.
+- Keys leave browser shortcuts alone (Ctrl/Cmd + and − still zoom the page). The globe is described
+  by the instructions (`aria-describedby`), and `GlobeView` frees its WebGL resources on unmount.
 - No new libraries: plain WebGL2, so it still works offline.
 
 ## Files
