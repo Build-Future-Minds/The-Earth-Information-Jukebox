@@ -1,0 +1,553 @@
+{
+  "schema_version": "0.2",
+  "is_mock": false,
+  "scene": "data/imerg/scene.json",
+  "step_seconds": 1.0,
+  "normalisation": {
+    "gradient_threshold": 12.0,
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2026-11-14T00:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.2833,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2026-11-14T01:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.2782,
+      "reason": null
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2026-11-14T02:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.2799,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2026-11-14T03:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3003,
+      "reason": null
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2026-11-14T04:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3085,
+      "reason": null
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2026-11-14T05:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3128,
+      "reason": null
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2026-11-14T06:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3159,
+      "reason": null
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2026-11-14T07:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3172,
+      "reason": null
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2026-11-14T08:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3145,
+      "reason": null
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2026-11-14T09:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3125,
+      "reason": null
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2026-11-14T10:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3216,
+      "reason": null
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2026-11-14T11:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3399,
+      "reason": null
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2026-11-14T12:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3369,
+      "reason": null
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2026-11-14T13:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3184,
+      "reason": null
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2026-11-14T14:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3146,
+      "reason": null
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2026-11-14T15:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.309,
+      "reason": null
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2026-11-14T16:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3033,
+      "reason": null
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2026-11-14T17:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3109,
+      "reason": null
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2026-11-14T18:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3256,
+      "reason": null
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2026-11-14T19:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3314,
+      "reason": null
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2026-11-14T20:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3304,
+      "reason": null
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2026-11-14T21:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3373,
+      "reason": null
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2026-11-14T22:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3318,
+      "reason": null
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2026-11-14T23:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3468,
+      "reason": null
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2026-11-15T00:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3486,
+      "reason": null
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2026-11-15T01:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3478,
+      "reason": null
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2026-11-15T02:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3612,
+      "reason": null
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2026-11-15T03:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.371,
+      "reason": null
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2026-11-15T04:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3607,
+      "reason": null
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2026-11-15T05:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3544,
+      "reason": null
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2026-11-14T00:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0647,
+      "reason": null
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2026-11-14T01:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0661,
+      "reason": null
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2026-11-14T02:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0624,
+      "reason": null
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2026-11-14T03:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0574,
+      "reason": null
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2026-11-14T04:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0498,
+      "reason": null
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2026-11-14T05:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0544,
+      "reason": null
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2026-11-14T06:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.062,
+      "reason": null
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2026-11-14T07:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0658,
+      "reason": null
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2026-11-14T08:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0696,
+      "reason": null
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2026-11-14T09:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.068,
+      "reason": null
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2026-11-14T10:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0674,
+      "reason": null
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2026-11-14T11:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0738,
+      "reason": null
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2026-11-14T12:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0878,
+      "reason": null
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2026-11-14T13:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1033,
+      "reason": null
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2026-11-14T14:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1221,
+      "reason": null
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2026-11-14T15:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1227,
+      "reason": null
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2026-11-14T16:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1086,
+      "reason": null
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2026-11-14T17:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.112,
+      "reason": null
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2026-11-14T18:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.097,
+      "reason": null
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2026-11-14T19:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0837,
+      "reason": null
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2026-11-14T20:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0753,
+      "reason": null
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2026-11-14T21:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.093,
+      "reason": null
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2026-11-14T22:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0835,
+      "reason": null
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2026-11-14T23:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0811,
+      "reason": null
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2026-11-15T00:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0761,
+      "reason": null
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2026-11-15T01:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0608,
+      "reason": null
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2026-11-15T02:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.064,
+      "reason": null
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2026-11-15T03:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0653,
+      "reason": null
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2026-11-15T04:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0552,
+      "reason": null
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2026-11-15T05:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0523,
+      "reason": null
+    }
+  ]
+}
