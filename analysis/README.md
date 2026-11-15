@@ -82,6 +82,15 @@ The output is checked against `contracts/scene.schema.json` before it is written
     cd analysis && python features.py --scene ../data/scene.json --out ../data/features.json \
         --rhythm-out ../data/rhythm_reference.json
 
+Second source, SVS 5669 GEOS Aerosols (one still, approved by Dev A on 15 Nov at threshold 6 for
+this source only; never compare its numbers with the ocean's):
+
+    python analysis/prepare_scene.py --source svs5669     # writes data/aerosols/scene.json and masks
+    cd analysis && python features.py --scene ../data/aerosols/scene.json \
+        --out ../data/aerosols/features.json --rhythm-out ../data/aerosols/rhythm_reference.json --threshold 6
+
+Regions: `assets/regions_aerosols.json`. Checks Dev A asked for: `assets/source_manifest.json`, SVS 5669.
+
 Tests: `tests/test_prepare_scene.py` (good input, bad inputs, unusable frames end to end).
 
 Background: `docs/mapping_spec.md` (the rule), `docs/math_notes.md` (why), `docs/science_review.md`

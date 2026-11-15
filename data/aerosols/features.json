@@ -1,0 +1,31 @@
+{
+  "schema_version": "0.2",
+  "is_mock": false,
+  "scene": "data/aerosols/scene.json",
+  "step_seconds": 1.0,
+  "normalisation": {
+    "gradient_threshold": 6.0,
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2025-08-19T20:00Z",
+      "region": "aerosol_streaks_vanuatu",
+      "status": "ok",
+      "alignment": 0.53,
+      "reason": null
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2025-08-19T20:00Z",
+      "region": "aerosol_cells_se_pacific",
+      "status": "ok",
+      "alignment": 0.0146,
+      "reason": null
+    }
+  ]
+}

@@ -8,6 +8,10 @@ After a merge to `main` it is also published at `.../globe.html` next to the app
 
 ## What it does
 
+- **Two NASA sources**, chosen at the top: Ocean currents (SVS 3912, `data/`) and Aerosols
+  (SVS 5669, one still, `data/aerosols/`). Each keeps its own picture, circles, land rule and
+  credit. Alignment numbers are never compared between sources (Dev A, 15 Nov). The aerosol
+  source shows "not measured yet" until `data/aerosols/features.json` exists.
 - The NASA frame (`data/preview.jpg`) wrapped on a 3D globe. Drag it, or focus it and use the arrow
   keys (Shift for bigger steps). It only moves when you move it.
 - Zoom from 0.6× to 6×: mouse wheel or trackpad, two-finger pinch, `+` / `-` keys (`0` resets) or the
@@ -25,6 +29,10 @@ After a merge to `main` it is also published at `.../globe.html` next to the app
 - A night sky behind the globe (stars, a faint Milky Way, a blue atmosphere glow). It is decoration,
   not data. The stars turn with the globe when you drag it and twinkle gently, except when the
   system asks for reduced motion.
+- Drawn on demand: a frame only when something changes. The stars twinkle at about 6 frames a
+  second, and not at all when the tab is hidden, the globe is off screen or reduced motion is on.
+- Keys leave browser shortcuts alone (Ctrl/Cmd + and − still zoom the page). The globe is described
+  by the instructions (`aria-describedby`), and `GlobeView` frees its WebGL resources on unmount.
 - No new libraries: plain WebGL2, so it still works offline.
 
 ## Files
@@ -34,7 +42,8 @@ After a merge to `main` it is also published at `.../globe.html` next to the app
 | `src/globe/geo.ts` | Map maths: lon/lat ↔ pixels, bounding square, slider limits, land share, region JSON. Tested in `geo.test.ts`. |
 | `src/globe/globeRenderer.ts` | The WebGL globe, the spotlight shader and the night sky |
 | `src/globe/GlobeView.tsx` | React component: drag, arrow keys and zoom. Props: `imageUrl`, `frame`, `spot`, `faceSpotToken`, `label` |
-| `src/globe/GlobePage.tsx` | The prototype page: sliders, presets, readout |
+| `src/globe/GlobePage.tsx` | The prototype page: source choice, sliders, presets, readout |
+| `src/globe/sources.ts` | The sources the globe can show (ocean from `data/`, aerosols from `data/aerosols/`) |
 
 ## For Dev B
 
