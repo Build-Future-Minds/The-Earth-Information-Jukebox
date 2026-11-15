@@ -4,10 +4,22 @@ import { describe, expect, it } from 'vitest';
 import { buildEarthTrack } from '../audio/earthVoice';
 import { regionLabel } from '../components/ExploreControls';
 import { stepAtSameMoment } from '../components/RhythmExplanation';
-import { dayLabels, otherRegionOf, regionLetter, sourceByKey, SOURCES } from './sources';
+import { dayLabels, otherRegionOf, PICTURES, regionLetter, sourceByKey, SOURCES } from './sources';
 
 describe('sources', () => {
-  it('lists ocean then aerosols', () => expect(SOURCES.map((s) => s.key)).toEqual(['ocean', 'aerosols']));
+  it('lists every picture: ocean, aerosols, rain', () =>
+    expect(PICTURES.map((p) => p.key)).toEqual(['ocean', 'aerosols', 'imerg']));
+
+  it('the app plays only pictures that have measurements', () => {
+    expect(SOURCES.map((s) => s.key)).toEqual(PICTURES.filter((p) => p.features).map((p) => p.key));
+    expect(SOURCES.slice(0, 2).map((s) => s.key)).toEqual(['ocean', 'aerosols']);
+  });
+
+  it('rain is regions E and F, neutral, an EIC observation', () => {
+    const rain = PICTURES.find((p) => p.key === 'imerg')!;
+    expect([rain.label, rain.firstLetter, rain.regionStyle, rain.resource, rain.landRule]).toEqual(['Rain', 'E', 'neutral', 'eic', null]);
+    expect(rain.scene.regions.map((r) => regionLetter(rain, r.id))).toEqual(['E', 'F']);
+  });
 
   it('letters come from the source', () => {
     const [ocean, aero] = SOURCES;

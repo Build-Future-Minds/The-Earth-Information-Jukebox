@@ -4,6 +4,7 @@ One command, from the repository root:
 
     python analysis/prepare_scene.py                     # SVS 3912 ocean currents (default)
     python analysis/prepare_scene.py --source svs5669    # SVS 5669 GEOS Aerosols (one still)
+    python analysis/prepare_scene.py --source svs4285    # SVS 4285 IMERG precipitation (30 hours)
 
 It reads
     assets/frames/svs3912/          the downloaded frames (bash tools/download_frames.sh)
@@ -83,6 +84,20 @@ AEROSOL_LEGEND = {
 }
 
 
+# Colour key of SVS 4285, from its colour bars (rainbarwhite2.png, snowbarwhite2.png on the page).
+IMERG_LEGEND = {
+    "quantity": "Precipitation rate from GPM IMERG (liquid: green to dark red; frozen: cyan to purple)",
+    "units": "mm per hour",
+    "stops": [
+        {"colour": "green", "value": "0.1-0.3 mm/h rain"},
+        {"colour": "yellow", "value": "0.5-1 mm/h rain"},
+        {"colour": "orange", "value": "2-3 mm/h rain"},
+        {"colour": "red to dark red", "value": "5-50 mm/h rain"},
+        {"colour": "cyan to purple", "value": "0.1-50 mm/h snow"},
+    ],
+}
+
+
 @dataclass(frozen=True)
 class Source:
     """Everything that differs between NASA sources. The method is the same for all of them."""
@@ -100,6 +115,10 @@ class Source:
     land_rule: tuple[int, int, int]  # (mean min, mean max, max channel spread): what flat grey land looks like
     dates_file: str | None = None    # per-frame times, '<frame number> <time>' per line
     fixed_time: str | None = None    # or one time for a single still
+    # "grey": land is flat grey in the frames (land_rule). "reference": the land is a photo, so use
+    # the land outline of the SVS 3912 ocean map (same world, same flat map) plus anything bright
+    # that never changes across the frames (ice, a corner mark).
+    land_mode: str = "grey"
 
 
 SOURCES = {
@@ -111,7 +130,13 @@ SOURCES = {
     "svs5669": Source("svs5669", 5669, "Aerosols_2025-08-19T20_00_00_3840x2160.png", "assets/frames/svs5669",
                       "assets/regions_aerosols.json", "data/aerosols/scene.json", "data/aerosols/masks",
                       0, 0, 1, AEROSOL_LEGEND, (30, 95, 12), fixed_time="2025-08-19T20:00Z"),
+    # 30 hourly frames saved from NASA's rolling 7-day folder (14 Nov 00:00 to 15 Nov 05:00 UTC),
+    # renumbered 0-29; assets/imerg_frames.txt links each number to its time and NASA file name.
+    "svs4285": Source("svs4285", 4285, "imergert_composite.{index}.png", "assets/frames/svs4285",
+                      "assets/regions_imerg.json", "data/imerg/scene.json", "data/imerg/masks",
+                      0, 29, 1, IMERG_LEGEND, (45, 255, 3), dates_file="imerg_dates.txt", land_mode="reference"),
 }
+REFERENCE_LAND_FRAME = "assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.tif"
 
 
 class SceneError(Exception):
@@ -242,6 +267,24 @@ def land_mask(frames: list[np.ndarray], rule: tuple[int, int, int] = (LAND_MIN, 
     return cv2.dilate(land, np.ones((k, k), np.uint8)).astype(bool)
 
 
+def reference_land_mask(root: Path, frames: list[np.ndarray], rule: tuple[int, int, int]) -> np.ndarray:
+    """Land for sources whose land is a photo: the SVS 3912 land outline, resized, plus static bright pixels."""
+    ref_path = root / REFERENCE_LAND_FRAME
+    try:
+        ref = load_image(ref_path)
+    except (FileNotFoundError, ValueError):
+        raise SceneError(f"Reference land map not found: {ref_path}\nRun: bash tools/download_frames.sh") from None
+    height, width = frames[0].shape[:2]
+    outline = is_land(ref).astype(np.uint8)
+    outline = cv2.resize(outline, (width, height), interpolation=cv2.INTER_NEAREST).astype(bool)
+    stack = np.stack([f.astype(np.int16) for f in frames])
+    still = (stack.max(axis=0) - stack.min(axis=0)).max(axis=2) <= rule[2]
+    bright = stack[0].mean(axis=2) >= rule[0]
+    land = (outline | (still & bright)).astype(np.uint8)
+    k = 2 * COAST_MARGIN_PX * 2 + 1   # a wider margin: the outline is resized
+    return cv2.dilate(land, np.ones((k, k), np.uint8)).astype(bool)
+
+
 def circle_box(centre: list[int], radius: int) -> list[int]:
     """The square around the circle: [x, y, width, height]."""
     return [centre[0] - radius, centre[1] - radius, 2 * radius, 2 * radius]
@@ -279,7 +322,10 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
         raise SceneError(f"None of the {len(indices)} frames {first}..{last} could be used "
                          f"({checks[0].reason}).\nRun: bash tools/download_frames.sh")
     height, width = usable[0].shape[:2]
-    land = land_mask(usable, source.land_rule)
+    if source.land_mode == "reference":
+        land = reference_land_mask(root, usable, source.land_rule)
+    else:
+        land = land_mask(usable, source.land_rule)
 
     masks, scene_regions = {}, []
     for r in regions:

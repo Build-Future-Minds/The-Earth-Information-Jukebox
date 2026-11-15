@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.2",
+  "is_mock": false,
+  "source": {
+    "svs_id": 4285,
+    "url": "https://svs.gsfc.nasa.gov/4285/",
+    "title": "Near Real-Time Global Precipitation from the Global Precipitation Measurement Constellation",
+    "credit": "NASA's Scientific Visualization Studio",
+    "data_kind": "observation",
+    "limitations": [
+      "Near real-time rain estimates, later replaced by NASA's research-quality version.",
+      "Land is a satellite photo, so land is found from the SVS 3912 land outline plus pixels that never change; both circles are open ocean.",
+      "A small 'L' mark sits in the bottom-right corner (masked as static).",
+      "Rain comes and goes: a circle with no rain in a frame makes that beat missing. Both chosen circles have rain in all 30 frames.",
+      "The numbers describe the drawn rain picture, not how much it rains."
+    ],
+    "model_or_instrument": "GPM IMERG near real-time (GPM constellation of satellites)",
+    "data_start": "2026-11-14T00:00Z",
+    "data_end": "2026-11-15T05:00Z"
+  },
+  "frames": {
+    "width": 3600,
+    "height": 1800,
+    "count": 30,
+    "pattern": "assets/frames/svs4285/imergert_composite.{index}.png",
+    "timestamps": [
+      "2026-11-14T00:00Z",
+      "2026-11-14T01:00Z",
+      "2026-11-14T02:00Z",
+      "2026-11-14T03:00Z",
+      "2026-11-14T04:00Z",
+      "2026-11-14T05:00Z",
+      "2026-11-14T06:00Z",
+      "2026-11-14T07:00Z",
+      "2026-11-14T08:00Z",
+      "2026-11-14T09:00Z",
+      "2026-11-14T10:00Z",
+      "2026-11-14T11:00Z",
+      "2026-11-14T12:00Z",
+      "2026-11-14T13:00Z",
+      "2026-11-14T14:00Z",
+      "2026-11-14T15:00Z",
+      "2026-11-14T16:00Z",
+      "2026-11-14T17:00Z",
+      "2026-11-14T18:00Z",
+      "2026-11-14T19:00Z",
+      "2026-11-14T20:00Z",
+      "2026-11-14T21:00Z",
+      "2026-11-14T22:00Z",
+      "2026-11-14T23:00Z",
+      "2026-11-15T00:00Z",
+      "2026-11-15T01:00Z",
+      "2026-11-15T02:00Z",
+      "2026-11-15T03:00Z",
+      "2026-11-15T04:00Z",
+      "2026-11-15T05:00Z"
+    ],
+    "first_index": 0,
+    "index_step": 1,
+    "camera_static_check": "phase correlation of frame 0 vs frame 29: shift 0.15 px (a 6 px test shift is measured as 6.00): fixed camera"
+  },
+  "legend": {
+    "quantity": "Precipitation rate from GPM IMERG (liquid: green to dark red; frozen: cyan to purple)",
+    "units": "mm per hour",
+    "stops": [
+      {
+        "colour": "green",
+        "value": "0.1-0.3 mm/h rain"
+      },
+      {
+        "colour": "yellow",
+        "value": "0.5-1 mm/h rain"
+      },
+      {
+        "colour": "orange",
+        "value": "2-3 mm/h rain"
+      },
+      {
+        "colour": "red to dark red",
+        "value": "5-50 mm/h rain"
+      },
+      {
+        "colour": "cyan to purple",
+        "value": "0.1-50 mm/h snow"
+      }
+    ]
+  },
+  "regions": [
+    {
+      "id": "imerg_band_south_pacific",
+      "name": "Long rain band in the South Pacific",
+      "center_px": [
+        425,
+        1075
+      ],
+      "radius_px": 100,
+      "box_px": [
+        325,
+        975,
+        200,
+        200
+      ],
+      "mask": "data/imerg/masks/mask_imerg_band_south_pacific.png",
+      "description": "Open ocean in the South Pacific, where a long band of rain runs through the circle, so its lines mostly share one direction."
+    },
+    {
+      "id": "imerg_showers_equator",
+      "name": "Scattered showers on the equator in the central Pacific",
+      "center_px": [
+        300,
+        900
+      ],
+      "radius_px": 100,
+      "box_px": [
+        200,
+        800,
+        200,
+        200
+      ],
+      "mask": "data/imerg/masks/mask_imerg_showers_equator.png",
+      "description": "Open ocean on the equator in the central Pacific, where tropical showers pop up in small patches pointing every way."
+    }
+  ]
+}

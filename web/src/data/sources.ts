@@ -1,75 +1,82 @@
-// Every NASA picture the app can play, and the rules that keep them apart.
+// Every NASA picture the app knows, and the rules that keep them apart.
 //
-//   ocean     SVS 3912, data/           30 frames, regions A and B (an EIC visualization)
+//   ocean     SVS 3912, data/           30 frames, regions A and B (EIC visualization, model output)
 //   aerosols  SVS 5669, data/aerosols/  one still, regions C and D (a challenge resource, not EIC)
+//   imerg     SVS 4285, data/imerg/     30 hourly frames, regions E and F (EIC, satellite observations)
 //   practice  fixtures/mock/            test input only, regions A and B
 //
-// Never compare numbers between sources (Dev A, 15 Nov): each picture is drawn and measured with
-// its own settings. Every comparison helper here takes ONE source, so two pictures can never meet.
+// PICTURES is every picture with a scene (the globe shows them all). SOURCES is the pictures that
+// have measurements (features.json), which the app can play.
+//
+// Never compare numbers between pictures (Dev A, 15 Nov): each is drawn and measured with its own
+// settings. Every comparison helper here takes ONE source, so two pictures can never meet.
 import type { EarthTrack } from '../audio/earthVoice';
 import { OCEAN_LAND, type LandRule } from '../globe/geo';
 import { ACTIVE, type Dataset } from './dataset';
 import type { Features, Region, Scene } from './types';
 
-export type SourceKey = 'ocean' | 'aerosols' | 'practice';
+export type SourceKey = 'ocean' | 'aerosols' | 'imerg' | 'practice';
 
-export interface Source extends Dataset {
+export interface Picture extends Omit<Dataset, 'features'> {
   key: SourceKey;
-  /** One word for the picture button: "Ocean", "Aerosols", "Practice". */
+  /** One word for the picture button: "Ocean", "Aerosols", "Rain", "Practice". */
   label: string;
-  /** Letter of the source's first region; the next region gets the next letter. */
-  firstLetter: 'A' | 'C';
+  /** null until Dev A has measured the picture. */
+  features: Features | null;
+  /** Letter of the picture's first region; the next region gets the next letter. */
+  firstLetter: 'A' | 'C' | 'E';
   /** 'hue': violet and rose (DESIGN.md). 'neutral': ink and white, for pictures that use those hues. */
   regionStyle: 'hue' | 'neutral';
   resource: 'eic' | 'challenge' | 'practice';
-  /** What flat land looks like in this picture (globe land check). */
-  landRule: LandRule;
+  /** What flat land looks like (globe land check); null when the land is a photo. */
+  landRule: LandRule | null;
 }
 
-// The aerosol source lives in data/aerosols/ (written by analysis/prepare_scene.py --source svs5669).
-const aerosolJson = import.meta.glob<{ default: unknown }>('../../../data/aerosols/{scene,features}.json', { eager: true });
-const aerosolImages = import.meta.glob<string>('../../../data/aerosols/preview.{jpg,jpeg,png,webp}', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-});
-
-function aerosols(): Source | null {
-  const scene = aerosolJson['../../../data/aerosols/scene.json']?.default as Scene | undefined;
-  const features = aerosolJson['../../../data/aerosols/features.json']?.default as Features | undefined;
-  if (!scene || !features) return null;
-  return {
-    scene,
-    features,
-    imageUrl: Object.values(aerosolImages)[0] ?? null,
-    origin: 'data/',
-    key: 'aerosols',
-    label: 'Aerosols',
-    firstLetter: 'C',
-    regionStyle: 'neutral',
-    resource: 'challenge',
-    landRule: [30, 95, 12], // dull grey-green land in this picture (same rule as prepare_scene.py)
-  };
+/** A picture the app can play: it has measurements. */
+export interface Source extends Picture {
+  features: Features;
 }
 
-function pickSources(): Source[] {
+function fromData(folder: 'aerosols' | 'imerg', json: Record<string, { default: unknown }>, images: Record<string, string>) {
+  const scene = json[`../../../data/${folder}/scene.json`]?.default as Scene | undefined;
+  const features = (json[`../../../data/${folder}/features.json`]?.default as Features | undefined) ?? null;
+  return scene ? { scene, features, imageUrl: Object.values(images)[0] ?? null, origin: 'data/' as const } : null;
+}
+
+// Written by analysis/prepare_scene.py --source svs5669 / svs4285.
+const aerosols = fromData(
+  'aerosols',
+  import.meta.glob<{ default: unknown }>('../../../data/aerosols/{scene,features}.json', { eager: true }),
+  import.meta.glob<string>('../../../data/aerosols/preview.{jpg,jpeg,png,webp}', { eager: true, query: '?url', import: 'default' }),
+);
+const imerg = fromData(
+  'imerg',
+  import.meta.glob<{ default: unknown }>('../../../data/imerg/{scene,features}.json', { eager: true }),
+  import.meta.glob<string>('../../../data/imerg/preview.{jpg,jpeg,png,webp}', { eager: true, query: '?url', import: 'default' }),
+);
+
+function pickPictures(): Picture[] {
   if (ACTIVE.origin === 'fixtures/mock/') {
     return [{ ...ACTIVE, key: 'practice', label: 'Practice', firstLetter: 'A', regionStyle: 'hue', resource: 'practice', landRule: OCEAN_LAND }];
   }
-  const ocean: Source = { ...ACTIVE, key: 'ocean', label: 'Ocean', firstLetter: 'A', regionStyle: 'hue', resource: 'eic', landRule: OCEAN_LAND };
-  const aero = aerosols();
-  return aero ? [ocean, aero] : [ocean];
+  const list: Picture[] = [{ ...ACTIVE, key: 'ocean', label: 'Ocean', firstLetter: 'A', regionStyle: 'hue', resource: 'eic', landRule: OCEAN_LAND }];
+  // Aerosol land is dull grey-green (same rule as prepare_scene.py).
+  if (aerosols) list.push({ ...aerosols, key: 'aerosols', label: 'Aerosols', firstLetter: 'C', regionStyle: 'neutral', resource: 'challenge', landRule: [30, 95, 12] });
+  // Rain: the land is a satellite photo, so no colour rule finds it (prepare_scene.py uses the ocean outline).
+  if (imerg) list.push({ ...imerg, key: 'imerg', label: 'Rain', firstLetter: 'E', regionStyle: 'neutral', resource: 'eic', landRule: null });
+  return list;
 }
 
-export const SOURCES: Source[] = pickSources();
+export const PICTURES: Picture[] = pickPictures();
+export const SOURCES: Source[] = PICTURES.filter((p): p is Source => p.features !== null);
 
 export function sourceByKey(key: SourceKey): Source {
   return SOURCES.find((s) => s.key === key) ?? SOURCES[0];
 }
 
-export function regionLetter(source: Source, regionId: string): string {
-  const i = source.scene.regions.findIndex((r) => r.id === regionId);
-  return String.fromCharCode(source.firstLetter.charCodeAt(0) + i);
+export function regionLetter(picture: Picture, regionId: string): string {
+  const i = picture.scene.regions.findIndex((r) => r.id === regionId);
+  return String.fromCharCode(picture.firstLetter.charCodeAt(0) + i);
 }
 
 /** The other region of the same source, for comparisons. Only when the source has exactly two. */
@@ -87,9 +94,8 @@ export function dayLabels(track: EarthTrack): (string | null)[] {
   return track.steps.map((s) => {
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s.step.source_time ?? '');
     if (!m) return null;
-    const day = m[0];
-    if (day === lastDay) return null;
-    lastDay = day;
+    if (m[0] === lastDay) return null;
+    lastDay = m[0];
     return `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]}`;
   });
 }
