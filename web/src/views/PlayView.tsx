@@ -14,8 +14,9 @@ import { MelodyPad } from '../components/MelodyPad';
 import { PracticeGame } from '../components/PracticeGame';
 
 interface Props {
+  /** The picture the scan plays: always the ocean picture (see App.tsx), not the one chosen on Listen. */
   scene: Scene;
-  /** The NASA still, or null in practice mode. */
+  /** That picture's NASA still, or null in practice mode. */
   imageUrl: string | null;
   /** The page's speed setting: the picture scan follows it. */
   speed: number;

@@ -11,9 +11,11 @@ interface Props {
   expanded?: boolean;
   controls?: string;
   keyshortcuts?: string;
+  /** A visible key hint ("Esc"), hidden from screen readers: aria-keyshortcuts already says it. */
+  hint?: string;
 }
 
-export function IconButton({ icon: Icon, label, onClick, primary, pressed, expanded, controls, keyshortcuts }: Props) {
+export function IconButton({ icon: Icon, label, onClick, primary, pressed, expanded, controls, keyshortcuts, hint }: Props) {
   return (
     <button
       type="button"
@@ -26,6 +28,7 @@ export function IconButton({ icon: Icon, label, onClick, primary, pressed, expan
     >
       <Icon />
       <span className="icon-label">{label}</span>
+      {hint && <kbd className="key-hint" aria-hidden="true">{hint}</kbd>}
     </button>
   );
 }

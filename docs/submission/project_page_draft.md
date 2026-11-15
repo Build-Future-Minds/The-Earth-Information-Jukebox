@@ -144,7 +144,7 @@ ____
 - **Web libraries:** Tone.js (all sound), React; Atkinson Hyperlegible Next and Mono fonts; built and
   tested with Vite, Vitest, Ajv and Playwright. The globe uses the browser's own WebGL2, no library.
 - **Services:** GitHub, GitHub Actions and GitHub Pages (code, tests, the published app)
-- **Hardware (only if in the final demo):** NOT CHECKED YET (is the MIDI piano in the final demo? Dev B)
+- **Hardware:** none. The MIDI piano is not in the final demo (Dev B, 15 Nov); the melody is played with the computer keyboard or the on-screen keys.
 - **Other tools:** VS Code. Recording and editing the video: NOT CHECKED YET (Student B)
 - **AI tools:** see "Use of artificial intelligence" and `AI_USE.md`
 - The app makes no network requests and uses no AI or cloud service to make sound.

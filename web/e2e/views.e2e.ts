@@ -56,12 +56,18 @@ for (const view of ['listen', 'play'] as const) {
   });
 }
 
-test('Tab order on Listen: page links, then Play, and Enter starts', async ({ page }) => {
+test('Tab order on Listen follows the screen: tabs, theme, region, then Play; Enter starts', async ({ page }) => {
   await openApp(page);
   for (const name of ['Listen', 'Compare', "How it's made", 'Play along']) {
     await page.keyboard.press('Tab');
     await expect(pages(page).getByRole('link', { name })).toBeFocused();
   }
+  for (const name of ['Light', 'Dark']) {
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name, exact: true })).toBeFocused();
+  }
+  await page.keyboard.press('Tab'); // the region radio group is one Tab stop
+  await expect(page.getByRole('radio', { name: /Region A/ })).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
