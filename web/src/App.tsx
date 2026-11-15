@@ -3,6 +3,8 @@ import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
+import { DEFAULT_MELODY_INSTRUMENT, type MelodyInstrumentId } from './audio/instruments';
+import type { PictureScanHandle } from './components/PictureScan';
 import { BeatTrack } from './components/BeatTrack';
 import { PlayerBar, RegionChoice, regionLabel, regionStyle } from './components/ExploreControls';
 import { PageLinks } from './components/PageLinks';
@@ -24,6 +26,10 @@ export function App() {
   const source = sourceByKey(sourceKey);
   const { scene, features, imageUrl } = source;
   const look = { firstLetter: source.firstLetter, neutral: source.regionStyle === 'neutral' };
+  // The picture scan (Play along) always plays the ocean picture, whichever picture is chosen on
+  // Listen: its colour rule was built and checked on the ocean's temperature colours only, and the
+  // ocean's regions are A and B, as the scan labels them (Dev B's review of #45).
+  const scanPicture = sourceByKey('ocean');
   const [regionId, setRegionId] = useState(SOURCES[0].scene.regions[0].id);
   const [playState, setPlayState] = useState<PlayState>('stopped');
   const [sounding, setSounding] = useState<TrackStep | null>(null);
@@ -31,9 +37,11 @@ export function App() {
   const [speed, setSpeed] = useState(1);
   const [volumeDb, setVolumeDb] = useState(-6);
   const [melodyDb, setMelodyDb] = useState(-10);
+  const [melodyInstrument, setMelodyInstrument] = useState<MelodyInstrumentId>(DEFAULT_MELODY_INSTRUMENT);
   const [heldNotes, setHeldNotes] = useState<ReadonlySet<number>>(new Set());
   const transport = useRef<Transport | null>(null);
   const melody = useRef<UserVoice | null>(null);
+  const scan = useRef<PictureScanHandle>(null);
   const explanationRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const view = useView();
@@ -61,7 +69,8 @@ export function App() {
   const pause = useCallback(() => transport.current?.pause(), []);
   const stop = useCallback(() => {
     transport.current?.stop();
-    melody.current?.allOff(); // Stop silences everything, melody included
+    melody.current?.hush(); // Stop silences everything: the melody and its echo,
+    scan.current?.stop(); // and the picture scan
     setSounding(null);
   }, []);
   const replay = useCallback(() => void transport.current?.replay(), []);
@@ -259,12 +268,21 @@ export function App() {
           {view === 'how' && <HowView scene={scene} />}
           {view === 'play' && (
             <PlayView
+              scene={scanPicture.scene}
+              imageUrl={scanPicture.imageUrl}
+              speed={speed}
+              scanRef={scan}
               playState={playState}
               onStart={start}
               onPause={pause}
               onStop={stop}
               heldNotes={heldNotes}
               melodyDb={melodyDb}
+              melodyInstrument={melodyInstrument}
+              onMelodyInstrument={(id) => {
+                setMelodyInstrument(id);
+                melody.current?.setInstrument(id);
+              }}
               onNoteOn={onMelodyNoteOn}
               onNoteOff={onMelodyNoteOff}
               onAllOff={onMelodyAllOff}
