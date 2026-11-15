@@ -19,8 +19,8 @@ export function PracticeGame() {
           </a>
           .
         </p>
-        <a className="button-link primary" href={GAME} target="_blank" rel="noopener">
-          Open the listening game <span className="small">(new tab)</span>
+        <a className="button-link primary" href={GAME}>
+          Open the listening game
         </a>
       </div>
       <div className="practice-preview" aria-hidden="true">
