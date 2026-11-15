@@ -42,9 +42,13 @@ and Developer A for the Python list (`requirements.txt`).
 | SVS 3912 | NASA visualization | https://svs.gsfc.nasa.gov/3912 | NASA/Goddard Space Flight Center Scientific Visualization Studio | Source images |
 | Tone.js 15.1.22 | Web Audio library | https://tonejs.github.io | MIT | Synthesising and timing every sound in the app |
 | React 19.3.1 | UI library | https://react.dev | MIT | The app's interface |
+| Atkinson Hyperlegible Next 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next | SIL Open Font License 1.1, © The Atkinson Hyperlegible Next Project Authors | Text in the app and listening game |
+| Atkinson Hyperlegible Mono 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next-mono | SIL Open Font License 1.1, © The Atkinson Hyperlegible Mono Project Authors | Numbers and readouts |
+| Google Fonts | Font service | https://fonts.google.com | Google service | Loads the two fonts in the listening game page |
 | Vite 8.3.8 | Build tool | https://vite.dev | MIT | Running and building the app |
 | TypeScript 7.0.2 | Programming language | https://www.typescriptlang.org | Apache-2.0 | App code and type checks |
 | Vitest 5.1.0 | Test runner | https://vitest.dev | MIT | App tests |
+| Playwright 1.65.1 | Browser test tool | https://playwright.dev | Apache-2.0 | Browser tests of the app |
 | Ajv 8.20.0 | JSON Schema validator | https://ajv.js.org | MIT | Checking data files against `contracts/` in tests |
 | GitHub Pages and Actions | Hosting and automation | https://pages.github.com | GitHub service | Testing and publishing the app |
 | Python 3.14 | Programming language | https://www.python.org | PSF License | Preparing images and measuring alignment |
@@ -58,15 +62,15 @@ and Developer A for the Python list (`requirements.txt`).
 
 Versions: web from `web/package-lock.json` (Dev B's list in `web/README.md`), Python from the installed packages on 14 Nov 2026. Re-check before final submission.
 
-Check: does the app or video contain any image, sound or font that is not in this table? App: no. Its only image is an SVS 3912 frame, text uses the viewer's own system font (no font files), and every sound is synthesised with Tone.js. Video: NOT CHECKED YET (not made yet).
+Check: does the app or video contain any image, sound or font that is not in this table? App: no. Its only image is an SVS 3912 frame, its only fonts are Atkinson Hyperlegible Next and Mono (added by Dev B after 14 Nov, now listed), and every sound is synthesised with Tone.js. Video: NOT CHECKED YET (not made yet). Rechecked 15 Nov 2026.
 
 ## Part 3 — Tools, languages, hardware (draft Sat 6 PM, final Sun 2 PM)
 
 Ask each teammate what they actually used. Delete anything we did not use in the end.
 
-- Languages: Python, TypeScript, HTML and CSS, Bash (frame download script)
+- Languages: Python, TypeScript, HTML and CSS, GLSL (the globe's shaders), Bash (frame download script)
 - Python libraries: NumPy, OpenCV, Matplotlib, Pillow, pytest, jsonschema
-- Web libraries: Tone.js, React; build and test with Vite, Vitest, Ajv
+- Web libraries: Tone.js, React; Atkinson Hyperlegible Next and Mono fonts; build and test with Vite, Vitest, Ajv, Playwright
 - Hardware (only if it is in the final demo): NOT CHECKED YET (ask Dev B whether the MIDI piano is in the final demo)
 - Other tools (recording, editing, design): Git and GitHub, GitHub Pages, VS Code. Recording and editing: NOT CHECKED YET (ask Student B)
 

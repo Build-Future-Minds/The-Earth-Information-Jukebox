@@ -64,7 +64,12 @@ that partly line up and plays a more even pulse.
 
 **The NASA source** (Student A, 2–3 sentences from worksheet part 1)
 
-____
+We used the "Global Sea Surface Currents and Temperature" visualization from NASA's Scientific
+Visualization Studio (SVS 3912), which is part of NASA's Earth Information Center collection. It
+shows ocean surface currents computed by the ECCO2 ocean model for March 2007 to March 2008, drawn
+as flow lines coloured by modelled sea surface temperature; it is model output, not a satellite
+photo. We used 30 frames (25–30 March 2007) and compared two circles of the same size: eddies
+east of Japan in the Kuroshio, and streaks in the Equatorial Pacific.
 
 **How the sound is made** (Developer A, 3–4 sentences; Student B checks a beginner can follow it)
 
@@ -102,11 +107,31 @@ ____
 
 ## NASA and space agency data used — Student A
 
-____
+- **Global Sea Surface Currents and Temperature**, NASA Scientific Visualization Studio, SVS 3912:
+  https://svs.gsfc.nasa.gov/3912
+  - Listed in NASA's Earth Information Center gallery ("EIC Beauty Pieces"):
+    https://svs.gsfc.nasa.gov/gallery/earth-information-center/
+  - Credit: NASA/Goddard Space Flight Center Scientific Visualization Studio
+  - What it is: ECCO2 (MIT/JPL) ocean model output, surface flows only, 25 Mar 2007 to 3 Mar 2008.
+    Flow lines are coloured by modelled sea surface temperature. Not an observation.
+  - What we used: the 2048×1024 `orig` frame set, frames 23000 to 23116 (every 4th frame, 30 frames,
+    model time 25 Mar 2007 12:00Z to 30 Mar 2007 11:42Z), and NASA's per-frame date file
+    `flat_ecco2_dates.txt`. Frame 25000 was used only to check that the camera does not move.
+  - Two regions, circles of radius 61 pixels: Kuroshio eddies east of Japan (centre 149°E, 29°N)
+    and Equatorial Pacific streaks (centre 132°W, 1°N). Land is left out of the measurement.
+- No other NASA or space agency data is used.
 
 ## Tools, coding languages, hardware and software — Student A
 
-____
+- **Languages:** Python, TypeScript, HTML and CSS, GLSL (the globe's shaders), Bash (frame download script)
+- **Python libraries:** NumPy, OpenCV, Matplotlib, Pillow, pytest, jsonschema
+- **Web libraries:** Tone.js (all sound), React; Atkinson Hyperlegible Next and Mono fonts; built and
+  tested with Vite, Vitest, Ajv and Playwright. The globe uses the browser's own WebGL2, no library.
+- **Services:** GitHub, GitHub Actions and GitHub Pages (code, tests, the published app)
+- **Hardware (only if in the final demo):** NOT CHECKED YET (is the MIDI piano in the final demo? Dev B)
+- **Other tools:** VS Code. Recording and editing the video: NOT CHECKED YET (Student B)
+- **AI tools:** see "Use of artificial intelligence" and `AI_USE.md`
+- The app makes no network requests and uses no AI or cloud service to make sound.
 
 ## Use of artificial intelligence — everyone, collected by the students, edited by Mr. E
 
@@ -114,7 +139,32 @@ ____ (from `AI_USE.md`: which tools, what for, how a person checked the result)
 
 ## References — Student A
 
-____
+| Name | What it is | Link | Licence or credit | Used for |
+| --- | --- | --- | --- | --- |
+| SVS 3912 | NASA visualization | https://svs.gsfc.nasa.gov/3912 | NASA/Goddard Space Flight Center Scientific Visualization Studio | Source images |
+| Tone.js 15.1.22 | Web Audio library | https://tonejs.github.io | MIT | Synthesising and timing every sound in the app |
+| React 19.3.1 | UI library | https://react.dev | MIT | The app's interface |
+| Atkinson Hyperlegible Next 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next | SIL Open Font License 1.1, © The Atkinson Hyperlegible Next Project Authors | Text in the app and listening game |
+| Atkinson Hyperlegible Mono 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next-mono | SIL Open Font License 1.1, © The Atkinson Hyperlegible Mono Project Authors | Numbers and readouts |
+| Google Fonts | Font service | https://fonts.google.com | Google service | Loads the two fonts in the listening game page |
+| Vite 8.3.8 | Build tool | https://vite.dev | MIT | Running and building the app |
+| TypeScript 7.0.2 | Programming language | https://www.typescriptlang.org | Apache-2.0 | App code and type checks |
+| Vitest 5.1.0 | Test runner | https://vitest.dev | MIT | App unit tests |
+| Playwright 1.65.1 | Browser test tool | https://playwright.dev | Apache-2.0 | Browser tests of the app |
+| Ajv 8.20.0 | JSON Schema validator | https://ajv.js.org | MIT | Checking data files against `contracts/` in tests |
+| GitHub Pages and Actions | Hosting and automation | https://pages.github.com | GitHub service | Testing and publishing the app |
+| Python 3.14 | Programming language | https://www.python.org | PSF License | Preparing images and measuring alignment |
+| NumPy 2.5.4 | Python library | https://numpy.org | BSD-3-Clause | Array maths |
+| OpenCV (opencv-python 5.0.0) | Python library | https://opencv.org | Apache-2.0 | Reading frames, image gradients, masks |
+| Matplotlib 3.11.2 | Python library | https://matplotlib.org | Matplotlib License (PSF-based) | Figures in the science review |
+| Pillow 13.0.0 | Python library | https://python-pillow.org | MIT-CMU | Reading frames in `check_motion.py`, preview images |
+| pytest 9.2.0 | Test runner | https://pytest.org | MIT | Python tests |
+| jsonschema 4.26.0 | Python library | https://python-jsonschema.readthedocs.io | MIT | Checking `scene.json` and `features.json` against `contracts/` |
+| Claude / Claude Code | AI tool | https://claude.ai | — | See "Use of artificial intelligence" and `AI_USE.md` |
+
+Versions checked on 15 Nov 2026 (web: installed packages from `package-lock.json`; Python: installed
+packages). The app's only image is an SVS 3912 frame, every sound is synthesised by our own code with
+Tone.js, and its only fonts are the two above. The video is NOT CHECKED YET (not made yet).
 
 ## Team contributions — each person writes their own line, roles not names
 
