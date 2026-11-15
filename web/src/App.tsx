@@ -7,16 +7,23 @@ import { ExploreControls, regionLabel, regionStyle } from './components/ExploreC
 import { PageLinks } from './components/PageLinks';
 import { ThemeSwitch } from './components/ThemeSwitch';
 import { stepAtSameMoment } from './components/RhythmExplanation';
+import { SourceChoice } from './components/SourceChoice';
+import { selectSource } from './data/selection';
+import { otherRegionOf, sourceByKey, SOURCES, type SourceKey } from './data/sources';
 import { useView, VIEWS } from './views';
 import { CompareView } from './views/CompareView';
 import { HowView } from './views/HowView';
 import { ListenView } from './views/ListenView';
 import { PlayView } from './views/PlayView';
 
-const { scene, features, imageUrl } = ACTIVE;
 
 export function App() {
-  const [regionId, setRegionId] = useState(scene.regions[0].id);
+  // The picture being played (the jukebox) and its region. Every comparison uses this one source.
+  const [sourceKey, setSourceKey] = useState<SourceKey>(SOURCES[0].key);
+  const source = sourceByKey(sourceKey);
+  const { scene, features, imageUrl } = source;
+  const look = { firstLetter: source.firstLetter, neutral: source.regionStyle === 'neutral' };
+  const [regionId, setRegionId] = useState(SOURCES[0].scene.regions[0].id);
   const [playState, setPlayState] = useState<PlayState>('stopped');
   const [sounding, setSounding] = useState<TrackStep | null>(null);
   const [explaining, setExplaining] = useState(false);
@@ -31,7 +38,7 @@ export function App() {
   const view = useView();
   const viewLabel = VIEWS.find((v) => v.key === view)!.label;
 
-  const track = useMemo(() => buildEarthTrack(features, regionId), [regionId]);
+  const track = useMemo(() => buildEarthTrack(features, regionId), [features, regionId]);
 
   useEffect(() => {
     const t = new Transport({ onStep: setSounding, onState: setPlayState });
@@ -91,7 +98,18 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [stop]);
+  }, [stop, scene]);
+
+  // Choosing another picture is like Stop, then its first region is selected.
+  const chooseSource = useCallback(
+    (key: SourceKey) => {
+      stop();
+      const next = selectSource(key);
+      setSourceKey(next.sourceKey);
+      setRegionId(next.regionId);
+    },
+    [stop],
+  );
 
   // Changing view is the same as pressing Stop. Then go to the top and move focus to the view's
   // heading, so a screen reader announces where you are. Not on the first load: Tab starts at the top.
@@ -111,12 +129,12 @@ export function App() {
     if (explaining) explanationRef.current?.focus();
   }, [explaining]);
 
-  const label = regionLabel(scene.regions, regionId);
+  const label = regionLabel(scene.regions, regionId, look.firstLetter);
   // For the comparison line: the other region's measurement at the same source moment (two regions only).
-  const otherRegion = scene.regions.length === 2 ? scene.regions.find((r) => r.id !== regionId) : undefined;
+  const otherRegion = otherRegionOf(source, regionId);
   const other = otherRegion
     ? {
-        label: regionLabel(scene.regions, otherRegion.id),
+        label: regionLabel(scene.regions, otherRegion.id, look.firstLetter),
         step: sounding ? stepAtSameMoment(features.steps, sounding.step, otherRegion.id) : null,
       }
     : null;
@@ -145,16 +163,23 @@ export function App() {
         <div className="rail">
           <header>
             <h1>Earth Sonata: Play the Planet</h1>
-            <p className="lede">
-              Compare two regions of a NASA ocean visualization by ear. More aligned lines, more even pulse.
-            </p>
+            {/* Student B's title line (docs/design/student_b_pictures.html), made picture-neutral
+                now that the app plays three pictures. */}
+            <p className="lede">Hear two regions. Lined-up streaks play an even pulse.</p>
           </header>
 
           <PageLinks current={view} />
 
+          {(view === 'listen' || view === 'compare') && (
+            <SourceChoice sources={SOURCES} current={sourceKey} onChoose={chooseSource} />
+          )}
+
           {view === 'listen' && (
             <ExploreControls
               regions={scene.regions}
+              look={look}
+              imageUrl={imageUrl}
+              frame={scene.frames}
               regionId={regionId}
               playState={playState}
               explaining={explaining}
@@ -196,7 +221,9 @@ export function App() {
               imageUrl={imageUrl}
               regionId={regionId}
               label={label}
-              colour={regionStyle(scene.regions, regionId)}
+              look={look}
+              onSelect={setRegionId}
+              colour={regionStyle(scene.regions, regionId, look)}
               track={track}
               sounding={sounding}
               playState={playState}
@@ -218,6 +245,7 @@ export function App() {
               getPosition={getPosition}
               onListen={listenTo}
               onStop={stop}
+              look={look}
             />
           )}
           {view === 'how' && <HowView scene={scene} />}

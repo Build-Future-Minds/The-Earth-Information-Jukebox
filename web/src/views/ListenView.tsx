@@ -7,6 +7,7 @@ import { BeatTrack } from '../components/BeatTrack';
 import { NowPlaying } from '../components/NowPlaying';
 import { RhythmExplanation, type OtherRegion } from '../components/RhythmExplanation';
 import { SceneView } from '../components/SceneView';
+import type { RegionLook } from '../components/ExploreControls';
 import type { Scene } from '../data/types';
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
   imageUrl: string | null;
   regionId: string;
   label: string;
+  look: RegionLook;
+  onSelect: (regionId: string) => void;
   colour: CSSProperties;
   track: EarthTrack;
   sounding: TrackStep | null;
@@ -29,7 +32,7 @@ interface Props {
 export function ListenView(p: Props) {
   return (
     <>
-      <SceneView scene={p.scene} imageUrl={p.imageUrl} regionId={p.regionId} />
+      <SceneView scene={p.scene} imageUrl={p.imageUrl} regionId={p.regionId} look={p.look} onSelect={p.onSelect} />
       <NowPlaying step={p.sounding} regionLabel={p.label} />
       <BeatTrack
         track={p.track}
