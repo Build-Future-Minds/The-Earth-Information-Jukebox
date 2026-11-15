@@ -102,6 +102,38 @@
   svg .lbl { fill: var(--ink-2); font: 400 12px var(--mono); }
   svg .ring { fill: none; stroke: var(--c); stroke-width: 4; }
   svg .ring-out { fill: none; stroke: #000; stroke-width: 7; }
+
+  /* Compare numerals */
+  .numerals { display: grid; grid-template-columns: 1fr 1fr 0.8fr; }
+  .numerals > div { padding: 4px 24px 6px 0; }
+  .numerals > div + div { padding-left: 24px; border-left: 1px solid var(--rule); }
+  .numerals .who { display: flex; gap: 8px; align-items: center; font-weight: 700; }
+  .numerals .big { font-size: clamp(3.4rem, 8vw, 6rem); line-height: 0.9; letter-spacing: -0.03em; margin: 12px 0 6px; font-variant-numeric: tabular-nums; }
+  .numerals .big.none { font-size: 1.6rem; font-weight: 400; color: var(--ink-2); line-height: 1.2; margin: 26px 0 20px; }
+  .numerals .sub { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
+  .missing-demo { opacity: 0.8; }
+  .weight-key { display: flex; align-items: baseline; gap: 10px; margin-top: 16px; font-size: 1.4rem; flex-wrap: wrap; }
+  .weight-key i { flex: 0 0 40px; height: 1px; background: var(--rule); align-self: center; }
+  .weight-key em { font-style: normal; font-size: 0.9rem; color: var(--ink-2); margin-left: 8px; }
+  @media (max-width: 720px) {
+    .numerals { grid-template-columns: 1fr 1fr; }
+    .numerals > .missing-demo { grid-column: 1 / -1; border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); margin-top: 12px; padding-top: 12px; }
+  }
+
+  /* Play along card: a hairline-ruled block, no box */
+  .card { display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); padding: 18px 0; max-width: 760px; }
+  .card-pic { display: flex; align-items: center; gap: 12px; }
+  .card-pic svg { width: 120px; height: 64px; display: block; }
+  .card-pic .q { font: 300 2.6rem/1 var(--font); color: var(--ink-2); }
+  .card-text h3 { margin: 0; font-size: 1.35rem; }
+  .card-text p { margin: 4px 0 12px; color: var(--ink-2); }
+  .play { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 4px; background: var(--action); color: var(--on-action); font-weight: 700; text-decoration: none; }
+
+  /* Credit and honesty footer */
+  .foot { border-top: 1px solid var(--ink); padding-top: 12px; display: grid; gap: 4px; font-size: 0.95rem; color: var(--ink-2); max-width: 70ch; }
+  .foot p { margin: 0; }
+  .foot b { color: var(--ink); font-weight: 600; }
+  .foot a { color: var(--ink); text-underline-offset: 3px; }
 </style>
 </head>
 <body>
@@ -188,6 +220,66 @@
     </div>
     <p class="note">For Dev A: caption 2 says “how much they agree, 0 to 1” for alignment; caption 3 is the rule in words (second pulse at 0.75 − 0.25 × alignment). The rule is our choice, which the footer says. The picture in step 1 is a drawing for the strip; the app’s own NASA still can replace it.</p>
   </section>
+
+  <!-- 4. Compare numerals -->
+  <section aria-labelledby="t4">
+    <h2 id="t4">Numerals on Compare</h2>
+    <p class="task">Task 7 · once per region · thin means swirly, heavy means lined up · no “wght”</p>
+    <div class="numerals">
+      <div>
+        <div class="who"><span class="badge" style="--c: var(--region-a)">A</span>Kuroshio eddies</div>
+        <p class="big" style="font-weight: 248">0.08</p>
+        <p class="sub">Swirly · second pulse at 73% of the beat</p>
+      </div>
+      <div>
+        <div class="who"><span class="badge" style="--c: var(--region-b)">B</span>Equatorial streaks</div>
+        <p class="big" style="font-weight: 702">0.67</p>
+        <p class="sub">Lined up · second pulse at 58% of the beat</p>
+      </div>
+      <div class="missing-demo">
+        <div class="who"><span class="badge" style="--c: var(--ink-2)">?</span>Missing frame</div>
+        <p class="big none">no data</p>
+        <p class="sub">Never shown as a number</p>
+      </div>
+    </div>
+    <div class="weight-key" aria-hidden="true">
+      <span style="font-weight: 200">0.0</span><i></i><span style="font-weight: 500">0.5</span><i></i><span style="font-weight: 800">1.0</span>
+      <em>thin = swirly · heavy = lined up</em>
+    </div>
+    <p class="note">For Dev B: the numeral is the alignment, set in the Next face with its weight from 200 (alignment 0) to 800 (alignment 1), the same mapping as now; the word “wght” and the weight number are gone. The key under the pair appears once on the page. The third column only shows the missing state for this page; in the app a missing frame replaces that region’s numeral with “no data”, in the regular weight.</p>
+  </section>
+
+  <!-- 5. Play along card -->
+  <section aria-labelledby="t5">
+    <h2 id="t5">Play along card</h2>
+    <p class="task">Task 14 · one card on Play along · the “?” patch picture and a Play the game button</p>
+    <div class="card">
+      <div class="card-pic" aria-hidden="true">
+        <svg viewBox="0 0 120 64"><rect class="well" width="120" height="64" rx="3"/><g id="cardP1"></g></svg>
+        <span class="q">?</span>
+        <svg viewBox="0 0 120 64"><rect class="well" width="120" height="64" rx="3"/><g id="cardP2"></g></svg>
+      </div>
+      <div class="card-text">
+        <h3>Test your ear</h3>
+        <p>Hear a rhythm. Which patch made it?</p>
+        <a class="play" href="#">▶ Play the game</a>
+      </div>
+    </div>
+    <p class="note">For Dev B: the button is a link styled as the primary button, opening the game in the same tab (the game has a Back link). The two patch pictures are the existing lined-up and swirly tick keys. No link to the quiz player here: that stays with the team, off the page.</p>
+  </section>
+
+  <!-- 6. Credit and honesty footer -->
+  <section aria-labelledby="t6">
+    <h2 id="t6">Credit and honesty footer</h2>
+    <p class="task">Task 16 · ends How it’s made · the credit and the three honesty lines, one short line each</p>
+    <footer class="foot">
+      <p><b>Picture:</b> NASA/Goddard Space Flight Center Scientific Visualization Studio, <a href="https://svs.gsfc.nasa.gov/3912">SVS 3912</a></p>
+      <p>A computer model of the ocean (ECCO2), not a photo.</p>
+      <p>The rhythm rule is a choice we made.</p>
+      <p>It describes the picture, not water speed or ocean health.</p>
+    </footer>
+    <p class="note">For Dev B: the short credit stays directly under the picture on every page, as now; this footer is the full version. When the aerosols source (SVS 5669) is chosen, the credit and the model line change with it. All sound is made in the browser; that line can join the footer if the team wants it.</p>
+  </section>
 </div>
 <script>
   // Theme switch, shared with the app and the game.
@@ -209,6 +301,9 @@
   document.getElementById("ticksStrip").innerHTML =
     [...Array(12)].map((_, i) => tick(24 + (i % 6) * 38, 36 + Math.floor(i / 6) * 58, i < 6 ? [3, -4, 0, 5, -2, 2][i] : [55, -40, 100, 20, -70, 140][i - 6], 22)).join("");
 
+  // Play along card: the lined-up and swirly keys.
+  document.getElementById("cardP1").innerHTML = [...Array(6)].map((_, i) => tick(22 + (i % 3) * 38, 20 + Math.floor(i / 3) * 24, [2, -3, 0, 4, -2, 1][i], 22)).join("");
+  document.getElementById("cardP2").innerHTML = [...Array(6)].map((_, i) => tick(22 + (i % 3) * 38, 20 + Math.floor(i / 3) * 24, [50, -45, 95, 20, -75, 135][i], 22)).join("");
   // One beat, to scale: first pulse at 0, second at split x beat, dashed middle.
   document.querySelectorAll("svg.beat").forEach((svg) => {
     const s = Number(svg.dataset.split), x0 = 14, w = 140;
