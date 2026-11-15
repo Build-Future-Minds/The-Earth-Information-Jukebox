@@ -119,7 +119,23 @@ ____
     `flat_ecco2_dates.txt`. Frame 25000 was used only to check that the camera does not move.
   - Two regions, circles of radius 61 pixels: Kuroshio eddies east of Japan (centre 149°E, 29°N)
     and Equatorial Pacific streaks (centre 132°W, 1°N). Land is left out of the measurement.
-- No other NASA or space agency data is used.
+- **GEOS Aerosols (2025)**, SVS 5669: https://svs.gsfc.nasa.gov/5669/ — a challenge resource ("GEOS
+  Aerosols" in the challenge's resource list); not in the Earth Information Center gallery.
+  - Credit: NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS)
+  - What it is: GEOS-FP model output, one still for 19 Aug 2025 20:00 UTC; colours show aerosol type
+    (blue sea salt, pink dust, orange/red smoke, green sulfates). Not an observation.
+  - What we used: the lossless 3840×2160 still. Two circles of radius 110 pixels over open ocean:
+    sulfate and sea-salt streaks near Vanuatu (168°E, 19°S) and sea-salt cells in the southeast
+    Pacific (105°W, 17°S). Measured at its own setting; its numbers are never compared with the ocean's.
+- **Near Real-Time Global Precipitation (GPM IMERG)**, SVS 4285: https://svs.gsfc.nasa.gov/4285/ — listed
+  in the Earth Information Center "Daily Visualizations" dashboard.
+  - Credit: NASA's Scientific Visualization Studio
+  - What it is: satellite rain estimates from the GPM constellation, a flat 3600×1800 map every 30 minutes.
+  - What we used: 30 hourly frames, 14 Nov 2026 00:00 to 15 Nov 2026 05:00 UTC (saved, because NASA keeps
+    only the latest week). Two circles of radius 100 pixels over open ocean: a long rain band in the South
+    Pacific (138°W, 18°S) and scattered showers on the equator (150°W, 0°).
+- The ocean currents (SVS 3912) are the main source in the app; all three can be explored on the globe page.
+  No other NASA or space agency data is used.
 
 ## Tools, coding languages, hardware and software — Student A
 
@@ -142,6 +158,8 @@ ____ (from `AI_USE.md`: which tools, what for, how a person checked the result)
 | Name | What it is | Link | Licence or credit | Used for |
 | --- | --- | --- | --- | --- |
 | SVS 3912 | NASA visualization | https://svs.gsfc.nasa.gov/3912 | NASA/Goddard Space Flight Center Scientific Visualization Studio | Source images |
+| SVS 5669 | NASA visualization (GEOS Aerosols) | https://svs.gsfc.nasa.gov/5669/ | NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS) | Second source (one still) |
+| SVS 4285 | NASA visualization (GPM IMERG precipitation) | https://svs.gsfc.nasa.gov/4285/ | NASA's Scientific Visualization Studio | Third source (30 hourly frames) |
 | Tone.js 15.1.22 | Web Audio library | https://tonejs.github.io | MIT | Synthesising and timing every sound in the app |
 | React 19.3.1 | UI library | https://react.dev | MIT | The app's interface |
 | Atkinson Hyperlegible Next 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next | SIL Open Font License 1.1, © The Atkinson Hyperlegible Next Project Authors | Text in the app and listening game |
@@ -170,7 +188,7 @@ Tone.js, and its only fonts are the two above. The video is NOT CHECKED YET (not
 
 - Developer A: ____
 - Developer B: ____
-- Student A: ____
+- Student A: wrote `prepare_scene.py`, which turns NASA frames and approved circles into the scene files and masks the measurement and app read, for three sources (ocean currents, aerosols, rain); checked every source and region (camera, land, labels, dates); built the 3D globe page; and wrote the NASA data, tools and references sections.
 - Student B: ____
 
 ---

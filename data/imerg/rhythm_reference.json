@@ -1,0 +1,2816 @@
+{
+  "schema_version": "0.1",
+  "is_mock": false,
+  "generated_by": "earth-sonata math engine 0.1.0",
+  "scene": "data/imerg/scene.json",
+  "source": {
+    "svs_id": 4285,
+    "url": "https://svs.gsfc.nasa.gov/4285/",
+    "title": "Near Real-Time Global Precipitation from the Global Precipitation Measurement Constellation",
+    "credit": "NASA's Scientific Visualization Studio",
+    "data_kind": "observation"
+  },
+  "measurement": {
+    "what": "How strongly the visible lines in the rendered image share one direction (structure-tensor orientation coherence). Not a physical quantity.",
+    "gray_mode": "value",
+    "blur_sigma_px": 1.0,
+    "blur_radius_px": 4,
+    "gradient_operator": "sobel_3x3_div_8",
+    "weight_power": 2,
+    "gradient_threshold": 12.0,
+    "gradient_threshold_units": "grey levels (0-255 scale) per pixel",
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3,
+    "smoothing_rule": "exponential moving average over consecutive ok steps; starts again after a missing step",
+    "same_settings_for_all_regions": true
+  },
+  "rhythm": {
+    "rule": "long_fraction = 0.75 - 0.25 * alignment",
+    "beat_seconds": 1.0,
+    "pulses_per_beat": 2,
+    "long_fraction_at_alignment_0": 0.75,
+    "long_fraction_at_alignment_1": 0.5,
+    "voice": "earth",
+    "pitch": 64,
+    "dur": 0.08,
+    "vel": 0.8,
+    "carries_data": [
+      "position of the second pulse inside the beat"
+    ],
+    "fixed_no_data": [
+      "tempo",
+      "pitch",
+      "note length",
+      "loudness"
+    ],
+    "missing_rule": "a missing step has no pulses"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2026-11-14T00:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.2833,
+      "alignment_raw": 0.2833,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2284,
+      "dominant_angle_deg": 161.9,
+      "long_fraction": 0.679175,
+      "pulse_times": [
+        0.0,
+        0.679175
+      ],
+      "long_interval": 0.679175,
+      "short_interval": 0.320825
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2026-11-14T01:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.2782,
+      "alignment_raw": 0.2662,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2399,
+      "dominant_angle_deg": 157.6,
+      "long_fraction": 0.68045,
+      "pulse_times": [
+        1.0,
+        1.68045
+      ],
+      "long_interval": 0.68045,
+      "short_interval": 0.31955
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2026-11-14T02:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.2799,
+      "alignment_raw": 0.2841,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2422,
+      "dominant_angle_deg": 155.3,
+      "long_fraction": 0.680025,
+      "pulse_times": [
+        2.0,
+        2.680025
+      ],
+      "long_interval": 0.680025,
+      "short_interval": 0.319975
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2026-11-14T03:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3003,
+      "alignment_raw": 0.3478,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.208,
+      "dominant_angle_deg": 159.1,
+      "long_fraction": 0.674925,
+      "pulse_times": [
+        3.0,
+        3.674925
+      ],
+      "long_interval": 0.674925,
+      "short_interval": 0.325075
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2026-11-14T04:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3085,
+      "alignment_raw": 0.3277,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.225,
+      "dominant_angle_deg": 157.6,
+      "long_fraction": 0.672875,
+      "pulse_times": [
+        4.0,
+        4.672875
+      ],
+      "long_interval": 0.672875,
+      "short_interval": 0.327125
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2026-11-14T05:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3128,
+      "alignment_raw": 0.3228,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2604,
+      "dominant_angle_deg": 155.9,
+      "long_fraction": 0.6718,
+      "pulse_times": [
+        5.0,
+        5.6718
+      ],
+      "long_interval": 0.6718,
+      "short_interval": 0.3282
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2026-11-14T06:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3159,
+      "alignment_raw": 0.3233,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.26,
+      "dominant_angle_deg": 156.0,
+      "long_fraction": 0.671025,
+      "pulse_times": [
+        6.0,
+        6.671025
+      ],
+      "long_interval": 0.671025,
+      "short_interval": 0.328975
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2026-11-14T07:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3172,
+      "alignment_raw": 0.3203,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2671,
+      "dominant_angle_deg": 161.0,
+      "long_fraction": 0.6707,
+      "pulse_times": [
+        7.0,
+        7.6707
+      ],
+      "long_interval": 0.6707,
+      "short_interval": 0.3293
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2026-11-14T08:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3145,
+      "alignment_raw": 0.3081,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2757,
+      "dominant_angle_deg": 159.6,
+      "long_fraction": 0.671375,
+      "pulse_times": [
+        8.0,
+        8.671375
+      ],
+      "long_interval": 0.671375,
+      "short_interval": 0.328625
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2026-11-14T09:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3125,
+      "alignment_raw": 0.3078,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2827,
+      "dominant_angle_deg": 162.4,
+      "long_fraction": 0.671875,
+      "pulse_times": [
+        9.0,
+        9.671875
+      ],
+      "long_interval": 0.671875,
+      "short_interval": 0.328125
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2026-11-14T10:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3216,
+      "alignment_raw": 0.3429,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.253,
+      "dominant_angle_deg": 160.4,
+      "long_fraction": 0.6696,
+      "pulse_times": [
+        10.0,
+        10.6696
+      ],
+      "long_interval": 0.6696,
+      "short_interval": 0.3304
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2026-11-14T11:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3399,
+      "alignment_raw": 0.3825,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2558,
+      "dominant_angle_deg": 161.5,
+      "long_fraction": 0.665025,
+      "pulse_times": [
+        11.0,
+        11.665025
+      ],
+      "long_interval": 0.665025,
+      "short_interval": 0.334975
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2026-11-14T12:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3369,
+      "alignment_raw": 0.33,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2645,
+      "dominant_angle_deg": 161.8,
+      "long_fraction": 0.665775,
+      "pulse_times": [
+        12.0,
+        12.665775
+      ],
+      "long_interval": 0.665775,
+      "short_interval": 0.334225
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2026-11-14T13:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3184,
+      "alignment_raw": 0.2751,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2676,
+      "dominant_angle_deg": 157.5,
+      "long_fraction": 0.6704,
+      "pulse_times": [
+        13.0,
+        13.6704
+      ],
+      "long_interval": 0.6704,
+      "short_interval": 0.3296
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2026-11-14T14:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3146,
+      "alignment_raw": 0.3058,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.248,
+      "dominant_angle_deg": 166.6,
+      "long_fraction": 0.67135,
+      "pulse_times": [
+        14.0,
+        14.67135
+      ],
+      "long_interval": 0.67135,
+      "short_interval": 0.32865
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2026-11-14T15:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.309,
+      "alignment_raw": 0.296,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2532,
+      "dominant_angle_deg": 169.8,
+      "long_fraction": 0.67275,
+      "pulse_times": [
+        15.0,
+        15.67275
+      ],
+      "long_interval": 0.67275,
+      "short_interval": 0.32725
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2026-11-14T16:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3033,
+      "alignment_raw": 0.2898,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.251,
+      "dominant_angle_deg": 163.1,
+      "long_fraction": 0.674175,
+      "pulse_times": [
+        16.0,
+        16.674175
+      ],
+      "long_interval": 0.674175,
+      "short_interval": 0.325825
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2026-11-14T17:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3109,
+      "alignment_raw": 0.3287,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.24,
+      "dominant_angle_deg": 163.0,
+      "long_fraction": 0.672275,
+      "pulse_times": [
+        17.0,
+        17.672275
+      ],
+      "long_interval": 0.672275,
+      "short_interval": 0.327725
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2026-11-14T18:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3256,
+      "alignment_raw": 0.3601,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.235,
+      "dominant_angle_deg": 161.4,
+      "long_fraction": 0.6686,
+      "pulse_times": [
+        18.0,
+        18.6686
+      ],
+      "long_interval": 0.6686,
+      "short_interval": 0.3314
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2026-11-14T19:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3314,
+      "alignment_raw": 0.3448,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2257,
+      "dominant_angle_deg": 161.6,
+      "long_fraction": 0.66715,
+      "pulse_times": [
+        19.0,
+        19.66715
+      ],
+      "long_interval": 0.66715,
+      "short_interval": 0.33285
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2026-11-14T20:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3304,
+      "alignment_raw": 0.328,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2254,
+      "dominant_angle_deg": 161.3,
+      "long_fraction": 0.6674,
+      "pulse_times": [
+        20.0,
+        20.6674
+      ],
+      "long_interval": 0.6674,
+      "short_interval": 0.3326
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2026-11-14T21:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3373,
+      "alignment_raw": 0.3536,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2138,
+      "dominant_angle_deg": 165.2,
+      "long_fraction": 0.665675,
+      "pulse_times": [
+        21.0,
+        21.665675
+      ],
+      "long_interval": 0.665675,
+      "short_interval": 0.334325
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2026-11-14T22:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3318,
+      "alignment_raw": 0.3189,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1941,
+      "dominant_angle_deg": 164.9,
+      "long_fraction": 0.66705,
+      "pulse_times": [
+        22.0,
+        22.66705
+      ],
+      "long_interval": 0.66705,
+      "short_interval": 0.33295
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2026-11-14T23:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3468,
+      "alignment_raw": 0.3817,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1789,
+      "dominant_angle_deg": 166.0,
+      "long_fraction": 0.6633,
+      "pulse_times": [
+        23.0,
+        23.6633
+      ],
+      "long_interval": 0.6633,
+      "short_interval": 0.3367
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2026-11-15T00:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3486,
+      "alignment_raw": 0.3528,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2005,
+      "dominant_angle_deg": 167.4,
+      "long_fraction": 0.66285,
+      "pulse_times": [
+        24.0,
+        24.66285
+      ],
+      "long_interval": 0.66285,
+      "short_interval": 0.33715
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2026-11-15T01:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3478,
+      "alignment_raw": 0.346,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2048,
+      "dominant_angle_deg": 167.1,
+      "long_fraction": 0.66305,
+      "pulse_times": [
+        25.0,
+        25.66305
+      ],
+      "long_interval": 0.66305,
+      "short_interval": 0.33695
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2026-11-15T02:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3612,
+      "alignment_raw": 0.3924,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1992,
+      "dominant_angle_deg": 167.8,
+      "long_fraction": 0.6597,
+      "pulse_times": [
+        26.0,
+        26.6597
+      ],
+      "long_interval": 0.6597,
+      "short_interval": 0.3403
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2026-11-15T03:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.371,
+      "alignment_raw": 0.3941,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1956,
+      "dominant_angle_deg": 169.8,
+      "long_fraction": 0.65725,
+      "pulse_times": [
+        27.0,
+        27.65725
+      ],
+      "long_interval": 0.65725,
+      "short_interval": 0.34275
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2026-11-15T04:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3607,
+      "alignment_raw": 0.3365,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2222,
+      "dominant_angle_deg": 170.2,
+      "long_fraction": 0.659825,
+      "pulse_times": [
+        28.0,
+        28.659825
+      ],
+      "long_interval": 0.659825,
+      "short_interval": 0.340175
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2026-11-15T05:00Z",
+      "region": "imerg_band_south_pacific",
+      "status": "ok",
+      "alignment": 0.3544,
+      "alignment_raw": 0.3397,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2281,
+      "dominant_angle_deg": 167.8,
+      "long_fraction": 0.6614,
+      "pulse_times": [
+        29.0,
+        29.6614
+      ],
+      "long_interval": 0.6614,
+      "short_interval": 0.3386
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2026-11-14T00:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0647,
+      "alignment_raw": 0.0647,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1207,
+      "dominant_angle_deg": 148.9,
+      "long_fraction": 0.733825,
+      "pulse_times": [
+        0.0,
+        0.733825
+      ],
+      "long_interval": 0.733825,
+      "short_interval": 0.266175
+    },
+    {
+      "t": 1.0,
+      "frame": 1,
+      "source_time": "2026-11-14T01:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0661,
+      "alignment_raw": 0.0693,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1132,
+      "dominant_angle_deg": 141.7,
+      "long_fraction": 0.733475,
+      "pulse_times": [
+        1.0,
+        1.733475
+      ],
+      "long_interval": 0.733475,
+      "short_interval": 0.266525
+    },
+    {
+      "t": 2.0,
+      "frame": 2,
+      "source_time": "2026-11-14T02:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0624,
+      "alignment_raw": 0.0537,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.118,
+      "dominant_angle_deg": 176.0,
+      "long_fraction": 0.7344,
+      "pulse_times": [
+        2.0,
+        2.7344
+      ],
+      "long_interval": 0.7344,
+      "short_interval": 0.2656
+    },
+    {
+      "t": 3.0,
+      "frame": 3,
+      "source_time": "2026-11-14T03:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0574,
+      "alignment_raw": 0.0458,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1096,
+      "dominant_angle_deg": 48.4,
+      "long_fraction": 0.73565,
+      "pulse_times": [
+        3.0,
+        3.73565
+      ],
+      "long_interval": 0.73565,
+      "short_interval": 0.26435
+    },
+    {
+      "t": 4.0,
+      "frame": 4,
+      "source_time": "2026-11-14T04:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0498,
+      "alignment_raw": 0.0321,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1217,
+      "dominant_angle_deg": 67.4,
+      "long_fraction": 0.73755,
+      "pulse_times": [
+        4.0,
+        4.73755
+      ],
+      "long_interval": 0.73755,
+      "short_interval": 0.26245
+    },
+    {
+      "t": 5.0,
+      "frame": 5,
+      "source_time": "2026-11-14T05:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0544,
+      "alignment_raw": 0.065,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1421,
+      "dominant_angle_deg": 63.7,
+      "long_fraction": 0.7364,
+      "pulse_times": [
+        5.0,
+        5.7364
+      ],
+      "long_interval": 0.7364,
+      "short_interval": 0.2636
+    },
+    {
+      "t": 6.0,
+      "frame": 6,
+      "source_time": "2026-11-14T06:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.062,
+      "alignment_raw": 0.0798,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1599,
+      "dominant_angle_deg": 75.8,
+      "long_fraction": 0.7345,
+      "pulse_times": [
+        6.0,
+        6.7345
+      ],
+      "long_interval": 0.7345,
+      "short_interval": 0.2655
+    },
+    {
+      "t": 7.0,
+      "frame": 7,
+      "source_time": "2026-11-14T07:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0658,
+      "alignment_raw": 0.0745,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1495,
+      "dominant_angle_deg": 82.8,
+      "long_fraction": 0.73355,
+      "pulse_times": [
+        7.0,
+        7.73355
+      ],
+      "long_interval": 0.73355,
+      "short_interval": 0.26645
+    },
+    {
+      "t": 8.0,
+      "frame": 8,
+      "source_time": "2026-11-14T08:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0696,
+      "alignment_raw": 0.0787,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1644,
+      "dominant_angle_deg": 84.0,
+      "long_fraction": 0.7326,
+      "pulse_times": [
+        8.0,
+        8.7326
+      ],
+      "long_interval": 0.7326,
+      "short_interval": 0.2674
+    },
+    {
+      "t": 9.0,
+      "frame": 9,
+      "source_time": "2026-11-14T09:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.068,
+      "alignment_raw": 0.064,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1637,
+      "dominant_angle_deg": 123.2,
+      "long_fraction": 0.733,
+      "pulse_times": [
+        9.0,
+        9.733
+      ],
+      "long_interval": 0.733,
+      "short_interval": 0.267
+    },
+    {
+      "t": 10.0,
+      "frame": 10,
+      "source_time": "2026-11-14T10:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0674,
+      "alignment_raw": 0.0661,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1895,
+      "dominant_angle_deg": 147.6,
+      "long_fraction": 0.73315,
+      "pulse_times": [
+        10.0,
+        10.73315
+      ],
+      "long_interval": 0.73315,
+      "short_interval": 0.26685
+    },
+    {
+      "t": 11.0,
+      "frame": 11,
+      "source_time": "2026-11-14T11:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0738,
+      "alignment_raw": 0.0888,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2163,
+      "dominant_angle_deg": 163.8,
+      "long_fraction": 0.73155,
+      "pulse_times": [
+        11.0,
+        11.73155
+      ],
+      "long_interval": 0.73155,
+      "short_interval": 0.26845
+    },
+    {
+      "t": 12.0,
+      "frame": 12,
+      "source_time": "2026-11-14T12:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0878,
+      "alignment_raw": 0.1203,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2108,
+      "dominant_angle_deg": 160.7,
+      "long_fraction": 0.72805,
+      "pulse_times": [
+        12.0,
+        12.72805
+      ],
+      "long_interval": 0.72805,
+      "short_interval": 0.27195
+    },
+    {
+      "t": 13.0,
+      "frame": 13,
+      "source_time": "2026-11-14T13:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1033,
+      "alignment_raw": 0.1397,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2035,
+      "dominant_angle_deg": 161.3,
+      "long_fraction": 0.724175,
+      "pulse_times": [
+        13.0,
+        13.724175
+      ],
+      "long_interval": 0.724175,
+      "short_interval": 0.275825
+    },
+    {
+      "t": 14.0,
+      "frame": 14,
+      "source_time": "2026-11-14T14:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1221,
+      "alignment_raw": 0.166,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2079,
+      "dominant_angle_deg": 168.2,
+      "long_fraction": 0.719475,
+      "pulse_times": [
+        14.0,
+        14.719475
+      ],
+      "long_interval": 0.719475,
+      "short_interval": 0.280525
+    },
+    {
+      "t": 15.0,
+      "frame": 15,
+      "source_time": "2026-11-14T15:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1227,
+      "alignment_raw": 0.1241,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1971,
+      "dominant_angle_deg": 173.6,
+      "long_fraction": 0.719325,
+      "pulse_times": [
+        15.0,
+        15.719325
+      ],
+      "long_interval": 0.719325,
+      "short_interval": 0.280675
+    },
+    {
+      "t": 16.0,
+      "frame": 16,
+      "source_time": "2026-11-14T16:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.1086,
+      "alignment_raw": 0.0757,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2073,
+      "dominant_angle_deg": 5.1,
+      "long_fraction": 0.72285,
+      "pulse_times": [
+        16.0,
+        16.72285
+      ],
+      "long_interval": 0.72285,
+      "short_interval": 0.27715
+    },
+    {
+      "t": 17.0,
+      "frame": 17,
+      "source_time": "2026-11-14T17:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.112,
+      "alignment_raw": 0.1198,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2018,
+      "dominant_angle_deg": 4.9,
+      "long_fraction": 0.722,
+      "pulse_times": [
+        17.0,
+        17.722
+      ],
+      "long_interval": 0.722,
+      "short_interval": 0.278
+    },
+    {
+      "t": 18.0,
+      "frame": 18,
+      "source_time": "2026-11-14T18:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.097,
+      "alignment_raw": 0.0621,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1943,
+      "dominant_angle_deg": 158.6,
+      "long_fraction": 0.72575,
+      "pulse_times": [
+        18.0,
+        18.72575
+      ],
+      "long_interval": 0.72575,
+      "short_interval": 0.27425
+    },
+    {
+      "t": 19.0,
+      "frame": 19,
+      "source_time": "2026-11-14T19:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0837,
+      "alignment_raw": 0.0525,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1926,
+      "dominant_angle_deg": 141.0,
+      "long_fraction": 0.729075,
+      "pulse_times": [
+        19.0,
+        19.729075
+      ],
+      "long_interval": 0.729075,
+      "short_interval": 0.270925
+    },
+    {
+      "t": 20.0,
+      "frame": 20,
+      "source_time": "2026-11-14T20:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0753,
+      "alignment_raw": 0.0558,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.1979,
+      "dominant_angle_deg": 89.7,
+      "long_fraction": 0.731175,
+      "pulse_times": [
+        20.0,
+        20.731175
+      ],
+      "long_interval": 0.731175,
+      "short_interval": 0.268825
+    },
+    {
+      "t": 21.0,
+      "frame": 21,
+      "source_time": "2026-11-14T21:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.093,
+      "alignment_raw": 0.1342,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2058,
+      "dominant_angle_deg": 92.5,
+      "long_fraction": 0.72675,
+      "pulse_times": [
+        21.0,
+        21.72675
+      ],
+      "long_interval": 0.72675,
+      "short_interval": 0.27325
+    },
+    {
+      "t": 22.0,
+      "frame": 22,
+      "source_time": "2026-11-14T22:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0835,
+      "alignment_raw": 0.0612,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2196,
+      "dominant_angle_deg": 83.5,
+      "long_fraction": 0.729125,
+      "pulse_times": [
+        22.0,
+        22.729125
+      ],
+      "long_interval": 0.729125,
+      "short_interval": 0.270875
+    },
+    {
+      "t": 23.0,
+      "frame": 23,
+      "source_time": "2026-11-14T23:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0811,
+      "alignment_raw": 0.0755,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2239,
+      "dominant_angle_deg": 80.4,
+      "long_fraction": 0.729725,
+      "pulse_times": [
+        23.0,
+        23.729725
+      ],
+      "long_interval": 0.729725,
+      "short_interval": 0.270275
+    },
+    {
+      "t": 24.0,
+      "frame": 24,
+      "source_time": "2026-11-15T00:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0761,
+      "alignment_raw": 0.0644,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2371,
+      "dominant_angle_deg": 81.2,
+      "long_fraction": 0.730975,
+      "pulse_times": [
+        24.0,
+        24.730975
+      ],
+      "long_interval": 0.730975,
+      "short_interval": 0.269025
+    },
+    {
+      "t": 25.0,
+      "frame": 25,
+      "source_time": "2026-11-15T01:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0608,
+      "alignment_raw": 0.0251,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2452,
+      "dominant_angle_deg": 57.8,
+      "long_fraction": 0.7348,
+      "pulse_times": [
+        25.0,
+        25.7348
+      ],
+      "long_interval": 0.7348,
+      "short_interval": 0.2652
+    },
+    {
+      "t": 26.0,
+      "frame": 26,
+      "source_time": "2026-11-15T02:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.064,
+      "alignment_raw": 0.0715,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2574,
+      "dominant_angle_deg": 39.6,
+      "long_fraction": 0.734,
+      "pulse_times": [
+        26.0,
+        26.734
+      ],
+      "long_interval": 0.734,
+      "short_interval": 0.266
+    },
+    {
+      "t": 27.0,
+      "frame": 27,
+      "source_time": "2026-11-15T03:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0653,
+      "alignment_raw": 0.0685,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.2788,
+      "dominant_angle_deg": 15.4,
+      "long_fraction": 0.733675,
+      "pulse_times": [
+        27.0,
+        27.733675
+      ],
+      "long_interval": 0.733675,
+      "short_interval": 0.266325
+    },
+    {
+      "t": 28.0,
+      "frame": 28,
+      "source_time": "2026-11-15T04:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0552,
+      "alignment_raw": 0.0317,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3175,
+      "dominant_angle_deg": 6.8,
+      "long_fraction": 0.7362,
+      "pulse_times": [
+        28.0,
+        28.7362
+      ],
+      "long_interval": 0.7362,
+      "short_interval": 0.2638
+    },
+    {
+      "t": 29.0,
+      "frame": 29,
+      "source_time": "2026-11-15T05:00Z",
+      "region": "imerg_showers_equator",
+      "status": "ok",
+      "alignment": 0.0523,
+      "alignment_raw": 0.0455,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3407,
+      "dominant_angle_deg": 26.0,
+      "long_fraction": 0.736925,
+      "pulse_times": [
+        29.0,
+        29.736925
+      ],
+      "long_interval": 0.736925,
+      "short_interval": 0.263075
+    }
+  ],
+  "events": {
+    "imerg_band_south_pacific": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.2833,
+          "long_fraction": 0.679175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.679175,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.2833,
+          "long_fraction": 0.679175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.2782,
+          "long_fraction": 0.68045,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.68045,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.2782,
+          "long_fraction": 0.68045,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.2799,
+          "long_fraction": 0.680025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.680025,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.2799,
+          "long_fraction": 0.680025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3003,
+          "long_fraction": 0.674925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.674925,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3003,
+          "long_fraction": 0.674925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3085,
+          "long_fraction": 0.672875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.672875,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3085,
+          "long_fraction": 0.672875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3128,
+          "long_fraction": 0.6718,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.6718,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3128,
+          "long_fraction": 0.6718,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3159,
+          "long_fraction": 0.671025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.671025,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3159,
+          "long_fraction": 0.671025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3172,
+          "long_fraction": 0.6707,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.6707,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3172,
+          "long_fraction": 0.6707,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3145,
+          "long_fraction": 0.671375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.671375,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3145,
+          "long_fraction": 0.671375,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3125,
+          "long_fraction": 0.671875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.671875,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3125,
+          "long_fraction": 0.671875,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3216,
+          "long_fraction": 0.6696,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.6696,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3216,
+          "long_fraction": 0.6696,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3399,
+          "long_fraction": 0.665025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.665025,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3399,
+          "long_fraction": 0.665025,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3369,
+          "long_fraction": 0.665775,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.665775,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3369,
+          "long_fraction": 0.665775,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3184,
+          "long_fraction": 0.6704,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.6704,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3184,
+          "long_fraction": 0.6704,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3146,
+          "long_fraction": 0.67135,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.67135,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3146,
+          "long_fraction": 0.67135,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.309,
+          "long_fraction": 0.67275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.67275,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.309,
+          "long_fraction": 0.67275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3033,
+          "long_fraction": 0.674175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.674175,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3033,
+          "long_fraction": 0.674175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3109,
+          "long_fraction": 0.672275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.672275,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3109,
+          "long_fraction": 0.672275,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3256,
+          "long_fraction": 0.6686,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.6686,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3256,
+          "long_fraction": 0.6686,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3314,
+          "long_fraction": 0.66715,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.66715,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3314,
+          "long_fraction": 0.66715,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3304,
+          "long_fraction": 0.6674,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.6674,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3304,
+          "long_fraction": 0.6674,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3373,
+          "long_fraction": 0.665675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.665675,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3373,
+          "long_fraction": 0.665675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3318,
+          "long_fraction": 0.66705,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.66705,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3318,
+          "long_fraction": 0.66705,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3468,
+          "long_fraction": 0.6633,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.6633,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3468,
+          "long_fraction": 0.6633,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3486,
+          "long_fraction": 0.66285,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.66285,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3486,
+          "long_fraction": 0.66285,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3478,
+          "long_fraction": 0.66305,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.66305,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3478,
+          "long_fraction": 0.66305,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3612,
+          "long_fraction": 0.6597,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.6597,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3612,
+          "long_fraction": 0.6597,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.371,
+          "long_fraction": 0.65725,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.65725,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.371,
+          "long_fraction": 0.65725,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3607,
+          "long_fraction": 0.659825,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.659825,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3607,
+          "long_fraction": 0.659825,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3544,
+          "long_fraction": 0.6614,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.6614,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_band_south_pacific",
+          "alignment": 0.3544,
+          "long_fraction": 0.6614,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ],
+    "imerg_showers_equator": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0647,
+          "long_fraction": 0.733825,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.733825,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0647,
+          "long_fraction": 0.733825,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0661,
+          "long_fraction": 0.733475,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 1.733475,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0661,
+          "long_fraction": 0.733475,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0624,
+          "long_fraction": 0.7344,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 2.7344,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0624,
+          "long_fraction": 0.7344,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0574,
+          "long_fraction": 0.73565,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 3.73565,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0574,
+          "long_fraction": 0.73565,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0498,
+          "long_fraction": 0.73755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 4.73755,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0498,
+          "long_fraction": 0.73755,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0544,
+          "long_fraction": 0.7364,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 5.7364,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0544,
+          "long_fraction": 0.7364,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.062,
+          "long_fraction": 0.7345,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 6.7345,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.062,
+          "long_fraction": 0.7345,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0658,
+          "long_fraction": 0.73355,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 7.73355,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0658,
+          "long_fraction": 0.73355,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0696,
+          "long_fraction": 0.7326,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 8.7326,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0696,
+          "long_fraction": 0.7326,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.068,
+          "long_fraction": 0.733,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 9.733,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.068,
+          "long_fraction": 0.733,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0674,
+          "long_fraction": 0.73315,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 10.73315,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0674,
+          "long_fraction": 0.73315,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0738,
+          "long_fraction": 0.73155,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 11.73155,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0738,
+          "long_fraction": 0.73155,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0878,
+          "long_fraction": 0.72805,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 12.72805,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0878,
+          "long_fraction": 0.72805,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1033,
+          "long_fraction": 0.724175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 13.724175,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1033,
+          "long_fraction": 0.724175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1221,
+          "long_fraction": 0.719475,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 14.719475,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1221,
+          "long_fraction": 0.719475,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1227,
+          "long_fraction": 0.719325,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 15.719325,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1227,
+          "long_fraction": 0.719325,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1086,
+          "long_fraction": 0.72285,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 16.72285,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.1086,
+          "long_fraction": 0.72285,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.112,
+          "long_fraction": 0.722,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 17.722,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.112,
+          "long_fraction": 0.722,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.097,
+          "long_fraction": 0.72575,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 18.72575,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.097,
+          "long_fraction": 0.72575,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0837,
+          "long_fraction": 0.729075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 19.729075,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0837,
+          "long_fraction": 0.729075,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0753,
+          "long_fraction": 0.731175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 20.731175,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0753,
+          "long_fraction": 0.731175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.093,
+          "long_fraction": 0.72675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 21.72675,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.093,
+          "long_fraction": 0.72675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0835,
+          "long_fraction": 0.729125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 22.729125,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0835,
+          "long_fraction": 0.729125,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0811,
+          "long_fraction": 0.729725,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 23.729725,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0811,
+          "long_fraction": 0.729725,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0761,
+          "long_fraction": 0.730975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 24.730975,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0761,
+          "long_fraction": 0.730975,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0608,
+          "long_fraction": 0.7348,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 25.7348,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0608,
+          "long_fraction": 0.7348,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.064,
+          "long_fraction": 0.734,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 26.734,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.064,
+          "long_fraction": 0.734,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0653,
+          "long_fraction": 0.733675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 27.733675,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0653,
+          "long_fraction": 0.733675,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0552,
+          "long_fraction": 0.7362,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 28.7362,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0552,
+          "long_fraction": 0.7362,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0523,
+          "long_fraction": 0.736925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 29.736925,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "imerg_showers_equator",
+          "alignment": 0.0523,
+          "long_fraction": 0.736925,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ]
+  }
+}
