@@ -687,7 +687,7 @@
       o.setPeriodicWave(pianoWave); o.frequency.value = hz; o.detune.value = cents;
       o.connect(tone);
       o.start(t); o.stop(end + 8 * damper + 0.05);
-      bin.push(o);
+      trackSource(bin, o);
     });
     const knock = ctx.createBufferSource(), felt = ctx.createBiquadFilter(), knockEnv = ctx.createGain();
     knock.buffer = hammerNoise;
@@ -696,7 +696,7 @@
     knockEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.02);
     knock.connect(felt).connect(knockEnv).connect(pan);
     knock.start(t); knock.stop(t + 0.04);
-    bin.push(knock);
+    trackSource(bin, knock);
   }
 
   // ---------- more instruments (all made in the browser, no recordings) ----------
@@ -722,7 +722,7 @@
       env.gain.setTargetAtTime(0, t + 0.002, decay);
       o.connect(env).connect(out);
       o.start(t); o.stop(end + 8 * damper + 0.05);
-      bin.push(o);
+      trackSource(bin, o);
     });
   }
 
@@ -761,7 +761,7 @@
       o.type = "sawtooth"; o.frequency.value = hz; o.detune.value = cents;
       o.connect(tone);
       o.start(t); o.stop(end + 12 * damper + 0.05);
-      bin.push(o);
+      trackSource(bin, o);
     });
   }
 
@@ -861,10 +861,17 @@
     env.gain.exponentialRampToValueAtTime(0.0001, end);
     osc.connect(env).connect(master);
     osc.start(t); osc.stop(end + 0.02);
-    bin.push(osc);
+    trackSource(bin, osc);
   }
 
-  const silence = (list) => list.forEach((s) => { try { s.stop(); } catch (e) {} });
+  const silence = (list) => [...list].forEach((s) => { try { s.stop(); } catch (e) {} });
+
+  // Keeps a source in its list only while it plays: a finished note removes itself, so the rolling
+  // music ("Keep the music playing") does not pile up sources until Stop.
+  function trackSource(bin, node) {
+    bin.push(node);
+    node.onended = () => { const i = bin.indexOf(node); if (i >= 0) bin.splice(i, 1); };
+  }
 
   function stopVoice(v) {
     silence(v.sources);
