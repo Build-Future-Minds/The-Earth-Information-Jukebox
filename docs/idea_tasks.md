@@ -1,6 +1,8 @@
 # New tasks from the 14 Nov brainstorm: how to do each one
 
-Owner of this page: Developer A (Mr. E). Written 14 Nov, 2:30 PM.
+Owner of this page: Developer A (Mr. E). Written 14 Nov, 2:30 PM. Updated 15 Nov, 12:30 AM:
+N1 is mostly delivered by #17; N2 and N3 moved to "only if time remains"; N3 is renamed
+"melody pulse lock"; the pattern is called "long–short" (#27).
 
 Each task below is also on the Earth Sonata Tracker. The tracker says who and when. This page
 says how. Numbers marked **measured** were run on 14 Nov on the 30 NASA frames (23000 to 23116)
@@ -8,9 +10,9 @@ or on test images, with the engine's default settings.
 
 | # | Task | Owner | When |
 | --- | --- | --- | --- |
-| N1 | Visual beat bar | Developer B | Now |
-| N2 | Play both regions at once | Developer B | Now |
-| N3 | Groove lock for the melody | Developer B | Now |
+| N1 | Visual beat bar | Developer B | Mostly done in #17; review it |
+| N2 | Play both regions at once | Developer B | Only if time remains |
+| N3 | Melody pulse lock | Developer B | Only if time remains |
 | N4 | Resource list and NASA data links | Student C | Now |
 | L1 | Give the first pulse its own fixed sound | Developer B | Only if time remains |
 | L2 | Graded listening pairs | Student B | Only if time remains |
@@ -39,9 +41,14 @@ or on test images, with the engine's default settings.
 **Why.** The rhythm is the result, and today it exists only as sound and one sentence. A person
 who cannot hear the pulses gets "second pulse at 73% of the beat" and nothing to look at.
 
-**Where.** Your restyle (pull request #13) adds `web/src/components/NowPlaying.tsx`, which already
-reads the sounding step (`step.events[0].why.long_fraction`). Put the bar there, or in a
-`BeatBar.tsx` beside it. Branch from `devb/axis-restyle` so the two do not conflict.
+**Status 15 Nov.** Mostly delivered by #17 (merged 14 Nov, 2:46 PM, not yet reviewed), in a
+different shape: `BeatTrack.tsx` is a beat lane on the audio clock (first pulse a tall ink mark,
+second pulse a short orange one, seekable by drag or arrow keys), and `RhythmsPlot.tsx` draws
+both regions on one time line with missing beats dashed. No separate one-beat bar is needed.
+Use the steps and checks below to review #17. Gaps found so far: the playhead still moves under
+reduced motion (`styles.css` only switches off CSS transitions), and no screen-reader check.
+
+**Where.** `web/src/components/BeatTrack.tsx`, `RhythmsPlot.tsx` and `NowPlaying.tsx` on `main`.
 
 **Steps**
 
@@ -67,7 +74,11 @@ reads the sounding step (`step.events[0].why.long_fraction`). Put the bar there,
 
 ---
 
-## N2. Play both regions at once — Developer B
+## N2. Play both regions at once — Developer B (only if time remains)
+
+**Status 15 Nov.** Not started; moved to "only if time remains". Student B's listening game
+already layers two sounds on a shared beat (#16), which shows the timing works. The app version
+below is still open.
 
 **Why.** Today a listener hears one region, switches, and has to remember the first rhythm. With
 both playing, the two second pulses land about 150 ms apart (**measured**: 142 ms at the least) and
@@ -111,7 +122,10 @@ region's own pair, not the mix.
 
 ---
 
-## N3. Groove lock for the melody — Developer B
+## N3. Melody pulse lock — Developer B (only if time remains)
+
+Called "groove lock" until 15 Nov. On this team "groove lock" now means the listening game's
+switch (#16), where a second sound joins on the beat of the first. This task is different.
 
 **What it is.** A switch on the melody pad, off by default.
 
@@ -120,7 +134,7 @@ region's own pair, not the mix.
   the rhythm of the region that is playing, so the same held notes groove differently on Region A and Region B.
 
 **The rule that must stay true** (`docs/CONTRACT.md`): the melody never changes an Earth note.
-Groove lock only reads the times of the Earth pulses.
+The pulse lock only reads the times of the Earth pulses.
 
 **Steps**
 
@@ -145,7 +159,7 @@ Groove lock only reads the times of the Earth pulses.
 - Browser test (`web/e2e/melody.e2e.ts`): `window.__earthNotes` is identical with the lock on and with it off. This is the proof that the Earth rhythm did not change.
 - By hand: hold one key and switch between Region A and Region B. The melody's rhythm changes with the Earth's.
 
-**Review.** Developer A. Confirm with Developer A that this is the groove lock he described before you build it.
+**Review.** Developer A. Confirm the meaning with Developer A before you build it.
 
 ---
 
@@ -449,6 +463,10 @@ from 0.70 to 0.39. A circle on the map is not a circle on the ground.
 
 **What does not change.** The approved pair. The Equatorial Pacific circle is unaffected, and
 Kuroshio stays low under every method.
+
+**Decided 15 Nov.** Regions stay circles on the flat map in version one (`science_review.md`
+section 6, row 11). True circles on the globe come with this task, in the next version. Student
+A's globe prototype (#25, `web/globe.html`) already draws the true measured area.
 
 ---
 
