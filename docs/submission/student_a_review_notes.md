@@ -54,3 +54,23 @@ circles on the picture and turns each alignment number into a rhythm. `npm test`
 against the team format before anything is published."
 
 Show it: run `python -m pytest tests/test_prepare_scene.py` in `analysis/` (11 passed).
+
+## Measurement check with Mr. E
+
+Dev A's numbers are in `docs/science_review.md`, section 10. What to go through:
+
+| Region | Steps ok | Alignment the app plays | Second pulse lands at |
+| --- | --- | --- | --- |
+| Kuroshio eddies (A) | 30 of 30 | 0.059 to 0.093, mean 0.072 | 73% of the beat (long–short) |
+| Equatorial Pacific (B) | 30 of 30 | 0.660 to 0.685, mean 0.672 | 58% of the beat (more even) |
+
+- At the same moment the gap is 0.600 on average and never below 0.567, so the second pulses land
+  about 150 ms apart at a 1 s beat.
+- All 30 model times in `data/scene.json` match NASA's dates file (check one yourself, e.g. step 17).
+- The masks are the exact circle, minus 27 land pixels (0.2%) in the Kuroshio circle.
+- Check it yourself before the meeting: `cd analysis && python -m pytest -q` (all pass) and
+  `cd web && npm test` (the app's notes equal the engine's).
+
+**How to say it:** "The Equatorial Pacific circle's lines share one direction much more than the
+Kuroshio circle's, in this rendering of ECCO2 model output." Not: calmer, more turbulent, faster
+or healthier.
