@@ -989,7 +989,12 @@
       track.rects[i].classList.toggle("live", on && pos < n.at + Math.max(n.len, 0.2));
       if (on) current = n;
     });
-    const showPitch = $("showNotes").checked && current;
+    // Note bars show when each note lands. They are hidden with "Show notes while playing" off, and
+    // for the mystery sound in Rhythm only (the listening test) until the round is answered.
+    const hideNotes = !$("showNotes").checked ||
+      (track.voice && track.voice.key === "mystery" && $("rhythmOnly").checked && !guessed);
+    $("track").classList.toggle("hide-notes", hideNotes);
+    const showPitch = !hideNotes && current;
     $("dot").style.top = showPitch ? ((yTop(current.idx) + BAR_H / 2) / LANE_H * 100) + "%" : "50%";
     const text = `${(pos * track.beat).toFixed(1)} / ${(BEATS * track.beat).toFixed(1)} s`;
     $("trackTime").textContent = text;
@@ -1027,9 +1032,11 @@
 
   // ---------- visualizer on the pictures ----------
   // A play line sweeps across each patch that is sounding (and across its box on the map), with a
-  // fading trail, a ring where each note struck, and the live waveform along the bottom. The mystery
-  // sound sweeps both patches, so the pictures never give the answer away. With "Show notes while
-  // playing" off, the rings stay at one height, so they do not show pitch.
+  // fading trail. For "Hear patch", a ring also marks each note and the live waveform runs along the
+  // bottom. The mystery sound sweeps both patches with the line and trail only: rings and the
+  // waveform show when notes land, so they never appear while it plays (the game is the listening
+  // test, so the answer must come from the ear). With "Show notes while playing" off, rings and the
+  // waveform are hidden for every sound.
   let analyser = null, waveBuf = null;
   function drawViz(live) {
     const now = ctx ? ctx.currentTime : 0, per = [[], []];
@@ -1038,14 +1045,17 @@
       if (pos < 0 || pos > BEATS) return;
       (v.key === "patch0" ? [0] : v.key === "patch1" ? [1] : [0, 1]).forEach((s) => per[s].push({ v, pos }));
     });
-    if (analyser && live.length) analyser.getByteTimeDomainData(waveBuf);
+    const showNotes = $("showNotes").checked;
+    const mysteryOn = live.some((v) => v.key === "mystery");
+    const showWave = showNotes && !mysteryOn;      // the mix would carry the mystery sound's pulses
+    if (analyser && showWave) analyser.getByteTimeDomainData(waveBuf);
     const signal = getComputedStyle(document.documentElement).getPropertyValue("--signal").trim() || "#d0451b";
     [0, 1].forEach((s) => {
       const c = $("viz" + s), g = c.getContext("2d"), W = c.width, H = c.height;
       g.clearRect(0, 0, W, H);
       $("sweep" + s).hidden = !per[s].length;
       if (!per[s].length) return;
-      if (waveBuf) {
+      if (waveBuf && showWave) {
         [[5, "rgba(0,0,0,0.5)"], [2, "rgba(255,255,255,0.85)"]].forEach(([w, col]) => {
           g.lineWidth = w; g.strokeStyle = col; g.beginPath();
           for (let i = 0; i < waveBuf.length; i += 4) {
@@ -1063,11 +1073,11 @@
           g.fillRect(x - 140 + k * 17.5, 0, 17.5, H);
         }
         g.globalAlpha = 1;
-        v.notes.forEach((n) => {                    // a ring where each note struck, fading out
+        if (showNotes && v.key !== "mystery") v.notes.forEach((n) => {   // a ring where each note struck, fading out
           const age = (pos - n.at) * v.beat;
           if (age < 0 || age > 0.8) return;
           const k = age / 0.8;
-          const y = $("showNotes").checked ? H * (0.1 + 0.65 * (1 - n.idx / (SCALE.length - 1))) : H * 0.45;
+          const y = H * (0.1 + 0.65 * (1 - n.idx / (SCALE.length - 1)));
           g.beginPath(); g.arc(n.at / BEATS * W, y, 6 + 46 * k, 0, 2 * Math.PI);
           g.lineWidth = 3; g.strokeStyle = `rgba(255,255,255,${(1 - k) * 0.9})`; g.stroke();
         });
@@ -1289,6 +1299,7 @@
     setStatus((correct ? "Right. " : "Not this time. ") + `Patch ${answer + 1} made this sound: it was the ${kind} one.`);
     $("sub").textContent = "Thin number: swirly. Heavy: lined up.";
     updateScore();
+    paintTrack(lastBeat);   // answered: the mystery sound's note bars may show now
     $("newRound").focus();
   }
 
@@ -1333,7 +1344,8 @@
   });
   $("hear0").addEventListener("click", () => playPatch(0));
   $("hear1").addEventListener("click", () => playPatch(1));
-  $("showNotes").addEventListener("change", (e) => $("track").classList.toggle("hide-notes", !e.target.checked));
+  $("showNotes").addEventListener("change", () => paintTrack(lastBeat));
+  $("rhythmOnly").addEventListener("change", () => paintTrack(lastBeat));
   $("newRound").addEventListener("click", newRound);
   $("replay").addEventListener("click", () => target &&
     playRound(guessed ? "Done. Press P for the next round." : "Which patch made this sound? Press 1 or 2."));
