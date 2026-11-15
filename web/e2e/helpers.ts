@@ -15,8 +15,9 @@ export const BEAT = 0.5; // step_seconds in the practice data
 export const LOOP = 4; // 8 steps per region
 export const TOL = 0.0015; // timing grid is 2.6 ms; allow half of that
 
-export async function openApp(page: Page) {
-  await page.goto('/');
+/** Open the app on one of its views (#listen, #compare, #how, #play). */
+export async function openApp(page: Page, view: 'listen' | 'compare' | 'how' | 'play' = 'listen') {
+  await page.goto(`/#${view}`);
   await expect(page.getByRole('heading', { name: /Earth Sonata/ })).toBeVisible();
 }
 

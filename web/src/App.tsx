@@ -3,17 +3,15 @@ import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
-import { MelodyPad } from './components/MelodyPad';
-import { NowPlaying } from './components/NowPlaying';
-import { BeatTrack } from './components/BeatTrack';
-import { LookingAt } from './components/LookingAt';
-import { RegionCloseups } from './components/RegionCloseups';
-import { RhythmsPlot } from './components/RhythmsPlot';
-import { PracticeGame } from './components/PracticeGame';
 import { ExploreControls, regionLabel, regionStyle } from './components/ExploreControls';
+import { PageLinks } from './components/PageLinks';
 import { ThemeSwitch } from './components/ThemeSwitch';
-import { RhythmExplanation, stepAtSameMoment } from './components/RhythmExplanation';
-import { SceneView } from './components/SceneView';
+import { stepAtSameMoment } from './components/RhythmExplanation';
+import { useView, VIEWS } from './views';
+import { CompareView } from './views/CompareView';
+import { HowView } from './views/HowView';
+import { ListenView } from './views/ListenView';
+import { PlayView } from './views/PlayView';
 
 const { scene, features, imageUrl } = ACTIVE;
 
@@ -29,6 +27,9 @@ export function App() {
   const transport = useRef<Transport | null>(null);
   const melody = useRef<UserVoice | null>(null);
   const explanationRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const view = useView();
+  const viewLabel = VIEWS.find((v) => v.key === view)!.label;
 
   const track = useMemo(() => buildEarthTrack(features, regionId), [regionId]);
 
@@ -92,6 +93,19 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [stop]);
 
+  // Changing view is the same as pressing Stop. Then go to the top and move focus to the view's
+  // heading, so a screen reader announces where you are. Not on the first load: Tab starts at the top.
+  // Compared with the previous view (not a "first run" flag), because React runs effects twice in dev.
+  const shownView = useRef(view);
+  useEffect(() => {
+    document.title = `${viewLabel} · Earth Sonata`;
+    if (shownView.current === view) return;
+    shownView.current = view;
+    stop();
+    window.scrollTo(0, 0);
+    headingRef.current?.focus();
+  }, [view, viewLabel, stop]);
+
   // Move focus to the explanation when it opens so a screen reader reads it once.
   useEffect(() => {
     if (explaining) explanationRef.current?.focus();
@@ -136,97 +150,93 @@ export function App() {
             </p>
           </header>
 
-          <ExploreControls
-            regions={scene.regions}
-            regionId={regionId}
-            playState={playState}
-            explaining={explaining}
-            speed={speed}
-            volumeDb={volumeDb}
-            onStart={start}
-            onPause={pause}
-            onStop={stop}
-            onReplay={replay}
-            onRegion={setRegionId}
-            onExplain={() => setExplaining((x) => !x)}
-            onSpeed={(s) => {
-              setSpeed(s);
-              transport.current?.setSpeed(s);
-            }}
-            onVolume={(db) => {
-              setVolumeDb(db);
-              transport.current?.setVolume(db);
-            }}
-          />
+          <PageLinks current={view} />
+
+          {view === 'listen' && (
+            <ExploreControls
+              regions={scene.regions}
+              regionId={regionId}
+              playState={playState}
+              explaining={explaining}
+              speed={speed}
+              volumeDb={volumeDb}
+              onStart={start}
+              onPause={pause}
+              onStop={stop}
+              onReplay={replay}
+              onRegion={setRegionId}
+              onExplain={() => setExplaining((x) => !x)}
+              onSpeed={(s) => {
+                setSpeed(s);
+                transport.current?.setSpeed(s);
+              }}
+              onVolume={(db) => {
+                setVolumeDb(db);
+                transport.current?.setVolume(db);
+              }}
+            />
+          )}
 
           <ThemeSwitch />
         </div>
 
         <main className="stage">
-          <SceneView scene={scene} imageUrl={imageUrl} regionId={regionId} />
-
+          <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
+          {/* In the shell, on every view: sound can start on Listen, Compare and Play along. */}
           <p className="status" role="status">{status}</p>
-          <NowPlaying step={sounding} regionLabel={label} />
-          <BeatTrack
-            track={track}
-            colour={regionStyle(scene.regions, regionId)}
-            regionLabel={label}
-            playState={playState}
-            speed={speed}
-            getPosition={getPosition}
-            onSeek={seek}
-          />
           {missing && playState !== 'stopped' && (
             <p className="missing" role="alert">
               Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
             </p>
           )}
 
-          {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} other={other} />}
-
-          <RhythmsPlot
-            features={features}
-            regions={scene.regions}
-            activeRegionId={regionId}
-            playState={playState}
-            getPosition={getPosition}
-          />
-
-          <LookingAt />
-          <RegionCloseups
-            scene={scene}
-            features={features}
-            imageUrl={imageUrl}
-            regionId={regionId}
-            onListen={listenTo}
-          />
-          <PracticeGame />
-
-          <MelodyPad
-            heldNotes={heldNotes}
-            volumeDb={melodyDb}
-            onNoteOn={onMelodyNoteOn}
-            onNoteOff={onMelodyNoteOff}
-            onAllOff={onMelodyAllOff}
-            onVolume={(db) => {
-              setMelodyDb(db);
-              melody.current?.setVolume(db);
-            }}
-          />
-
-          <footer>
-            <h2>Source and credit</h2>
-            <p>
-              <a href={scene.source.url}>{scene.source.title}</a>. {scene.source.credit}.
-            </p>
-            <p>Data kind: {scene.source.data_kind.replace(/_/g, ' ')}.</p>
-            <ul>
-              {scene.source.limitations.map((l) => (
-                <li key={l}>{l}</li>
-              ))}
-            </ul>
-            <p className="muted">Cached image measurements with live sound. All sounds are synthesised in your browser.</p>
-          </footer>
+          {view === 'listen' && (
+            <ListenView
+              scene={scene}
+              imageUrl={imageUrl}
+              regionId={regionId}
+              label={label}
+              colour={regionStyle(scene.regions, regionId)}
+              track={track}
+              sounding={sounding}
+              playState={playState}
+              speed={speed}
+              getPosition={getPosition}
+              onSeek={seek}
+              explaining={explaining}
+              explanationRef={explanationRef}
+              other={other}
+            />
+          )}
+          {view === 'compare' && (
+            <CompareView
+              scene={scene}
+              features={features}
+              imageUrl={imageUrl}
+              regionId={regionId}
+              playState={playState}
+              getPosition={getPosition}
+              onListen={listenTo}
+            />
+          )}
+          {view === 'how' && <HowView scene={scene} />}
+          {view === 'play' && (
+            <PlayView
+              playState={playState}
+              onStart={start}
+              onPause={pause}
+              onStop={stop}
+              heldNotes={heldNotes}
+              melodyDb={melodyDb}
+              onNoteOn={onMelodyNoteOn}
+              onNoteOff={onMelodyNoteOff}
+              onAllOff={onMelodyAllOff}
+              onMelodyVolume={(db) => {
+                setMelodyDb(db);
+                melody.current?.setVolume(db);
+              }}
+            />
+          )}
         </main>
       </div>
     </>

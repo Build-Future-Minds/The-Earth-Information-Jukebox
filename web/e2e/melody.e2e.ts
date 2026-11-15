@@ -2,7 +2,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { followsSchedule, melodyVoices, noteCount, notesAfter, openApp, startWithKeyboard } from './helpers';
 
-test.beforeEach(async ({ page }) => openApp(page));
+test.beforeEach(async ({ page }) => openApp(page, 'play'));
 
 const pad = (page: Page) => page.locator('.pad');
 /** Voices fade out over 0.4 s after release. */

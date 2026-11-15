@@ -20,14 +20,6 @@ test('no sound before Start', async ({ page }) => {
   await expect(page.getByRole('status')).toHaveText(/Stopped/);
 });
 
-test('the first Tab from page load reaches Start, and Enter starts', async ({ page }) => {
-  await page.keyboard.press('Tab');
-  await expect(page.getByRole('button', { name: 'Start' })).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('status')).toHaveText(/Playing/);
-  await notesAfter(page, 0, 2);
-});
-
 test('practice data is labelled as practice', async ({ page }) => {
   await expect(page.getByText('PRACTICE DATA')).toBeVisible();
 });
