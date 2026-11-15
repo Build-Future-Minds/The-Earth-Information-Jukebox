@@ -90,6 +90,16 @@ the melody; timing, pitch and note length still come from the patch exactly as b
   scheduled start: none of the chords' starts falls between beats). They sit about 4 dB under the
   melody. One sound peaks at 0.90 of full scale, two layered at 0.99.
 
+- **Instrument:** Piano (default), Marimba, Music box or Soft synth, for the melody and the chords.
+  All are made in the browser by our own code, no recordings. Each still stops at the end of the
+  note's length, so length is still heard.
+- **Background:** under the chords, a soft held pad of the same chord swells in on the beat and fades
+  into the next one. It makes no new notes between beats.
+- **Keep the music playing** (on): after a sound ends, the chords and pad roll on, two beats at a
+  time, until Stop or Esc. With Groove lock on, the next sound joins on the music's beat. Checked by
+  logging every scheduled start while the music rolled on its own: 88 starts, none between beats.
+  Two sounds at once peak at 0.92 of full scale or less on every instrument.
+
 Leave it off for the plain test tone. Switching on Rhythm only also switches Musical sound off.
 
 **Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5), so pitch gives
