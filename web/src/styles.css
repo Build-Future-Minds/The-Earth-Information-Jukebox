@@ -429,3 +429,13 @@ footer ul { margin: 0; padding-left: 1.2rem; color: var(--ink-2); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* Page links (four views), in the rail on every view. The current page is bold with the signal
+   underline (DESIGN.md "Live Only": it marks what is chosen). */
+.page-links ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.page-links a { display: inline-block; padding: 8px 0; color: var(--ink); text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; }
+.page-links a:hover { border-bottom-color: var(--rule); }
+.page-links a[aria-current='page'] { font-weight: 800; border-bottom-color: var(--signal); }
+.view-title { font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+.view-title:focus { outline: none; }
+.view-title:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
