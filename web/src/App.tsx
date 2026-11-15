@@ -3,7 +3,9 @@ import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
+import { DEFAULT_MELODY_INSTRUMENT, type MelodyInstrumentId } from './audio/instruments';
 import { MelodyPad } from './components/MelodyPad';
+import { PictureScan, type PictureScanHandle } from './components/PictureScan';
 import { NowPlaying } from './components/NowPlaying';
 import { BeatTrack } from './components/BeatTrack';
 import { LookingAt } from './components/LookingAt';
@@ -24,9 +26,11 @@ export function App() {
   const [speed, setSpeed] = useState(1);
   const [volumeDb, setVolumeDb] = useState(-6);
   const [melodyDb, setMelodyDb] = useState(-10);
+  const [melodyInstrument, setMelodyInstrument] = useState<MelodyInstrumentId>(DEFAULT_MELODY_INSTRUMENT);
   const [heldNotes, setHeldNotes] = useState<ReadonlySet<number>>(new Set());
   const transport = useRef<Transport | null>(null);
   const melody = useRef<UserVoice | null>(null);
+  const scan = useRef<PictureScanHandle>(null);
   const explanationRef = useRef<HTMLElement>(null);
 
   const track = useMemo(() => buildEarthTrack(features, regionId), [regionId]);
@@ -51,7 +55,8 @@ export function App() {
   const pause = useCallback(() => transport.current?.pause(), []);
   const stop = useCallback(() => {
     transport.current?.stop();
-    melody.current?.allOff(); // Stop silences everything, melody included
+    melody.current?.hush(); // Stop silences everything: the melody and its echo,
+    scan.current?.stop(); // and the picture scan
     setSounding(null);
   }, []);
   const replay = useCallback(() => void transport.current?.replay(), []);
@@ -191,17 +196,28 @@ export function App() {
           <RhythmsPlot features={features} regions={scene.regions} activeRegionId={regionId} />
           <PracticeGame />
 
-          <MelodyPad
-            heldNotes={heldNotes}
-            volumeDb={melodyDb}
-            onNoteOn={onMelodyNoteOn}
-            onNoteOff={onMelodyNoteOff}
-            onAllOff={onMelodyAllOff}
-            onVolume={(db) => {
-              setMelodyDb(db);
-              melody.current?.setVolume(db);
-            }}
-          />
+          {/* Play along: two extras with their own instruments and volumes. Neither can change an
+              Earth note (docs/CONTRACT.md); Stop and Esc silence both. */}
+          <section className="playalong" aria-labelledby="playalong-heading">
+            <h2 id="playalong-heading">Play along (optional)</h2>
+            <PictureScan ref={scan} scene={scene} imageUrl={imageUrl} speed={speed} />
+            <MelodyPad
+              heldNotes={heldNotes}
+              volumeDb={melodyDb}
+              instrument={melodyInstrument}
+              onNoteOn={onMelodyNoteOn}
+              onNoteOff={onMelodyNoteOff}
+              onAllOff={onMelodyAllOff}
+              onVolume={(db) => {
+                setMelodyDb(db);
+                melody.current?.setVolume(db);
+              }}
+              onInstrument={(id) => {
+                setMelodyInstrument(id);
+                melody.current?.setInstrument(id);
+              }}
+            />
+          </section>
 
           <footer>
             <h2>Source and credit</h2>

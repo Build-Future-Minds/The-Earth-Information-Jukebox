@@ -1,12 +1,14 @@
 // User voice: a melody the visitor plays live.
-// Completely separate from the Earth voice: its own synth and volume, played immediately
+// Completely separate from the Earth voice: its own instrument and volume, played immediately
 // (not on the Transport), so it can never move, add or remove an Earth note (docs/CONTRACT.md).
+// The instrument is a choice (instruments.ts); every one of them is synthesised here in the browser.
 //
 // The API takes MIDI note numbers plus the input holding the note, so every input feeds the same
 // calls: the computer keyboard ('key'), clicks on the on-screen keys ('pointer'), and later a MIDI
 // piano ('midi': Web MIDI note-on/off → noteOn(note, velocity / 127, 'midi') / noteOff(note, 'midi')).
 
 import * as Tone from 'tone';
+import { createMelodyInstrument, DEFAULT_MELODY_INSTRUMENT, Room, type MelodyInstrument, type MelodyInstrumentId } from './instruments';
 
 /** Home-row keys → MIDI notes. C major pentatonic from C5, an octave above the Earth pulse (E4),
  *  so any combination sounds consonant and the two voices stay easy to tell apart. Design choice. */
@@ -23,10 +25,17 @@ export const KEYBOARD_NOTES: Record<string, number> = {
 
 export type InputSource = 'key' | 'pointer' | 'midi';
 
-const hz = (note: number) => Tone.Frequency(note, 'midi').toFrequency();
+/** Development-only hook for the browser tests: how many melody voices are sounding or fading. */
+declare global {
+  interface Window {
+    __melodySynth?: { readonly activeVoices: number };
+  }
+}
 
 export class UserVoice {
-  private synth: Tone.PolySynth | null = null;
+  private instrument: MelodyInstrument | null = null;
+  private instrumentId: MelodyInstrumentId = DEFAULT_MELODY_INSTRUMENT;
+  private room: Room | null = null;
   private volume: Tone.Volume | null = null;
   private volumeDb = -10;
   private initP: Promise<void> | null = null;
@@ -57,7 +66,8 @@ export class UserVoice {
     this.initP ??= this.init();
     await this.initP;
     if (this.tokens.get(note) !== token) return; // released (or pressed again) while audio started
-    this.synth!.triggerAttack(hz(note), Tone.immediate(), velocity);
+    this.room!.open(); // Stop closes the room; a new note opens it again
+    this.instrument!.attack(note, Tone.immediate(), velocity);
     this.sounding.add(note);
   }
 
@@ -71,12 +81,38 @@ export class UserVoice {
     this.emit();
   }
 
-  /** Stop every melody note (Stop, Esc, the pad losing focus, the window losing focus). */
+  /** Stop every melody note (the pad losing focus, the window losing focus). */
   allOff(): void {
     for (const note of [...this.sounding]) this.release(note);
+    this.instrument?.damp(); // struck notes ring by themselves: end those too
     this.holders.clear();
     this.tokens.clear();
     this.emit();
+  }
+
+  /** Stop and Esc: every note off, and the room's echo ends at once as well. */
+  hush(): void {
+    this.allOff();
+    this.room?.close();
+  }
+
+  /** Change the melody's sound. Notes being held are let go first. */
+  setInstrument(id: MelodyInstrumentId): void {
+    if (id === this.instrumentId) return;
+    this.instrumentId = id;
+    if (!this.instrument || !this.volume) return; // audio not started yet: init() will build this one
+    this.allOff();
+    const old = this.instrument;
+    setTimeout(() => old.dispose(), 600); // after its notes have faded (release is 0.4 s)
+    this.instrument = createMelodyInstrument(id);
+    this.instrument.output.connect(this.volume);
+  }
+
+  /** Voices sounding or fading. A struck instrument's notes end by themselves, so for those this
+   *  counts the keys still held down. */
+  activeVoices(): number {
+    if (!this.instrument) return 0;
+    return this.instrument.struck ? this.sounding.size : this.instrument.activeVoices;
   }
 
   setVolume(db: number): void {
@@ -86,13 +122,14 @@ export class UserVoice {
 
   dispose(): void {
     this.allOff();
-    this.synth?.dispose();
+    this.instrument?.dispose();
     this.volume?.dispose();
+    this.room?.dispose();
   }
 
   private release(note: number): void {
     if (!this.sounding.delete(note)) return;
-    this.synth?.triggerRelease(hz(note), Tone.immediate());
+    this.instrument?.release(note, Tone.immediate());
   }
 
   private emit(): void {
@@ -101,14 +138,18 @@ export class UserVoice {
 
   private async init(): Promise<void> {
     await Tone.start();
-    this.volume = new Tone.Volume(this.volumeDb).toDestination();
-    // Soft, sustained timbre: clearly different from the short Earth drum pulse.
-    this.synth = new Tone.PolySynth(Tone.Synth, {
-      oscillator: { type: 'triangle' },
-      envelope: { attack: 0.02, decay: 0.1, sustain: 0.6, release: 0.4 },
-    }).connect(this.volume);
+    // Its own room (reverb) and volume: nothing here is shared with the Earth voice.
+    this.room = new Room(0.28, 3.5);
+    this.volume = new Tone.Volume(this.volumeDb).connect(this.room.input);
+    this.instrument = createMelodyInstrument(this.instrumentId);
+    this.instrument.output.connect(this.volume);
     if (import.meta.env.DEV && typeof window !== 'undefined') {
-      (window as unknown as { __melodySynth?: Tone.PolySynth }).__melodySynth = this.synth;
+      const voice = this;
+      window.__melodySynth = {
+        get activeVoices() {
+          return voice.activeVoices();
+        },
+      };
     }
   }
 }

@@ -52,6 +52,11 @@ No sound plays until you press Start.
 | `src/components/ExploreControls.tsx` | Buttons, region choice, speed, volume (Student B) |
 | `src/components/RhythmExplanation.tsx` | "Explain this rhythm", written from the notes now playing (Student B) |
 | `src/components/SceneView.tsx` | Source image with the region boxes |
+| `src/audio/scanScore.ts` | Play along: turns the pixels under a scan line into held notes and chimes (pure functions) |
+| `src/audio/scanPlayer.ts` | Play along: plays a scan with its own clock, instruments and volume |
+| `src/audio/instruments.ts` | Play along: marimba, bells, choir pad, the melody sounds and the reverb (all synthesised) |
+| `src/components/PictureScan.tsx` | "Play the picture": the image with the moving line, and the scan controls |
+| `src/components/MelodyPad.tsx` | "Your melody": the keys, the sound choice and its volume |
 
 ## Deploy
 
@@ -74,6 +79,7 @@ Versions are from `web/package-lock.json` on 14 Nov 2026. Re-check with
 | Name | What it is | Link | Licence or credit | Used for |
 | --- | --- | --- | --- | --- |
 | Tone.js 15.1.22 | Web Audio library | https://tonejs.github.io | MIT | Synthesising and timing every sound in the app |
+| Tonal 6.5.1 | Music-theory library | https://github.com/tonaljs/tonal | MIT | Note names, the scale and the chord steps of the picture scan (added 15 Nov) |
 | React 19.3.1 | UI library | https://react.dev | MIT | The app's interface |
 | Vite 8.3.8 | Build tool | https://vite.dev | MIT | Running and building the app |
 | TypeScript 7.0.2 | Programming language | https://www.typescriptlang.org | Apache-2.0 | App code and type checks |

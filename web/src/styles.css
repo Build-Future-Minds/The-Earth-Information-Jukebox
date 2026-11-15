@@ -202,6 +202,102 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 
 /* Melody pad */
 .melody { display: grid; gap: var(--xs); border-top: 1px solid var(--rule); padding-top: var(--sm); }
+
+/* Play along: the picture scan, then the melody keys. Hairline rules, no boxes (DESIGN.md). */
+.playalong { display: grid; gap: var(--md); border-top: 1px solid var(--rule); padding-top: var(--sm); }
+.playalong h2 { margin: 0; }
+.playalong h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; margin: 0; }
+.scan { display: grid; gap: var(--xs); }
+.scan .row, .melody .row { align-items: flex-end; }
+
+/* The picture takes at most about half the window's height, so its note bars, the legend, the
+   controls and the melody keys stay near it. --aspect is the picture's width divided by its height. */
+.scan-view { grid-template-columns: minmax(0, 1fr); justify-items: start; gap: var(--sm); }
+.scan-picture,
+.scan-side { display: grid; gap: var(--xs); min-width: 0; width: min(100%, calc(54vh * var(--aspect, 2))); }
+.scan-side { gap: var(--sm); }
+/* The radar's picture is square, so its bars, legend and locator map sit beside it when there is room. */
+@media (min-width: 860px) {
+  .scan-view.radar { grid-template-columns: min(54vh, 520px) minmax(0, 1fr); column-gap: var(--md); align-items: start; }
+  .scan-view.radar .scan-picture,
+  .scan-view.radar .scan-side { width: 100%; }
+}
+
+/* Drawn over the NASA image: black and white only, never a colour (DESIGN.md "The Image Owns
+   Colour"). Stroke widths are in screen pixels, so they look the same on the map and on the
+   zoomed circle. The dimming and the moving parts show only while the scan plays or is paused. */
+.scan-view.stopped .veil,
+.scan-view.stopped .played-arc,
+.scan-view.line.stopped .sweep,
+.scan-view.radar.stopped .sweep .trail,
+.scan-view.radar.stopped .sweep .profile { display: none; }
+/* A stopped radar shows its needle at rest, pointing east, where the turn will begin. */
+.scan-view.radar.stopped .sweep { opacity: 0.8; }
+.scan-view .veil { fill: #000; fill-opacity: 0.42; }
+.scan-view.radar .trail { fill: #fff; fill-opacity: 0.032; }
+/* The needle's ends (hub and tip on the radar, arrowheads on the map line), the part of the rim
+   already passed, and compass letters. */
+.scan-view .needle-end { fill: #fff; stroke: #000; stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.scan-view .played-arc { fill: none; stroke: #fff; stroke-width: 7px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.scan-view .compass text { fill: #fff; stroke: #000; stroke-width: 3px; paint-order: stroke; stroke-linejoin: round;
+                           font-family: var(--mono); font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.scan-view .range-rings circle { fill: none; stroke: #fff; stroke-opacity: 0.34; stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.scan-view.stopped .range-rings { display: none; }
+.scan-view .sweep-outline { fill: none; stroke: #000; stroke-opacity: 0.6; stroke-width: 9px; vector-effect: non-scaling-stroke; }
+.scan-view .sweep-halo { fill: none; stroke: #fff; stroke-opacity: 0.3; stroke-width: 15px; vector-effect: non-scaling-stroke; }
+.scan-view .sweep-line { fill: none; stroke: #fff; stroke-width: 3.5px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.scan-view .box.active .ring-outline { fill: none; stroke: #000; stroke-width: 6px; vector-effect: non-scaling-stroke; }
+.scan-view .box.active .ring { fill: none; stroke: #fff; stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+/* The shape riding the line: wide where a band is loud. */
+.scan-view .profile { fill: #fff; fill-opacity: 0.78; stroke: #000; stroke-opacity: 0.65; stroke-width: 1.5px;
+                      stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+/* A chime: a ring spreads from the spot and fades, and a mark stays until the sweep ends. */
+.scan-view .trace .chime-dot { fill: #fff; stroke: #000; stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: 0.7;
+                         transform-box: fill-box; transform-origin: center; }
+.scan-view .trace .ripple { fill: none; stroke: #fff; stroke-width: 2.5px; vector-effect: non-scaling-stroke; opacity: 0;
+                            transform-box: fill-box; transform-origin: center; }
+.scan-view:not(.still) .trace .ripple { animation: scan-ripple 1.1s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+.scan-view:not(.still) .trace .chime-dot { animation: scan-settle 1.4s ease-out forwards; }
+@keyframes scan-ripple { from { transform: scale(0.12); opacity: 0.95; } to { transform: scale(1); opacity: 0; } }
+@keyframes scan-settle { from { transform: scale(2); opacity: 1; } to { transform: scale(1); opacity: 0.7; } }
+
+/* Note bars: the low root, then the twelve held notes, low to high. The ink shows how loud each
+   is now; a bar flashes Signal when its band chimes (live, so the one accent). */
+.scan-view .notes { width: 100%; display: grid; grid-template-columns: 1.5fr repeat(12, 1fr); gap: 4px; height: 84px; align-items: stretch; }
+.note-bar { display: grid; grid-template-rows: 1fr auto; justify-items: stretch; min-width: 0; }
+.note-bar i { display: block; position: relative; align-self: end; height: calc(100% * var(--length, 1)); background: var(--rule-2);
+              border-radius: var(--r-key); overflow: hidden; }
+.note-bar i::after { content: ""; position: absolute; inset: 0; background: var(--ink); transform-origin: bottom;
+                     transform: scaleY(var(--level, 0)); }
+.note-bar b { font: 400 0.75rem/1.7 var(--mono); color: var(--ink-2); text-align: center; overflow: hidden; }
+.note-bar.root { margin-right: 6px; }
+.note-bar.hit i { animation: note-hit 0.6s ease-out; }
+.note-bar.hit i::after { animation: note-hit-fill 0.6s ease-out; }
+@keyframes note-hit { from { background: var(--signal); box-shadow: 0 0 0 3px var(--signal); } to { background: var(--rule-2); box-shadow: 0 0 0 0 transparent; } }
+@keyframes note-hit-fill { from { background: var(--signal); } to { background: var(--ink); } }
+/* Legend: the same shapes as on the picture, each with its meaning. Shapes that sit on the image
+   are shown on the image well; the bars are shown on paper, as they are on the page. */
+.scan-legend { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+               gap: 8px var(--md); font-size: 0.9rem; line-height: 1.4; color: var(--ink-2); }
+.scan-legend li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; }
+.scan-legend strong { color: var(--ink); font-weight: 650; }
+.scan-view .scan-legend .glyph { width: 30px; height: 22px; margin-top: 1px; background: var(--well); border-radius: var(--r-key); }
+.scan-view .scan-legend .glyph.light { background: var(--paper); outline: 1px solid var(--rule); }
+.glyph .g-track { fill: var(--rule-2); }
+.glyph .g-ink { fill: var(--ink); }
+.glyph .g-signal { fill: var(--signal); }
+/* Locator: where the radar's circle is on the whole picture. */
+.scan-mini { display: grid; gap: 4px; max-width: 340px; font-size: 0.85rem; color: var(--ink-2); }
+
+.scan-how summary { cursor: pointer; font-weight: 600; }
+.scan-how ul { margin: var(--xs) 0 0; padding-left: 1.2rem; display: grid; gap: 4px; color: var(--ink-2); font-size: 0.95rem; max-width: 70ch; }
+.scan-how strong { color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-view .trace .ripple, .scan-view .trace .chime-dot, .note-bar.hit i, .note-bar.hit i::after { animation: none; }
+}
+.scan-test { font: 600 0.85rem/1.5 var(--mono); color: var(--ink-2); }
+.scan-status { font-size: 1.05rem; font-weight: 650; line-height: 1.3; margin: 0; }
 .pad {
   border: 2px solid var(--ink);
   border-radius: var(--r);
