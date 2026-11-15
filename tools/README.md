@@ -90,6 +90,21 @@ melody (right hand); timing, pitch and note length still come from the patch exa
 
 Switch it off for the plain test tone, the strict setting for a real listening test.
 
+**Music style** (with Musical sound on): *Piano* (the default, above) or *Christmas*, a small
+orchestra made in the browser. A new style is heard from the next sound.
+
+- **Celesta** plays the melody (the patch's notes) by FM synthesis: a bright strike that mellows
+  into a round tone held for the note's length.
+- **Choir** sings "ooh" under each melody note: the nearest note of the current chord at least a
+  minor third below, held as long as the melody note, so a repeated melody note gets new harmony
+  every two beats.
+- **Strings** hold the chords C, Am, Dm, G7 and home to C; a **harp** strums each chord change; a
+  **bass** plays every beat; **sleigh bells** shake on every beat; a **timpani** marks the start and
+  the home chord; a 3.2 s **concert-hall echo**; a quiet **celesta run** after the last beat.
+- **Timing:** the harp strum and the bell cluster start within the first 54 ms of a beat (the
+  melody's second note is never earlier than half a beat); the closing run starts only after the
+  last beat. The same for every patch, so it carries no answer. About as loud as the piano.
+
 **Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5), so pitch gives
 nothing away and the spacing of the pulses carries the answer. This is close to the team's rule
 (`docs/mapping_spec.md`) but not the same: each note is held for half its gap, so note length still
