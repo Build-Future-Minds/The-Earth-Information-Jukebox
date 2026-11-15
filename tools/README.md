@@ -71,10 +71,43 @@ limiter keeps two sounds from clipping (one sound at the default volume is uncha
 listening test, note that layering the mystery sound with its own patch makes the two line up exactly
 in Rhythm only mode, which gives the answer away by ear.
 
-**Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5) at one fixed
-length, so only the spacing of the pulses carries the answer. That is the team's actual rule
-(`docs/mapping_spec.md`) and the setting for the real test. The speed control at 0.5× gives a
-1-second beat.
+**Musical sound** (off by default): the sound becomes a short piece of music. The patch's notes are
+the melody; timing, pitch and note length still come from the patch exactly as before.
+
+- **The sound** is made in the browser, no samples: a warm, struck tone with rich overtones on two
+  strings tuned a hair apart, a soft knock at the start, brightness that mellows as the note rings,
+  and a natural fade (low notes ring longer). When a note's length is up, it is stopped in about
+  0.2 s, so the length is still heard. Louder notes are brighter; low notes sit left, high notes right.
+- **The chords** move C, Am7, Fmaj7, Gsus and home to C, two beats a chord (one 10-beat phrase).
+  Every chord uses only the melody's notes (C, D, E, G, A), so the melody never clashes with them,
+  and each chord moves to the next by the smallest step, so the harmony flows. On the first beat of a
+  chord a bass note sounds with it; on the second the chord sounds again, softly; each chord is held
+  into the next. With Groove lock on, two sounds share one set of chords: a sound that joins extends
+  them. With Groove lock off, a second sound starts its own chords on its own beat.
+- **The chords are the same for every patch and start only on the beat.** Nobody has checked by ear
+  yet whether they hide the spacing, so use Musical sound for practice and the quiz player for the
+  real test. The chords start where the melody's first note already is (checked by logging every
+  scheduled start: none of the chords' starts falls between beats). They sit about 4 dB under the
+  melody. One sound peaks at 0.90 of full scale, two layered at 0.99.
+
+- **Instrument:** Piano (default), Marimba, Music box or Soft synth, for the melody and the chords.
+  All are made in the browser by our own code, no recordings. Each still stops at the end of the
+  note's length, so length is still heard.
+- **Background:** under the chords, a soft held pad of the same chord swells in on the beat and fades
+  into the next one. It makes no new notes between beats.
+- **Keep the music playing** (on): after a sound ends, the chords and pad roll on, two beats at a
+  time, until Stop or Esc. With Groove lock on, the next sound joins on the music's beat. Checked by
+  logging every scheduled start while the music rolled on its own: 88 starts, none between beats.
+  Two sounds at once peak at 0.92 of full scale or less on every instrument.
+
+Leave it off for the plain test tone. Switching on Rhythm only also switches Musical sound off.
+
+**Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5), so pitch gives
+nothing away and the spacing of the pulses carries the answer. This is close to the team's rule
+(`docs/mapping_spec.md`) but not the same: each note is held for half its gap, so note length still
+follows the spacing, while the app uses one pitch and one note length. The real listening check
+uses the quiz player, not this game (`docs/ACCESSIBILITY_LOG.md`, "Listening task"). The speed
+control at 0.5× gives a 1-second beat.
 
 **Line directions on the patches:** after you answer, each patch is drawn with short white ticks,
 one per 24 px cell, showing which way the visible lines run there (the same strong pixels that vote
