@@ -1,0 +1,39 @@
+{
+  "_about": "Approved aerosol regions for SVS 5669 (one still). Owner: Student A. Dev A approved threshold 6 for this source on 15 Nov; checks in source_manifest.json.",
+  "status": "approved by Dev A, 15 Nov 2026",
+  "shape": "Circles, radius 110 px, same for both regions.",
+  "regions": [
+    {
+      "id": "aerosol_streaks_vanuatu",
+      "role": "aligned (even beat)",
+      "name": "Sulfate and sea-salt streaks near Vanuatu",
+      "center_px": [
+        3710,
+        1310
+      ],
+      "radius_px": 110,
+      "center_lonlat": [
+        167.8,
+        -19.2
+      ],
+      "description": "Open ocean east of New Caledonia, near Vanuatu, where green sulfate and blue sea-salt streaks run mostly the same way.",
+      "alignment_at_6": 0.53
+    },
+    {
+      "id": "aerosol_cells_se_pacific",
+      "role": "swirly (long-short beat)",
+      "name": "Sea-salt cells in the southeast Pacific",
+      "center_px": [
+        800,
+        1280
+      ],
+      "radius_px": 110,
+      "center_lonlat": [
+        -105.0,
+        -16.7
+      ],
+      "description": "Open ocean in the southeast Pacific, where blue sea salt forms a honeycomb of small cells pointing every way.",
+      "alignment_at_6": 0.015
+    }
+  ]
+}

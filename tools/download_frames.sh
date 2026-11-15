@@ -28,3 +28,13 @@ for n in $(seq 23000 4 23116) 25000; do
 done
 
 echo "Done: $(ls "$DEST" | wc -l | tr -d ' ') files in $DEST"
+
+# Second source: SVS 5669 GEOS Aerosols, one lossless still (19 Aug 2025 20:00 UTC) and its colour bar.
+# Credit: NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS).
+A=https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005669
+ADEST="$(cd "$(dirname "$0")/.." && pwd)/assets/frames/svs5669"
+mkdir -p "$ADEST"
+DEST="$ADEST"
+fetch "$A/Aerosols_2025-08-19T20_00_00_3840x2160.png" Aerosols_2025-08-19T20_00_00_3840x2160.png
+fetch "$A/Aerosols_cbar.png" Aerosols_cbar.png
+echo "Done: $(ls "$ADEST" | wc -l | tr -d ' ') files in $ADEST"

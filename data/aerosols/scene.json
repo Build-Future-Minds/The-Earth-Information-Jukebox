@@ -1,0 +1,90 @@
+{
+  "schema_version": "0.2",
+  "is_mock": false,
+  "source": {
+    "svs_id": 5669,
+    "url": "https://svs.gsfc.nasa.gov/5669/",
+    "title": "GEOS Aerosols (2025)",
+    "credit": "NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS)",
+    "data_kind": "model_output",
+    "limitations": [
+      "Model output (GEOS-FP replay), not an observation.",
+      "One moment only (19 Aug 2025 20:00 UTC): no change over time, so each region plays a steady rhythm.",
+      "Plumes are a rendering of modelled aerosol; the numbers describe the drawn picture, not air quality or amounts.",
+      "Pixels are not square (16:9 world map): 0.094 degrees per pixel east-west, 0.083 north-south."
+    ],
+    "model_or_instrument": "GEOS-FP 2Km Replay (NASA GMAO)",
+    "data_start": "2025-08-19T20:00Z",
+    "data_end": "2025-08-19T20:00Z"
+  },
+  "frames": {
+    "width": 3840,
+    "height": 2160,
+    "count": 1,
+    "pattern": "assets/frames/svs5669/Aerosols_2025-08-19T20_00_00_3840x2160.png",
+    "timestamps": [
+      "2025-08-19T20:00Z"
+    ],
+    "first_index": 0,
+    "index_step": 1,
+    "camera_static_check": "see assets/source_manifest.json"
+  },
+  "legend": {
+    "quantity": "Aerosol type (colour of the plumes), GEOS-FP model",
+    "units": "type, not amount",
+    "stops": [
+      {
+        "colour": "blue",
+        "value": "sea salt"
+      },
+      {
+        "colour": "pink/magenta",
+        "value": "dust"
+      },
+      {
+        "colour": "orange/red",
+        "value": "smoke from fires"
+      },
+      {
+        "colour": "green",
+        "value": "sulfates from pollution and volcanoes"
+      }
+    ]
+  },
+  "regions": [
+    {
+      "id": "aerosol_streaks_vanuatu",
+      "name": "Sulfate and sea-salt streaks near Vanuatu",
+      "center_px": [
+        3710,
+        1310
+      ],
+      "radius_px": 110,
+      "box_px": [
+        3600,
+        1200,
+        220,
+        220
+      ],
+      "mask": "data/aerosols/masks/mask_aerosol_streaks_vanuatu.png",
+      "description": "Open ocean east of New Caledonia, near Vanuatu, where green sulfate and blue sea-salt streaks run mostly the same way."
+    },
+    {
+      "id": "aerosol_cells_se_pacific",
+      "name": "Sea-salt cells in the southeast Pacific",
+      "center_px": [
+        800,
+        1280
+      ],
+      "radius_px": 110,
+      "box_px": [
+        690,
+        1170,
+        220,
+        220
+      ],
+      "mask": "data/aerosols/masks/mask_aerosol_cells_se_pacific.png",
+      "description": "Open ocean in the southeast Pacific, where blue sea salt forms a honeycomb of small cells pointing every way."
+    }
+  ]
+}

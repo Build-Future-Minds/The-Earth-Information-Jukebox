@@ -2,7 +2,8 @@
 
 One command, from the repository root:
 
-    python analysis/prepare_scene.py
+    python analysis/prepare_scene.py                     # SVS 3912 ocean currents (default)
+    python analysis/prepare_scene.py --source svs5669    # SVS 5669 GEOS Aerosols (one still)
 
 It reads
     assets/frames/svs3912/          the downloaded frames (bash tools/download_frames.sh)
@@ -25,7 +26,12 @@ What it checks
     list and its model time. It is reported here, and features.py marks it `missing` with a
     reason. The land mask is built only from the usable frames.
 
-Owner: Student A. The numbers describe the rendered image of ECCO2 model output.
+The aerosol source writes data/aerosols/scene.json and data/aerosols/masks/ instead. Dev A
+measures it at threshold 6 (approved for this source only; never compare numbers across sources):
+    cd analysis && python features.py --scene ../data/aerosols/scene.json \
+        --out ../data/aerosols/features.json --threshold 6
+
+Owner: Student A. The numbers describe the rendered image, not the ocean or the air itself.
 """
 
 from __future__ import annotations
@@ -61,6 +67,50 @@ LEGEND = {
         {"colour": "yellow", "value": "about 25 C"},
         {"colour": "red", "value": "32 C"},
     ],
+}
+
+
+# Colour key of SVS 5669, as written on its source page.
+AEROSOL_LEGEND = {
+    "quantity": "Aerosol type (colour of the plumes), GEOS-FP model",
+    "units": "type, not amount",
+    "stops": [
+        {"colour": "blue", "value": "sea salt"},
+        {"colour": "pink/magenta", "value": "dust"},
+        {"colour": "orange/red", "value": "smoke from fires"},
+        {"colour": "green", "value": "sulfates from pollution and volcanoes"},
+    ],
+}
+
+
+@dataclass(frozen=True)
+class Source:
+    """Everything that differs between NASA sources. The method is the same for all of them."""
+    key: str
+    svs_id: int
+    frame_name: str                 # may contain {index}
+    frames_dir: str
+    regions: str
+    out: str
+    masks_dir: str
+    first: int
+    last: int
+    step: int
+    legend: dict
+    land_rule: tuple[int, int, int]  # (mean min, mean max, max channel spread): what flat grey land looks like
+    dates_file: str | None = None    # per-frame times, '<frame number> <time>' per line
+    fixed_time: str | None = None    # or one time for a single still
+
+
+SOURCES = {
+    "svs3912": Source("svs3912", 3912, FRAME_NAME, "assets/frames/svs3912", "assets/regions_draft.json",
+                      "data/scene.json", "data/masks", 23000, 23116, 4, LEGEND,
+                      (LAND_MIN, LAND_MAX, MAX_CHANNEL_SPREAD), dates_file="flat_ecco2_dates.txt"),
+    # One still (19 Aug 2025 20:00 UTC, time from the file name and the source page). Land is
+    # dull grey-green; both approved circles are open ocean, so the rule only guards against mistakes.
+    "svs5669": Source("svs5669", 5669, "Aerosols_2025-08-19T20_00_00_3840x2160.png", "assets/frames/svs5669",
+                      "assets/regions_aerosols.json", "data/aerosols/scene.json", "data/aerosols/masks",
+                      0, 0, 1, AEROSOL_LEGEND, (30, 95, 12), fixed_time="2025-08-19T20:00Z"),
 }
 
 
@@ -129,37 +179,39 @@ def read_regions(path: Path) -> list[dict]:
     return regions
 
 
-def source_entry(manifest_path: Path) -> dict:
+def source_entry(manifest_path: Path, svs_id: int = SVS_ID) -> dict:
     manifest = read_json(manifest_path, "Source manifest")
     for asset in manifest.get("assets", []):
-        if asset.get("svs_id") == SVS_ID:
+        if asset.get("svs_id") == svs_id:
             for key in ("url", "title", "credit", "data_kind", "limitations"):
                 if not asset.get(key):
-                    raise SceneError(f"{manifest_path.name}: the SVS {SVS_ID} entry has no '{key}'. "
+                    raise SceneError(f"{manifest_path.name}: the SVS {svs_id} entry has no '{key}'. "
                                      "Fill it in from the source page, then run again.")
             return asset
-    raise SceneError(f"{manifest_path.name} has no entry with svs_id {SVS_ID}. Add it, then run again.")
+    raise SceneError(f"{manifest_path.name} has no entry with svs_id {svs_id}. Add it, then run again.")
 
 
 # ---------------------------------------------------------------- frames and masks
 
-def is_land(frame_bgr: np.ndarray) -> np.ndarray:
+def is_land(frame_bgr: np.ndarray, rule: tuple[int, int, int] = (LAND_MIN, LAND_MAX, MAX_CHANNEL_SPREAD)) -> np.ndarray:
+    low, high, max_spread = rule
     rgb = frame_bgr.astype(np.int16)
     spread = rgb.max(axis=2) - rgb.min(axis=2)
     mean = rgb.mean(axis=2)
-    return (spread <= MAX_CHANNEL_SPREAD) & (mean >= LAND_MIN) & (mean <= LAND_MAX)
+    return (spread <= max_spread) & (mean >= low) & (mean <= high)
 
 
 def check_frames(frames_dir: Path, indices: list[int], dates: dict[int, str],
-                 size: tuple[int, int] | None) -> tuple[list[FrameCheck], list[np.ndarray]]:
+                 size: tuple[int, int] | None, frame_name: str = FRAME_NAME,
+                 dates_name: str = "flat_ecco2_dates.txt") -> tuple[list[FrameCheck], list[np.ndarray]]:
     """Check every frame. Unusable frames keep their place; usable ones are returned for the land mask."""
     missing_dates = [n for n in indices if n not in dates]
     if missing_dates:
-        raise SceneError(f"No model time for frame(s) {missing_dates[:5]} in flat_ecco2_dates.txt.\n"
+        raise SceneError(f"No model time for frame(s) {missing_dates[:5]} in {dates_name}.\n"
                          "Check --first/--last/--step, or download the dates file again.")
     checks, usable = [], []
     for n in indices:
-        path = frames_dir / FRAME_NAME.format(index=n)
+        path = frames_dir / frame_name.format(index=n)
         check = FrameCheck(index=n, timestamp=dates[n], usable=False)
         try:
             frame = load_image(path)
@@ -182,9 +234,9 @@ def check_frames(frames_dir: Path, indices: list[int], dates: dict[int, str],
     return checks, usable
 
 
-def land_mask(frames: list[np.ndarray]) -> np.ndarray:
+def land_mask(frames: list[np.ndarray], rule: tuple[int, int, int] = (LAND_MIN, LAND_MAX, MAX_CHANNEL_SPREAD)) -> np.ndarray:
     """Pixels that are land in most usable frames, grown by a small coast margin."""
-    votes = np.mean([is_land(f) for f in frames], axis=0)
+    votes = np.mean([is_land(f, rule) for f in frames], axis=0)
     land = (votes > 0.5).astype(np.uint8)
     k = 2 * COAST_MARGIN_PX + 1
     return cv2.dilate(land, np.ones((k, k), np.uint8)).astype(bool)
@@ -206,23 +258,28 @@ def region_mask(land: np.ndarray, centre: list[int], radius: int) -> np.ndarray:
 # ---------------------------------------------------------------- the scene
 
 def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_path: Path,
-                first: int, last: int, step: int, masks_dir: Path) -> tuple[dict, dict[str, np.ndarray], list[FrameCheck]]:
+                first: int, last: int, step: int, masks_dir: Path,
+                source: Source = SOURCES["svs3912"]) -> tuple[dict, dict[str, np.ndarray], list[FrameCheck]]:
     """Everything except writing files. Raises SceneError with a fix for any bad input."""
     if step < 1 or last < first:
         raise SceneError(f"Frame range {first}..{last} step {step} is empty. Use --first <= --last and --step >= 1.")
     if not frames_dir.is_dir():
         raise SceneError(f"Frames folder not found: {frames_dir}\nRun: bash tools/download_frames.sh")
-    dates = read_dates(frames_dir / "flat_ecco2_dates.txt")
-    regions = read_regions(regions_path)
-    asset = source_entry(manifest_path)
     indices = list(range(first, last + 1, step))
+    if source.dates_file:
+        dates = read_dates(frames_dir / source.dates_file)
+    else:
+        dates = {n: source.fixed_time for n in indices}
+    regions = read_regions(regions_path)
+    asset = source_entry(manifest_path, source.svs_id)
 
-    checks, usable = check_frames(frames_dir, indices, dates, size=None)
+    checks, usable = check_frames(frames_dir, indices, dates, size=None, frame_name=source.frame_name,
+                                  dates_name=source.dates_file or "the source preset")
     if not usable:
         raise SceneError(f"None of the {len(indices)} frames {first}..{last} could be used "
                          f"({checks[0].reason}).\nRun: bash tools/download_frames.sh")
     height, width = usable[0].shape[:2]
-    land = land_mask(usable)
+    land = land_mask(usable, source.land_rule)
 
     masks, scene_regions = {}, []
     for r in regions:
@@ -245,22 +302,23 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
             "radius_px": int(radius),
             "box_px": [x, y, w, h],
             "mask": mask_rel,
-            "description": f"A circle {2 * radius} pixels across, centred at x {centre[0]}, y {centre[1]} on the "
-                           f"map. Only lines inside the circle are measured; land is left out "
-                           f"({1 - water:.0%} of the circle).",
+            "description": r.get("description") or (
+                f"A circle {2 * radius} pixels across, centred at x {centre[0]}, y {centre[1]} on the "
+                f"map. Only lines inside the circle are measured; land is left out "
+                f"({1 - water:.0%} of the circle)."),
         })
 
-    pattern = (frames_dir.resolve().relative_to(root.resolve()) / FRAME_NAME).as_posix()
-    source = {k: asset[k] for k in ("url", "title", "credit", "data_kind", "limitations")}
-    source = {"svs_id": SVS_ID, **source}
+    pattern = (frames_dir.resolve().relative_to(root.resolve()) / source.frame_name).as_posix()
+    source_block = {k: asset[k] for k in ("url", "title", "credit", "data_kind", "limitations")}
+    source_block = {"svs_id": source.svs_id, **source_block}
     for key in ("model_or_instrument", "data_start", "data_end"):
         if key in asset:
-            source[key] = asset[key]
+            source_block[key] = asset[key]
     motion = asset.get("motion_check", {})
     scene = {
         "schema_version": "0.2",
         "is_mock": False,
-        "source": source,
+        "source": source_block,
         "frames": {
             "width": width,
             "height": height,
@@ -272,7 +330,7 @@ def build_scene(*, root: Path, frames_dir: Path, regions_path: Path, manifest_pa
             "camera_static_check": (f"{motion['method']}: {motion['result']}" if motion
                                     else "see assets/source_manifest.json"),
         },
-        "legend": LEGEND,
+        "legend": source.legend,
         "regions": scene_regions,
     }
     return scene, masks, checks
@@ -303,21 +361,31 @@ def write_outputs(scene: dict, masks: dict[str, np.ndarray], root: Path, out_pat
 
 
 def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
-    parser = argparse.ArgumentParser(description="Write data/scene.json and region masks from the NASA frames.")
-    parser.add_argument("--frames-dir", type=Path, default=root / "assets/frames/svs3912")
-    parser.add_argument("--regions", type=Path, default=root / "assets/regions_draft.json")
+    parser = argparse.ArgumentParser(description="Write a scene.json and region masks from the NASA frames.")
+    parser.add_argument("--source", choices=sorted(SOURCES), default="svs3912",
+                        help="which NASA source (sets the defaults below)")
+    parser.add_argument("--frames-dir", type=Path)
+    parser.add_argument("--regions", type=Path)
     parser.add_argument("--manifest", type=Path, default=root / "assets/source_manifest.json")
-    parser.add_argument("--out", type=Path, default=root / "data/scene.json")
-    parser.add_argument("--masks-dir", type=Path, default=root / "data/masks")
-    parser.add_argument("--first", type=int, default=23000)
-    parser.add_argument("--last", type=int, default=23116)
-    parser.add_argument("--step", type=int, default=4, help="SVS 3912 frame numbers go up in fours")
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--masks-dir", type=Path)
+    parser.add_argument("--first", type=int)
+    parser.add_argument("--last", type=int)
+    parser.add_argument("--step", type=int, help="SVS 3912 frame numbers go up in fours")
     args = parser.parse_args(argv)
+    src = SOURCES[args.source]
+    args.frames_dir = args.frames_dir or root / src.frames_dir
+    args.regions = args.regions or root / src.regions
+    args.out = args.out or root / src.out
+    args.masks_dir = args.masks_dir or root / src.masks_dir
+    args.first = src.first if args.first is None else args.first
+    args.last = src.last if args.last is None else args.last
+    args.step = src.step if args.step is None else args.step
 
     try:
         scene, masks, checks = build_scene(root=root, frames_dir=args.frames_dir, regions_path=args.regions,
                                            manifest_path=args.manifest, first=args.first, last=args.last,
-                                           step=args.step, masks_dir=args.masks_dir)
+                                           step=args.step, masks_dir=args.masks_dir, source=src)
         validate(scene)
         write_outputs(scene, masks, root, args.out)
     except SceneError as err:
@@ -329,8 +397,11 @@ def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
           f"{len(scene['regions'])} regions) and {len(masks)} mask(s) in {args.masks_dir}")
     for c in bad:
         print(f"  frame {c.index} ({c.timestamp}) kept in place but unusable: {c.reason}")
-    print(f"Next (Dev A): cd analysis && python features.py --scene ../{args.out.resolve().relative_to(root.resolve()).as_posix()} "
-          f"--out ../data/features.json --rhythm-out ../data/rhythm_reference.json")
+    out_rel = args.out.resolve().relative_to(root.resolve())
+    extra = " --threshold 6" if src.key == "svs5669" else ""
+    print(f"Next (Dev A): cd analysis && python features.py --scene ../{out_rel.as_posix()} "
+          f"--out ../{(out_rel.parent / 'features.json').as_posix()} "
+          f"--rhythm-out ../{(out_rel.parent / 'rhythm_reference.json').as_posix()}{extra}")
     return 0
 
 
