@@ -524,3 +524,6 @@ figure.scene figcaption { font-size: 0.85rem; }
   .player .icon-button, .player .icon-button.primary { min-width: 0; min-height: 48px; padding: 4px 2px; }
   figure.scene { max-width: 100%; }
 }
+
+/* A way back to the app from the extra pages (globe.html). */
+.back { display: inline-block; margin-bottom: var(--xs); color: var(--ink-2); font-size: 0.9rem; text-underline-offset: 2px; }
