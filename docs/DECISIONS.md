@@ -136,6 +136,70 @@ input can call the same `noteOn` / `noteOff` with no other change. Web MIDI need
 localhost and a permission prompt, and Safari does not support it. **Unverified for our demo
 browser.** Test on the demo machine before relying on it.
 
+---
+
+## D9. Play along: a picture scan and new instruments, kept apart from the Earth voice
+
+**Design choice**, after **Verified** NASA examples. Owner: Dev A, 15 Nov. Code:
+`web/src/audio/scanScore.ts`, `scanPlayer.ts`, `instruments.ts`, `components/PictureScan.tsx`.
+Rule, settings, measurements and limits: `mapping_spec.md`, "Play along: the picture scan".
+
+**What:** the "Play along" section has two extras. "Play the picture" sweeps a line over the
+NASA image (west to east over the whole picture, or a radar turn inside a region's circle) and
+plays what it crosses. "Your melody" is the melody pad, now with five sounds to choose from.
+
+**Why a scan:** it is the method NASA uses for its own image sonifications, so visitors may
+know it, and it lets the whole picture be heard, not only two circles. Position sets pitch [S11],
+light sets loudness [S9, S11], colour chooses the instrument, with a choir for the whole image, a
+marimba for red and orange and a glockenspiel for blue [S10]. The radar on a circle is the
+Caldwell 73 method [S10].
+
+**Why it is kept apart:** the Earth rhythm is the tested claim. The scan has its own clock,
+instruments, volume and reverb, and shares nothing with the Earth voice. `web/e2e/scan.e2e.ts`
+checks that the Earth notes keep their schedule while it plays. Stop and Esc silence it, echo
+included.
+
+**Why these sounds:** the first melody sound was one plain triangle wave with no room. The new
+ones are still synthesised by our code (no samples, no generated music): struck bars built from
+the tones a real bar makes [S12], a choir pad, and a reverb. Notes come from a five-note
+scale, so the picture, the keys and any mix of them never clash.
+
+**Music library:** note names, the scale and the low note's chord steps come from Tonal (MIT),
+which is bundled with the app. We did not take a library of recorded instrument samples: those
+are fetched from the network when the page runs, the licences of the recordings were not
+confirmed, and "all sound is synthesised by our own code" would stop being true.
+
+**Decoration:** the low note steps C, A, F, G on a fixed timetable, and the sound moves left to
+right with the line. Neither carries data, and both are named as decoration in the app.
+
+**Note spacing (third round, 15 Nov):** the 12 held notes went from every step of the scale
+starting at C3 to a spacing that is wide at the bottom and close at the top. Low notes a step
+apart blur together, and on the radar every band sounds at once. Struck notes are now one octave
+above their band on either instrument, so pitch says only where a spot is and the instrument
+says only which colour.
+
+**A sound library:** three scan sounds to choose from (Ocean choir, Music box, Plain), all
+synthesised here and all playing the same score. The Plain one is the first version's
+instruments, kept so a listener can compare. The bars' tones come from the equations of a
+vibrating bar; the numbers and a table are in `mapping_spec.md`.
+
+**A legend:** every mark on the picture and every bar is named beside it, with the same shapes,
+in plain text a screen reader reads.
+
+**How it looks, and where it leaves `DESIGN.md`:** the part of the picture not played yet is
+dimmed, a white line with a white shape rides over it, and each chime leaves a white mark. This
+is black and white only, so the image's colours are never changed, but it does overlay the NASA
+image, and the chime rings and bar flashes fade smoothly. `DESIGN.md` says no overlays beyond
+the region rings and no eased motion. Developer A asked for the scan to be easier to see and
+smoother (15 Nov). **Student B to review**, as the owner of the design rules. With reduced motion
+set, the line moves once a second and nothing fades.
+
+**Not decided here:** the Earth pulse keeps its sound. Changing it is task L1 in
+`idea_tasks.md` and needs the listening check to be run again.
+
+**Listening:** Developer A listened to the first two versions on 15 Nov and judged them good.
+One listener, not a test. The third round was checked by measurement only.
+
 ## Sources
 
 | ID | Citation | Link | Status | Used in |
@@ -148,9 +212,14 @@ browser.** Test on the demo machine before relying on it.
 | S6 | Walker, B. N., & Nees, M. A. (2011). Theory of Sonification. In T. Hermann, A. Hunt & J. G. Neuhoff (Eds.), *The Sonification Handbook* (ch. 2). Logos, Berlin. | https://sonification.de/handbook/index.php/chapters/chapter2 | Unverified (exists; not read) | D4 |
 | S7 | Mardia, K. V., & Jupp, P. E. (2000). *Directional Statistics.* Wiley. ISBN 978-0-471-95333-3. | n/a | Unverified (publication details only) | D5 |
 | S8 | Bigün, J., & Granlund, G. H. (1987). Optimal orientation detection of linear symmetry. *Proc. 1st ICCV*, London, 433–438. | n/a | Unverified (publication details only) | D5 |
+| S9 | NASA Scientific Visualization Studio. *Sonification of NGC 1569* (SVS 14156, released 16 May 2022). Sonification: SYSTEM Sounds (M. Russo, A. Santaguida). | https://svs.gsfc.nasa.gov/14156 | Verified (read 15 Nov) | D9 |
+| S10 | NASA Scientific Visualization Studio. *Data Sonification: Caldwell 73* (SVS 13786, released 23 Dec 2020). Credit: SYSTEM Sounds (M. Russo, A. Santaguida). | https://svs.gsfc.nasa.gov/13786 | Verified (read 15 Nov) | D9 |
+| S11 | Chandra X-ray Center. *A Universe of Sound: Galactic Center.* | https://chandra.si.edu/sound/gcenter.html | Verified (read 15 Nov) | D9 |
+| S12 | Stanford CCRMA, Music 150 course notes. *Percussion instruments: rectangular bars (the glockenspiel), the marimba, xylophone and vibraphone.* | https://ccrma.stanford.edu/CCRMA/Courses/150/percussion.html | Verified (read 15 Nov) | D9 |
 
 Software used (Tone.js, React, Vite and others) is listed from `web/package.json` in References.
 It is not repeated here.
 
 **How these were checked:** an AI research assistant fetched each source on 14 Nov 2026 and
-quoted the passages. Dev B reviewed the results. Logged in `AI_USE.md`.
+quoted the passages. Dev B reviewed the results. S9 to S12 were fetched and quoted the same way
+on 15 Nov for Dev A, who has not yet read them. Logged in `AI_USE.md`.

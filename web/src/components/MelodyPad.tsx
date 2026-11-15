@@ -1,18 +1,22 @@
-// Optional melody: a separate "user" voice. Play it with the computer keyboard (while this pad
-// has focus) or by pressing the on-screen keys with a mouse or touch. Letter keys only play while
-// the pad has focus, so they stay free for screen readers and speech input (docs/DECISIONS.md D8).
+// Your melody: a separate "user" voice, the second half of "Play along". Play it with the computer
+// keyboard (while this pad has focus) or by pressing the on-screen keys with a mouse or touch.
+// Letter keys only play while the pad has focus, so they stay free for screen readers and speech
+// input (docs/DECISIONS.md D8).
 // Inputs send MIDI note numbers, so a MIDI piano can later call the same onNoteOn / onNoteOff.
 import { useEffect, useState } from 'react';
+import { MELODY_INSTRUMENTS, type MelodyInstrumentId } from '../audio/instruments';
 import { KEYBOARD_NOTES, type InputSource } from '../audio/userVoice';
 
 interface Props {
   /** Notes held right now by any input (from UserVoice), so the highlight matches the sound. */
   heldNotes: ReadonlySet<number>;
   volumeDb: number;
+  instrument: MelodyInstrumentId;
   onNoteOn: (note: number, source: InputSource) => void;
   onNoteOff: (note: number, source: InputSource) => void;
   onAllOff: () => void;
   onVolume: (db: number) => void;
+  onInstrument: (id: MelodyInstrumentId) => void;
 }
 
 const KEYS = Object.keys(KEYBOARD_NOTES);
@@ -30,9 +34,12 @@ export function MelodyPad(p: Props) {
   const fromKey = (e: React.KeyboardEvent) => (e.ctrlKey || e.metaKey || e.altKey ? undefined : KEYBOARD_NOTES[e.key.toLowerCase()]);
 
   return (
-    <section className="melody" aria-labelledby="melody-heading">
-      <h2 id="melody-heading">Add a melody (optional)</h2>
-      <p className="muted">Your melody is a separate voice. It never changes the Earth rhythm.</p>
+    <div className="melody" role="group" aria-labelledby="melody-heading">
+      <h3 id="melody-heading">Your melody</h3>
+      <p className="muted">
+        Your melody is a separate voice. It never changes the Earth rhythm. Its eight keys use the same five-note scale as the
+        picture scan, so whatever you play fits.
+      </p>
       <div
         className={active ? 'pad active' : 'pad'}
         tabIndex={0}
@@ -81,21 +88,31 @@ export function MelodyPad(p: Props) {
           })}
         </span>
       </div>
-      <label className="range">
-        <span className="range-row">
-          <span>Melody volume</span>
-          <span className="readout" aria-hidden="true">{p.volumeDb} dB</span>
-        </span>
-        <input
-          type="range"
-          min={-36}
-          max={0}
-          step={1}
-          value={p.volumeDb}
-          onChange={(e) => p.onVolume(Number(e.target.value))}
-          aria-valuetext={`${p.volumeDb} decibels`}
-        />
-      </label>
-    </section>
+      <div className="row">
+        <label>
+          Melody sound{' '}
+          <select value={p.instrument} onChange={(e) => p.onInstrument(e.target.value as MelodyInstrumentId)}>
+            {MELODY_INSTRUMENTS.map((i) => (
+              <option key={i.id} value={i.id}>{i.label}</option>
+            ))}
+          </select>
+        </label>
+        <label className="range">
+          <span className="range-row">
+            <span>Melody volume</span>
+            <span className="readout" aria-hidden="true">{p.volumeDb} dB</span>
+          </span>
+          <input
+            type="range"
+            min={-36}
+            max={0}
+            step={1}
+            value={p.volumeDb}
+            onChange={(e) => p.onVolume(Number(e.target.value))}
+            aria-valuetext={`${p.volumeDb} decibels`}
+          />
+        </label>
+      </div>
+    </div>
   );
 }
