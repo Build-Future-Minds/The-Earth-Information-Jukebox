@@ -4,17 +4,16 @@ import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
 import { DEFAULT_MELODY_INSTRUMENT, type MelodyInstrumentId } from './audio/instruments';
-import { MelodyPad } from './components/MelodyPad';
-import { PictureScan, type PictureScanHandle } from './components/PictureScan';
-import { NowPlaying } from './components/NowPlaying';
-import { BeatTrack } from './components/BeatTrack';
-import { LookingAt } from './components/LookingAt';
-import { RegionCloseups } from './components/RegionCloseups';
-import { RhythmsPlot } from './components/RhythmsPlot';
-import { PracticeGame } from './components/PracticeGame';
-import { ExploreControls, regionLabel } from './components/ExploreControls';
-import { RhythmExplanation, stepAtSameMoment } from './components/RhythmExplanation';
-import { SceneView } from './components/SceneView';
+import type { PictureScanHandle } from './components/PictureScan';
+import { ExploreControls, regionLabel, regionStyle } from './components/ExploreControls';
+import { PageLinks } from './components/PageLinks';
+import { ThemeSwitch } from './components/ThemeSwitch';
+import { stepAtSameMoment } from './components/RhythmExplanation';
+import { useView, VIEWS } from './views';
+import { CompareView } from './views/CompareView';
+import { HowView } from './views/HowView';
+import { ListenView } from './views/ListenView';
+import { PlayView } from './views/PlayView';
 
 const { scene, features, imageUrl } = ACTIVE;
 
@@ -32,6 +31,9 @@ export function App() {
   const melody = useRef<UserVoice | null>(null);
   const scan = useRef<PictureScanHandle>(null);
   const explanationRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const view = useView();
+  const viewLabel = VIEWS.find((v) => v.key === view)!.label;
 
   const track = useMemo(() => buildEarthTrack(features, regionId), [regionId]);
 
@@ -96,6 +98,19 @@ export function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [stop]);
 
+  // Changing view is the same as pressing Stop. Then go to the top and move focus to the view's
+  // heading, so a screen reader announces where you are. Not on the first load: Tab starts at the top.
+  // Compared with the previous view (not a "first run" flag), because React runs effects twice in dev.
+  const shownView = useRef(view);
+  useEffect(() => {
+    document.title = `${viewLabel} · Earth Sonata`;
+    if (shownView.current === view) return;
+    shownView.current = view;
+    stop();
+    window.scrollTo(0, 0);
+    headingRef.current?.focus();
+  }, [view, viewLabel, stop]);
+
   // Move focus to the explanation when it opens so a screen reader reads it once.
   useEffect(() => {
     if (explaining) explanationRef.current?.focus();
@@ -128,7 +143,7 @@ export function App() {
           PRACTICE DATA — test input, not NASA data
         </div>
       )}
-      {/* Student B's Axis Specimen layout (DESIGN.md "Layout"): a fixed rail with the title and the
+      {/* Layout: a fixed rail with the title, theme switch and the
           controls, and a main column. The NASA image stays large in the main column: in a 400 px rail
           each region circle would be about 10 px across. Below 960 px the rail stacks on top. */}
       <div className="layout">
@@ -140,98 +155,103 @@ export function App() {
             </p>
           </header>
 
-          <ExploreControls
-            regions={scene.regions}
-            regionId={regionId}
-            playState={playState}
-            explaining={explaining}
-            speed={speed}
-            volumeDb={volumeDb}
-            onStart={start}
-            onPause={pause}
-            onStop={stop}
-            onReplay={replay}
-            onRegion={setRegionId}
-            onExplain={() => setExplaining((x) => !x)}
-            onSpeed={(s) => {
-              setSpeed(s);
-              transport.current?.setSpeed(s);
-            }}
-            onVolume={(db) => {
-              setVolumeDb(db);
-              transport.current?.setVolume(db);
-            }}
-          />
+          <PageLinks current={view} />
+
+          {view === 'listen' && (
+            <ExploreControls
+              regions={scene.regions}
+              regionId={regionId}
+              playState={playState}
+              explaining={explaining}
+              speed={speed}
+              volumeDb={volumeDb}
+              onStart={start}
+              onPause={pause}
+              onStop={stop}
+              onReplay={replay}
+              onRegion={setRegionId}
+              onExplain={() => setExplaining((x) => !x)}
+              onSpeed={(s) => {
+                setSpeed(s);
+                transport.current?.setSpeed(s);
+              }}
+              onVolume={(db) => {
+                setVolumeDb(db);
+                transport.current?.setVolume(db);
+              }}
+            />
+          )}
+
+          <ThemeSwitch />
         </div>
 
         <main className="stage">
-          <SceneView scene={scene} imageUrl={imageUrl} regionId={regionId} />
-
+          <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
+          {/* In the shell, on every view: sound can start on Listen, Compare and Play along. */}
           <p className="status" role="status">{status}</p>
-          <NowPlaying step={sounding} regionLabel={label} />
-          <BeatTrack
-            track={track}
-            regionLabel={label}
-            playState={playState}
-            speed={speed}
-            getPosition={getPosition}
-            onSeek={seek}
-          />
           {missing && playState !== 'stopped' && (
             <p className="missing" role="alert">
               Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
             </p>
           )}
 
-          {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} other={other} />}
-
-          <LookingAt />
-          <RegionCloseups
-            scene={scene}
-            features={features}
-            imageUrl={imageUrl}
-            regionId={regionId}
-            onListen={listenTo}
-          />
-          <RhythmsPlot features={features} regions={scene.regions} activeRegionId={regionId} />
-          <PracticeGame />
-
-          {/* Play along: two extras with their own instruments and volumes. Neither can change an
-              Earth note (docs/CONTRACT.md); Stop and Esc silence both. */}
-          <section className="playalong" aria-labelledby="playalong-heading">
-            <h2 id="playalong-heading">Play along (optional)</h2>
-            <PictureScan ref={scan} scene={scene} imageUrl={imageUrl} speed={speed} />
-            <MelodyPad
+          {view === 'listen' && (
+            <ListenView
+              scene={scene}
+              imageUrl={imageUrl}
+              regionId={regionId}
+              label={label}
+              colour={regionStyle(scene.regions, regionId)}
+              track={track}
+              sounding={sounding}
+              playState={playState}
+              speed={speed}
+              getPosition={getPosition}
+              onSeek={seek}
+              explaining={explaining}
+              explanationRef={explanationRef}
+              other={other}
+            />
+          )}
+          {view === 'compare' && (
+            <CompareView
+              scene={scene}
+              features={features}
+              imageUrl={imageUrl}
+              regionId={regionId}
+              playState={playState}
+              getPosition={getPosition}
+              onListen={listenTo}
+              onStop={stop}
+            />
+          )}
+          {view === 'how' && <HowView scene={scene} />}
+          {view === 'play' && (
+            <PlayView
+              scene={scene}
+              imageUrl={imageUrl}
+              speed={speed}
+              scanRef={scan}
+              playState={playState}
+              onStart={start}
+              onPause={pause}
+              onStop={stop}
               heldNotes={heldNotes}
-              volumeDb={melodyDb}
-              instrument={melodyInstrument}
-              onNoteOn={onMelodyNoteOn}
-              onNoteOff={onMelodyNoteOff}
-              onAllOff={onMelodyAllOff}
-              onVolume={(db) => {
-                setMelodyDb(db);
-                melody.current?.setVolume(db);
-              }}
-              onInstrument={(id) => {
+              melodyDb={melodyDb}
+              melodyInstrument={melodyInstrument}
+              onMelodyInstrument={(id) => {
                 setMelodyInstrument(id);
                 melody.current?.setInstrument(id);
               }}
+              onNoteOn={onMelodyNoteOn}
+              onNoteOff={onMelodyNoteOff}
+              onAllOff={onMelodyAllOff}
+              onMelodyVolume={(db) => {
+                setMelodyDb(db);
+                melody.current?.setVolume(db);
+              }}
             />
-          </section>
-
-          <footer>
-            <h2>Source and credit</h2>
-            <p>
-              <a href={scene.source.url}>{scene.source.title}</a>. {scene.source.credit}.
-            </p>
-            <p>Data kind: {scene.source.data_kind.replace(/_/g, ' ')}.</p>
-            <ul>
-              {scene.source.limitations.map((l) => (
-                <li key={l}>{l}</li>
-              ))}
-            </ul>
-            <p className="muted">Cached image measurements with live sound. All sounds are synthesised in your browser.</p>
-          </footer>
+          )}
         </main>
       </div>
     </>

@@ -1,17 +1,27 @@
-/* Earth Sonata app, styled with Student B's "Axis Specimen" design system (DESIGN.md).
-   Cool paper, near-black ink, hairline rules, 4px corners, no shadows. One signal orange means
-   "chosen, live or focused" and nothing else. The NASA image owns all other colour.
-   A single light world by design (DESIGN.md), so no dark palette. */
+/* Earth Sonata app, styled with the "Tide Table" design system (DESIGN.md).
+   Hairline rules, 4px corners, no shadows, type weight carries the data.
+   "Tide Table" world: a tide table printed on a sea chart. Two themes: light (almanac white,
+   navy ink, tide-blue actions) and dark, the night edition (deep navy, inks lifted). Signal red-orange means "live or focused" only. Region A is violet and
+   Region B rose: both off the NASA picture's blue-to-red temperature scale, so a region colour
+   is never read as warm or cold. */
 :root {
-  --signal: #ff5a1f;
-  --ink: #111214;
-  --ink-2: #4b515a;
-  --ink-hover: #2a2c31;
-  --paper: #f6f7f8;
-  --rule: #d9dce1;
-  --rule-2: #eceef1;
-  --well: #2a2a2a;
+  /* Light */
+  --signal: oklch(0.55 0.18 33);
+  --on-signal: oklch(0.99 0 0);
+  --ink: oklch(0.26 0.05 260);
+  --ink-2: oklch(0.46 0.04 255);
+  --paper: oklch(0.972 0.004 230);
+  --rule: oklch(0.87 0.015 245);
+  --rule-2: oklch(0.94 0.008 240);
+  --action: oklch(0.48 0.13 255);
+  --action-hover: oklch(0.42 0.13 255);
+  --on-action: oklch(0.99 0 0);
+  --region-a: oklch(0.47 0.15 300);
+  --region-b: oklch(0.52 0.17 5);
+  --on-region: oklch(0.99 0 0);
+  --well: oklch(0.20 0.03 262);
   --white: #ffffff;
+  --black: #000000;
 
   --font: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, 'Segoe UI', sans-serif;
   --mono: 'Atkinson Hyperlegible Mono Variable', 'Atkinson Hyperlegible Mono', ui-monospace, Consolas, monospace;
@@ -27,14 +37,34 @@
 
   color-scheme: light;
 }
+/* Dark: the night edition. Chosen with the header switch; with no choice, follows the system. */
+:root[data-theme='dark'] {
+  --signal: oklch(0.72 0.17 42);
+  --on-signal: oklch(0.17 0.03 262);
+  --ink: oklch(0.95 0.01 250);
+  --ink-2: oklch(0.78 0.03 255);
+  --paper: oklch(0.17 0.03 262);
+  --rule: oklch(0.34 0.035 262);
+  --rule-2: oklch(0.225 0.035 262);
+  --action: oklch(0.74 0.11 250);
+  --action-hover: oklch(0.80 0.10 250);
+  --on-action: oklch(0.17 0.03 262);
+  --region-a: oklch(0.77 0.11 300);
+  --region-b: oklch(0.79 0.11 0);
+  --on-region: oklch(0.17 0.03 262);
+  --well: oklch(0.12 0.02 262);
+  color-scheme: dark;
+}
 
 * { box-sizing: border-box; }
-::selection { background: var(--signal); color: var(--ink); }
+html { background: var(--paper); }
+::selection { background: var(--signal); color: var(--on-signal); }
 
 body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
+  transition: background-color var(--snap), color var(--snap);
   caret-color: var(--signal);
   font: 400 18px/1.5 var(--font);
 }
@@ -52,7 +82,7 @@ body {
   max-height: 100vh;
   overflow-y: auto;
 }
-.stage { padding: 32px 40px 40px; display: grid; gap: var(--md); align-content: start; min-width: 0; }
+.stage { padding: 32px 40px 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--md); align-content: start; min-width: 0; }
 .stage > * { max-width: 1100px; }
 @media (max-width: 959px) {
   .layout { display: block; }
@@ -69,6 +99,14 @@ body {
 h1 { font-size: 1.9rem; font-weight: 750; line-height: 1.1; letter-spacing: -0.015em; margin: 0; text-wrap: balance; }
 h2 { font-size: 1.05rem; font-weight: 700; line-height: 1.3; margin: 0 0 var(--xs); }
 header { display: grid; gap: var(--xs); }
+/* The theme switch sits under the controls, so Start stays the first keyboard stop. */
+.rail > .theme-switch { justify-self: start; }
+/* Light / Dark switch: two joined buttons, the chosen one filled in ink. */
+.theme-switch { display: inline-flex; flex: none; gap: 2px; background: var(--ink); border: 2px solid var(--ink); border-radius: var(--r); overflow: hidden; }
+.theme-switch button { border: 0; border-radius: 0; min-height: 40px; font-size: 0.9rem; gap: 6px; padding: 0 12px; background: var(--paper); }
+.theme-switch button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+.theme-switch button:focus-visible { outline-offset: -6px; }
+.theme-switch svg { width: 16px; height: 16px; }
 .lede, .muted { color: var(--ink-2); margin: 0; max-width: 65ch; }
 p { margin: 0; }
 a { color: var(--ink); text-decoration-thickness: 2px; text-underline-offset: 3px; }
@@ -87,25 +125,54 @@ a:hover { text-decoration-color: var(--signal); }
   padding: var(--xs) var(--sm);
 }
 
-/* The image: dark well, 4px corners, credit directly underneath. */
-.scene { margin: 0; display: grid; gap: var(--xs); }
-.scene svg { width: 100%; height: auto; display: block; background: var(--well); border-radius: var(--r); }
+/* The image sits in a sea-chart frame: a 1px ink neatline with latitude and longitude ticks every
+   10°, labelled every 30°. Credit directly underneath. */
+.scene { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--xs); min-width: 0; }
+.chart { position: relative; margin: 22px 0 0 44px; border: 1px solid var(--ink); min-width: 0; }
+.scene svg { width: 100%; height: auto; display: block; background: var(--well); }
+.graticule { position: absolute; inset: 0; pointer-events: none; font: 400 0.75rem/1 var(--mono); color: var(--ink-2); }
+.g-lon, .g-lat { position: absolute; }
+.g-lon { top: -7px; bottom: -7px; width: 0; }
+.g-lon::before, .g-lon::after { content: ""; position: absolute; left: -0.5px; width: 1px; height: 7px; background: var(--ink); }
+.g-lon::before { top: 0; }
+.g-lon::after { bottom: 0; }
+.g-lat { left: -7px; right: -7px; height: 0; }
+.g-lat::before, .g-lat::after { content: ""; position: absolute; top: -0.5px; height: 1px; width: 7px; background: var(--ink); }
+.g-lat::before { left: 0; }
+.g-lat::after { right: 0; }
+.g-lon.minor { top: -4px; bottom: -4px; }
+.g-lon.minor::before, .g-lon.minor::after { height: 4px; }
+.g-lat.minor { left: -4px; right: -4px; }
+.g-lat.minor::before, .g-lat.minor::after { width: 4px; }
+.g-lon b { position: absolute; top: -18px; transform: translateX(-50%); font-weight: 400; white-space: nowrap; }
+.g-lat b { position: absolute; right: calc(100% + 4px); top: -0.5em; font-weight: 400; white-space: nowrap; }
+@media (max-width: 640px) {
+  .chart { margin-left: 34px; }
+  .graticule { font-size: 0.65rem; }
+  .g-lon:nth-of-type(even) b { display: none; }
+}
 .frame-placeholder { fill: var(--rule-2); }
 figcaption { color: var(--ink-2); font-size: 1rem; max-width: 70ch; display: grid; gap: 4px; }
-.credit { font: 400 0.9rem/1.5 var(--mono); color: var(--ink-2); }
+.credit { font: 400 0.9rem/1.5 var(--font); color: var(--ink-2); }
 figcaption strong { color: var(--ink); }
 
-/* Region circles: a white ring inside a black outline, so it reads on any part of the image.
-   Black and white only on the NASA image (DESIGN.md); the live region's tab inverts to ink. */
-.box .ring-outline { fill: none; stroke: var(--ink); stroke-width: 12; }
-.box .ring { fill: none; stroke: var(--white); stroke-width: 5; }
-.box .tab { fill: var(--white); stroke: var(--ink); stroke-width: 3; }
-.box text { fill: var(--ink); font: 700 30px var(--font); }
+/* Region circles: the region's colour inside a black outline, so it reads on any part of the image.
+   The live region's ring and tab get heavier. */
+.box .ring-outline { fill: none; stroke: var(--black); stroke-width: 12; }
+.box .ring { fill: none; stroke: var(--region, var(--white)); stroke-width: 5; }
+.box .tab { fill: var(--region, var(--white)); stroke: var(--black); stroke-width: 3; }
+.box text { fill: var(--on-region); font: 700 30px var(--font); }
 .box.active .ring-outline { stroke-width: 16; }
-.box.active .ring { stroke-width: 8; }
-.box.active .tab { fill: var(--ink); stroke: var(--white); }
-.box.active text { fill: var(--white); }
+.box.active .ring { stroke-width: 9; }
+.box.active .tab { stroke-width: 5; }
 .box * { transition: fill var(--snap), stroke var(--snap); }
+.map-tag { position: absolute; transform: translate(-50%, calc(-100% - 6px)); display: inline-flex; align-items: center;
+           gap: 6px; padding: 2px 8px 2px 2px; border-radius: 999px; background: var(--region); color: var(--on-region);
+           font: 700 0.8rem/1 var(--font); box-shadow: 0 0 0 2px var(--black); pointer-events: none; white-space: nowrap; }
+.map-tag b { display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%;
+             background: var(--on-region); color: var(--region); font-weight: 800; }
+.map-tag.active { box-shadow: 0 0 0 3px var(--black); }
+@media (max-width: 640px) { .map-tag { padding: 2px; } .map-tag > span { display: none; } }
 
 /* Status sentence, then the live readout. */
 .status { font-size: 1.35rem; font-weight: 650; line-height: 1.3; max-width: 46ch; text-wrap: balance; }
@@ -125,9 +192,9 @@ figcaption strong { color: var(--ink); }
   min-width: 3.2ch;
   transition: font-weight var(--snap);
 }
-.np-readout { display: grid; font: 400 0.9rem/1.5 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.np-readout { display: grid; font: 400 0.9rem/1.5 var(--font); color: var(--ink-2); font-variant-numeric: tabular-nums; }
 
-/* Missing information: stated plainly in ink, no red (DESIGN.md: no second hue). */
+/* Missing information: stated plainly in ink, no red: missing is not an error. */
 .missing {
   border: 2px solid var(--ink);
   border-radius: var(--r);
@@ -146,7 +213,10 @@ legend { font-weight: 600; font-size: 0.95rem; padding: 0 var(--xs) 0 0; }
 label.range { display: inline-grid; gap: 2px; min-width: 160px; }
 .range-row { display: flex; justify-content: space-between; gap: var(--xs); }
 .readout { font: 400 0.9rem/1.5 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
-input[type='radio'], input[type='checkbox'] { width: 22px; height: 22px; accent-color: var(--signal); margin: 0; }
+input[type='radio'], input[type='checkbox'] { width: 22px; height: 22px; accent-color: var(--action); margin: 0; }
+/* A region's letter badge: its colour, used wherever that region is named. */
+.region-badge { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%; flex: none;
+                background: var(--region); color: var(--on-region); font: 800 0.8rem/1 var(--font); }
 label { font-weight: 600; font-size: 0.95rem; }
 
 button {
@@ -164,9 +234,9 @@ button {
   transition: background-color var(--snap), color var(--snap);
 }
 button:hover { background: var(--rule-2); }
-button.primary { background: var(--ink); color: var(--paper); }
-button.primary:hover { background: var(--ink-hover); }
-button[aria-expanded='true'] { background: var(--signal); color: var(--ink); border-color: var(--ink); }
+button.primary { background: var(--action); border-color: var(--action); color: var(--on-action); }
+button.primary:hover { background: var(--action-hover); border-color: var(--action-hover); }
+button[aria-expanded='true'] { background: var(--ink); color: var(--paper); }
 
 /* Key caps take their button's text colour, so they invert on filled buttons. */
 kbd {
@@ -204,10 +274,9 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 .melody { display: grid; gap: var(--xs); border-top: 1px solid var(--rule); padding-top: var(--sm); }
 
 /* Play along: the picture scan, then the melody keys. Hairline rules, no boxes (DESIGN.md). */
-.playalong { display: grid; gap: var(--md); border-top: 1px solid var(--rule); padding-top: var(--sm); }
-.playalong h2 { margin: 0; }
-.playalong h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; margin: 0; }
-.scan { display: grid; gap: var(--xs); }
+.scan h3,
+.melody h3 { font-size: 1.05rem; font-weight: 700; line-height: 1.3; margin: 0; }
+.scan { display: grid; gap: var(--xs); border-top: 1px solid var(--rule); padding-top: var(--sm); }
 .scan .row, .melody .row { align-items: flex-end; }
 
 /* The picture takes at most about half the window's height, so its note bars, the legend, the
@@ -308,7 +377,7 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
   background: transparent;
 }
 .pad.active { border-color: var(--signal); }
-.pad-hint { color: var(--ink-2); font: 400 0.9rem/1.5 var(--mono); }
+.pad-hint { color: var(--ink-2); font: 400 0.9rem/1.5 var(--font); }
 .pad-keys { display: flex; flex-wrap: wrap; gap: var(--xs); }
 .pad-keys kbd {
   touch-action: none;
@@ -323,17 +392,17 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
   border-radius: var(--r);
   transition: background-color var(--snap);
 }
-.pad-keys kbd.down { background: var(--signal); color: var(--ink); }
+.pad-keys kbd.down { background: var(--signal); color: var(--on-signal); border-color: var(--signal); }
 
 /* ---------- Brought in from Student B's listening game (tools/listening_game.html) ---------- */
 .small { font-size: 0.9rem; }
 
 /* Beat visualizer: the "Now playing" lane. */
 .track { display: grid; gap: 6px; }
-.track-head { display: flex; justify-content: space-between; gap: 12px; font: 400 0.85rem var(--mono);
+.track-head { display: flex; justify-content: space-between; gap: 12px; font: 400 0.85rem var(--font);
               color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .track-hint { font-size: 0.85rem; color: var(--ink-2); max-width: 70ch; }
-.track-lane { position: relative; height: 64px; margin-top: 8px; background: var(--rule-2); border-radius: var(--r);
+.track-lane { position: relative; height: 64px; margin-top: 8px; border-bottom: 1px solid var(--ink-2);
               cursor: ew-resize; touch-action: none; user-select: none; -webkit-user-select: none; }
 .track-lane.idle { cursor: default; }
 .track-lane svg { display: block; width: 100%; height: 100%; }
@@ -348,11 +417,11 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 .dot, .playline { pointer-events: none; }
 .track-lane.idle .dot, .track-lane.idle .playline { display: none; }
 
-/* Shared marks for the lane and the plot (DESIGN.md "Rhythm plot"). */
+/* Shared marks for the lane and the plot (DESIGN.md, tide curves and rhythm rows). */
 svg .beat { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
 svg .baseline { stroke: var(--rule); stroke-width: 2; vector-effect: non-scaling-stroke; }
-svg .note.lo { fill: var(--ink); }
-svg .note.hi { fill: var(--signal); }
+svg .note.lo { fill: var(--region, var(--ink)); }
+svg .note.hi { fill: var(--ink-2); }
 svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
 
 /* "What you are looking at" */
@@ -370,26 +439,28 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
 .patch { margin: 0; min-width: 0; }
 .patch canvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: var(--r); background: var(--well); }
 .numeral { display: block; font: 500 clamp(4.5rem, 10vw, 9rem)/0.78 var(--font); letter-spacing: -0.04em;
-           margin: -0.32em 0 0 0.06em; position: relative; color: var(--ink);
+           margin: -0.32em 0 0 0.06em; position: relative; color: var(--region, var(--ink));
            -webkit-text-stroke: 0.06em var(--paper); paint-order: stroke fill; transition: font-weight var(--snap); }
 .patch-readout { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 10px 0 12px;
                  font: 400 0.9rem/1.5 var(--mono); color: var(--ink-2); }
 .patch-readout .value { font: 500 2.6rem/1 var(--font); color: var(--ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .patch-readout .value small { font: 400 0.9rem var(--mono); color: var(--ink-2); margin-left: 8px; letter-spacing: 0; }
 .hear { width: 100%; justify-content: space-between; border-color: var(--ink-2); font-weight: 600; }
-.hear[aria-pressed='true'] { background: var(--signal); border-color: var(--ink); color: var(--ink); }
+.hear[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .where { font-size: 0.9rem; color: var(--ink-2); margin: 8px 0 0; }
 
 /* "Both rhythms, one time line" */
 .plot { border-top: 1px solid var(--rule); padding-top: var(--sm); display: grid; gap: 6px; }
 .plot p { color: var(--ink-2); font-size: 0.95rem; max-width: 70ch; }
 .plot-row { display: grid; grid-template-columns: 5.5rem 1fr 4.5rem; align-items: center; gap: 12px; height: 56px; }
-.plot-row b { font-weight: 650; }
+.plot-row b { font-weight: 650; color: var(--region, var(--ink)); white-space: nowrap; }
+.nw { white-space: nowrap; }
 .plot-row.current b { box-shadow: inset 0 -3px 0 var(--signal); justify-self: start; }
 .plot-row svg { display: block; width: 100%; height: 40px; }
 .plot-split { font: 400 0.9rem var(--mono); color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--ink-2); margin-top: 4px; }
 .swatch { display: inline-block; width: 4px; height: 16px; vertical-align: -3px; margin-right: 8px; }
+.swatch.short { height: 10px; vertical-align: -1px; }
 .swatch.hatch { width: 16px; background: var(--rule-2); outline: 1px dashed var(--ink-2); outline-offset: -1px; }
 
 @media (max-width: 640px) {
@@ -398,6 +469,30 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
   .patch-readout .value { font-size: 1.9rem; }
   .plot-row { grid-template-columns: 4.5rem 1fr; }
   .plot-split { display: none; }
+}
+
+/* Tide table: ruled columns, numbers in mono, the playing region's row marked by weight. */
+.tide-table { border-collapse: collapse; width: 100%; max-width: 760px; font-size: 0.95rem; margin: 2px 0 var(--sm); }
+.tide-table th, .tide-table td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); font-weight: 400; }
+.tide-table thead th { font-weight: 600; font-size: 0.85rem; color: var(--ink-2); border-bottom-color: var(--ink); }
+.tide-table tbody th { display: flex; align-items: center; gap: 8px; }
+.tide-table .num { white-space: nowrap; text-align: right; font: 400 0.95rem var(--mono); font-variant-numeric: tabular-nums; }
+.tide-table thead .num { font: 600 0.85rem var(--font); white-space: normal; }
+.tide-table tr.current th { font-weight: 700; }
+/* Tide curves: alignment over the model frames, one curve per region. */
+.tide { margin: 0 0 var(--sm); max-width: 760px; }
+.tide svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tide-grid { stroke: var(--rule); stroke-width: 1; }
+.tide-axis { fill: var(--ink-2); font: 400 12px var(--mono); }
+.tide-curve { fill: none; stroke: var(--region); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.tide-end { fill: var(--region); font: 700 14px var(--mono); }
+.tide-now { stroke: var(--signal); stroke-width: 2; }
+.tide figcaption { font-size: 0.85rem; margin-top: 8px; }
+@media (max-width: 640px) {
+  .tide-table { font-size: 0.85rem; }
+  .tide-table th, .tide-table td { padding-right: 8px; }
+  .tide-axis { font-size: 22px; }
+  .tide-end { font-size: 26px; }
 }
 
 /* "Practice: test your ear": launch section for Student B's listening game. */
@@ -415,8 +510,8 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
   transition: background-color var(--snap);
 }
 .button-link:hover { background: var(--rule-2); }
-.button-link.primary { background: var(--ink); color: var(--paper); }
-.button-link.primary:hover { background: var(--ink-hover); }
+.button-link.primary { background: var(--action); border-color: var(--action); color: var(--on-action); }
+.button-link.primary:hover { background: var(--action-hover); border-color: var(--action-hover); }
 .button-link .small { font-weight: 400; font-size: 0.85rem; opacity: 0.8; }
 
 footer { border-top: 1px solid var(--rule); padding-top: var(--sm); font-size: 0.95rem; display: grid; gap: var(--xs); }
@@ -429,3 +524,24 @@ footer ul { margin: 0; padding-left: 1.2rem; color: var(--ink-2); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* Page links (four views), in the rail on every view. The current page is bold with the signal
+   underline (DESIGN.md "Live Only": it marks what is chosen). */
+.page-links ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.page-links a { display: inline-block; padding: 8px 0; color: var(--ink); text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; }
+.page-links a:hover { border-bottom-color: var(--rule); }
+.page-links a[aria-current='page'] { font-weight: 800; border-bottom-color: var(--signal); }
+.view-title { font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+.view-title:focus { outline: none; }
+.view-title:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+
+/* Icon button (DESIGN.md): a 20px line icon over a one-word label, same border, hover, pressed and
+   focus states as other buttons. */
+.icon-row { gap: var(--xs); }
+.icon-button { display: inline-grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; min-width: 64px; padding: 6px 10px; }
+.icon-button svg { display: block; }
+.icon-label { font-size: 0.85rem; font-weight: 700; line-height: 1; }
+.sound-settings { display: grid; gap: var(--sm); }
+.sound-settings[hidden] { display: none; }
+button.speed { min-width: 56px; font-family: var(--mono); }
+button.speed[aria-pressed='true'] { background: var(--ink); color: var(--paper); }

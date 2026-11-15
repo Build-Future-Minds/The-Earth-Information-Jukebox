@@ -6,6 +6,7 @@ import featuresSchema from '../../../contracts/features.schema.json';
 import sceneSchema from '../../../contracts/scene.schema.json';
 import musicEventSchema from '../../../contracts/music-event.schema.json';
 import { ACTIVE, mockFeatures, mockScene } from './dataset';
+import { SOURCES } from './sources';
 import { buildEarthTrack } from '../audio/earthVoice';
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
@@ -14,9 +15,11 @@ const validScene = ajv.compile(sceneSchema);
 const validEvent = ajv.compile(musicEventSchema);
 
 describe('data matches the contract', () => {
+  // Practice, the active data, and every source the app can play (ocean and data/aerosols/).
   for (const [name, scene, features] of [
     ['practice', mockScene, mockFeatures],
     ['active', ACTIVE.scene, ACTIVE.features],
+    ...SOURCES.map((s) => [s.key, s.scene, s.features] as const),
   ] as const) {
     it(`${name} scene.json is valid`, () => {
       expect(validScene(scene), JSON.stringify(validScene.errors)).toBe(true);

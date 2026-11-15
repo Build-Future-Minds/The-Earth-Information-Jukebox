@@ -607,7 +607,7 @@ function Legend({ sound, order, radar }: { sound: ScanSoundDef; order: string; r
           <rect x="21" y="15" width="6" height="4" className="g-ink" />
         </svg>
         <span>
-          <strong>Bars: the 12 held notes ({sound.heldName}),</strong> from {order}, low to high. The dark part is how loud each is
+          <strong>Bars: the 12 held notes ({sound.heldName}),</strong> from {order}, low to high. The filled part is how loud each is
           now. A bar flashes orange when a note is struck in its band.
         </span>
       </li>

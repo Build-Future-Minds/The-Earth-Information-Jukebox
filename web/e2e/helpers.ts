@@ -15,14 +15,15 @@ export const BEAT = 0.5; // step_seconds in the practice data
 export const LOOP = 4; // 8 steps per region
 export const TOL = 0.0015; // timing grid is 2.6 ms; allow half of that
 
-export async function openApp(page: Page) {
-  await page.goto('/');
+/** Open the app on one of its views (#listen, #compare, #how, #play). */
+export async function openApp(page: Page, view: 'listen' | 'compare' | 'how' | 'play' = 'listen') {
+  await page.goto(`/#${view}`);
   await expect(page.getByRole('heading', { name: /Earth Sonata/ })).toBeVisible();
 }
 
-/** Start playback with the keyboard: focus Start, press Enter. (Tab order has its own test.) */
+/** Start playback with the keyboard: focus Play, press Enter. (Tab order has its own test.) */
 export async function startWithKeyboard(page: Page) {
-  await page.getByRole('button', { name: 'Start' }).focus();
+  await page.getByRole('button', { name: 'Play', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('status')).toHaveText(/Playing/);
 }

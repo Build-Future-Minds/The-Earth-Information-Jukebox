@@ -1,12 +1,13 @@
+import type { CSSProperties } from 'react';
 // Region close-ups: Student B's patch columns from tools/listening_game.html, brought into the app.
 // Each region circle is shown enlarged from the NASA preview frame, with white-over-black ticks for
 // the line directions (illustration: lineTicks.ts) and a giant numeral whose weight is the region's
-// alignment in this frame (DESIGN.md "Weight Is the Value"). Black and white only on the image.
+// alignment in this frame (DESIGN.md). The letter takes the region's colour; the ticks stay black and white.
 import { useEffect, useRef, useState } from 'react';
 import { longFraction } from '../audio/earthVoice';
 import { lineTicks, type Tick } from '../data/lineTicks';
 import type { Features, Region, Scene } from '../data/types';
-import { regionLabel } from './ExploreControls';
+import { regionLabel, regionStyle } from './ExploreControls';
 import { weightFor } from './NowPlaying';
 
 interface Props {
@@ -15,13 +16,16 @@ interface Props {
   imageUrl: string | null;
   regionId: string;
   onListen: (regionId: string) => void;
+  /** True while the Earth voice plays; the current region's button then stops it. */
+  playing: boolean;
+  onStop: () => void;
 }
 
 const SCALE = 3; // canvas pixels per image pixel
 const CELL = 15; // tick cell, in image pixels
 const TICK_LEN = 30; // canvas pixels
 
-export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }: Props) {
+export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, playing, onStop }: Props) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   useEffect(() => {
     if (!imageUrl) return;
@@ -43,6 +47,7 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }
             key={r.id}
             region={r}
             label={regionLabel(scene.regions, r.id)}
+            colour={regionStyle(scene.regions, r.id)}
             step={firstStep(r.id)}
             image={image}
             frameWidth={scene.frames.width}
@@ -50,12 +55,13 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }
             current={r.id === regionId}
             frameNote={frameNote}
             onListen={() => onListen(r.id)}
+            live={playing && r.id === regionId}
+            onStop={onStop}
           />
         ))}
       </div>
       <p className="muted small">
-        Ticks are worked out in your browser from this one picture, to show what the measurement looks at. The rhythm uses
-        Dev A&apos;s measurement of every frame (<code>features.json</code>).
+        Ticks are drawn in your browser; the rhythm uses Dev A&apos;s measurement of every frame.
       </p>
     </section>
   );
@@ -64,6 +70,7 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }
 interface CloseupProps {
   region: Region;
   label: string;
+  colour: CSSProperties;
   step: Features['steps'][number] | undefined;
   image: HTMLImageElement | null;
   frameWidth: number;
@@ -71,9 +78,11 @@ interface CloseupProps {
   current: boolean;
   frameNote: string;
   onListen: () => void;
+  live: boolean;
+  onStop: () => void;
 }
 
-function Closeup({ region, label, step, image, frameWidth, threshold, current, frameNote, onListen }: CloseupProps) {
+function Closeup({ region, label, colour, step, image, frameWidth, threshold, current, frameNote, onListen, live, onStop }: CloseupProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ticks, setTicks] = useState<Tick[]>([]);
   const [x0, y0, w, h] = region.box_px;
@@ -114,7 +123,7 @@ function Closeup({ region, label, step, image, frameWidth, threshold, current, f
   const ok = step?.status === 'ok';
   const a = ok ? step!.alignment : null;
   return (
-    <figure className={current ? 'patch current' : 'patch'}>
+    <figure className={current ? 'patch current' : 'patch'} style={colour}>
       <canvas
         ref={canvasRef}
         width={w * SCALE}
@@ -135,13 +144,15 @@ function Closeup({ region, label, step, image, frameWidth, threshold, current, f
           <small>alignment</small>
         </span>
         <span>
-          {a === null ? 'missing in this frame' : `second pulse at ${Math.round(longFraction(a) * 100)}%`}
+          <span className="nw">{a === null ? 'missing in this frame' : `second pulse at ${Math.round(longFraction(a) * 100)}%`}</span>
           <br />
-          {frameNote}
+          {/* "model time" may wrap; the timestamp itself never breaks. */}
+          {frameNote.split(' ').slice(0, -1).join(' ')} <span className="nw">{frameNote.split(' ').slice(-1)[0]}</span>
         </span>
       </div>
-      <button type="button" className="hear" onClick={onListen} aria-pressed={current}>
-        {current ? `Listening to ${label}` : `Listen to ${label}`}
+      {/* A toggle, so Compare has a visible Stop: Esc alone is no help on a phone. */}
+      <button type="button" className="hear" onClick={live ? onStop : onListen} aria-pressed={live}>
+        {live ? `Stop ${label}` : `Listen to ${label}`}
       </button>
       <figcaption className="where">{region.name}</figcaption>
     </figure>

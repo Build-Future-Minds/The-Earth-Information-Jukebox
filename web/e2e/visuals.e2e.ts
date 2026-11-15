@@ -35,7 +35,7 @@ test('clicking the lane moves playback to that point', async ({ page }) => {
 
 test('the arrow keys on the lane step through beats', async ({ page }) => {
   await startWithKeyboard(page);
-  await page.getByRole('button', { name: 'Pause' }).click();
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await lane(page).focus();
   await page.keyboard.press('Home');
   await expect(lane(page)).toHaveAttribute('aria-valuenow', '0');
@@ -47,6 +47,7 @@ test('the arrow keys on the lane step through beats', async ({ page }) => {
 });
 
 test('both rhythms are drawn on one time line, from the same rule as the sound', async ({ page }) => {
+  await openApp(page, 'compare');
   const rows = page.locator('.plot-row');
   await expect(rows).toHaveCount(2);
   // Practice data: Region A is well aligned (about 54/46), Region B is not (about 69/31) and has 2 missing beats.
@@ -57,19 +58,22 @@ test('both rhythms are drawn on one time line, from the same rule as the sound',
 });
 
 test('the explainer and close-ups are present; Listen picks a region and plays it', async ({ page }) => {
+  await openApp(page, 'how');
   await expect(page.getByRole('heading', { name: 'What you are looking at' })).toBeVisible();
+  await openApp(page, 'compare');
   await expect(page.locator('.patch')).toHaveCount(2);
   await page.getByRole('button', { name: 'Listen to Region B' }).click();
   await expect(page.getByRole('status')).toHaveText(/Playing Region B/);
-  await expect(page.getByRole('button', { name: 'Listening to Region B' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Stop Region B' })).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('the landing page links to Student B\'s listening game, labelled as a separate practice tool', async ({ page }) => {
+test('Play along links to Student B\'s listening game, labelled as a separate practice tool', async ({ page }) => {
+  await openApp(page, 'play');
   const section = page.getByRole('region', { name: 'Practice: test your ear' });
   await expect(section).toBeVisible();
   await expect(section).toContainText('A separate practice tool');
   const game = section.getByRole('link', { name: /Open the listening game/ });
   await expect(game).toHaveAttribute('href', 'tools/listening_game.html');
-  await expect(game).toHaveAttribute('target', '_blank');
+  await expect(game).not.toHaveAttribute('target', '_blank');
   await expect(section.getByRole('link', { name: 'quiz player' })).toHaveAttribute('href', 'tools/listening_quiz_player.html');
 });

@@ -1,0 +1,148 @@
+{
+  "schema_version": "0.1",
+  "is_mock": false,
+  "generated_by": "earth-sonata math engine 0.1.0",
+  "scene": "data/aerosols/scene.json",
+  "source": {
+    "svs_id": 5669,
+    "url": "https://svs.gsfc.nasa.gov/5669/",
+    "title": "GEOS Aerosols (2025)",
+    "credit": "NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS)",
+    "data_kind": "model_output"
+  },
+  "measurement": {
+    "what": "How strongly the visible lines in the rendered image share one direction (structure-tensor orientation coherence). Not a physical quantity.",
+    "gray_mode": "value",
+    "blur_sigma_px": 1.0,
+    "blur_radius_px": 4,
+    "gradient_operator": "sobel_3x3_div_8",
+    "weight_power": 2,
+    "gradient_threshold": 6.0,
+    "gradient_threshold_units": "grey levels (0-255 scale) per pixel",
+    "min_usable_fraction": 0.05,
+    "smoothing_alpha": 0.3,
+    "smoothing_rule": "exponential moving average over consecutive ok steps; starts again after a missing step",
+    "same_settings_for_all_regions": true
+  },
+  "rhythm": {
+    "rule": "long_fraction = 0.75 - 0.25 * alignment",
+    "beat_seconds": 1.0,
+    "pulses_per_beat": 2,
+    "long_fraction_at_alignment_0": 0.75,
+    "long_fraction_at_alignment_1": 0.5,
+    "voice": "earth",
+    "pitch": 64,
+    "dur": 0.08,
+    "vel": 0.8,
+    "carries_data": [
+      "position of the second pulse inside the beat"
+    ],
+    "fixed_no_data": [
+      "tempo",
+      "pitch",
+      "note length",
+      "loudness"
+    ],
+    "missing_rule": "a missing step has no pulses"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2025-08-19T20:00Z",
+      "region": "aerosol_streaks_vanuatu",
+      "status": "ok",
+      "alignment": 0.53,
+      "alignment_raw": 0.53,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.3228,
+      "dominant_angle_deg": 165.7,
+      "long_fraction": 0.6175,
+      "pulse_times": [
+        0.0,
+        0.6175
+      ],
+      "long_interval": 0.6175,
+      "short_interval": 0.3825
+    },
+    {
+      "t": 0.0,
+      "frame": 0,
+      "source_time": "2025-08-19T20:00Z",
+      "region": "aerosol_cells_se_pacific",
+      "status": "ok",
+      "alignment": 0.0146,
+      "alignment_raw": 0.0146,
+      "reason": null,
+      "reason_code": null,
+      "usable_fraction": 0.4684,
+      "dominant_angle_deg": 65.7,
+      "long_fraction": 0.74635,
+      "pulse_times": [
+        0.0,
+        0.74635
+      ],
+      "long_interval": 0.74635,
+      "short_interval": 0.25365
+    }
+  ],
+  "events": {
+    "aerosol_streaks_vanuatu": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aerosol_streaks_vanuatu",
+          "alignment": 0.53,
+          "long_fraction": 0.6175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.6175,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aerosol_streaks_vanuatu",
+          "alignment": 0.53,
+          "long_fraction": 0.6175,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ],
+    "aerosol_cells_se_pacific": [
+      {
+        "t": 0.0,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aerosol_cells_se_pacific",
+          "alignment": 0.0146,
+          "long_fraction": 0.74635,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      },
+      {
+        "t": 0.74635,
+        "voice": "earth",
+        "pitch": 64,
+        "dur": 0.08,
+        "vel": 0.8,
+        "why": {
+          "region": "aerosol_cells_se_pacific",
+          "alignment": 0.0146,
+          "long_fraction": 0.74635,
+          "rule": "long_fraction = 0.75 - 0.25 * alignment"
+        }
+      }
+    ]
+  }
+}

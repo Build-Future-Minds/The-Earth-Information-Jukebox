@@ -2,7 +2,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { followsSchedule, melodyVoices, noteCount, notesAfter, openApp, startWithKeyboard } from './helpers';
 
-test.beforeEach(async ({ page }) => openApp(page));
+test.beforeEach(async ({ page }) => openApp(page, 'play'));
 
 const pad = (page: Page) => page.locator('.pad');
 /** Voices fade out over 0.4 s after release. */
@@ -28,7 +28,7 @@ test('letter keys play only while the pad has focus', async ({ page }) => {
   await pad(page).focus();
   await page.keyboard.press('a'); // starts the melody synth
   await settle(page);
-  await page.getByRole('button', { name: 'Start' }).focus();
+  await page.getByRole('button', { name: 'Play', exact: true }).focus();
   for (const k of 'asdfghjk') await page.keyboard.down(k);
   expect(await melodyVoices(page)).toBe(0);
   for (const k of 'asdfghjk') await page.keyboard.up(k);

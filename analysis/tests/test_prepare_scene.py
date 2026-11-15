@@ -192,3 +192,61 @@ def test_unusable_frames_keep_their_place_and_are_measured_as_missing(project: P
                 assert steps[i]["alignment"] is None
             else:
                 assert steps[i]["status"] == "ok", (region["id"], n, steps[i]["reason"])
+
+
+# ------------------------------------------------------------- 4. a second source: one still
+
+def test_single_still_source_writes_one_frame_with_its_fixed_time(tmp_path: Path) -> None:
+    """The aerosol preset path: one TEST INPUT still, a fixed time, place descriptions kept."""
+    still = tmp_path / "assets/frames/TEST_INPUT_still"
+    still.mkdir(parents=True)
+    src = P.Source("svs5669", 5669, "TEST_INPUT_still.png", str(still.relative_to(tmp_path)),
+                   "assets/regions.json", "data/aerosols/scene.json", "data/aerosols/masks", 0, 0, 1,
+                   P.AEROSOL_LEGEND, (30, 95, 12), fixed_time="2025-08-19T20:00Z")
+    cv2.imwrite(str(still / src.frame_name), make_test_input_frame(1))
+    regions = [dict(r, description=f"TEST INPUT place {i}") for i, r in enumerate(REGIONS)]
+    (tmp_path / "assets/regions.json").write_text(json.dumps({"regions": regions}), encoding="utf-8")
+    (tmp_path / "assets/source_manifest.json").write_text(json.dumps({"assets": [{
+        "svs_id": 5669, "url": "about:test", "title": "TEST INPUT - NOT NASA DATA", "credit": "Synthetic test input",
+        "data_kind": "synthetic_test_input", "limitations": ["Synthetic test input."]}]}), encoding="utf-8")
+    scene, masks, checks = P.build_scene(root=tmp_path, frames_dir=still, regions_path=tmp_path / "assets/regions.json",
+                                         manifest_path=tmp_path / "assets/source_manifest.json", first=0, last=0, step=1,
+                                         masks_dir=tmp_path / "data/aerosols/masks", source=src)
+    P.validate(scene)
+    assert scene["frames"]["count"] == 1 and scene["frames"]["timestamps"] == ["2025-08-19T20:00Z"]
+    assert scene["frames"]["pattern"].endswith("TEST_INPUT_still.png")
+    assert scene["source"]["svs_id"] == 5669 and scene["legend"] == P.AEROSOL_LEGEND
+    assert [r["description"] for r in scene["regions"]] == ["TEST INPUT place 0", "TEST INPUT place 1"]
+
+
+def test_ocean_is_still_the_default_source() -> None:
+    assert P.SOURCES["svs3912"].frame_name == P.FRAME_NAME
+    assert P.SOURCES["svs3912"].dates_file == "flat_ecco2_dates.txt"
+
+
+# ------------------------------------------------------------- 5. a source whose land is a photo
+
+def test_reference_land_uses_the_ocean_outline_and_static_bright_pixels(tmp_path: Path) -> None:
+    """TEST INPUT: land is taken from the reference outline, plus a bright mark that never moves."""
+    ref = np.zeros((32, 64, 3), np.uint8)
+    ref[:, :16] = (49, 49, 49)                                   # grey land on the left quarter
+    path = tmp_path / P.REFERENCE_LAND_FRAME
+    path.parent.mkdir(parents=True)
+    cv2.imwrite(str(path), ref)
+    frames = []
+    for i in range(3):
+        f = np.zeros((64, 128, 3), np.uint8)
+        f[60:63, 120:126] = 255                                   # a static bright corner mark
+        f[30:34, 60 + i * 5:70 + i * 5] = (0, 200, 255)           # rain that moves
+        frames.append(f)
+    land = P.reference_land_mask(tmp_path, frames, (45, 255, 3))
+    assert land.shape == (64, 128)
+    assert land[30, 10] and not land[30, 100]                     # the outline, scaled up
+    assert land[61, 122]                                          # the static mark
+    assert not land[32, 75]                                       # moving rain is not land
+
+
+def test_imerg_preset_reads_its_dates_file() -> None:
+    src = P.SOURCES["svs4285"]
+    assert src.land_mode == "reference" and src.dates_file == "imerg_dates.txt"
+    assert (src.first, src.last, src.step) == (0, 29, 1)

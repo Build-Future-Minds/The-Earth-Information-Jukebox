@@ -3,6 +3,7 @@
 // region's loop. Drag the lane or use the arrow keys to move playback (playing or paused only).
 // Marks follow DESIGN.md "Rhythm plot": a tall ink bar for the first pulse of each beat, a shorter
 // signal bar for the second. The app's pitch is fixed, so height only tells the two pulses apart.
+import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { EarthTrack } from '../audio/earthVoice';
 import type { PlayState } from '../audio/transport';
@@ -10,6 +11,7 @@ import type { PlayState } from '../audio/transport';
 interface Props {
   track: EarthTrack;
   regionLabel: string;
+  colour: CSSProperties;
   playState: PlayState;
   speed: number;
   /** Track seconds (speed 1) inside the loop, from the audio clock. */
@@ -21,7 +23,7 @@ interface Props {
 const U = 20;
 const LANE_H = 64;
 
-export function BeatTrack({ track, regionLabel, playState, speed, getPosition, onSeek }: Props) {
+export function BeatTrack({ track, regionLabel, colour, playState, speed, getPosition, onSeek }: Props) {
   const [pos, setPos] = useState(0);
   const laneRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
@@ -78,14 +80,15 @@ export function BeatTrack({ track, regionLabel, playState, speed, getPosition, o
   };
 
   return (
-    <section className="track" aria-label="Beat visualizer">
-      <div className="track-head">
-        <span>Now playing: {active ? regionLabel : 'nothing'}</span>
-        <span>{timeText}</span>
-      </div>
+    <section className="track" aria-label="Beat visualizer" style={colour}>
+      {active && (
+        <div className="track-head">
+          <span>Now playing: {regionLabel}</span>
+          <span>{timeText}</span>
+        </div>
+      )}
       <p className="track-hint">
-        Each mark is a pulse: tall ink for the first pulse of a beat, short orange for the second. Drag the line, or
-        press the left and right arrow keys, to move through the rhythm.
+        Tall mark: first pulse. Short grey: second. Drag or use arrow keys.
       </p>
       <div
         ref={laneRef}

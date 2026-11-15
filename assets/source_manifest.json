@@ -33,7 +33,10 @@
       },
       "motion_check": {
         "method": "analysis/check_motion.py (land-pixel difference test)",
-        "frames_compared": ["23000 vs 25000", "23000 vs 23116"],
+        "frames_compared": [
+          "23000 vs 25000",
+          "23000 vs 23116"
+        ],
         "result": "PASS: land in only one frame 0.58% / 0.32%, mean land change 1.29 / 0.23 (0-255). A 5 px shifted copy fails (9.44%).",
         "verified": "2026-11-14"
       },
@@ -66,13 +69,180 @@
       "verified": "2026-11-14 (planning pass, source page)",
       "todo": []
     },
-    { "svs_id": 5313, "url": "https://svs.gsfc.nasa.gov/5313/", "title": "Night Lights, 2012-2023, EIC", "role": "candidate second source", "verified": null, "todo": ["Inspect page. Brief says animations include transitions and zooms."] },
-    { "svs_id": 5669, "url": "https://svs.gsfc.nasa.gov/5669/", "title": "GEOS Aerosols", "role": "candidate", "verified": null, "todo": ["Inspect page. Brief says this page provides a still image."] },
-    { "svs_id": 5533, "url": "https://svs.gsfc.nasa.gov/5533/", "title": "Air Quality Model Runs", "role": "candidate", "verified": null, "todo": ["Inspect page."] },
-    { "svs_id": 5196, "url": "https://svs.gsfc.nasa.gov/5196/", "title": "DYAMOND CO2", "role": "candidate", "verified": null, "todo": ["Inspect page."] },
-    { "svs_id": 5011, "url": "https://svs.gsfc.nasa.gov/5011/", "title": "ISS Lightning", "role": "candidate", "verified": null, "todo": ["Inspect page. Brief says it uses a 10-day roving window."] },
-    { "svs_id": 4960, "url": "https://svs.gsfc.nasa.gov/4960/", "title": "Atmospheric River", "role": "candidate", "verified": null, "todo": ["Inspect page."] },
-    { "svs_id": 4950, "url": "https://svs.gsfc.nasa.gov/4950/", "title": "GEDI Forest Height", "role": "candidate", "verified": null, "todo": ["Inspect page. Brief says animations are not a time series of forest growth."] },
-    { "svs_id": 13786, "url": "https://svs.gsfc.nasa.gov/13786/", "title": "Caldwell 73 sonification", "role": "method inspiration only", "verified": null, "todo": ["Inspect page."] }
+    {
+      "svs_id": 5313,
+      "url": "https://svs.gsfc.nasa.gov/5313/",
+      "title": "Change in Night Lights between 2012 and 2023 - EIC Version",
+      "role": "inspected; not used with the line method",
+      "data_kind": "observation",
+      "model_or_instrument": "Black Marble, Suomi NPP VIIRS (annual averages)",
+      "credit": "NASA's Scientific Visualization Studio",
+      "limitations": [
+        "Frame folder cannot be listed (403); the 7680x2160 video decodes fine.",
+        "Year labels, a colour bar and zoom-in boxes are drawn on the frames.",
+        "City lights are dots, not lines: brightness would be the honest measure, which needs a new rule."
+      ],
+      "verified": "2026-11-15 (Student A, source page and downloaded files)",
+      "todo": []
+    },
+    {
+      "svs_id": 5669,
+      "url": "https://svs.gsfc.nasa.gov/5669/",
+      "title": "GEOS Aerosols (2025)",
+      "role": "second source (approved by Dev A, 15 Nov), one still",
+      "eic_gallery": "Not in the Earth Information Center gallery (checked 2026-11-15). Used as a challenge resource: 'GEOS Aerosols' in the challenge's resource list. Describe it as a challenge resource, not EIC data.",
+      "media_kind": "still image",
+      "data_kind": "model_output",
+      "model_or_instrument": "GEOS-FP 2Km Replay (NASA GMAO)",
+      "data_start": "2025-08-19T20:00Z",
+      "data_end": "2025-08-19T20:00Z",
+      "credit": "NASA's Global Modeling and Assimilation Office (GMAO) and NASA's Scientific Visualization Studio (SVS)",
+      "legend": "Aerosol type: blue sea salt, pink/magenta dust, orange/red smoke from fires, green sulfates from pollution and volcanoes. Colour bar file: Aerosols_cbar.png",
+      "downloads_to_use": [
+        "Aerosols_2025-08-19T20_00_00_3840x2160.png (lossless PNG)",
+        "Aerosols_cbar.png"
+      ],
+      "map_geometry": {
+        "projection": "equirectangular, whole globe stretched to 3840x2160 (16:9)",
+        "longitude": "x = (lon + 180) * 3840 / 360",
+        "latitude": "y = (90 - lat) * 2160 / 180",
+        "checked": "lon/lat grid on the still: 0 line passes the UK and the Ghana coast, 60N meets Greenland's southern tip, Antarctica from about 70S"
+      },
+      "limitations": [
+        "Model output (GEOS-FP replay), not an observation.",
+        "One moment only (19 Aug 2025 20:00 UTC): no change over time, so each region plays a steady rhythm.",
+        "Plumes are a rendering of modelled aerosol; the numbers describe the drawn picture, not air quality or amounts.",
+        "Pixels are not square (16:9 world map): 0.094 degrees per pixel east-west, 0.083 north-south."
+      ],
+      "measurement_checks": {
+        "approved_by": "Dev A, 15 Nov: threshold 6 for this source only; never compare numbers with the ocean source",
+        "lossless": "PNG still used, not a video",
+        "plume_free_patch": "circle at [1880,1310] (South Atlantic) comes back missing at threshold 6: 0.4% clear edges",
+        "votes": "0% of voting pixels on land or coast in both circles",
+        "pair_gap": "lined-up minus swirly = 0.513 / 0.515 / 0.522 at thresholds 5 / 6 / 8 (features.py), order kept",
+        "latitude": "both whole circles inside +-30 degrees (centres 19S and 17S)"
+      },
+      "verified": "2026-11-15 (Student A, source page and downloaded files)",
+      "todo": []
+    },
+    {
+      "svs_id": 5533,
+      "url": "https://svs.gsfc.nasa.gov/5533/",
+      "title": "Air Quality Model Runs",
+      "role": "inspected; not used",
+      "data_kind": "model_output",
+      "model_or_instrument": "GEOS-CF (NASA GMAO)",
+      "credit": "NASA's Scientific Visualization Studio and NASA's Global Modeling and Assimilation Office",
+      "limitations": [
+        "Map frame set is 'MapWithLabels' (labels likely drawn on); other sets are a rotating globe.",
+        "No per-frame dates (frame numbers only).",
+        "Shows pollution plumes, not lines."
+      ],
+      "verified": "2026-11-15 (Student A, source page only)",
+      "todo": []
+    },
+    {
+      "svs_id": 5196,
+      "url": "https://svs.gsfc.nasa.gov/5196/",
+      "title": "DYAMOND CO2",
+      "role": "candidate",
+      "verified": null,
+      "todo": [
+        "Inspect page."
+      ]
+    },
+    {
+      "svs_id": 5011,
+      "url": "https://svs.gsfc.nasa.gov/5011/",
+      "title": "ISS Lightning",
+      "role": "candidate",
+      "verified": null,
+      "todo": [
+        "Inspect page. Brief says it uses a 10-day roving window."
+      ]
+    },
+    {
+      "svs_id": 4960,
+      "url": "https://svs.gsfc.nasa.gov/4960/",
+      "title": "Atmospheric River",
+      "role": "candidate",
+      "verified": null,
+      "todo": [
+        "Inspect page."
+      ]
+    },
+    {
+      "svs_id": 4950,
+      "url": "https://svs.gsfc.nasa.gov/4950/",
+      "title": "GEDI Forest Height",
+      "role": "inspected; rejected for the line method",
+      "data_kind": "observation",
+      "model_or_instrument": "GEDI lidar on the ISS (RH100), Apr 2018-Apr 2020",
+      "credit": "NASA's Scientific Visualization Studio",
+      "limitations": [
+        "Global frames are a turning globe (frame 900 Africa, 2400 Pacific); close-ups are moving tilted 3D views.",
+        "No flat-map frame set and no per-frame dates; the animation adds satellite passes, not change over time.",
+        "Visible lines are mostly the satellite's ground tracks; state labels and colour bars drawn on."
+      ],
+      "verified": "2026-11-15 (Student A, source page and downloaded files)",
+      "todo": []
+    },
+    {
+      "svs_id": 13786,
+      "url": "https://svs.gsfc.nasa.gov/13786/",
+      "title": "Caldwell 73 sonification",
+      "role": "method inspiration only",
+      "verified": null,
+      "todo": [
+        "Inspect page."
+      ]
+    },
+    {
+      "svs_id": 4285,
+      "url": "https://svs.gsfc.nasa.gov/4285/",
+      "title": "Near Real-Time Global Precipitation from the Global Precipitation Measurement Constellation",
+      "role": "third source (regions approved by Dev A, 15 Nov), 30 hourly frames",
+      "eic_gallery": "Yes: listed in the Earth Information Center 'Daily Visualizations' dashboard (gallery/daily-visualizations), part of the EIC content.",
+      "media_kind": "frame set",
+      "data_kind": "observation",
+      "model_or_instrument": "GPM IMERG near real-time (GPM constellation of satellites)",
+      "data_start": "2026-11-14T00:00Z",
+      "data_end": "2026-11-15T05:00Z",
+      "credit": "NASA's Scientific Visualization Studio",
+      "legend": "Liquid precipitation rate green (0.1) to yellow (0.5-1) to orange (2-3) to red and dark red (5-50 mm/hour); frozen precipitation cyan to purple (0.1-50 mm/hour). Colour bar files: rainbarwhite2.png, snowbarwhite2.png",
+      "downloads_to_use": [
+        "frames/3600x1800_2x1_30p/flatcomposite/, 30 frames one hour apart, 14 Nov 00:00 to 15 Nov 05:00 UTC, saved and renumbered 0-29 (list: assets/imerg_frames.txt)",
+        "rainbarwhite2.png, snowbarwhite2.png"
+      ],
+      "rolling_folder": "NASA keeps only about the latest 7 days in this folder, so these frames disappear from NASA after about 21 Nov 2026. Keep the saved copy; the download script works only while NASA still has them.",
+      "map_geometry": {
+        "projection": "equirectangular, 3600x1800",
+        "longitude": "x = (lon + 180) * 3600 / 360",
+        "latitude": "y = (90 - lat) * 1800 / 180",
+        "checked": "lon/lat grid on frame 0: 0 line passes the UK and Ghana; same layout as SVS 3912"
+      },
+      "motion_check": {
+        "method": "phase correlation of frame 0 vs frame 29",
+        "result": "shift 0.15 px (a 6 px test shift is measured as 6.00): fixed camera"
+      },
+      "limitations": [
+        "Near real-time rain estimates, later replaced by NASA's research-quality version.",
+        "Land is a satellite photo, so land is found from the SVS 3912 land outline plus pixels that never change; both circles are open ocean.",
+        "A small 'L' mark sits in the bottom-right corner (masked as static).",
+        "Rain comes and goes: a circle with no rain in a frame makes that beat missing. Both chosen circles have rain in all 30 frames.",
+        "The numbers describe the drawn rain picture, not how much it rains."
+      ],
+      "measurement_checks": {
+        "threshold": "Dev A's default 12, no change",
+        "rain_free_patch": "circle at [1750,1050] (5W 15S) comes back missing at 12 (0% usable)",
+        "votes": "0% of voting pixels on land or coast in both circles over all 30 frames",
+        "pair_gap": "band minus showers: mean 0.258 / 0.259 / 0.261 at thresholds 8 / 12 / 16; order kept in all 30 frames; smallest single-frame gap 0.15 (Dev A to say whether the 0.20 rule applies per frame for a time series)",
+        "latitude": "both whole circles inside +-30 degrees (7.5S-27.5S and 10S-10N)",
+        "rain_every_frame": "both circles measure ok in 30 of 30 frames; the band circle has at least 13% of its pixels voting in every frame",
+        "first_pick_replaced": "a first pick at 110W 20S passed the numbers but the band only clipped its edge (6-9% of pixels voting), so it was replaced"
+      },
+      "verified": "2026-11-15 (Student A, source page, colour bars and the saved frames)",
+      "todo": []
+    }
   ]
 }

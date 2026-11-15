@@ -20,14 +20,6 @@ test('no sound before Start', async ({ page }) => {
   await expect(page.getByRole('status')).toHaveText(/Stopped/);
 });
 
-test('the first Tab from page load reaches Start, and Enter starts', async ({ page }) => {
-  await page.keyboard.press('Tab');
-  await expect(page.getByRole('button', { name: 'Start' })).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('status')).toHaveText(/Playing/);
-  await notesAfter(page, 0, 2);
-});
-
 test('practice data is labelled as practice', async ({ page }) => {
   await expect(page.getByText('PRACTICE DATA')).toBeVisible();
 });
@@ -74,19 +66,19 @@ test('Stop (Esc) and Pause leave no sound, at random moments', async ({ page }) 
   for (let i = 0; i < 8; i++) {
     await page.waitForTimeout(300 + Math.random() * 500);
     if (i % 2 === 0) await page.keyboard.press('Escape');
-    else await page.getByRole('button', { name: 'Pause' }).click();
+    else await page.getByRole('button', { name: 'Pause', exact: true }).click();
     expect(await earthPeakAhead(page)).toBeLessThan(0.01);
     const mark = await noteCount(page);
     await page.waitForTimeout(700);
     expect(await noteCount(page)).toBe(mark);
-    await page.getByRole('button', { name: /^(Start|Resume)$/ }).click();
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
     await expect(page.getByRole('status')).toHaveText(/Playing/);
   }
 });
 
 test('the explanation follows the sound: reset on Stop, never the old region after a switch', async ({ page }) => {
   await startWithKeyboard(page);
-  await page.getByRole('button', { name: 'Explain this rhythm' }).click();
+  await page.getByRole('button', { name: 'Explain', exact: true }).click();
   const explanation = page.locator('.explanation p').first();
   await page.getByRole('radio', { name: /Region A/ }).focus();
   let region = 1;
@@ -124,7 +116,8 @@ test('switching region keeps the position, on the beat', async ({ page }) => {
 
 test('half speed doubles the beat and keeps the split', async ({ page }) => {
   await startWithKeyboard(page);
-  await page.getByLabel('Speed').selectOption('0.5');
+  await page.getByRole('button', { name: 'Sound', exact: true }).click();
+  await page.getByRole('button', { name: '½×', exact: true }).click();
   await page.waitForTimeout(1200);
   const notes = await notesAfter(page, await noteCount(page), 10);
   expect(followsSchedule(notes, 0.5)).toBe(true);
@@ -138,7 +131,7 @@ test('half speed doubles the beat and keeps the split', async ({ page }) => {
 
 test('1 / 2 only act on the Region choice (WCAG 2.1.4), and focus follows', async ({ page }) => {
   const checked = () => page.locator('input[name=region]:checked').getAttribute('value');
-  await page.getByRole('button', { name: 'Start' }).focus();
+  await page.getByRole('button', { name: 'Play', exact: true }).focus();
   await page.keyboard.press('2');
   expect(await checked()).toBe('boundary_current');
   await page.getByRole('radio', { name: /Region A/ }).focus();
@@ -150,7 +143,7 @@ test('1 / 2 only act on the Region choice (WCAG 2.1.4), and focus follows', asyn
 });
 
 test('the explanation opens by keyboard and receives focus', async ({ page }) => {
-  await page.getByRole('button', { name: 'Explain this rhythm' }).focus();
+  await page.getByRole('button', { name: 'Explain', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('.explanation')).toBeFocused();
   await expect(page.locator('.explanation')).toContainText('computer model');

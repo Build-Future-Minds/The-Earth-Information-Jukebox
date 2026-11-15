@@ -14,7 +14,7 @@ interface ScanNote {
   pan: number;
 }
 
-test.beforeEach(async ({ page }) => openApp(page));
+test.beforeEach(async ({ page }) => openApp(page, 'play'));
 
 const scanNotes = (page: Page) => page.evaluate(() => (window as unknown as { __scanNotes?: ScanNote[] }).__scanNotes ?? []);
 const playButton = (page: Page) => page.getByRole('button', { name: 'Play the picture' });
@@ -193,7 +193,11 @@ test('Esc stops the scan too, and Pause holds its place', async ({ page }) => {
 
 test('the speed setting stretches the scan: at half speed the two dots are 10 seconds apart', async ({ page }) => {
   test.setTimeout(90_000);
-  await page.getByLabel('Speed').selectOption('0.5');
+  // Speed is set on the Listen view and kept when the view changes.
+  await openApp(page, 'listen');
+  await page.getByRole('button', { name: 'Sound', exact: true }).click();
+  await page.getByRole('button', { name: '½×', exact: true }).click();
+  await openApp(page, 'play');
   await startScanWithKeyboard(page);
   await page.waitForFunction(() => ((window as unknown as { __scanNotes?: unknown[] }).__scanNotes?.length ?? 0) >= 2, undefined, { timeout: 40_000 });
   const [red, green] = await scanNotes(page);
