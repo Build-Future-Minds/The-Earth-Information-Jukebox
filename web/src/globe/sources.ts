@@ -1,10 +1,9 @@
-// The NASA sources the globe can show. Each is a scene.json (circles in that picture's own pixels),
-// its features.json if Dev A has measured it, and one picture to wrap on the globe.
-// Never compare alignment numbers between sources (Dev A, 15 Nov): each source has its own settings.
-import { ACTIVE } from '../data/dataset';
+// The NASA pictures the globe can show, taken from the app's one list (data/sources.ts): each is a
+// scene.json (circles in that picture's own pixels), its features.json if Dev A has measured it, and
+// one picture to wrap on the globe. Never compare alignment numbers between pictures (Dev A, 15 Nov).
+import { PICTURES } from '../data/sources';
 import type { Features, Scene } from '../data/types';
 import type { LandRule } from './geo';
-import { OCEAN_LAND } from './geo';
 
 export interface GlobeSource {
   key: string;
@@ -20,65 +19,24 @@ export interface GlobeSource {
   regionsFile: string;
 }
 
-// The aerosol source lives in data/aerosols/ (written by analysis/prepare_scene.py --source svs5669).
-const aerosolJson = import.meta.glob<{ default: unknown }>('../../../data/aerosols/{scene,features}.json', { eager: true });
-const aerosolImages = import.meta.glob<string>('../../../data/aerosols/preview.{jpg,jpeg,png,webp}', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-});
-// The IMERG source lives in data/imerg/ (written by analysis/prepare_scene.py --source svs4285).
-const imergJson = import.meta.glob<{ default: unknown }>('../../../data/imerg/{scene,features}.json', { eager: true });
-const imergImages = import.meta.glob<string>('../../../data/imerg/preview.{jpg,jpeg,png,webp}', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-});
+const LABEL: Record<string, string> = { ocean: 'Ocean currents', aerosols: 'Aerosols', imerg: 'Rain (IMERG)', practice: 'Practice data' };
+const REGIONS_FILE: Record<string, string> = { aerosols: 'assets/regions_aerosols.json', imerg: 'assets/regions_imerg.json' };
 
-function oceanSource(): GlobeSource {
-  return {
-    key: 'ocean',
-    label: 'Ocean currents',
-    scene: ACTIVE.scene,
-    features: ACTIVE.features,
-    imageUrl: ACTIVE.imageUrl,
-    landRule: OCEAN_LAND,
-    note: `ECCO2 model output, first frame of the run (${ACTIVE.scene.frames.timestamps?.[0] ?? 'model time unknown'}).`,
-    regionsFile: 'assets/regions_draft.json',
-  };
+function noteFor(key: string, times: string[]): string {
+  if (key === 'aerosols')
+    return `GEOS-FP model output, one still (${times[0] ?? 'time unknown'}). Measured at its own settings: don't compare its numbers with the ocean's.`;
+  if (key === 'imerg')
+    return `GPM IMERG satellite rain estimates, first of ${times.length} hourly frames (${times[0] ?? '?'} to ${times[times.length - 1] ?? '?'}). Don't compare its numbers with other sources.`;
+  return `ECCO2 model output, first frame of the run (${times[0] ?? 'model time unknown'}).`;
 }
 
-function aerosolSource(): GlobeSource | null {
-  const scene = aerosolJson['../../../data/aerosols/scene.json']?.default as Scene | undefined;
-  if (!scene) return null;
-  const features = (aerosolJson['../../../data/aerosols/features.json']?.default as Features | undefined) ?? null;
-  return {
-    key: 'aerosols',
-    label: 'Aerosols',
-    scene,
-    features,
-    imageUrl: Object.values(aerosolImages)[0] ?? null,
-    landRule: [30, 95, 12], // dull grey-green land in this picture (same rule as prepare_scene.py)
-    note: `GEOS-FP model output, one still (${scene.frames.timestamps?.[0] ?? 'time unknown'}). Measured at its own settings: don't compare its numbers with the ocean's.`,
-    regionsFile: 'assets/regions_aerosols.json',
-  };
-}
-
-function imergSource(): GlobeSource | null {
-  const scene = imergJson['../../../data/imerg/scene.json']?.default as Scene | undefined;
-  if (!scene) return null;
-  const features = (imergJson['../../../data/imerg/features.json']?.default as Features | undefined) ?? null;
-  const times = scene.frames.timestamps ?? [];
-  return {
-    key: 'imerg',
-    label: 'Rain (IMERG)',
-    scene,
-    features,
-    imageUrl: Object.values(imergImages)[0] ?? null,
-    landRule: null, // the land is a satellite photo; prepare_scene.py uses the ocean map's land outline instead
-    note: `GPM IMERG satellite rain estimates, first of ${times.length} hourly frames (${times[0] ?? '?'} to ${times[times.length - 1] ?? '?'}). Don't compare its numbers with other sources.`,
-    regionsFile: 'assets/regions_imerg.json',
-  };
-}
-
-export const GLOBE_SOURCES: GlobeSource[] = [oceanSource(), aerosolSource(), imergSource()].filter((s): s is GlobeSource => s !== null);
+export const GLOBE_SOURCES: GlobeSource[] = PICTURES.map((p) => ({
+  key: p.key,
+  label: LABEL[p.key],
+  scene: p.scene,
+  features: p.features,
+  imageUrl: p.imageUrl,
+  landRule: p.landRule,
+  note: noteFor(p.key, p.scene.frames.timestamps ?? []),
+  regionsFile: REGIONS_FILE[p.key] ?? 'assets/regions_draft.json',
+}));
