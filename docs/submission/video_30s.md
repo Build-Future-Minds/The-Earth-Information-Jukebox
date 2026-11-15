@@ -48,7 +48,7 @@ so **confirm it against Dev B's recording** before the captions are final.
 
 | Region | What the app says |
 | --- | --- |
-| A | "The pulse is short–long because the visible lines in this region run in many directions. Alignment is 0.08 (0 = every which way, 1 = all the same way), so the second pulse falls 73% of the way through the beat (rule: long_fraction = 0.75 - 0.25 * alignment). Compared with Region B at the same moment, this region is less even, more short–long (second pulse at 73% of the beat, against 58% for Region B)." |
+| A | "The pulse is long–short because the visible lines in this region run in many directions. Alignment is 0.08 (0 = every which way, 1 = all the same way), so the second pulse falls 73% of the way through the beat (rule: long_fraction = 0.75 - 0.25 * alignment). Compared with Region B at the same moment, this region is less even, more long–short (second pulse at 73% of the beat, against 58% for Region B)." |
 | B | "The pulse has a slight lilt because the visible lines in this region partly share a direction. Alignment is 0.67 (0 = every which way, 1 = all the same way), so the second pulse falls 58% of the way through the beat (rule: long_fraction = 0.75 - 0.25 * alignment). Compared with Region A at the same moment, this region is more even (second pulse at 58% of the beat, against 73% for Region A)." |
 
 - **Neither region says "even".** Real alignment values are about 0.08 and 0.67, and the app only

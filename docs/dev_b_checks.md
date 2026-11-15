@@ -56,7 +56,7 @@ the log; that was checked below.
 | Circles in the right places on frame 23000 | **Pass.** Region A Kuroshio (east of Japan), Region B Equatorial Pacific |
 | PRACTICE banner gone; NASA credit under the image and in the footer | **Pass** |
 | Replay gives the same rhythm | **Pass.** Identical note times and values |
-| Rhythm and explanation | Region A 73/27 "short–long", Region B 58/42 "slight lilt"; the comparison line says which is more even |
+| Rhythm and explanation | Region A 73/27 "long–short", Region B 58/42 "slight lilt"; the comparison line says which is more even |
 | Missing information | Can't be checked on real data, because no real frame is missing. Covered by the practice-data tests |
 
 ## Student B's visuals in the app (PRs #13, #17, #19): automated in `web/e2e/visuals.e2e.ts`

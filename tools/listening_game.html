@@ -354,7 +354,7 @@
       <summary>How the rhythm is made</summary>
       <p>Every bit of visible line in a patch votes for its direction. If most lines run the same way,
         alignment is near 1 and the two pulses in each beat are evenly spaced. If they run every which way,
-        alignment is near 0 and the second pulse comes late: short–long.</p>
+        alignment is near 0 and the second pulse comes late: long–short.</p>
       <p>The white ticks on each patch show which way the visible lines run in each part of it. When most
         ticks point the same way, the patch is lined up. When they point every which way, it is swirly.</p>
       <p>Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat. Real patches only span about
@@ -1041,7 +1041,7 @@
     }
     drawPlot(shown[0], shown[1]);
 
-    const kind = target.alignment > shown[1 - answer].alignment ? "higher, longer and more even" : "lower, shorter and more short–long";
+    const kind = target.alignment > shown[1 - answer].alignment ? "higher, longer and more even" : "lower, shorter and more long–short";
     setStatus((correct ? "Right. " : "Not this time. ") + `Patch ${answer + 1} made this sound: it was the ${kind} one.`);
     $("sub").textContent = "Thin numeral: swirly lines. Heavy numeral: lined-up lines. Press P for the next round.";
     updateScore();

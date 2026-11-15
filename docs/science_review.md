@@ -31,7 +31,7 @@ m², no smoothing. Derivations are in `math_notes.md`.
 ## 1. Named test cases
 
 `long_fraction` is the share of the beat before the second pulse: 0.5 is even, 0.75 is the
-strongest short–long.
+strongest long–short.
 
 <!-- table:spec_cases -->
 ### Named test cases
@@ -43,8 +43,8 @@ Expected: See the 'expected' column; the rule is long_fraction = 0.75 - 0.25 * a
 | Aligned: parallel horizontal lines | near 1; even pulses | ok | 1.0 | - | 0.45 | 0.5 | yes |
 | Aligned: parallel diagonal lines (45 deg) | near 1; even pulses | ok | 1.0 | - | 0.408 | 0.5 | yes |
 | Aligned: parallel short dashes (40 px) | high, below 1: dash ends are edges too | ok | 0.9209 | - | 0.422 | 0.5198 | yes |
-| Mixed: horizontal and vertical lines, equal areas | near 0; strong short-long | ok | 0.0 | - | 0.474 | 0.75 | yes |
-| Mixed: dashes at random angles | near 0 (about 0.89/sqrt(n)); strong short-long | ok | 0.0892 | - | 0.422 | 0.7277 | yes |
+| Mixed: horizontal and vertical lines, equal areas | near 0; strong long-short | ok | 0.0 | - | 0.474 | 0.75 | yes |
+| Mixed: dashes at random angles | near 0 (about 0.89/sqrt(n)); strong long-short | ok | 0.0892 | - | 0.422 | 0.7277 | yes |
 | Reversed: parallel lines turned 180 deg | same as aligned (1.0000) | ok | 1.0 | - | 0.45 | 0.5 | yes |
 | Blank image | missing with a reason; no pulses | missing | missing | too_few_edges | 0.0 | missing | yes |
 | Masked: everything excluded | missing with a reason; no pulses | missing | missing | all_masked | 0.0 | missing | yes |
@@ -364,6 +364,7 @@ the smoothed value restarts after the gap, and smoothing with α = 0.3 lags a fa
 | 8 | Camera smear and zoom change the score. | Camera-smear and zoom tables |
 | 9 | Strong noise is reported as a low score, not as missing. | Noise table, last column |
 | 10 | Bright lines count more than faint ones (weight m²). | Weighting table |
+| 11 | Each region is a circle on the flat map, not on the Earth. On the ground it covers 10.7° of latitude (about 1,190 km) north–south but 10.7° × cos(latitude) east–west, so the Kuroshio circle (28.8° N) is about 12% narrower east–west than north–south. The Equatorial Pacific circle (1.4° N) is a true circle. **Design choice (15 Nov):** keep flat circles in version one; true circles on the globe wait for the next version, together with the map-stretch correction (row 7). | Geometry from the map scale in `assets/source_manifest.json` (0.176° per pixel, both axes). The effect of the shape on the score is **not measured**. |
 
 ## 7. Wording
 
@@ -409,6 +410,10 @@ image of ECCO2 model output. The raw values per frame are shown; the app plays s
 | `equator_pacific`, centre [271, 504] (**approved**) | +1.4° | 0.671 | 0.011 | 0.652 to 0.689 | 0.484 | 58 / 42 | 0.671 |
 
 No frame was `missing` in any circle.
+
+**Rerun on 15 Nov, 12 AM**, on `main` with the same command (without `--map`): every number in
+this table, the map-stretch estimates and the pair gaps below came out the same to 3 decimals.
+The joint check with Student A is still to do.
 
 The usable fraction is now the share of the **circle's** pixels with a clear edge (Dev B's review;
 `math_notes.md` section 6). The first run divided by the 122 × 122 box, which gave 0.208, 0.372,

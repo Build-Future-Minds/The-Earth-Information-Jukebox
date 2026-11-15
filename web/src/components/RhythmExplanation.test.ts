@@ -31,9 +31,9 @@ describe('compareLine', () => {
     expect(line).toContain('second pulse at 55% of the beat, against 65% for Region B');
   });
 
-  it('says less even, more short–long when this region is clearly less aligned', () => {
+  it('says less even, more long–short when this region is clearly less aligned', () => {
     const line = compareLine(playing(ok('a', 0.4)), regionB(ok('b', 0.8)))!;
-    expect(line).toContain('less even, more short–long');
+    expect(line).toContain('less even, more long–short');
     expect(line).toContain('second pulse at 65% of the beat, against 55% for Region B');
   });
 
@@ -68,7 +68,7 @@ describe('compareLine', () => {
 
 describe('explain with a comparison', () => {
   it('on real-looking values neither region is "even", but the comparison still says which is more even', () => {
-    // Real patches span about 0.15 to 0.50, so the single-region words are "slight lilt" and "short–long".
+    // Real patches span about 0.15 to 0.50, so the single-region words are "slight lilt" and "long–short".
     const text = explain(playing(ok('a', 0.45)), regionB(ok('b', 0.15)));
     expect(text).toContain('has a slight lilt');
     expect(text).not.toContain('is even');

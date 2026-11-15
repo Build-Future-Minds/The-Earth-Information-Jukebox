@@ -177,9 +177,9 @@ frames 3 and 4 (missing).
 
 - **Is `alignment` in `features.json` the smoothed score?** Yes. It is smoothed (setting 0.3) and
   is exactly what the app turns into rhythm, so the quiz is right to use it.
-- **Pulse order:** the rule plays the long gap first (75 %, then 25 % of the beat). The briefing,
-  `mapping_spec.md` and the app all call this pattern "short–long". The briefing says it in a
-  sentence; there is no table. The quiz file reports `short_gap_s` and `long_gap_s` without an
+- **Pulse order:** the rule plays the long gap first (75 %, then 25 % of the beat), so the team
+  calls this pattern "long–short" (renamed 15 Nov; words only). The Team Briefing still says
+  "short–long", in one sentence; there is no table. The quiz file reports `short_gap_s` and `long_gap_s` without an
   order, so the answers do not change. The quiz player now plays the long gap first, like the app.
 
 ### Still open

@@ -6,7 +6,7 @@ import type { Step } from '../data/types';
 describe('longFraction (rule from docs/mapping_spec.md)', () => {
   it('A = 1 gives an even 50/50 split', () => expect(longFraction(1)).toBe(0.5));
   it('A = 0.5 gives about 62/38', () => expect(longFraction(0.5)).toBeCloseTo(0.625));
-  it('A = 0 gives a strong 75/25 short–long', () => expect(longFraction(0)).toBe(0.75));
+  it('A = 0 gives a strong 75/25 long–short', () => expect(longFraction(0)).toBe(0.75));
   it('clamps values outside 0–1', () => {
     expect(longFraction(1.2)).toBe(0.5);
     expect(longFraction(-0.1)).toBe(0.75);
