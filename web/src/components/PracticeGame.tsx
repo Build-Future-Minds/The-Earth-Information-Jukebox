@@ -11,13 +11,9 @@ export function PracticeGame() {
     <section className="practice" aria-labelledby="practice-title">
       <div className="practice-text">
         <h2 id="practice-title">Practice: test your ear</h2>
-        <p>
-          Student B&apos;s listening game: hear one mystery rhythm, then pick which of two ocean patches made it. Patches come
-          from all over the NASA picture, from easy to hard.
-        </p>
+        <p>Hear a mystery rhythm, then pick which of two ocean patches made it.</p>
         <p className="muted small">
-          A separate practice tool. To make differences easier to hear, it can stretch the pulse spacing and let pitch follow
-          the lines; this page plays the team&apos;s one rule. For a scored listening check, use the{' '}
+          A separate practice tool with its own sound settings. For a scored check, use the{' '}
           <a href={QUIZ} target="_blank" rel="noopener">
             quiz player
           </a>

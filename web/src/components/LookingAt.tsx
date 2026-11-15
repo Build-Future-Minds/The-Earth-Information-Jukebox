@@ -26,23 +26,18 @@ export function LookingAt() {
       <div>
         <h2 id="looking-title">What you are looking at</h2>
         <p>
-          The NASA picture draws ocean currents as thin bright streaks. Each circle is a window onto the map. In the close-ups
-          below, white ticks show which way the streaks run in each small square. When the ticks mostly agree, the streaks are
-          lined up. When they point every which way, the streaks look swirly.
-        </p>
-        <p>
-          The rhythm is made from how much the streaks share one direction: more agreement, more even pulse. This is a rule we
-          chose. It describes the picture, not water speed or ocean health.
+          White ticks show which way the current streaks run. More agreement, more even pulse: a rule we chose. It describes
+          the picture, not water speed or ocean health.
         </p>
       </div>
       <div className="key" aria-hidden="true">
         <figure>
           <Key degrees={agree} />
-          <figcaption>Ticks agree: lined up</figcaption>
+          <figcaption>Lined up</figcaption>
         </figure>
         <figure>
           <Key degrees={scatter} />
-          <figcaption>Ticks scatter: swirly</figcaption>
+          <figcaption>Swirly</figcaption>
         </figure>
       </div>
     </section>
