@@ -1,138 +1,142 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-14T00:00:00Z",
-  "title": "Design System: Axis Specimen",
-  "scope": "tools/listening_game.html, future surfaces in the same world, and (since 14 Nov, agreed by Student B and Developer B) Developer B's React app in web/ (web/src/styles.css). The app keeps its NASA image in the main column, not the rail.",
+  "generatedAt": "2026-11-15T00:00:00Z",
+  "title": "Design System: Tide Table",
+  "scope": "The app (web/, styles in web/src/styles.css) and the listening game (tools/listening_game.html). Shared tokens (the game names its region slots --patch-1 and --patch-2, same values as --region-a and --region-b), shared graticule and theme switch, shared theme choice in localStorage key es-theme.",
   "extensions": {
     "colorMeta": {
-      "signal": { "role": "primary", "displayName": "Signal Orange", "canonical": "#ff5a1f", "tonalRamp": ["#3d1405", "#6b220a", "#9c310e", "#cf4213", "#ff5a1f", "#ff8a5e", "#ffbb9f", "#ffe6dc"] },
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#111214", "tonalRamp": ["#111214", "#2a2c31", "#4b515a", "#6c727b", "#8f949c", "#b4b8be", "#d9dce1", "#f6f7f8"] },
-      "ink-2": { "role": "neutral", "displayName": "Slate Ink", "canonical": "#4b515a", "tonalRamp": ["#111214", "#2a2c31", "#4b515a", "#6c727b", "#8f949c", "#b4b8be", "#d9dce1", "#f6f7f8"] },
-      "paper": { "role": "neutral", "displayName": "Cool Paper", "canonical": "#f6f7f8", "tonalRamp": ["#111214", "#2a2c31", "#4b515a", "#6c727b", "#8f949c", "#b4b8be", "#d9dce1", "#f6f7f8"] },
-      "rule": { "role": "neutral", "displayName": "Rule Grey", "canonical": "#d9dce1", "tonalRamp": ["#111214", "#2a2c31", "#4b515a", "#6c727b", "#8f949c", "#b4b8be", "#d9dce1", "#f6f7f8"] },
-      "rule-2": { "role": "neutral", "displayName": "Faint Rule", "canonical": "#eceef1", "tonalRamp": ["#111214", "#2a2c31", "#4b515a", "#6c727b", "#8f949c", "#b4b8be", "#eceef1", "#f6f7f8"] },
-      "well": { "role": "neutral", "displayName": "Image Well", "canonical": "#2a2a2a", "tonalRamp": ["#141414", "#2a2a2a", "#474747", "#666666", "#878787", "#a9a9a9", "#cccccc", "#f0f0f0"] }
+      "signal": { "role": "secondary", "displayName": "High-Water Signal", "canonical": "oklch(0.55 0.18 33)", "dark": "oklch(0.72 0.17 42)", "tonalRamp": ["oklch(0.20 0.06 33)", "oklch(0.30 0.10 33)", "oklch(0.40 0.14 33)", "oklch(0.55 0.18 33)", "oklch(0.65 0.17 38)", "oklch(0.72 0.17 42)", "oklch(0.84 0.09 42)", "oklch(0.95 0.03 42)"] },
+      "action": { "role": "primary", "displayName": "Tide Blue", "canonical": "oklch(0.48 0.13 255)", "dark": "oklch(0.74 0.11 250)", "tonalRamp": ["oklch(0.20 0.05 255)", "oklch(0.30 0.09 255)", "oklch(0.42 0.13 255)", "oklch(0.48 0.13 255)", "oklch(0.60 0.12 253)", "oklch(0.74 0.11 250)", "oklch(0.86 0.06 250)", "oklch(0.95 0.02 250)"] },
+      "region-a": { "role": "tertiary", "displayName": "Region A Violet", "canonical": "oklch(0.47 0.15 300)", "dark": "oklch(0.77 0.11 300)", "tonalRamp": ["oklch(0.20 0.06 300)", "oklch(0.30 0.10 300)", "oklch(0.40 0.14 300)", "oklch(0.47 0.15 300)", "oklch(0.60 0.14 300)", "oklch(0.77 0.11 300)", "oklch(0.88 0.06 300)", "oklch(0.96 0.02 300)"] },
+      "region-b": { "role": "tertiary", "displayName": "Region B Rose", "canonical": "oklch(0.52 0.17 5)", "dark": "oklch(0.79 0.11 0)", "tonalRamp": ["oklch(0.20 0.06 5)", "oklch(0.32 0.11 5)", "oklch(0.42 0.15 5)", "oklch(0.52 0.17 5)", "oklch(0.64 0.15 3)", "oklch(0.79 0.11 0)", "oklch(0.89 0.06 0)", "oklch(0.96 0.02 0)"] },
+      "ink": { "role": "neutral", "displayName": "Navy Ink", "canonical": "oklch(0.26 0.05 260)", "dark": "oklch(0.95 0.01 250)", "tonalRamp": ["oklch(0.15 0.03 260)", "oklch(0.26 0.05 260)", "oklch(0.36 0.05 258)", "oklch(0.46 0.04 255)", "oklch(0.60 0.03 252)", "oklch(0.74 0.02 250)", "oklch(0.87 0.015 245)", "oklch(0.972 0.004 230)"] },
+      "ink-2": { "role": "neutral", "displayName": "Slate Ink", "canonical": "oklch(0.46 0.04 255)", "dark": "oklch(0.78 0.03 255)", "tonalRamp": ["oklch(0.15 0.03 260)", "oklch(0.26 0.05 260)", "oklch(0.36 0.05 258)", "oklch(0.46 0.04 255)", "oklch(0.60 0.03 252)", "oklch(0.74 0.02 250)", "oklch(0.87 0.015 245)", "oklch(0.972 0.004 230)"] },
+      "paper": { "role": "neutral", "displayName": "Almanac White", "canonical": "oklch(0.972 0.004 230)", "dark": "oklch(0.17 0.03 262)", "tonalRamp": ["oklch(0.15 0.03 262)", "oklch(0.26 0.05 260)", "oklch(0.46 0.04 255)", "oklch(0.70 0.02 250)", "oklch(0.87 0.015 245)", "oklch(0.94 0.008 240)", "oklch(0.96 0.005 235)", "oklch(0.972 0.004 230)"] },
+      "rule": { "role": "neutral", "displayName": "Hairline", "canonical": "oklch(0.87 0.015 245)", "dark": "oklch(0.34 0.035 262)", "tonalRamp": ["oklch(0.15 0.03 262)", "oklch(0.26 0.05 260)", "oklch(0.46 0.04 255)", "oklch(0.70 0.02 250)", "oklch(0.80 0.018 247)", "oklch(0.87 0.015 245)", "oklch(0.94 0.008 240)", "oklch(0.972 0.004 230)"] },
+      "rule-2": { "role": "neutral", "displayName": "Faint Hairline", "canonical": "oklch(0.94 0.008 240)", "dark": "oklch(0.225 0.035 262)", "tonalRamp": ["oklch(0.15 0.03 262)", "oklch(0.26 0.05 260)", "oklch(0.46 0.04 255)", "oklch(0.70 0.02 250)", "oklch(0.80 0.018 247)", "oklch(0.87 0.015 245)", "oklch(0.94 0.008 240)", "oklch(0.972 0.004 230)"] },
+      "well": { "role": "neutral", "displayName": "Chart Well", "canonical": "oklch(0.20 0.03 262)", "dark": "oklch(0.12 0.02 262)", "tonalRamp": ["oklch(0.08 0.015 262)", "oklch(0.12 0.02 262)", "oklch(0.16 0.025 262)", "oklch(0.20 0.03 262)", "oklch(0.28 0.035 262)", "oklch(0.38 0.035 260)", "oklch(0.55 0.03 258)", "oklch(0.75 0.02 255)"] }
     },
     "typographyMeta": {
-      "numeral": { "displayName": "Numeral", "purpose": "Giant patch numbers 1 and 2; weight 500 at rest, 200 to 800 from alignment on reveal; Paper stroke halo; overlaps the image's lower edge by 0.32em." },
-      "value": { "displayName": "Value", "purpose": "Alignment number under each numeral; weight set by alignment; 1.9rem under 640px." },
-      "headline": { "displayName": "Headline", "purpose": "The page question in the rail." },
-      "status": { "displayName": "Status", "purpose": "Live status sentence at the top of main, aria-live polite, max 46ch." },
-      "title": { "displayName": "Title", "purpose": "Section heads: Score, plot heading." },
-      "body": { "displayName": "Body", "purpose": "Prose, 60 to 70ch." },
-      "label": { "displayName": "Label", "purpose": "Control names; buttons use 700 at 1rem." },
-      "readout": { "displayName": "Readout", "purpose": "Mono tabular readouts: slider outputs, note and wght lines, table numbers." },
-      "key": { "displayName": "Key", "purpose": "Key caps inside buttons." }
+      "numeral": { "displayName": "Giant Numeral", "purpose": "Alignment number under each region's patch; weight 200 to 800 carries the value." },
+      "value": { "displayName": "Live Value", "purpose": "The live alignment readout in the now-playing row; weight follows alignment." },
+      "headline": { "displayName": "Page Title", "purpose": "H1 in the rail." },
+      "title": { "displayName": "Section Title", "purpose": "H2 section headings." },
+      "status": { "displayName": "Status Sentence", "purpose": "The one sentence about what is playing." },
+      "body": { "displayName": "Body", "purpose": "Prose, capped at 65 to 70ch." },
+      "label": { "displayName": "Label", "purpose": "Form labels, legends, table headers." },
+      "readout": { "displayName": "Readout (mono)", "purpose": "Numbers, coordinates, axes, key caps; the only use of the mono face." }
     },
-    "shadows": [],
-    "focus": [
-      { "name": "focus-ring", "value": "outline: 3px solid #ff5a1f; outline-offset: 3px", "purpose": "Global :focus-visible on every interactive element." }
+    "shadows": [
+      { "name": "none", "value": "none", "purpose": "The system is flat. No elevation shadows." },
+      { "name": "map-tag-ring", "value": "0 0 0 2px #000", "purpose": "A solid outline (3px when active) so the region tag reads on any part of the picture. Not elevation." },
+      { "name": "current-underline", "value": "inset 0 -3px 0 var(--signal)", "purpose": "Marks the playing region's name in the rhythm rows." }
     ],
     "motion": [
-      { "name": "snap", "value": "90ms steps(2, jump-end)", "purpose": "Every state change, including numeral font-weight on reveal. No easing. Disabled under prefers-reduced-motion." }
+      { "name": "snap", "value": "180ms steps(2, jump-end)", "purpose": "Two 90 ms steps, no easing, for every state change. Disabled under prefers-reduced-motion." }
     ],
     "breakpoints": [
-      { "name": "stack", "value": "960px", "purpose": "Rail and main stack: top rail, main, bottom rail; 16px gutter." },
-      { "name": "narrow", "value": "640px", "purpose": "Patch gap 14px; readouts stack; Value drops to 1.9rem." }
+      { "name": "narrow", "value": "640px" },
+      { "name": "stack", "value": "960px" }
     ]
   },
   "components": [
     {
-      "name": "Button",
-      "kind": "button",
-      "refersTo": "button",
-      "description": "Bordered transparent button with a key cap on the right.",
-      "html": "<button class=\"ds-btn\">Replay <kbd class=\"ds-kbd\">R</kbd></button>",
-      "css": ".ds-btn { font: 700 1rem/1 'Atkinson Hyperlegible Next', system-ui, sans-serif; min-height: 48px; padding: 0 16px; border-radius: 4px; border: 2px solid #111214; background: transparent; color: #111214; cursor: pointer; display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 160px; } .ds-btn:hover { background: #eceef1; } .ds-btn:focus-visible { outline: 3px solid #ff5a1f; outline-offset: 3px; } .ds-kbd { font: 600 0.8rem/1.4 'Atkinson Hyperlegible Mono', ui-monospace, monospace; border: 1.5px solid currentColor; border-radius: 3px; padding: 0 5px; }"
-    },
-    {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Ink-filled button for the one rail action, New round.",
-      "html": "<button class=\"ds-btn-primary\">New round <kbd class=\"ds-kbd\">P</kbd></button>",
-      "css": ".ds-btn-primary { font: 700 1rem/1 'Atkinson Hyperlegible Next', system-ui, sans-serif; min-height: 48px; padding: 0 16px; border-radius: 4px; border: 2px solid #111214; background: #111214; color: #f6f7f8; cursor: pointer; display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 240px; } .ds-btn-primary:hover { background: #2a2c31; } .ds-btn-primary:focus-visible { outline: 3px solid #ff5a1f; outline-offset: 3px; } .ds-kbd { font: 600 0.8rem/1.4 'Atkinson Hyperlegible Mono', ui-monospace, monospace; border: 1.5px solid currentColor; border-radius: 3px; padding: 0 5px; }"
+      "description": "Start and the main action; tide blue, ink-weight outline shape.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Start</button>",
+      "css": ".ds-btn { font: 700 1rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; min-height: 48px; padding: 0 16px; border: 2px solid var(--ink); border-radius: 4px; background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 10px; } .ds-btn:hover { background: var(--rule-2); } .ds-btn-primary { background: var(--action); border-color: var(--action); color: var(--on-action); } .ds-btn-primary:hover { background: var(--action-hover); border-color: var(--action-hover); } .ds-btn:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }"
     },
     {
-      "name": "Quiet Button",
+      "name": "Secondary Button",
       "kind": "button",
-      "refersTo": "button-quiet",
-      "description": "Low-emphasis destructive-ish action, Reset score, set apart at the rail's foot.",
-      "html": "<button class=\"ds-btn-quiet\">Reset score</button>",
-      "css": ".ds-btn-quiet { font: 600 1rem/1 'Atkinson Hyperlegible Next', system-ui, sans-serif; min-height: 48px; padding: 0 16px; border-radius: 4px; border: 2px solid #d9dce1; background: transparent; color: #4b515a; cursor: pointer; } .ds-btn-quiet:hover { background: #eceef1; } .ds-btn-quiet:focus-visible { outline: 3px solid #ff5a1f; outline-offset: 3px; }"
+      "refersTo": "button",
+      "description": "Outlined button for pause, stop, replay.",
+      "html": "<button class=\"ds-btn\">Pause</button>",
+      "css": ".ds-btn { font: 700 1rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; min-height: 48px; padding: 0 16px; border: 2px solid var(--ink); border-radius: 4px; background: transparent; color: var(--ink); cursor: pointer; } .ds-btn:hover { background: var(--rule-2); } .ds-btn[aria-expanded='true'], .ds-btn[aria-pressed='true'] { background: var(--ink); color: var(--paper); } .ds-btn:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }"
     },
     {
-      "name": "Pick Buttons",
+      "name": "Theme Switch",
       "kind": "custom",
-      "refersTo": "pick",
-      "description": "Full-width answer buttons keyed 1 and 2; the pick floods Signal Orange, a missed answer fills Ink.",
-      "html": "<div class=\"ds-pick-pair\"><button class=\"ds-pick ds-pick-chosen\">Your pick made it <kbd class=\"ds-kbd\">1</kbd></button><button class=\"ds-pick\">Patch 2 <kbd class=\"ds-kbd\">2</kbd></button></div>",
-      "css": ".ds-pick-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; } .ds-pick { font: 700 1.1rem/1 'Atkinson Hyperlegible Next', system-ui, sans-serif; width: 100%; min-height: 60px; padding: 0 16px; border-radius: 4px; border: 2px solid #111214; background: transparent; color: #111214; display: inline-flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 90ms steps(2, jump-end); } .ds-pick:hover { background: #eceef1; } .ds-pick:focus-visible { outline: 3px solid #ff5a1f; outline-offset: 3px; } .ds-pick-chosen, .ds-pick-chosen:hover { background: #ff5a1f; border-color: #ff5a1f; color: #111214; } .ds-pick-answer { background: #111214; color: #f6f7f8; } .ds-kbd { font: 600 0.8rem/1.4 'Atkinson Hyperlegible Mono', ui-monospace, monospace; border: 1.5px solid currentColor; border-radius: 3px; padding: 0 5px; }"
+      "description": "Light / Dark, two joined buttons, the chosen one filled in ink.",
+      "html": "<div class=\"ds-theme\" role=\"group\" aria-label=\"Colour theme\"><button aria-pressed=\"true\">Light</button><button aria-pressed=\"false\">Dark</button></div>",
+      "css": ".ds-theme { display: inline-flex; gap: 2px; background: var(--ink); border: 2px solid var(--ink); border-radius: 4px; overflow: hidden; } .ds-theme button { border: 0; min-height: 40px; padding: 0 12px; font: 700 0.9rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; background: var(--paper); color: var(--ink); cursor: pointer; } .ds-theme button[aria-pressed='true'] { background: var(--ink); color: var(--paper); } .ds-theme button:focus-visible { outline: 3px solid var(--signal); outline-offset: -6px; }"
     },
     {
-      "name": "Range With Readout",
+      "name": "Range",
       "kind": "input",
-      "refersTo": "range",
-      "description": "Hairline slider with a square thumb and a Mono live readout in the label row.",
-      "html": "<div class=\"ds-axis\"><label class=\"ds-axis-label\">Volume <output class=\"ds-axis-out\">0.70</output></label><input class=\"ds-range\" type=\"range\" min=\"0\" max=\"1\" step=\"0.05\" value=\"0.7\"></div>",
-      "css": ".ds-axis { display: grid; gap: 6px; width: 320px; font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif; color: #111214; } .ds-axis-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.95rem; font-weight: 600; } .ds-axis-out { font: 400 0.9rem 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #4b515a; } .ds-range { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; margin: 0; background: transparent; cursor: pointer; } .ds-range::-webkit-slider-runnable-track { height: 2px; background: #4b515a; } .ds-range::-moz-range-track { height: 2px; background: #4b515a; } .ds-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -8px; background: #111214; border: 0; border-radius: 4px; } .ds-range::-moz-range-thumb { width: 18px; height: 18px; background: #111214; border: 0; border-radius: 4px; } .ds-range:focus-visible { outline: 3px solid #ff5a1f; outline-offset: 3px; } .ds-range:focus-visible::-webkit-slider-thumb { background: #ff5a1f; } .ds-range:focus-visible::-moz-range-thumb { background: #ff5a1f; }"
+      "description": "Label row with name left and mono readout right; 2px track, square ink thumb.",
+      "html": "<label class=\"ds-range\"><span class=\"ds-range-row\"><span>Volume</span><span class=\"ds-readout\">-12 dB</span></span><input type=\"range\"></label>",
+      "css": ".ds-range { display: inline-grid; gap: 2px; min-width: 160px; font: 600 0.95rem 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; color: var(--ink); } .ds-range-row { display: flex; justify-content: space-between; gap: 10px; } .ds-readout { font: 400 0.9rem/1.5 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; color: var(--ink-2); font-variant-numeric: tabular-nums; } .ds-range input { appearance: none; background: transparent; height: 28px; width: 100%; } .ds-range input::-webkit-slider-runnable-track { height: 2px; background: var(--ink-2); } .ds-range input::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; margin-top: -8px; background: var(--ink); border-radius: 4px; } .ds-range input:focus-visible::-webkit-slider-thumb { background: var(--signal); }"
     },
     {
-      "name": "Weighted Numeral",
-      "kind": "custom",
-      "refersTo": "numeral",
-      "description": "Giant patch numeral and alignment value whose font weight is the alignment.",
-      "html": "<div class=\"ds-specimen\"><div class=\"ds-well\"></div><span class=\"ds-numeral\" style=\"font-weight:777\">1</span><div class=\"ds-readout\"><span class=\"ds-value\" style=\"font-weight:777\">0.54<small>alignment</small></span><span>note C6, wght 777</span></div></div>",
-      "css": ".ds-specimen { width: 360px; font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif; color: #111214; } .ds-well { aspect-ratio: 8 / 5; background: #2a2a2a; border-radius: 4px; } .ds-numeral { display: block; font: 500 7rem/0.78 'Atkinson Hyperlegible Next', system-ui, sans-serif; letter-spacing: -0.04em; margin: -0.32em 0 0 0.06em; position: relative; -webkit-text-stroke: 0.06em #f6f7f8; paint-order: stroke fill; transition: font-weight 90ms steps(2, jump-end); } .ds-readout { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 10px 0 12px; font: 400 0.9rem 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #4b515a; } .ds-value { font: 500 2.6rem/1 'Atkinson Hyperlegible Next', system-ui, sans-serif; color: #111214; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; } .ds-value small { font: 400 0.9rem 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #4b515a; margin-left: 8px; letter-spacing: 0; }"
+      "name": "Region Badge",
+      "kind": "chip",
+      "refersTo": "region-badge-a",
+      "description": "The region's colour holding its letter, used wherever the region is named.",
+      "html": "<span class=\"ds-badge\" style=\"--region: var(--region-a)\">A</span> <span class=\"ds-badge\" style=\"--region: var(--region-b)\">B</span>",
+      "css": ".ds-badge { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--region); color: var(--on-region); font: 800 0.8rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; }"
     },
     {
-      "name": "Rhythm Plot",
+      "name": "Tide Table",
       "kind": "custom",
-      "refersTo": "plot",
-      "description": "Both rhythms on one time axis: Ink bars for the low pulse on the beat, Signal bars for the high pulse.",
-      "html": "<section class=\"ds-plot\"><h2>Both rhythms, one time line</h2><div class=\"ds-plot-row\"><b>Patch 1</b><svg viewBox=\"0 0 600 40\" preserveAspectRatio=\"none\"><line x1=\"6\" x2=\"594\" y1=\"20\" y2=\"20\" stroke=\"#d9dce1\" stroke-width=\"2\"/><line x1=\"6\" x2=\"6\" y1=\"0\" y2=\"40\" stroke=\"#d9dce1\" stroke-width=\"2\"/><line x1=\"300\" x2=\"300\" y1=\"0\" y2=\"40\" stroke=\"#d9dce1\" stroke-width=\"2\"/><line x1=\"594\" x2=\"594\" y1=\"0\" y2=\"40\" stroke=\"#d9dce1\" stroke-width=\"2\"/><rect x=\"3\" y=\"4\" width=\"6\" height=\"32\" fill=\"#111214\"/><rect x=\"185\" y=\"8\" width=\"6\" height=\"24\" fill=\"#ff5a1f\"/><rect x=\"297\" y=\"4\" width=\"6\" height=\"32\" fill=\"#111214\"/><rect x=\"479\" y=\"8\" width=\"6\" height=\"24\" fill=\"#ff5a1f\"/></svg></div></section>",
-      "css": ".ds-plot { width: 560px; border-top: 1px solid #d9dce1; padding-top: 16px; font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif; color: #111214; } .ds-plot h2 { font-size: 1.05rem; margin: 0 0 8px; } .ds-plot-row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: center; gap: 12px; height: 52px; } .ds-plot-row b { font-weight: 650; } .ds-plot svg { display: block; width: 100%; height: 40px; }"
+      "description": "Ruled columns, mono numbers, header rule in ink, playing region's row in weight 700.",
+      "html": "<table class=\"ds-tide\"><thead><tr><th>Region</th><th class=\"num\">Alignment, low-high</th></tr></thead><tbody><tr class=\"current\"><th><span class=\"ds-badge\" style=\"--region: var(--region-a)\">A</span> Region A</th><td class=\"num\">0.31-0.88</td></tr><tr><th><span class=\"ds-badge\" style=\"--region: var(--region-b)\">B</span> Region B</th><td class=\"num\">0.12-0.64</td></tr></tbody></table>",
+      "css": ".ds-tide { border-collapse: collapse; width: 100%; font: 400 0.95rem 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; color: var(--ink); } .ds-tide th, .ds-tide td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); font-weight: 400; } .ds-tide thead th { font-weight: 600; font-size: 0.85rem; color: var(--ink-2); border-bottom-color: var(--ink); } .ds-tide tbody th { display: flex; align-items: center; gap: 8px; } .ds-tide .num { text-align: right; white-space: nowrap; font-family: 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; font-variant-numeric: tabular-nums; } .ds-tide tr.current th { font-weight: 700; } .ds-badge { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--region); color: var(--on-region); font: 800 0.8rem/1 sans-serif; }"
     },
     {
-      "name": "Score Table",
+      "name": "Tide Curves",
       "kind": "custom",
-      "refersTo": "score",
-      "description": "Hairline-ruled table with Mono numeric columns and a Mono total.",
-      "html": "<div class=\"ds-score\"><div class=\"ds-score-head\"><h2>Score</h2><span class=\"ds-score-big\">1 / 1</span></div><table><thead><tr><th>Difference</th><th class=\"num\">Right</th><th class=\"num\">Played</th></tr></thead><tbody><tr><td class=\"num-l\">0.40-0.49</td><td class=\"num\">1</td><td class=\"num\">1</td></tr></tbody></table></div>",
-      "css": ".ds-score { width: 340px; font-family: 'Atkinson Hyperlegible Next', system-ui, sans-serif; color: #111214; } .ds-score-head { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px solid #d9dce1; padding-top: 18px; } .ds-score-head h2 { font-size: 1.05rem; margin: 0; } .ds-score-big { font: 400 1.6rem/1 'Atkinson Hyperlegible Mono', ui-monospace, monospace; } .ds-score table { width: 100%; border-collapse: collapse; font-size: 0.9rem; } .ds-score th, .ds-score td { text-align: left; padding: 5px 8px 5px 0; border-bottom: 1px solid #d9dce1; } .ds-score th { font-weight: 600; color: #4b515a; } .ds-score .num, .ds-score .num-l { font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; } .ds-score .num { text-align: right; }"
+      "description": "Alignment over the model frames: one curve per region, labelled at its right end, signal line for the playing position, a gap where a frame is missing.",
+      "html": "<svg class=\"ds-curves\" viewBox=\"-34 -8 712 150\" width=\"100%\" role=\"img\" aria-label=\"Alignment over frames\"><line class=\"grid\" x1=\"0\" x2=\"600\" y1=\"0\" y2=\"0\"/><line class=\"grid\" x1=\"0\" x2=\"600\" y1=\"60\" y2=\"60\"/><line class=\"grid\" x1=\"0\" x2=\"600\" y1=\"120\" y2=\"120\"/><g style=\"--region: var(--region-a)\"><path class=\"curve\" d=\"M0 70 L100 40 L200 55 M300 30 L400 25 L600 20\"/><text class=\"end\" x=\"610\" y=\"25\">A 0.83</text></g><g style=\"--region: var(--region-b)\"><path class=\"curve\" d=\"M0 100 L100 90 L300 80 L600 60\"/><text class=\"end\" x=\"610\" y=\"65\">B 0.50</text></g><line class=\"now\" x1=\"250\" x2=\"250\" y1=\"-6\" y2=\"120\"/></svg>",
+      "css": ".ds-curves { display: block; overflow: visible; } .ds-curves .grid { stroke: var(--rule); stroke-width: 1; } .ds-curves .curve { fill: none; stroke: var(--region); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; } .ds-curves .end { fill: var(--region); font: 700 14px 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; } .ds-curves .now { stroke: var(--signal); stroke-width: 2; }"
+    },
+    {
+      "name": "Chart Frame",
+      "kind": "custom",
+      "description": "The NASA picture inside a 1px ink neatline with graticule ticks and mono labels outside it.",
+      "html": "<div class=\"ds-chart\"><div class=\"well\"></div><span class=\"tick lat\"><b>30</b></span><span class=\"tick lon\"><b>60</b></span></div>",
+      "css": ".ds-chart { position: relative; margin: 22px 0 0 44px; border: 1px solid var(--ink); height: 140px; } .ds-chart .well { position: absolute; inset: 0; background: var(--well); } .ds-chart .tick { position: absolute; font: 400 0.75rem/1 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; color: var(--ink-2); } .ds-chart .lat { left: -7px; right: -7px; top: 50%; height: 1px; background: linear-gradient(90deg, var(--ink) 7px, transparent 7px, transparent calc(100% - 7px), var(--ink) calc(100% - 7px)); } .ds-chart .lat b { position: absolute; right: calc(100% + 4px); top: -0.5em; font-weight: 400; } .ds-chart .lon { top: -7px; bottom: -7px; left: 50%; width: 1px; background: linear-gradient(var(--ink) 7px, transparent 7px, transparent calc(100% - 7px), var(--ink) calc(100% - 7px)); } .ds-chart .lon b { position: absolute; top: -18px; transform: translateX(-50%); font-weight: 400; }"
     }
   ],
   "narrative": {
-    "northStar": "Axis Specimen",
-    "overview": "The page is a type specimen for one measurement. Every alignment number is set in a variable sans whose weight is the value itself: a swirly patch's numeral reads as a hairline, a lined-up one as a slab. The page around those numerals stays still and quiet: cool paper, near-black ink, hairline rules, square 4px corners. One signal orange marks what is live or chosen. The NASA image is the only full-spectrum colour on screen, and the system never competes with it.\n\nDensity is a working instrument, not a quiz app. A fixed 400px left rail holds the map, playback, settings and score. The main column holds the status sentence, two equal patch columns and one shared plot. State changes snap in two 90ms steps with no easing, like an acetate overlay being swapped.",
+    "northStar": "The Tide Table on the Chart",
+    "overview": "Earth Sonata reads like a tide table printed on a sea chart. The NASA picture sits inside a chart frame with latitude and longitude ticks, and each region's numbers are set in ruled columns. Structure is 1px hairline rules, never boxes, cards or side stripes. Corners are 4px, nothing casts a shadow, and depth comes from rules, ink and the dark well behind the picture.\n\nTwo editions of one print. Light is almanac white with navy ink and tide-blue actions. Dark is the night edition: deep navy ground with the same inks lifted. The theme follows the saved choice, else the system setting, and is set before first paint. One red-orange, the signal, is the only loud colour and it means live, chosen or focused, nothing else.\n\nThe system is keyboard-first. Start is the first Tab stop, so the theme switch sits under the playback controls in the rail. Colour is never the only cue: every region mark carries its letter.",
     "keyCharacteristics": [
-      "Type weight carries data: variable `wght` 200 to 800 maps an alignment of 0 to 1.",
-      "One accent (signal orange) for selection, focus, the live state and the high pulse.",
-      "Flat surfaces, 1px hairline rules, 4px corners, no shadows.",
-      "Mono readouts with tabular figures beside every control and value.",
-      "Keyboard first: every action shows its key in a key cap."
+      "One face, Atkinson Hyperlegible Next. Atkinson Hyperlegible Mono only for numbers, coordinates and readouts.",
+      "Signal red-orange is live, chosen or focused only.",
+      "Region A violet, Region B rose, both off the NASA picture's blue-to-red temperature scale, so a region colour is never read as warm or cold.",
+      "Hairline rules for structure; no boxes, no side stripes.",
+      "Type weight carries data: the giant numeral and the live value run weight 200 to 800 with alignment.",
+      "A missing frame breaks a tide curve and is never drawn as zero."
     ],
     "rules": [
-      { "name": "The One Signal Rule", "body": "Signal Orange is the only accent. It means \"chosen, live or focused\" and nothing else. No second hue is introduced for right/wrong; the answer is shown in Ink.", "section": "colors" },
-      { "name": "The Image Owns Colour Rule", "body": "The NASA visualization is the only full-spectrum colour. Chrome stays in paper, ink and rule greys so the data image is never repainted or competed with.", "section": "colors" },
-      { "name": "The Weight Is the Value Rule", "body": "Alignment numbers and patch numerals take `font-weight` from the measured alignment (200 at the swirly end, 800 at the lined-up end). Before the answer they sit at a neutral 500 so the page gives nothing away. Never use weight for emphasis on these elements.", "section": "typography" },
-      { "name": "The Mono Readout Rule", "body": "Every number that changes while you watch (slider outputs, alignment note and weight lines, scores) is set in Atkinson Hyperlegible Mono with tabular figures.", "section": "typography" },
-      { "name": "The Hairline Rule", "body": "Structure is a 1px Rule Grey line, not a card, not a shadow, not a tinted panel.", "section": "elevation" }
+      { "name": "The Live Only Rule", "body": "Signal red-orange appears only on something live, chosen or focused. If it is decoration, it is wrong.", "section": "colors" },
+      { "name": "The Off-Scale Rule", "body": "Region colours stay violet and rose. Never blue, red, orange or yellow, because the NASA picture already uses that range for temperature.", "section": "colors" },
+      { "name": "The Letter Rule", "body": "A region colour never travels alone; its letter badge or end label goes with it.", "section": "colors" },
+      { "name": "The Weight Is the Value Rule", "body": "Alignment 0 maps to weight 200 and alignment 1 to 800, so the numeral's weight still carries alignment. Do not flatten it to one weight.", "section": "typography" },
+      { "name": "The Numbers in Mono Rule", "body": "Coordinates, table cells, axes and readouts use the mono face with tabular figures. Words never do.", "section": "typography" },
+      { "name": "The No Shadow Rule", "body": "Nothing floats. A new surface gets a hairline rule or a neatline, not a shadow.", "section": "elevation" }
     ],
     "dos": [
-      "**Do** drive the weight of every alignment numeral from the value (200 to 800), and hold it at 500 until the answer is shown.",
-      "**Do** reserve Signal Orange for the chosen, live or focused thing, with Ink text on it.",
-      "**Do** animate state changes as a two-step 90ms snap (`steps(2, jump-end)`), and remove transitions under reduced motion.",
-      "**Do** set live numbers in Atkinson Hyperlegible Mono with tabular figures.",
-      "**Do** show each action's keyboard key in a key cap inside its button.",
-      "**Do** keep the NASA credit directly under the image it credits."
+      "Do use hairline rules (1px `rule`) to separate sections and table rows.",
+      "Do reserve signal for live, chosen and focused.",
+      "Do pair every region colour with its letter.",
+      "Do set coordinates, table cells and readouts in the mono face with tabular figures.",
+      "Do let font weight (200 to 800) carry alignment on the numeral and live value.",
+      "Do draw a missing frame as a break or hatched gap.",
+      "Do give both themes the same structure; only the inks lift.",
+      "Do keep Start the first Tab stop."
     ],
     "donts": [
-      "**Don't** add a second accent or green/red right/wrong colours; the answer is shown with Ink.",
-      "**Don't** use shadows, cards or tinted panels; separate sections with 1px Rule Grey lines.",
-      "**Don't** round corners past 4px.",
-      "**Don't** tint, recolour or overlay colour on the NASA imagery beyond the black-and-white region boxes.",
-      "**Don't** use eased or springy motion; the world snaps."
+      "Don't put content in boxes, cards or floating panels, or add side stripes.",
+      "Don't add drop shadows.",
+      "Don't colour a region blue, red, orange or yellow.",
+      "Don't use signal for decoration, errors or missing data.",
+      "Don't draw a missing frame as zero.",
+      "Don't add a second text face or use the mono face for prose.",
+      "Don't let colour be the only cue for a region or a state."
     ]
   }
 }

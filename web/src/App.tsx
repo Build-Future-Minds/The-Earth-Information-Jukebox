@@ -10,7 +10,8 @@ import { LookingAt } from './components/LookingAt';
 import { RegionCloseups } from './components/RegionCloseups';
 import { RhythmsPlot } from './components/RhythmsPlot';
 import { PracticeGame } from './components/PracticeGame';
-import { ExploreControls, regionLabel } from './components/ExploreControls';
+import { ExploreControls, regionLabel, regionStyle } from './components/ExploreControls';
+import { ThemeSwitch } from './components/ThemeSwitch';
 import { RhythmExplanation, stepAtSameMoment } from './components/RhythmExplanation';
 import { SceneView } from './components/SceneView';
 
@@ -123,7 +124,7 @@ export function App() {
           PRACTICE DATA — test input, not NASA data
         </div>
       )}
-      {/* Student B's Axis Specimen layout (DESIGN.md "Layout"): a fixed rail with the title and the
+      {/* Layout: a fixed rail with the title, theme switch and the
           controls, and a main column. The NASA image stays large in the main column: in a 400 px rail
           each region circle would be about 10 px across. Below 960 px the rail stacks on top. */}
       <div className="layout">
@@ -157,6 +158,8 @@ export function App() {
               transport.current?.setVolume(db);
             }}
           />
+
+          <ThemeSwitch />
         </div>
 
         <main className="stage">
@@ -166,6 +169,7 @@ export function App() {
           <NowPlaying step={sounding} regionLabel={label} />
           <BeatTrack
             track={track}
+            colour={regionStyle(scene.regions, regionId)}
             regionLabel={label}
             playState={playState}
             speed={speed}
@@ -180,6 +184,14 @@ export function App() {
 
           {explaining && <RhythmExplanation ref={explanationRef} step={sounding} regionLabel={label} other={other} />}
 
+          <RhythmsPlot
+            features={features}
+            regions={scene.regions}
+            activeRegionId={regionId}
+            playState={playState}
+            getPosition={getPosition}
+          />
+
           <LookingAt />
           <RegionCloseups
             scene={scene}
@@ -188,7 +200,6 @@ export function App() {
             regionId={regionId}
             onListen={listenTo}
           />
-          <RhythmsPlot features={features} regions={scene.regions} activeRegionId={regionId} />
           <PracticeGame />
 
           <MelodyPad
