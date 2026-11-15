@@ -55,7 +55,7 @@ export function BeatTrack({ track, regionLabel, colour, playState, speed, getPos
   const W = length * U;
   const pct = (100 * pos) / length;
   const real = (s: number) => (s / speed).toFixed(1);
-  const timeText = active ? `${real(pos)} / ${real(length)} s` : 'Press Start to hear the rhythm';
+  const timeText = active ? `${real(pos)} / ${real(length)} s` : 'Press Play to hear the rhythm';
 
   const seekTo = (t: number) => {
     if (!active) return;

@@ -53,7 +53,7 @@ export function describeSplit(longFraction: number): 'even' | 'slight lilt' | 'l
 }
 
 export function explain(step: TrackStep | null, other?: OtherRegion | null): string {
-  if (!step) return 'Press Start to hear a rhythm, then ask for an explanation.';
+  if (!step) return 'Press Play to hear a rhythm, then ask for an explanation.';
   if (step.step.status === 'missing') {
     return `There is not enough visible detail here to make a rhythm, so the Earth voice is quiet. Reason: ${step.step.reason}.`;
   }
