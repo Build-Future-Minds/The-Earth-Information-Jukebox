@@ -9,6 +9,8 @@ import type { Features, MusicEvent } from './types';
 const json = import.meta.glob<{ default: unknown }>(
   [
     '../../../data/{features,rhythm_reference}.json',
+    '../../../data/aerosols/{features,rhythm_reference}.json',
+    '../../../data/imerg/{features,rhythm_reference}.json',
     '../../../analysis/practice/{features,rhythm_reference}.practice.json',
     '../../../contracts/rhythm-reference.schema.json',
   ],
@@ -18,6 +20,9 @@ const get = (p: string) => json[`../../../${p}`]?.default;
 
 const pairs = [
   { name: 'real data (data/)', features: 'data/features.json', ref: 'data/rhythm_reference.json' },
+  // Every other picture the app can play (data/sources.ts): its notes must be the engine's too.
+  { name: 'aerosols (data/aerosols/)', features: 'data/aerosols/features.json', ref: 'data/aerosols/rhythm_reference.json' },
+  { name: 'rain (data/imerg/)', features: 'data/imerg/features.json', ref: 'data/imerg/rhythm_reference.json' },
   {
     name: "Dev A's practice output",
     features: 'analysis/practice/features.practice.json',
