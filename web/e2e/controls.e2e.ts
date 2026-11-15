@@ -35,3 +35,13 @@ test('Sound shows speed and volume, with no decibel numbers', async ({ page }) =
   await expect(page.getByRole('slider', { name: 'Volume' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Playback controls' })).not.toContainText('dB');
 });
+
+test('pressing a circle on the picture selects that region', async ({ page }) => {
+  await page.locator('.box[data-region]').nth(1).click();
+  await expect(page.getByRole('status')).toHaveText(/Stopped\. Region B selected\./);
+  await expect(page.getByRole('radio', { name: /Region B/ })).toBeChecked();
+});
+
+test('practice data has one picture, so there is no picture choice', async ({ page }) => {
+  await expect(page.getByRole('group', { name: 'Picture' })).toHaveCount(0);
+});

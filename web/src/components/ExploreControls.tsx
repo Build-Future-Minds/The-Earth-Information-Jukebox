@@ -3,6 +3,7 @@ import { IconButton } from './IconButton';
 import { ExplainIcon, PauseIcon, PlayIcon, ReplayIcon, SoundIcon, StopIcon } from './icons';
 // Owner: Student B (v1 by Dev B — refine wording, order and labels; review together).
 // Real <button>s and form controls only, so everything works with Tab / Enter / Space.
+import { thumbCss } from '../data/selection';
 import type { Region } from '../data/types';
 import type { PlayState } from '../audio/transport';
 
@@ -21,6 +22,10 @@ interface Props {
   onExplain: () => void;
   onSpeed: (speed: number) => void;
   onVolume: (db: number) => void;
+  look?: RegionLook;
+  /** The picture, for a round crop of each region in the region choice. */
+  imageUrl?: string | null;
+  frame?: { width: number; height: number };
 }
 
 export const SPEEDS = [0.5, 0.75, 1, 1.25];
@@ -36,8 +41,16 @@ export function regionColour(regions: Region[], id: string): string {
   return i === 0 ? 'var(--region-a)' : i === 1 ? 'var(--region-b)' : 'var(--ink)';
 }
 
-/** Sets the --region custom property that the region's marks and badge read. */
-export function regionStyle(regions: Region[], id: string): CSSProperties {
+/** How a picture's regions look: their first letter, and neutral (ink) instead of violet and rose. */
+export interface RegionLook {
+  firstLetter?: string;
+  neutral?: boolean;
+}
+
+/** Sets the custom properties the region's marks and badge read. Neutral regions (DESIGN.md
+ *  Off-Scale Rule: aerosols, rain) are ink inside a white outline, so they show on any picture. */
+export function regionStyle(regions: Region[], id: string, look: RegionLook = {}): CSSProperties {
+  if (look.neutral) return { ['--region' as string]: 'var(--ink)', ['--region-outline' as string]: 'var(--white)' } as CSSProperties;
   return { ['--region' as string]: regionColour(regions, id) } as CSSProperties;
 }
 
@@ -75,10 +88,14 @@ export function ExploreControls(p: Props) {
               checked={p.regionId === r.id}
               onChange={() => p.onRegion(r.id)}
             />
-            <span className="region-badge" aria-hidden="true" style={regionStyle(p.regions, r.id)}>
-              {String.fromCharCode(65 + p.regions.indexOf(r))}
+            {p.imageUrl && p.frame && (
+              <span className="region-thumb" aria-hidden="true"
+                style={{ backgroundImage: `url(${p.imageUrl})`, ...thumbCss(r, p.frame, 44), ...regionStyle(p.regions, r.id, p.look) }} />
+            )}
+            <span className="region-badge" aria-hidden="true" style={regionStyle(p.regions, r.id, p.look)}>
+              {regionLabel(p.regions, r.id, p.look?.firstLetter).replace('Region ', '')}
             </span>
-            {regionLabel(p.regions, r.id)}: {r.name}
+            {regionLabel(p.regions, r.id, p.look?.firstLetter)}: {r.name}
             <kbd aria-hidden="true">{p.regions.indexOf(r) + 1}</kbd>
           </label>
         ))}
