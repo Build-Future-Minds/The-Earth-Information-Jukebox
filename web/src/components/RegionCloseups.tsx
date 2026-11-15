@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { longFraction } from '../audio/earthVoice';
 import { lineTicks, type Tick } from '../data/lineTicks';
 import type { Features, Region, Scene } from '../data/types';
-import { regionLabel, regionStyle } from './ExploreControls';
+import { regionLabel, regionStyle, type RegionLook } from './ExploreControls';
 import { weightFor } from './NowPlaying';
 
 interface Props {
@@ -19,13 +19,15 @@ interface Props {
   /** True while the Earth voice plays; the current region's button then stops it. */
   playing: boolean;
   onStop: () => void;
+  /** First letter and neutral style of this picture's regions. */
+  look?: RegionLook;
 }
 
 const SCALE = 3; // canvas pixels per image pixel
 const CELL = 15; // tick cell, in image pixels
 const TICK_LEN = 30; // canvas pixels
 
-export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, playing, onStop }: Props) {
+export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, playing, onStop, look = {} }: Props) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   useEffect(() => {
     if (!imageUrl) return;
@@ -46,8 +48,8 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, 
           <Closeup
             key={r.id}
             region={r}
-            label={regionLabel(scene.regions, r.id)}
-            colour={regionStyle(scene.regions, r.id)}
+            label={regionLabel(scene.regions, r.id, look.firstLetter)}
+            colour={regionStyle(scene.regions, r.id, look)}
             step={firstStep(r.id)}
             image={image}
             frameWidth={scene.frames.width}

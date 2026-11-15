@@ -11,7 +11,8 @@
 .globe-dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--sm); margin: 0; }
 .globe-dl dd { margin: 0; }
 .globe-json { margin: 0; padding: var(--xs); border: 1px solid var(--rule); border-radius: var(--r); font: 400 0.85rem/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; user-select: all; }
-button[aria-pressed='true'] { background: var(--signal); color: var(--ink); border-color: var(--ink); }
+/* Pressed = ink fill, paper text (DESIGN.md Buttons); red-orange with ink text failed contrast (2.92:1). */
+button[aria-pressed='true'] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 /* Zoom buttons over the top-right corner of the globe: paper keys with an ink border (DESIGN.md buttons). */
 .globe-zoom { position: absolute; top: var(--sm); right: var(--sm); display: grid; gap: 6px; }
 .globe-zoom button { min-height: 44px; min-width: 44px; padding: 0; display: grid; place-items: center; text-align: center; background: var(--paper); font-size: 1.4rem; }

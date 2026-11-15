@@ -63,6 +63,24 @@ be clear at a glance: **more buttons, less text, and every visual explains itsel
 
 ## Decided
 
+### Layout change after seeing it live (Dev B, 15 Nov)
+
+The left rail is replaced. Dev B saw the live app: the page links didn't read as navigation, the
+rail left large blank areas, phones scrolled past every control before reaching the picture, and
+the control buttons didn't read as one player. Approved replacement:
+- **Tabs:** a sticky top bar with the title, four real tabs (icon plus word) and the theme switch.
+  On phones (640px and below) the tabs move to a fixed bottom bar, like an app.
+- **Player bar:** Play, Stop (with a visible "Esc" hint), Replay, the beat timeline, Explain and
+  Sound in one framed bar under the picture, like a music player. On phones it sticks above the tabs.
+- **Less scrolling:** Listen fits one desktop screen (1440 x 900). The picture is capped to the
+  screen height. The view heading stays as a focus target, but is visually hidden because the tab
+  already says where you are.
+- **Tab order follows the screen:** tabs, theme switch, picture choice, region choice, then Play.
+- Every published page has a way back to the app, and none is a dead end (`globe.html`, the quiz
+  player). Each page gets a keyboard and screen-reader check.
+
+The rail-based bullets below are superseded where they conflict.
+
 ### Views and navigation
 
 - The hash picks the view. No hash or an unknown hash shows Listen. Links are real `<a href="#compare">`.

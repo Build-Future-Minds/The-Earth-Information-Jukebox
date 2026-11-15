@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { buildEarthTrack } from '../audio/earthVoice';
 import type { PlayState } from '../audio/transport';
 import type { Features, Region } from '../data/types';
-import { regionLabel, regionStyle } from './ExploreControls';
+import { regionLabel, regionStyle, type RegionLook } from './ExploreControls';
 
 interface Props {
   features: Features;
@@ -14,12 +14,14 @@ interface Props {
   activeRegionId: string;
   playState: PlayState;
   getPosition: () => number;
+  /** First letter and neutral style of this picture's regions. */
+  look?: RegionLook;
 }
 
 const U = 20;
 const ROW_H = 40;
 
-export function RhythmsPlot({ features, regions, activeRegionId, playState, getPosition }: Props) {
+export function RhythmsPlot({ features, regions, activeRegionId, playState, getPosition, look = {} }: Props) {
   // The playing position, in model frames, for the marker across the tide curves.
   const [pos, setPos] = useState<number | null>(null);
   useEffect(() => {
@@ -86,8 +88,8 @@ export function RhythmsPlot({ features, regions, activeRegionId, playState, getP
             return (
               <tr key={region.id} className={region.id === activeRegionId ? 'current' : undefined}>
                 <th scope="row">
-                  <span className="region-badge" aria-hidden="true" style={regionStyle(regions, region.id)}>
-                    {regionLabel(regions, region.id).replace('Region ', '')}
+                  <span className="region-badge" aria-hidden="true" style={regionStyle(regions, region.id, look)}>
+                    {regionLabel(regions, region.id, look.firstLetter).replace('Region ', '')}
                   </span>
                   {region.name}
                 </th>
@@ -105,7 +107,7 @@ export function RhythmsPlot({ features, regions, activeRegionId, playState, getP
           viewBox={`-34 -8 ${CW + 42 + LABEL} ${CH + 30}`}
           role="img"
           aria-label={`Alignment over ${frames} model frames. ${series
-            .map((x) => `${regionLabel(regions, x.region.id)} from ${fmt(x.lo)} to ${fmt(x.hi)}`)
+            .map((x) => `${regionLabel(regions, x.region.id, look.firstLetter)} from ${fmt(x.lo)} to ${fmt(x.hi)}`)
             .join('; ')}.`}
         >
           {[0, 0.5, 1].map((a) => (
@@ -117,9 +119,9 @@ export function RhythmsPlot({ features, regions, activeRegionId, playState, getP
           {series.map((x) => {
             // Each curve is named at its right end (letter and last value), so colour is never the only cue.
             const lastOk = [...x.steps].reverse().find((st) => st.status === 'ok');
-            const letter = regionLabel(regions, x.region.id).replace('Region ', '');
+            const letter = regionLabel(regions, x.region.id, look.firstLetter).replace('Region ', '');
             return (
-              <g key={x.region.id} style={regionStyle(regions, x.region.id)}>
+              <g key={x.region.id} style={regionStyle(regions, x.region.id, look)}>
                 <path className="tide-curve" d={curve(x.steps)} />
                 {lastOk && lastOk.status === 'ok' && (
                   <text className="tide-end" x={CW + 10} y={cy(lastOk.alignment) + 5}>
@@ -140,14 +142,14 @@ export function RhythmsPlot({ features, regions, activeRegionId, playState, getP
 
       <p>Grey second-pulse marks nearer the middle of the beat mean a more even pulse.</p>
       {tracks.map(({ region, track }) => {
-        const label = regionLabel(regions, region.id);
+        const label = regionLabel(regions, region.id, look.firstLetter);
         const split = meanSplit(region.id);
         const missing = track.steps.filter((s) => s.events.length === 0).length;
         return (
           <div
             key={region.id}
             className={region.id === activeRegionId ? 'plot-row current' : 'plot-row'}
-            style={regionStyle(regions, region.id)}
+            style={regionStyle(regions, region.id, look)}
           >
             <b>{label}</b>
             <svg

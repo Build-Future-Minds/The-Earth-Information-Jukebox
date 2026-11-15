@@ -39,6 +39,11 @@ function startOf(source: GlobeSource) {
   return { lon, lat, radius: r.radius_px };
 }
 
+/** Every published page has a way back to the app (Dev B, 15 Nov); globe.html sits next to index.html. */
+function BackLink() {
+  return <a className="back" href="./">← Back to Earth Sonata</a>;
+}
+
 export function GlobePage() {
   const [sourceKey, setSourceKey] = useState(GLOBE_SOURCES[0].key);
   const source = GLOBE_SOURCES.find((s) => s.key === sourceKey) ?? GLOBE_SOURCES[0];
@@ -106,6 +111,7 @@ export function GlobePage() {
   if (!imageUrl) {
     return (
       <main className="stage">
+        <BackLink />
         <p>The globe needs the real NASA picture: add <code>data/preview.jpg</code>, <code>data/scene.json</code> and <code>data/features.json</code> (see data/README.md).</p>
       </main>
     );
@@ -115,6 +121,7 @@ export function GlobePage() {
     <div className="layout">
       <aside className="rail" aria-label="Spotlight controls">
         <div>
+          <BackLink />
           <p className="readout">PROTOTYPE · not in the app yet</p>
           <h1>Globe spotlight</h1>
         </div>

@@ -210,6 +210,13 @@ What moves where in this task: Listen gets SceneView, NowPlaying, BeatTrack and 
 - [ ] **Step 4: Browser test** `clicking a circle on the picture selects that region` (practice data).
 - [ ] **Step 5: Run** everything and the build. **Commit and open PR.**
 
+### Task 6b: Tabs and player bar (layout change, Dev B 15 Nov)
+
+**Files:** `web/src/App.tsx`, `web/src/components/PageLinks.tsx` (tabs with icons), `web/src/components/ExploreControls.tsx` (split into `PlayerBar` and `RegionChoice`), `web/src/views/ListenView.tsx`, `web/src/styles.css`, `DESIGN.md` (Layout, Page links, Tab order), `web/e2e/layout.e2e.ts`.
+
+- [ ] Browser tests first: `page links are tabs with icons`; `Listen fits one screen at 1440x900` (scrollHeight <= innerHeight + 2); `on a phone the tabs sit at the bottom` (390x844: nav bottom >= 840); `on a phone the picture starts on the first screen` (picture top < 500); `the player bar holds the controls and the timeline`; `Stop shows its Esc hint`; Tab order updated to tabs, theme, region, then Play.
+- [ ] Implement, update the existing tests' Tab order, run everything, commit, open PR.
+
 ### Task 7: Dates under the beats, trimmed Explain
 
 **Files:**
@@ -257,6 +264,11 @@ Content, in order:
 
 - [ ] **Step 1: Browser tests**: `Play along has its own Earth Play and the melody keys`; `no link to the quiz player in the app`; `the globe loads only on Play along` (no globe chunk requested on `#listen`; on `#play` a canvas named "Globe of…" appears).
 - [ ] **Step 2: Run.** FAIL. **Step 3: Implement.** **Step 4: Run** everything and the build; check that the main JS chunk does not grow by the globe's size. **Step 5: Commit and open PR.**
+
+### Task 11b: No dead ends; accessibility on every page
+
+- [ ] `globe.html` and the quiz player get a "← Back to Earth Sonata" link (the listening game has one).
+- [ ] Keyboard and screen-reader check of every published page (app views, globe, listening game, quiz player): every control has a name, the focus order follows the screen, and nothing is reachable only by mouse. Fix what fails, each fix with a test.
 
 ### Task 11: Final pass
 
