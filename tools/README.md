@@ -71,21 +71,21 @@ limiter keeps two sounds from clipping (one sound at the default volume is uncha
 listening test, note that layering the mystery sound with its own patch makes the two line up exactly
 in Rhythm only mode, which gives the answer away by ear.
 
-**Musical sound** (on by default): the sound becomes a short piano piece. The patch's notes are the
-melody (right hand); timing, pitch and note length still come from the patch exactly as before.
+**Musical sound** (on by default): the sound becomes a short piece of music. The patch's notes are
+the melody; timing, pitch and note length still come from the patch exactly as before.
 
-- **The piano** is made in the browser, no samples: a tone with a piano's overtones on two strings
-  tuned a hair apart, a felt-hammer knock, brightness that mellows as the note rings, and a natural
-  fade (low notes ring longer). When a note's length is up, the damper stops it in about 0.2 s, so
-  the length is still heard. Louder notes are brighter; low notes sit left, high notes right.
-- **The left hand** plays C, Am7, Fmaj7, Gsus and home to C, two beats a chord (one 10-beat phrase).
-  Every chord uses only the melody's notes (C, D, E, G, A), so the melody never clashes with it, and
-  each chord moves to the next by the smallest step, so the harmony flows. On the first beat of a
-  chord the bass sounds with it; on the second the chord is touched again, softly; the pedal holds
-  each chord into the next. Two sounds share one left hand: a sound that joins extends it.
-- **It gives nothing away and does not blur the timing.** The left hand is the same for every patch
-  and starts notes only on the beat, where the melody's first note already is (checked by logging
-  every scheduled start: none of the left hand's falls between beats). It sits about 4 dB under the
+- **The sound** is made in the browser, no samples: a warm, struck tone with rich overtones on two
+  strings tuned a hair apart, a soft knock at the start, brightness that mellows as the note rings,
+  and a natural fade (low notes ring longer). When a note's length is up, it is stopped in about
+  0.2 s, so the length is still heard. Louder notes are brighter; low notes sit left, high notes right.
+- **The chords** move C, Am7, Fmaj7, Gsus and home to C, two beats a chord (one 10-beat phrase).
+  Every chord uses only the melody's notes (C, D, E, G, A), so the melody never clashes with them,
+  and each chord moves to the next by the smallest step, so the harmony flows. On the first beat of a
+  chord a bass note sounds with it; on the second the chord sounds again, softly; each chord is held
+  into the next. Two sounds share one set of chords: a sound that joins extends them.
+- **It gives nothing away and does not blur the timing.** The chords are the same for every patch
+  and start only on the beat, where the melody's first note already is (checked by logging every
+  scheduled start: none of the chords' starts falls between beats). They sit about 4 dB under the
   melody. One sound peaks at 0.90 of full scale, two layered at 0.99.
 
 Switch it off for the plain test tone, the strict setting for a real listening test.

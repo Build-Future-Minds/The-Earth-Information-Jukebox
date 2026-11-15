@@ -245,7 +245,7 @@
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="musical" checked> Musical sound</label>
-      <p class="hint-note">On: a piano. The patch's notes are the melody; the left hand plays chords that flow into each other (C, Am7, Fmaj7, Gsus, home to C) on the beat. The left hand is the same for every patch, so it gives nothing away. Off: the plain test tone, for a strict listening test.</p>
+      <p class="hint-note">On: the sound becomes a short piece of music. The patch's notes are the melody, over chords that flow into each other on the beat. The chords are the same for every patch, so they give nothing away. Off: the plain test tone, for a strict listening test.</p>
     </div>
     <div class="axis">
       <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
@@ -593,10 +593,10 @@
     plainPulse(t, hz, peak, length, bin);
   }
 
-  // ---------- piano (Musical sound) ----------
-  // A piano note, made in the browser: a tone with a piano's mix of overtones, played on two strings
-  // tuned a hair apart (the slow shimmer of a real piano), struck by a felt hammer (a short knock),
-  // bright at first and mellowing as it rings, and fading on its own the way a piano string does.
+  // ---------- the music's tone (Musical sound) ----------
+  // One note, made in the browser: a warm, struck tone with rich overtones, played on two strings
+  // tuned a hair apart (a slow shimmer), struck softly (a short knock),
+  // bright at first and mellowing as it rings, and fading on its own the way a struck string does.
   // Low notes ring longer than high ones. When the key is let go, the damper stops it in about a
   // fifth of a second, so the note's length is still heard. Louder notes are also brighter.
   let pianoWave = null, hammerNoise = null;
@@ -640,13 +640,13 @@
     bin.push(knock);
   }
 
-  // The melody: the patch's own notes, on the piano. Timing, pitch and length are unchanged.
+  // The melody: the patch's own notes. Timing, pitch and length are unchanged.
   function musicalPulse(t, hz, peak, length, bin) {
     pianoNote(t, hz, peak, length, master, bin, 0.07);
   }
 
-  // ---------- the left hand (Musical sound) ----------
-  // Under the melody, the piano's left hand plays a short phrase: C, Am7, Fmaj7, Gsus and home to C,
+  // ---------- the chords (Musical sound) ----------
+  // Under the melody, chords play a short phrase: C, Am7, Fmaj7, Gsus and home to C,
   // two beats each (10 beats). Every chord is built only from the melody's own notes (C, D, E, G, A),
   // so no melody note ever clashes with it, and each chord moves to the next by the smallest step
   // (C to Am7 keeps all three notes, then one note moves at a time), so the harmony flows instead of
@@ -654,7 +654,7 @@
   // the chord is touched again, softly. The sustain pedal holds each chord until the next one, so
   // they connect. Everything lands on the beat, where the melody's first note already is, so it never
   // blurs where the second note falls; it is the same for every patch, so it carries no answer.
-  // One left hand is shared by all sounds playing: a sound that joins extends it.
+  // One set of chords is shared by all sounds playing: a sound that joins extends it.
   const PHRASE = ["C", "C", "Am7", "Am7", "Fmaj7", "Fmaj7", "Gsus", "Gsus", "C", "C"];
   const CHORDS = {
     C:     { bass: 65.41, chord: [196.00, 261.63, 329.63] },   // C2;  G3 C4 E4
@@ -664,7 +664,7 @@
   };
   let band = null;   // { start, beat, upTo: beats scheduled so far, bus, sources }
 
-  // Schedules the left hand's beats up to `until` (audio time), continuing the phrase where it left off.
+  // Schedules the chords' beats up to `until` (audio time), continuing the phrase where it left off.
   function bandExtend(until) {
     const last = Math.ceil((until - band.start) / band.beat - 1e-6);
     for (let b = band.upTo; b < last; b++) {
@@ -683,7 +683,7 @@
     band.upTo = Math.max(band.upTo, last);
   }
 
-  // A sound starting from silence starts a new left hand on its beat; a sound joining one already
+  // A sound starting from silence starts new chords on its beat; a sound joining one already
   // playing keeps it going until it ends too.
   function bandFor(v, joined) {
     if (!musical()) return;
