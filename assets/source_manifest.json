@@ -87,6 +87,7 @@
       "url": "https://svs.gsfc.nasa.gov/5669/",
       "title": "GEOS Aerosols (2025)",
       "role": "second source (approved by Dev A, 15 Nov), one still",
+      "eic_gallery": "Not in the Earth Information Center gallery (checked 2026-11-15: the gallery does not list 5669, and the 5669 page links to no gallery). Listed as 'GEOS Aerosols' in the challenge's resource list, separate from the EIC Content Database item. TO CONFIRM (Mr. E): the challenge page's GEOS Aerosols link goes to svs.gsfc.nasa.gov/5669. Do not call it EIC data.",
       "media_kind": "still image",
       "data_kind": "model_output",
       "model_or_instrument": "GEOS-FP 2Km Replay (NASA GMAO)",
