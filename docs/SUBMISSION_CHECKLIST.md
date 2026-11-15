@@ -32,7 +32,7 @@ Write what you find here, with the link, and tell the team if anything changes t
 | Link to final project | Public GitHub repo URL |
 | Link to demo | Public 30-second video (or 7 slides) |
 | Detailed description | From README + docs/mapping_spec.md, including limitations |
-| Tools, languages, hardware | Python, NumPy, OpenCV, TypeScript, React, Vite, Tone.js, Web MIDI, MIDI piano (optional) |
+| Tools, languages, hardware | Python, NumPy, OpenCV, TypeScript, React, Vite, Tone.js. No hardware: the MIDI piano is not in the final demo, and the app does not use Web MIDI (see the project page's tools section) |
 | NASA data used | SVS 3912 (ECCO2 model visualization); others only if actually used |
 | Use of AI | Paste summary from `AI_USE.md` |
 | References | From `assets/source_manifest.json` + library list |
