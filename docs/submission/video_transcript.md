@@ -15,7 +15,7 @@ one beat a second.
       Caption: Earth Sonata: hear two regions of one NASA ocean image
 
 0:04  [Picture: Start is pressed with the keyboard. Region A is selected.
-      Sound: Region A's rhythm. Two pulses each beat, the second one late in the beat: short–long.]
+      Sound: Region A's rhythm. Two pulses each beat, the second one late in the beat: long–short.]
       Caption: Region A: lines run in many directions — the less even pulse
 
 0:11  [Picture: the Region choice changes to Region B with the keyboard.

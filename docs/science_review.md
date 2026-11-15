@@ -31,7 +31,7 @@ m², no smoothing. Derivations are in `math_notes.md`.
 ## 1. Named test cases
 
 `long_fraction` is the share of the beat before the second pulse: 0.5 is even, 0.75 is the
-strongest short–long.
+strongest long–short.
 
 <!-- table:spec_cases -->
 ### Named test cases
@@ -43,8 +43,8 @@ Expected: See the 'expected' column; the rule is long_fraction = 0.75 - 0.25 * a
 | Aligned: parallel horizontal lines | near 1; even pulses | ok | 1.0 | - | 0.45 | 0.5 | yes |
 | Aligned: parallel diagonal lines (45 deg) | near 1; even pulses | ok | 1.0 | - | 0.408 | 0.5 | yes |
 | Aligned: parallel short dashes (40 px) | high, below 1: dash ends are edges too | ok | 0.9209 | - | 0.422 | 0.5198 | yes |
-| Mixed: horizontal and vertical lines, equal areas | near 0; strong short-long | ok | 0.0 | - | 0.474 | 0.75 | yes |
-| Mixed: dashes at random angles | near 0 (about 0.89/sqrt(n)); strong short-long | ok | 0.0892 | - | 0.422 | 0.7277 | yes |
+| Mixed: horizontal and vertical lines, equal areas | near 0; strong long-short | ok | 0.0 | - | 0.474 | 0.75 | yes |
+| Mixed: dashes at random angles | near 0 (about 0.89/sqrt(n)); strong long-short | ok | 0.0892 | - | 0.422 | 0.7277 | yes |
 | Reversed: parallel lines turned 180 deg | same as aligned (1.0000) | ok | 1.0 | - | 0.45 | 0.5 | yes |
 | Blank image | missing with a reason; no pulses | missing | missing | too_few_edges | 0.0 | missing | yes |
 | Masked: everything excluded | missing with a reason; no pulses | missing | missing | all_masked | 0.0 | missing | yes |

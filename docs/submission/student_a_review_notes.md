@@ -30,7 +30,7 @@ second of playback, and each region has its own steps.
 | File | `flat_global_ecco2_2028x1024.23068.tif` | same file |
 | Model time | `timestamps[17]` = **2007-03-28T10:10Z** (matches line `23068` of the dates file) | same |
 | Circle | centre [1872, 348], radius 61 | centre [271, 504], radius 61 |
-| Second pulse | 0.735 of the beat: strong short–long | 0.584 of the beat: closer to even |
+| Second pulse | 0.735 of the beat: strong long–short | 0.584 of the beat: closer to even |
 
 Checked on 14 Nov 2026: both regions have 30 steps, all `ok`.
 

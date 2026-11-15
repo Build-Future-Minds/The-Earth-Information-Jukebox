@@ -12,7 +12,7 @@ Firefox, with sound on. Nothing plays until you press Start.
 
 1. **Start and listen.** Press `Tab` until you reach **Start**, then press `Enter`. You hear
    Region A, the Kuroshio eddies east of Japan: one beat a second, two pulses a beat. Its pulse is
-   short–long.
+   long–short.
 2. **Compare.** Press `Tab` to reach the **Region** choice, then press `2` (or the down arrow) for
    Region B, streaks in the Equatorial Pacific. It carries on from the same moment, so you can hear
    the two a few seconds apart. Its pulse is more even. Press `1` to go back.
