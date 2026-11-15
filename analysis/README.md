@@ -25,6 +25,7 @@ pip install -r requirements.txt
 | `python features.py --scene practice/scene.practice.json --out practice/features.practice.json --rhythm-out practice/rhythm_reference.practice.json` | Measures a scene and writes `features.json` plus the optional check file. |
 | `python run_experiments.py` | Re-measures every verification experiment, redraws `docs/figures/math/`, rewrites the tables in `docs/science_review.md`, and writes two test-tone rhythms to `out/`. |
 | `python explore_regions.py --map` | Measures the draft circles in `assets/regions_draft.json` on the NASA frames and scores every circle position in the picture. Needs `bash tools/download_frames.sh` first. Writes only to `out/`. |
+| `python make_alignment_map.py` | The globe's alignment map: the alignment of a 61 px circle centred on every point of a 16 px grid over the first ocean frame, wrapped round at the date line. Writes `../data/alignment_map.json` (`contracts/alignment-map.schema.json`) and checks it equals `features.json` at both region centres. Needs the frames. |
 
 SVS 3912's frame files are numbered 23000, 23004, …. `prepare_scene.py` writes that into
 `scene.json` (`frames.first_index`, `frames.index_step`), so `features.py` needs no extra flags.
