@@ -173,6 +173,12 @@
         ],
         "createdAt": "2026-11-14T20:19:21.295Z",
         "reason": "Claude decided: spent decision-round sketch drawn before DESIGN.md existed; git-ignored, not shipping"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "hyperlegible next\",sans-serif",
+        "createdAt": "2026-11-15T19:24:41.959Z",
+        "reason": "Claude: this is Atkinson Hyperlegible Next, the face DESIGN.md already declares; the detector misreads the quoted stack"
       }
     ]
   }

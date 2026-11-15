@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 // Owner: Student B (v1 by Dev B — refine wording, order and labels; review together).
 // Real <button>s and form controls only, so everything works with Tab / Enter / Space.
 import type { Region } from '../data/types';
@@ -21,6 +22,17 @@ interface Props {
 }
 
 export const SPEEDS = [0.5, 0.75, 1, 1.25];
+
+/** A region's colour token: Region A violet, Region B rose (styles.css). */
+export function regionColour(regions: Region[], id: string): string {
+  const i = regions.findIndex((r) => r.id === id);
+  return i === 0 ? 'var(--region-a)' : i === 1 ? 'var(--region-b)' : 'var(--ink)';
+}
+
+/** Sets the --region custom property that the region's marks and badge read. */
+export function regionStyle(regions: Region[], id: string): CSSProperties {
+  return { ['--region' as string]: regionColour(regions, id) } as CSSProperties;
+}
 
 /** "Region A". Letters start at the source's first letter (aerosols: C), so pictures never share one. */
 export function regionLabel(regions: Region[], id: string, firstLetter = 'A'): string {
@@ -58,6 +70,9 @@ export function ExploreControls(p: Props) {
               checked={p.regionId === r.id}
               onChange={() => p.onRegion(r.id)}
             />
+            <span className="region-badge" aria-hidden="true" style={regionStyle(p.regions, r.id)}>
+              {String.fromCharCode(65 + p.regions.indexOf(r))}
+            </span>
             {regionLabel(p.regions, r.id)}: {r.name}
             <kbd aria-hidden="true">{p.regions.indexOf(r) + 1}</kbd>
           </label>

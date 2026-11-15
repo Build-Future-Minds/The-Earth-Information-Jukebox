@@ -1,4 +1,4 @@
-// The measurement behind the rhythm sounding now, in Student B's "Axis Specimen" style (DESIGN.md):
+// The measurement behind the rhythm sounding now (DESIGN.md, "Tide Table"):
 // the alignment number's font weight is the value itself (200 = every which way, 800 = all one way).
 // Visual only: the status line and "Explain this rhythm" give screen readers the same facts.
 import type { TrackStep } from '../audio/earthVoice';
@@ -14,13 +14,14 @@ export const weightFor = (alignment: number) => Math.round(200 + 600 * Math.min(
 export function NowPlaying({ step, regionLabel }: Props) {
   const why = step?.events[0]?.why;
   const missing = step?.step.status === 'missing';
+  if (!step) return null;
   return (
     <div className="now-playing" aria-hidden="true">
       <span className="np-value" style={{ fontWeight: why ? weightFor(why.alignment) : 500 }}>
-        {why ? why.alignment.toFixed(2) : '–'}
+        {why ? why.alignment.toFixed(2) : 'no value'}
       </span>
       <span className="np-readout">
-        <span>{step ? regionLabel : 'Not playing'} · alignment</span>
+        <span>{regionLabel} · alignment</span>
         <span>
           {why
             ? `second pulse at ${Math.round(why.long_fraction * 100)}% of the beat · wght ${weightFor(why.alignment)}`
