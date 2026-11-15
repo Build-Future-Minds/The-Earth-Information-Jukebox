@@ -88,11 +88,16 @@ the melody; timing, pitch and note length still come from the patch exactly as b
   yet whether they hide the spacing, so use Musical sound for practice and the quiz player for the
   real test. The chords start where the melody's first note already is (checked by logging every
   scheduled start: none of the chords' starts falls between beats). They sit about 4 dB under the
-  melody. One sound peaks at 0.90 of full scale, two layered at 0.99.
+  melody. One sound peaked at 0.90 of full scale, two layered at 0.99 (measured before the loudness
+  balance below; not measured again since).
 
-- **Instrument:** Piano (default), Marimba, Music box or Soft synth, for the melody and the chords.
-  All are made in the browser by our own code, no recordings. Each still stops at the end of the
-  note's length, so length is still heard.
+- **Instruments (fixed, all playing together):** melody on piano with a quiet music box on the same
+  notes; bass on piano over a soft synth; chords on piano with a soft synth pad on the first beat and
+  a light marimba tap on the second. All are made in the browser by our own code, no recordings or
+  AI-generated audio. Each still stops at the end of the note's length, so length is still heard.
+- **Loudness balance:** the melody's level follows its pitch (×1.6 at C3, 1 at G4, ×0.5 at C7), so
+  low notes are easier to hear and high notes are not too loud. Low piano notes also keep more
+  overtones so small speakers can play them.
 - **Background:** under the chords, a soft held pad of the same chord swells in on the beat and fades
   into the next one. It makes no new notes between beats.
 - **Keep the music playing** (on): after a sound ends, the chords and pad roll on, two beats at a

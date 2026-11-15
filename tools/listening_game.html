@@ -23,9 +23,10 @@
   speed 1, pulses at 0 and long_fraction × beat, long_fraction = 0.75 − 0.25 × A.
   Pitch (this game's choice, Student B; the team rule in docs/mapping_spec.md keeps pitch fixed
   until Dev A decides): alignment, stretched across this image's measured range, picks a base note
-  from E3 to C6 on a C pentatonic scale (C3 to C7). The second pulse of each beat sits two scale
-  steps higher. Swirly patches jump up to 4 steps away from the base on each note and are held for
-  a random 8 to 58 % of the gap; lined-up patches stay on the base note and are held for 95 %.
+  from E3 to C6 on a C pentatonic scale (C3 to C7). From there every patch plays the same short
+  tune (TUNE), with the first note of each beat moved onto the chord playing then. Swirly patches
+  leap up to 4 steps away from the tune on each note and are held for a random 8 to 58 % of the
+  gap; lined-up patches play the tune smoothly and hold each note for 95 %.
   The jumps are seeded by the patch position, so a patch always sounds the same. 10 beats.
 
   Run from the repository folder:  python -m http.server 8000 --bind 127.0.0.1
@@ -92,7 +93,11 @@
   h1 { font-size: 1.9rem; font-weight: 750; line-height: 1.1; letter-spacing: -0.015em; margin: 0; }
   .lede { margin: 8px 0 0; color: var(--ink-2); font-size: 1rem; text-wrap: pretty; }
   /* The map sits in a sea-chart frame: an ink neatline, ticks every 30 degrees, labels every 60. */
-  .chart { position: relative; margin: 18px 0 0 34px; border: 1px solid var(--ink); }
+  /* Centred in the main column, large enough to read the patch boxes; side padding leaves room for the labels. */
+  .map-block { width: 100%; max-width: 1000px; margin: 0 auto; padding: 0 34px; }
+  @media (max-width: 640px) { .map-block { padding: 0 0 0 34px; } }
+  .map-block .credit { margin: 8px 0 0; }
+  .chart { position: relative; margin: 18px 0 0; border: 1px solid var(--ink); }
   .map { position: relative; margin: 0; background: var(--well); overflow: hidden; }
   .map img { display: block; width: 100%; height: auto; }
   .graticule { position: absolute; inset: 0; pointer-events: none; font: 400 0.65rem/1 var(--mono); color: var(--ink-2); }
@@ -185,6 +190,11 @@
   .patch { margin: 0; min-width: 0; }
   .patch canvas { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; border-radius: 4px;
                   background: var(--well); }
+  /* The visualizer: a transparent canvas over each patch, and a play line inside each map box. */
+  .stage { position: relative; }
+  .patch canvas.viz { position: absolute; inset: 0; height: 100%; background: transparent; pointer-events: none; }
+  .box .sweep { position: absolute; top: 0; bottom: 0; left: 0; width: 3px; margin-left: -1.5px;
+                background: var(--signal); outline: 1px solid #000; }
   .numeral { display: block; font: 500 clamp(4.5rem, 10vw, 9rem)/0.78 var(--sans); letter-spacing: -0.04em;
              margin: -0.32em 0 0 0.06em; position: relative; color: var(--slot, var(--ink));
              -webkit-text-stroke: 0.06em var(--paper); paint-order: stroke fill; transition: font-weight var(--snap); }
@@ -256,23 +266,12 @@
 </head>
 <body>
 <div class="app">
-  <aside class="rail rail-top" aria-label="Map and playback">
+  <aside class="rail rail-top" aria-label="Playback">
     <div>
       <a class="back" href="../">← Back to Earth Sonata</a>
       <h1>Which patch made this rhythm?</h1>
       <p class="lede">Hear a sound, pick the patch that made it.</p>
     </div>
-
-    <div class="chart">
-    <figure class="map" id="mapFigure">
-      <img id="world" src="../assets/frames/svs3912/flat_global_ecco2_2028x1024.25000.jpg"
-           alt="NASA visualization of global sea surface currents, coloured by modelled temperature: blue cold, green mild, yellow and red warm.">
-      <div class="box" id="box0" hidden aria-hidden="true"><span>1</span></div>
-      <div class="box" id="box1" hidden aria-hidden="true"><span>2</span></div>
-    </figure>
-      <div class="graticule" aria-hidden="true"><span class="g-lon" style="left:8.333%"></span><span class="g-lon" style="left:16.67%"><b>120°W</b></span><span class="g-lon" style="left:25%"></span><span class="g-lon" style="left:33.33%"><b>60°W</b></span><span class="g-lon" style="left:41.67%"></span><span class="g-lon" style="left:50%"><b>0°</b></span><span class="g-lon" style="left:58.33%"></span><span class="g-lon" style="left:66.67%"><b>60°E</b></span><span class="g-lon" style="left:75%"></span><span class="g-lon" style="left:83.33%"><b>120°E</b></span><span class="g-lon" style="left:91.67%"></span><span class="g-lat" style="top:16.67%"><b>60°N</b></span><span class="g-lat" style="top:33.33%"></span><span class="g-lat" style="top:50%"><b>0°</b></span><span class="g-lat" style="top:66.67%"></span><span class="g-lat" style="top:83.33%"><b>60°S</b></span></div>
-    </div>
-    <p class="credit" style="margin-top:-14px">NASA SVS <a href="https://svs.gsfc.nasa.gov/3912">3912</a>, ECCO2 model, not a photo.</p>
 
     <div class="actions">
       <button class="primary" id="newRound" disabled>New round <kbd>P</kbd></button>
@@ -303,13 +302,6 @@
       <p class="hint-note">Off for a strict test.</p>
     </div>
     <div class="axis">
-      <label for="instrument">Instrument</label>
-      <select id="instrument">
-        <option value="piano" selected>Piano</option>
-        <option value="marimba">Marimba</option>
-        <option value="bells">Music box</option>
-        <option value="synth">Soft synth</option>
-      </select>
       <label class="switch"><input type="checkbox" id="keepMusic" checked> Keep the music playing</label>
       <p class="hint-note">With Musical sound on. Stop or Esc ends it.</p>
     </div>
@@ -359,6 +351,19 @@
     <p class="status" id="status" aria-live="polite">Measuring the NASA image…</p>
     <p class="sub" id="sub"></p>
 
+    <div class="map-block">
+    <div class="chart">
+    <figure class="map" id="mapFigure">
+      <img id="world" src="../assets/frames/svs3912/flat_global_ecco2_2028x1024.25000.jpg"
+           alt="NASA visualization of global sea surface currents, coloured by modelled temperature: blue cold, green mild, yellow and red warm.">
+      <div class="box" id="box0" hidden aria-hidden="true"><span>1</span><i class="sweep" id="sweep0" hidden></i></div>
+      <div class="box" id="box1" hidden aria-hidden="true"><span>2</span><i class="sweep" id="sweep1" hidden></i></div>
+    </figure>
+      <div class="graticule" aria-hidden="true"><span class="g-lon" style="left:8.333%"></span><span class="g-lon" style="left:16.67%"><b>120°W</b></span><span class="g-lon" style="left:25%"></span><span class="g-lon" style="left:33.33%"><b>60°W</b></span><span class="g-lon" style="left:41.67%"></span><span class="g-lon" style="left:50%"><b>0°</b></span><span class="g-lon" style="left:58.33%"></span><span class="g-lon" style="left:66.67%"><b>60°E</b></span><span class="g-lon" style="left:75%"></span><span class="g-lon" style="left:83.33%"><b>120°E</b></span><span class="g-lon" style="left:91.67%"></span><span class="g-lat" style="top:16.67%"><b>60°N</b></span><span class="g-lat" style="top:33.33%"></span><span class="g-lat" style="top:50%"><b>0°</b></span><span class="g-lat" style="top:66.67%"></span><span class="g-lat" style="top:83.33%"><b>60°S</b></span></div>
+    </div>
+    <p class="credit">NASA SVS <a href="https://svs.gsfc.nasa.gov/3912">3912</a>, ECCO2 model, not a photo.</p>
+    </div>
+
     <div class="intro">
       <div>
         <p>White ticks show which way the current streaks run. The sound comes from how much they agree.</p>
@@ -371,7 +376,7 @@
 
     <div class="pair" id="pair">
       <figure class="patch" id="patch0">
-        <canvas id="canvas0" width="576" height="360" role="img" aria-label="Patch 1, not chosen yet."></canvas>
+        <div class="stage"><canvas id="canvas0" width="576" height="360" role="img" aria-label="Patch 1, not chosen yet."></canvas><canvas class="viz" id="viz0" width="576" height="360" aria-hidden="true"></canvas></div>
         <span class="numeral" id="num0" aria-hidden="true">1</span>
         <div class="readout"><span id="align0"></span><span id="wght0"></span></div>
         <button class="hear" id="hear0" disabled aria-label="Hear what patch 1 sounds like">Hear patch 1 <kbd>Q</kbd></button>
@@ -379,7 +384,7 @@
         <p class="where" id="where0"></p>
       </figure>
       <figure class="patch" id="patch1">
-        <canvas id="canvas1" width="576" height="360" role="img" aria-label="Patch 2, not chosen yet."></canvas>
+        <div class="stage"><canvas id="canvas1" width="576" height="360" role="img" aria-label="Patch 2, not chosen yet."></canvas><canvas class="viz" id="viz1" width="576" height="360" aria-hidden="true"></canvas></div>
         <span class="numeral" id="num1" aria-hidden="true">2</span>
         <div class="readout"><span id="align1"></span><span id="wght1"></span></div>
         <button class="hear" id="hear1" disabled aria-label="Hear what patch 2 sounds like">Hear patch 2 <kbd>W</kbd></button>
@@ -473,15 +478,33 @@
   // round is a different take of the patch's sound than the "Hear patch" button plays, so matching
   // them means recognising how the patch sounds, not just spotting an identical copy.
   // Rhythm-only mode drops pitch and length: every patch plays the same two notes at one length.
-  function notesFor(p, variant = 0) {
+  //
+  // The tune: every patch plays the same short melody, in scale steps above its base note, so it
+  // sounds like music rather than random notes. It rises, peaks over the F chord and comes home.
+  // The first note of each beat is moved to the nearest note of the chord playing then (PHRASE), so
+  // the melody always agrees with the chords, and the last note resolves. Swirly patches still leap
+  // away from the tune and stop short; lined-up patches play it smoothly. `phase` is where in the
+  // chord phrase the sound starts (a sound joining the music mid-phrase).
+  const TUNE = [[0, 1], [2, 1], [0, -1], [0, 2], [1, 2], [3, 2], [1, 0], [-1, 0], [1, 0], [0, 0]];
+  const CHORD_TONES = { C: [0, 2, 3], Am7: [4, 0, 2, 3], Fmaj7: [4, 0, 2], Gsus: [3, 0, 1] };   // scale degrees: C D E G A = 0–4
+  function toChord(idx, chord) {
+    for (const d of [0, -1, 1, -2, 2]) {
+      const i = idx + d;
+      if (i >= 0 && i < SCALE.length && CHORD_TONES[chord].includes(i % 5)) return i;
+    }
+    return idx;
+  }
+  function notesFor(p, variant = 0, phase = 0) {
     const flat = $("rhythmOnly").checked;
     const s = spread(p.alignment), wobble = 1 - s, lf = timingFraction(p.alignment);
     const rand = seeded(p.x * 7919 + p.y * 104729 + variant * 1299721), base = noteFor(p.alignment), notes = [];
     for (let b = 0; b < BEATS; b++) {
-      [[0, lf, 0], [lf, 1 - lf, 2]].forEach(([at, gap, up], k) => {
+      const chord = PHRASE[(b + phase) % PHRASE.length];
+      [[0, lf], [lf, 1 - lf]].forEach(([at, gap], k) => {
         if (flat) { notes.push({ at: b + at, len: gap * 0.5, idx: k ? FLAT_HIGH : FLAT_LOW, second: k === 1 }); return; }
         const jump = Math.round((rand() * 2 - 1) * MAX_JUMP * wobble);
-        const idx = Math.min(SCALE.length - 1, Math.max(0, base + up + jump));
+        let idx = Math.min(SCALE.length - 1, Math.max(0, base + TUNE[b][k] + jump));
+        if (k === 0 || b === BEATS - 1) idx = toChord(idx, chord);
         const hold = Math.min(0.97, 0.95 * s + wobble * (0.08 + 0.5 * rand()));
         notes.push({ at: b + at, len: gap * hold, idx, second: k === 1 });
       });
@@ -622,6 +645,9 @@
       limiter.threshold.value = -3; limiter.knee.value = 0; limiter.ratio.value = 20;
       limiter.attack.value = 0.002; limiter.release.value = 0.1;
       master.connect(limiter).connect(ctx.destination);
+      analyser = ctx.createAnalyser(); analyser.fftSize = 1024;   // for the waveform on the patches
+      waveBuf = new Uint8Array(analyser.fftSize);
+      limiter.connect(analyser);
       roomBuffer = roomImpulse(1.8);
       roomLimiter = limiter;
       freshRoom();
@@ -648,9 +674,14 @@
   // One note. Timing, pitch and length are set by the caller from the patch's alignment; this only
   // decides what the note sounds like, the same way for every patch.
   function pulse(t, hz, peak, length, bin = loose) {
+    peak *= balance(hz);
     if (musical()) return musicalPulse(t, hz, peak, length, bin);
     plainPulse(t, hz, peak, length, bin);
   }
+
+  // Even loudness across the range: ears and laptop speakers hear low notes as quieter and high
+  // notes as louder, so low notes are lifted and high ones softened (1 at G4, ×1.6 at C3, ×0.5 at C7).
+  const balance = (hz) => Math.min(1.6, Math.max(0.5, Math.pow(392 / hz, 0.45)));
 
   // ---------- the music's tone (Musical sound) ----------
   // One note, made in the browser: a warm, struck tone with rich overtones, played on two strings
@@ -673,8 +704,9 @@
     const ring = Math.min(5, Math.max(0.6, 2.4 * Math.pow(261.63 / hz, 0.6)));   // seconds; low notes ring longer
     const tone = ctx.createBiquadFilter(), env = ctx.createGain(), pan = ctx.createStereoPanner();
     tone.type = "lowpass"; tone.Q.value = 0.4;
-    tone.frequency.setValueAtTime(Math.min(18000, hz * (5 + 12 * velocity)), t);
-    tone.frequency.setTargetAtTime(Math.min(9000, hz * 2.5 + 500), t + 0.01, 0.35);
+    // Low notes keep enough overtones to be heard on small speakers.
+    tone.frequency.setValueAtTime(Math.min(18000, Math.max(2500, hz * (5 + 12 * velocity))), t);
+    tone.frequency.setTargetAtTime(Math.min(9000, Math.max(1500, hz * 2.5 + 500)), t + 0.01, 0.35);
     env.gain.setValueAtTime(0.0001, t);
     env.gain.linearRampToValueAtTime(peak, t + 0.003);
     env.gain.setTargetAtTime(peak * 0.4, t + 0.003, 0.12);           // the quick drop after the strike
@@ -765,12 +797,13 @@
     });
   }
 
-  const INSTRUMENTS = { piano: pianoNote, marimba: marimbaNote, bells: bellNote, synth: synthNote };
-  const instrumentNote = (...args) => (INSTRUMENTS[$("instrument").value] || pianoNote)(...args);
-
-  // The melody: the patch's own notes, on the chosen instrument. Timing, pitch and length are unchanged.
+  // The band: all four instruments play together, each with its own job, and cannot be changed.
+  // Melody: piano, with a quiet music box on the same notes for sparkle. Bass: piano over a soft
+  // synth. Chords: piano and a soft synth pad on the first beat, a light marimba tap on the second.
+  // Timing, pitch and length of the patch's notes are unchanged.
   function musicalPulse(t, hz, peak, length, bin) {
-    instrumentNote(t, hz, peak, length, master, bin, 0.07);
+    pianoNote(t, hz, peak, length, master, bin, 0.07);
+    bellNote(t, hz, peak * 0.22, length, master, bin, 0.07);
   }
 
   // ---------- the chords (Musical sound) ----------
@@ -802,14 +835,15 @@
       const beats = first ? Math.min(2 - (b % 2), last - b) : 1, home = b + beats >= last;
       const held = home ? beats * band.beat + 1.5 : beats * band.beat + 0.04;   // pedal; the home chord rings
       if (first) {
-        instrumentNote(t, ch.bass * 2, 0.34, held, band.bus, band.sources, 0.12);      // bass
-        instrumentNote(t, ch.bass, 0.22, held, band.bus, band.sources, 0.12);          // and its low octave
-        ch.chord.forEach((hz) => instrumentNote(t, hz, 0.13, held, band.bus, band.sources, 0.12));
+        pianoNote(t, ch.bass * 2, 0.34, held, band.bus, band.sources, 0.12);           // bass
+        pianoNote(t, ch.bass, 0.22, held, band.bus, band.sources, 0.12);               // and its low octave
+        synthNote(t, ch.bass * 2, 0.5, beats * band.beat + 0.2, band.bus, band.sources, 0.2, 0.08, 0.12);   // warm synth under the bass
+        ch.chord.forEach((hz) => pianoNote(t, hz, 0.13, held, band.bus, band.sources, 0.12));
         // The background: a soft held pad of the same chord, swelling in slowly and fading into the
         // next one. It starts on the beat and makes no new notes in between, so it never marks a time.
         ch.chord.forEach((hz) => synthNote(t, hz, 0.5, beats * band.beat + 0.3, band.bus, band.sources, 0.25, 0.35, 0.05));
       } else {
-        ch.chord.forEach((hz) => instrumentNote(t, hz, 0.08, band.beat + 0.04, band.bus, band.sources, 0.12));
+        ch.chord.forEach((hz) => marimbaNote(t, hz, 0.12, band.beat + 0.04, band.bus, band.sources, 0.12));   // marimba tap
       }
     }
     band.upTo = Math.max(band.upTo, last);
@@ -885,6 +919,7 @@
     if (ctx) freshRoom();
     timers.forEach(clearTimeout); timers = [];
     cancelAnimationFrame(anim);
+    drawViz([]);
     $("track").querySelectorAll(".note.live").forEach((r) => r.classList.remove("live"));
     if (track && track.voice) $("trackLabel").textContent = "Now playing: " + track.voice.label;
   }
@@ -909,8 +944,12 @@
       beat = anchor.beat;
       start = anchor.start + Math.max(0, Math.ceil((now + 0.05 - anchor.start) / beat)) * beat;
     }
-    const v = { key, p, variant, label, beat, start, end: start + BEATS * beat, sources: [] };
-    notesFor(p, variant).forEach((n) =>
+    // Joining music already playing: the tune follows the chord the music is on.
+    const joinsBand = musical() && band && anchor && $("grooveLock").checked;
+    const phase = joinsBand ? ((Math.round((start - band.start) / beat) % PHRASE.length) + PHRASE.length) % PHRASE.length : 0;
+    const v = { key, p, variant, phase, label, beat, start, end: start + BEATS * beat, sources: [],
+                notes: notesFor(p, variant, phase) };
+    v.notes.forEach((n) =>
       pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat, v.sources));
     voices.push(v);
     bandFor(v, anchor && $("grooveLock").checked ? anchor : null);
@@ -925,10 +964,10 @@
   const LANE_W = 600, LANE_H = 64, BAR_H = 11;
   const yTop = (idx) => 4 + (1 - idx / (SCALE.length - 1)) * (LANE_H - 8 - BAR_H);
 
-  function drawNotes(svg, p, variant = 0) {
+  function drawNotes(svg, p, variant = 0, phase = 0) {
     let s = "";
     for (let b = 0; b <= BEATS; b++) s += `<line class="beat" x1="${b / BEATS * LANE_W}" x2="${b / BEATS * LANE_W}" y1="0" y2="${LANE_H}"/>`;
-    notesFor(p, variant).forEach((n) => {
+    notesFor(p, variant, phase).forEach((n) => {
       s +=`<rect class="note ${n.second ? "hi" : "lo"}" x="${(n.at / BEATS * LANE_W).toFixed(1)}" y="${yTop(n.idx).toFixed(1)}" width="${Math.max(3, n.len / BEATS * LANE_W).toFixed(1)}" height="${BAR_H}"/>`;
     });
     svg.innerHTML = s;
@@ -962,14 +1001,15 @@
   // The timeline shows the newest sound that is still playing. When two play, the label names both;
   // when the newest ends first, the timeline moves to the one still going.
   function showVoice(v) {
-    track = { p: v.p, variant: v.variant, notes: notesFor(v.p, v.variant),
-              rects: drawNotes($("trackSvg"), v.p, v.variant), beat: v.beat, voice: v };
+    track = { p: v.p, variant: v.variant, notes: notesFor(v.p, v.variant, v.phase),
+              rects: drawNotes($("trackSvg"), v.p, v.variant, v.phase), beat: v.beat, voice: v };
   }
 
   function followVoices() {
     cancelAnimationFrame(anim);
     const frame = () => {
       const live = liveVoices();
+      drawViz(live);
       if (!live.length) {
         if (track && track.voice) paintTrack(BEATS);
         if (track) track.rects.forEach((r) => r.classList.remove("live"));
@@ -983,6 +1023,60 @@
       anim = requestAnimationFrame(frame);
     };
     anim = requestAnimationFrame(frame);
+  }
+
+  // ---------- visualizer on the pictures ----------
+  // A play line sweeps across each patch that is sounding (and across its box on the map), with a
+  // fading trail, a ring where each note struck, and the live waveform along the bottom. The mystery
+  // sound sweeps both patches, so the pictures never give the answer away. With "Show notes while
+  // playing" off, the rings stay at one height, so they do not show pitch.
+  let analyser = null, waveBuf = null;
+  function drawViz(live) {
+    const now = ctx ? ctx.currentTime : 0, per = [[], []];
+    live.forEach((v) => {
+      const pos = (now - v.start) / v.beat;
+      if (pos < 0 || pos > BEATS) return;
+      (v.key === "patch0" ? [0] : v.key === "patch1" ? [1] : [0, 1]).forEach((s) => per[s].push({ v, pos }));
+    });
+    if (analyser && live.length) analyser.getByteTimeDomainData(waveBuf);
+    const signal = getComputedStyle(document.documentElement).getPropertyValue("--signal").trim() || "#d0451b";
+    [0, 1].forEach((s) => {
+      const c = $("viz" + s), g = c.getContext("2d"), W = c.width, H = c.height;
+      g.clearRect(0, 0, W, H);
+      $("sweep" + s).hidden = !per[s].length;
+      if (!per[s].length) return;
+      if (waveBuf) {
+        [[5, "rgba(0,0,0,0.5)"], [2, "rgba(255,255,255,0.85)"]].forEach(([w, col]) => {
+          g.lineWidth = w; g.strokeStyle = col; g.beginPath();
+          for (let i = 0; i < waveBuf.length; i += 4) {
+            const x = i / (waveBuf.length - 1) * W, y = H * 0.86 + (waveBuf[i] - 128) / 128 * H * 0.12;
+            i ? g.lineTo(x, y) : g.moveTo(x, y);
+          }
+          g.stroke();
+        });
+      }
+      per[s].forEach(({ v, pos }) => {
+        const x = pos / BEATS * W;
+        g.fillStyle = signal;                       // fading trail behind the line
+        for (let k = 0; k < 8; k++) {
+          g.globalAlpha = 0.05 * (k + 1);
+          g.fillRect(x - 140 + k * 17.5, 0, 17.5, H);
+        }
+        g.globalAlpha = 1;
+        v.notes.forEach((n) => {                    // a ring where each note struck, fading out
+          const age = (pos - n.at) * v.beat;
+          if (age < 0 || age > 0.8) return;
+          const k = age / 0.8;
+          const y = $("showNotes").checked ? H * (0.1 + 0.65 * (1 - n.idx / (SCALE.length - 1))) : H * 0.45;
+          g.beginPath(); g.arc(n.at / BEATS * W, y, 6 + 46 * k, 0, 2 * Math.PI);
+          g.lineWidth = 3; g.strokeStyle = `rgba(255,255,255,${(1 - k) * 0.9})`; g.stroke();
+        });
+        g.fillStyle = "rgba(0,0,0,0.55)"; g.fillRect(x - 3.5, 0, 7, H);
+        g.fillStyle = signal; g.fillRect(x - 2.5, 0, 5, H);
+        g.fillStyle = "#fff"; g.fillRect(x - 0.75, 0, 1.5, H);
+        $("sweep" + s).style.left = (pos / BEATS * 100) + "%";
+      });
+    });
   }
 
   // Dragging the line: each note sounds as the line crosses it (either direction), and pressing on a
