@@ -34,9 +34,10 @@ export function regionStyle(regions: Region[], id: string): CSSProperties {
   return { ['--region' as string]: regionColour(regions, id) } as CSSProperties;
 }
 
-export function regionLabel(regions: Region[], id: string): string {
+/** "Region A". Letters start at the source's first letter (aerosols: C), so pictures never share one. */
+export function regionLabel(regions: Region[], id: string, firstLetter = 'A'): string {
   const i = regions.findIndex((r) => r.id === id);
-  return `Region ${String.fromCharCode(65 + i)}`;
+  return `Region ${String.fromCharCode(firstLetter.charCodeAt(0) + i)}`;
 }
 
 export function ExploreControls(p: Props) {
