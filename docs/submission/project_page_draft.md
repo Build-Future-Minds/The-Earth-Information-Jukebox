@@ -14,14 +14,18 @@ Earth Sonata: Play the Planet
 
 ## High-level summary — Student B
 
-Earth Sonata lets a visitor compare two regions of a NASA ocean visualization by listening to a
-short rhythm for each one. The app plays the rhythm, where more lined-up lines in the picture give
-a more even pulse, and then explains in words which pattern in the image made the sound and how
-the two regions compare. It uses a NASA computer-model visualization (ECCO2), the rhythm rule is a
-choice we made, and it describes the picture, not water speed, turbulence or ocean health.
+NASA's pictures of Earth are made to be looked at, so the patterns in them are hard to follow for
+people who cannot see the screen, and hard to compare even for people who can. Earth Sonata takes
+one NASA computer-model visualization of ocean currents, measures how strongly the visible current
+lines in two regions run the same way, and plays each region as a rhythm that is more even where the
+lines line up, then explains in words which pattern made the sound. A visitor can compare two parts
+of the ocean picture by ear, with only a keyboard if they like, and every sound can be traced back
+to the numbers that made it, using a rule we chose and say we chose.
 
-*(Draft copied from `student_b_worksheet.md` part 1 on 14 Nov. Not yet read aloud to someone
-outside the team; update both places after that check.)*
+*(Three sentences: the problem, what Earth Sonata does, why it is useful. Drafted 14 Nov from
+`PRODUCT.md` and the app on `main`. It replaces the earlier summary; its honesty points (model
+visualization, our chosen rule) are in the sentences, and "describes the picture" is in "Limits".
+Not yet read aloud to someone outside the team.)*
 
 ## Link to final project — Developer B
 
