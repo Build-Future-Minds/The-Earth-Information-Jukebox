@@ -211,7 +211,7 @@
   <aside class="rail rail-top" aria-label="Map and playback">
     <div>
       <h1>Which patch made this rhythm?</h1>
-      <p class="lede">An Earth Sonata: Play the Planet practice game. Hear one sound, then pick the patch that made it.</p>
+      <p class="lede">Hear a sound, pick the patch that made it.</p>
     </div>
 
     <figure class="map" id="mapFigure">
@@ -220,8 +220,7 @@
       <div class="box" id="box0" hidden aria-hidden="true"><span>1</span></div>
       <div class="box" id="box1" hidden aria-hidden="true"><span>2</span></div>
     </figure>
-    <p class="credit" style="margin-top:-14px">Visualization: NASA/Goddard Space Flight Center Scientific Visualization Studio,
-      <a href="https://svs.gsfc.nasa.gov/3912">SVS 3912</a>. ECCO2 model output, model time 19 June 2007. Not a photo.</p>
+    <p class="credit" style="margin-top:-14px">NASA SVS <a href="https://svs.gsfc.nasa.gov/3912">3912</a>, ECCO2 model, not a photo.</p>
 
     <div class="actions">
       <button class="primary" id="newRound" disabled>New round <kbd>P</kbd></button>
@@ -241,34 +240,28 @@
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="grooveLock" checked> Groove lock</label>
-      <p class="hint-note">Two sounds can play at once: press Q, W or R while another sound is playing. On: the new sound waits for the next beat of the one already playing and keeps its speed, so the pulses line up. Off: it starts the moment you press.</p>
+      <p class="hint-note">Two sounds lock to one beat.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="musical" checked> Musical sound</label>
-      <p class="hint-note">On: the sound becomes a short piece of music. The patch's notes are the melody, over chords that flow into each other on the beat. The chords are the same for every patch, so they give nothing away. Off: the plain test tone, for a strict listening test.</p>
-    </div>
-    <div class="axis">
-      <p class="label" style="margin:0">Pitch and length <span class="switch-state">follow alignment</span></p>
-      <p class="hint-note">Unless Rhythm only is on, the notes' pitch and length change with the patch. Both are this game's choice; the team's rule keeps pitch fixed until Dev A decides.</p>
+      <p class="hint-note">Off for a strict test.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="showNotes" checked> Show notes while playing</label>
-      <p class="hint-note">Off: only the moving dot shows, so a listening test is judged by ear alone.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="showLines" checked> Show line directions</label>
-      <p class="hint-note">White ticks show which way the visible lines run in each part of a patch. The sound is made from how much they agree. They always appear after you answer.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="rhythmOnly"> Rhythm only</label>
-      <p class="hint-note">On: every patch plays the same two notes (G4 then D5), so pitch gives nothing away and the spacing of the pulses carries the answer. This is close to the team's rule but not the same: each note here is held for half its gap, so note length still follows the spacing, while the app uses one pitch and one note length.</p>
+      <p class="hint-note">Same notes for every patch.</p>
     </div>
     <div class="axis">
       <label class="switch"><input type="checkbox" id="stretchTiming" checked> Stretch the pulse spacing</label>
-      <p class="hint-note">On: the spacing uses the whole range this image has, so the difference is easier to hear (up to about 125 ms). Off: the team's exact rule, where real patches differ by only about 44 ms. Turn it off for a test of the team's rule.</p>
+      <p class="hint-note">Off: the team\'s exact rule.</p>
     </div>
     <div class="axis">
-      <label for="difficulty">Rounds <span class="switch-state">how far apart</span></label>
+      <label for="difficulty">Rounds</label>
       <select id="difficulty">
         <option value="easy" selected>Easy: patches far apart</option>
         <option value="medium">Medium</option>
@@ -297,16 +290,15 @@
     </div>
 
     <p class="status" id="status" aria-live="polite">Measuring the NASA image…</p>
-    <p class="sub" id="sub">Listen to the sound, then pick the patch you think made it.</p>
+    <p class="sub" id="sub"></p>
 
     <div class="intro">
       <div>
-        <p><strong>What you are looking at.</strong> The NASA picture draws ocean currents as thin bright streaks. Each patch below is a small window onto the map. The white ticks show which way the streaks run in each part of the window. When the ticks mostly agree, the streaks are lined up. When they point every which way, the water is swirly.</p>
-        <p>The sound is made from how much the ticks agree. Use Hear patch 1 and Hear patch 2 to learn what each one sounds like.</p>
+        <p>White ticks show which way the current streaks run. The sound comes from how much they agree.</p>
       </div>
       <div class="key" aria-hidden="true">
-        <figure><svg viewBox="0 0 150 64" id="keyAgree"></svg><figcaption>Ticks agree: lined up</figcaption></figure>
-        <figure><svg viewBox="0 0 150 64" id="keyScatter"></svg><figcaption>Ticks scatter: swirly</figcaption></figure>
+        <figure><svg viewBox="0 0 150 64" id="keyAgree"></svg><figcaption>Lined up</figcaption></figure>
+        <figure><svg viewBox="0 0 150 64" id="keyScatter"></svg><figcaption>Swirly</figcaption></figure>
       </div>
     </div>
 
@@ -330,8 +322,7 @@
     </div>
 
     <div class="track" id="track">
-      <div class="track-head"><span id="trackLabel">Now playing</span><span id="trackTime">Press New round to hear a sound</span></div>
-      <p class="track-hint">Drag the line, or press the left and right arrow keys, to hear the sound at that point.</p>
+      <div class="track-head"><span id="trackLabel">Now playing</span><span id="trackTime"></span></div>
       <div class="track-lane" id="lane" tabindex="0" role="slider" aria-label="Sound timeline" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" aria-valuetext="Start">
         <svg id="trackSvg" viewBox="0 0 600 64" preserveAspectRatio="none"></svg>
         <span class="playline" id="playline"></span>
@@ -341,7 +332,7 @@
 
     <section class="plot" aria-labelledby="plotTitle">
       <h2 id="plotTitle">Both rhythms, one time line</h2>
-      <p id="plotNote">Appears after you answer, so the screen never gives the answer away.</p>
+      <p id="plotNote">Shows after you answer.</p>
       <div id="plotRows" hidden>
         <div class="plot-row"><b>Patch 1</b><svg id="plot0" viewBox="0 0 600 64" preserveAspectRatio="none" role="img"></svg></div>
         <div class="plot-row"><b>Patch 2</b><svg id="plot1" viewBox="0 0 600 64" preserveAspectRatio="none" role="img"></svg></div>
@@ -352,26 +343,12 @@
 
     <details>
       <summary>How the rhythm is made</summary>
-      <p>Every bit of visible line in a patch votes for its direction. If most lines run the same way,
-        alignment is near 1 and the two pulses in each beat are evenly spaced. If they run every which way,
-        alignment is near 0 and the second pulse comes late: long–short.</p>
-      <p>The white ticks on each patch show which way the visible lines run in each part of it. When most
-        ticks point the same way, the patch is lined up. When they point every which way, it is swirly.</p>
-      <p>Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat. Real patches only span about
-        0.15 to 0.50 alignment, so that moves the pulse by only about 44 ms. With Stretch the pulse spacing
-        on, the game uses where the patch sits in this image's range instead of the raw alignment.</p>
-      <p>The same rule, in more detail: After you answer, the big
-        numerals take a font weight from the alignment: thin means swirly, heavy means lined up. The scale
-        is stretched across the middle 80 % of patches measured in this image: the most swirly tenth all
-        read as weight 200 and the most lined-up tenth as weight 800. The notes use the same scale.</p>
-      <p>Pitch and note length follow alignment too, on a four-octave scale. Lined-up patches play
-        steady, high notes held almost until the next one, so the sound keeps going like a line. Swirly
-        patches play lower notes that jump around in pitch and stop short at random lengths, like lines
-        running every which way. The more swirly the patch, the more the notes jump. That is this game's
-        choice; the team's rule keeps pitch fixed until Dev A decides.</p>
-      <p>The numbers here are a quick practice measurement made in your browser, not the team's checked
-        numbers. The rule is a choice the team made. It describes the picture, not water speed,
-        turbulence or ocean health.</p>
+      <p>Lines that run the same way give alignment near 1: two evenly spaced pulses per beat.
+        Lines that run every which way give alignment near 0: long–short.
+        Rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat.</p>
+      <p>In this game, pitch and note length also follow alignment, and Stretch widens the spacing.
+        The team's rule keeps pitch fixed. Numbers here are a quick browser measurement, not the team's.
+        It describes the picture, not water speed or ocean health.</p>
     </details>
   </main>
 </div>
@@ -944,12 +921,12 @@
   function drawPlot(left, right) {
     drawRow($("plot0"), left, 1); drawRow($("plot1"), right, 2);
     $("plotRows").hidden = false; $("plotLegend").hidden = false;
-    $("plotNote").textContent = "Each bar is a note: higher up is a higher note, longer is held longer. Steady, long, high bars: lined up. Jumpy, short, low bars: swirly.";
+    $("plotNote").textContent = "Each bar is a note. Steady, long, high: lined up. Jumpy, short, low: swirly.";
   }
 
   function clearPlot() {
     $("plotRows").hidden = true; $("plotLegend").hidden = true;
-    $("plotNote").textContent = "Appears after you answer, so the screen never gives the answer away.";
+    $("plotNote").textContent = "Shows after you answer.";
   }
 
   function setStatus(text) {
@@ -1001,7 +978,7 @@
     clearPlot();
     $("replay").disabled = false;
     $("hear0").disabled = false; $("hear1").disabled = false;
-    $("sub").textContent = "Listen to the mystery sound. Use Hear patch 1 and Hear patch 2 to learn how each patch sounds (press both to hear them together), then pick the patch that made the mystery sound.";
+    $("sub").textContent = "Compare with Hear patch 1 and 2, then pick.";
     playRound("Which patch made this sound? Press 1 or 2.", true);
   }
 
@@ -1043,7 +1020,7 @@
 
     const kind = target.alignment > shown[1 - answer].alignment ? "higher, longer and more even" : "lower, shorter and more long–short";
     setStatus((correct ? "Right. " : "Not this time. ") + `Patch ${answer + 1} made this sound: it was the ${kind} one.`);
-    $("sub").textContent = "Thin numeral: swirly lines. Heavy numeral: lined-up lines. Press P for the next round.";
+    $("sub").textContent = "Thin number: swirly. Heavy: lined up.";
     updateScore();
     $("newRound").focus();
   }
@@ -1132,7 +1109,7 @@
       $("newRound").disabled = pool.length < 2;
       if (pool.length < 2) { setStatus("Not enough usable ocean patches were found in this image."); return; }
       setStatus("Ready. Press New round to hear a sound.");
-      $("sub").textContent = `${pool.length} ocean patches measured. ${result.onLand} touched land and ${result.missing} were too blank, so they are left out.`;
+      $("sub").textContent = `${pool.length} ocean patches measured.`;
     }, 30);
   }
   if (world.complete && world.naturalWidth) onImage();
