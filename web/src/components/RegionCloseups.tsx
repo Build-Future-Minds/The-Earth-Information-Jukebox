@@ -54,8 +54,7 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }
         ))}
       </div>
       <p className="muted small">
-        Ticks are worked out in your browser from this one picture, to show what the measurement looks at. The rhythm uses
-        Dev A&apos;s measurement of every frame (<code>features.json</code>).
+        Ticks are drawn in your browser; the rhythm uses Dev A&apos;s measurement of every frame.
       </p>
     </section>
   );
