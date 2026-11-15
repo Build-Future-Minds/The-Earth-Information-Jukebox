@@ -100,7 +100,8 @@ the melody; timing, pitch and note length still come from the patch exactly as b
   overtones so small speakers can play them.
 - **Background:** under the chords, a soft held pad of the same chord swells in on the beat and fades
   into the next one. It makes no new notes between beats.
-- **Keep the music playing** (on): after a sound ends, the chords and pad roll on, two beats at a
+- **Keep the music playing** (off by default, so the music stops when the play line ends): when
+  ticked, after a sound ends, the chords and pad roll on, two beats at a
   time, until Stop or Esc. With Groove lock on, the next sound joins on the music's beat. Checked by
   logging every scheduled start while the music rolled on its own: 88 starts, none between beats.
   Two sounds at once peak at 0.92 of full scale or less on every instrument.

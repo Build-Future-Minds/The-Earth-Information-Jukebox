@@ -302,7 +302,7 @@
       <p class="hint-note">Off for a strict test.</p>
     </div>
     <div class="axis">
-      <label class="switch"><input type="checkbox" id="keepMusic" checked> Keep the music playing</label>
+      <label class="switch"><input type="checkbox" id="keepMusic"> Keep the music playing</label>
       <p class="hint-note">With Musical sound on. Stop or Esc ends it.</p>
     </div>
     <div class="axis">
@@ -1047,7 +1047,10 @@
     });
     const showNotes = $("showNotes").checked;
     const mysteryOn = live.some((v) => v.key === "mystery");
-    const showWave = showNotes && !mysteryOn;      // the mix would carry the mystery sound's pulses
+    // Until the round is answered, the mystery sound shows no rings and no waveform (the mix would
+    // carry its pulses). Once answered there is nothing left to give away, so they show again.
+    const hideMystery = mysteryOn && !guessed;
+    const showWave = showNotes && !hideMystery;
     if (analyser && showWave) analyser.getByteTimeDomainData(waveBuf);
     const signal = getComputedStyle(document.documentElement).getPropertyValue("--signal").trim() || "#d0451b";
     [0, 1].forEach((s) => {
@@ -1073,7 +1076,7 @@
           g.fillRect(x - 140 + k * 17.5, 0, 17.5, H);
         }
         g.globalAlpha = 1;
-        if (showNotes && v.key !== "mystery") v.notes.forEach((n) => {   // a ring where each note struck, fading out
+        if (showNotes && (v.key !== "mystery" || guessed)) v.notes.forEach((n) => {   // a ring where each note struck, fading out
           const age = (pos - n.at) * v.beat;
           if (age < 0 || age > 0.8) return;
           const k = age / 0.8;
