@@ -17,7 +17,17 @@ Checklist before you write:
 - What do they hear? A short repeating rhythm for that region: two pulses per beat, with the second pulse landing earlier or later depending on how much the visible lines in the region run the same way.
 - What do they learn? Which pattern in the picture made the sound, and how the two regions compare.
 
-Your draft:
+Your draft (14 Nov, second version: the problem, what it does, why it is useful):
+
+> NASA's pictures of Earth are made to be looked at, so the patterns in them are hard to follow for
+> people who cannot see the screen, and hard to compare even for people who can. Earth Sonata takes
+> one NASA computer-model visualization of ocean currents, measures how strongly the visible current
+> lines in two regions run the same way, and plays each region as a rhythm that is more even where the
+> lines line up, then explains in words which pattern made the sound. A visitor can compare two parts
+> of the ocean picture by ear, with only a keyboard if they like, and every sound can be traced back
+> to the numbers that made it, using a rule we chose and say we chose.
+
+Earlier draft (said what it does and its limits, but not the problem or why it is useful):
 
 > Earth Sonata lets a visitor compare two regions of a NASA ocean visualization by listening to a short rhythm for each one. The app plays the rhythm, where more lined-up lines in the picture give a more even pulse, and then explains in words which pattern in the image made the sound and how the two regions compare. It uses a NASA computer-model visualization (ECCO2), the rhythm rule is a choice we made, and it describes the picture, not water speed, turbulence or ocean health.
 
