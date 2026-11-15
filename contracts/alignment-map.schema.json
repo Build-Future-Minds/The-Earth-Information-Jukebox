@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "earth-sonata/alignment-map.schema.json",
+  "title": "Alignment map",
+  "description": "Alignment for a circle centred on every point of a coarse grid over one frame of a picture, for looking up any spot on the globe. Written by analysis/make_alignment_map.py, read by the globe. Same measurement as features.json; null means no number, never zero.",
+  "type": "object",
+  "required": ["schema_version", "is_mock", "generated_by", "scene", "source", "frame", "measurement", "grid", "summary", "checked_against_features", "limitations", "alignment"],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "is_mock": { "type": "boolean" },
+    "generated_by": { "type": "string" },
+    "scene": { "type": "string", "description": "The scene this frame comes from, relative to the project folder." },
+    "source": {
+      "type": "object",
+      "required": ["svs_id", "url", "title", "credit", "data_kind"],
+      "properties": {
+        "svs_id": { "type": ["integer", "null"] },
+        "url": { "type": "string" },
+        "title": { "type": "string" },
+        "credit": { "type": "string" },
+        "data_kind": { "type": "string" }
+      }
+    },
+    "frame": {
+      "type": "object",
+      "required": ["index", "file_number", "source_time"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "file_number": { "type": "integer" },
+        "source_time": { "type": ["string", "null"] }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "required": ["what", "radius_px", "gradient_threshold", "min_usable_fraction", "min_open_water", "smoothing"],
+      "properties": {
+        "what": { "type": "string" },
+        "radius_px": { "type": "integer", "minimum": 1 },
+        "gradient_threshold": { "type": "number", "exclusiveMinimum": 0 },
+        "min_usable_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+        "min_open_water": { "type": "number", "minimum": 0, "maximum": 1 },
+        "smoothing": { "type": "string" }
+      }
+    },
+    "grid": {
+      "type": "object",
+      "required": ["step_px", "columns", "rows", "first_center_px", "image_width", "image_height", "projection"],
+      "properties": {
+        "step_px": { "type": "integer", "minimum": 1 },
+        "columns": { "type": "integer", "minimum": 1 },
+        "rows": { "type": "integer", "minimum": 1 },
+        "first_center_px": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "minItems": 2, "maxItems": 2 },
+        "image_width": { "type": "integer", "minimum": 1 },
+        "image_height": { "type": "integer", "minimum": 1 },
+        "projection": { "type": "string" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["points", "with_a_number", "min", "max"],
+      "properties": {
+        "points": { "type": "integer", "minimum": 0 },
+        "with_a_number": { "type": "integer", "minimum": 0 },
+        "min": { "type": ["number", "null"] },
+        "max": { "type": ["number", "null"] }
+      }
+    },
+    "checked_against_features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["region", "center_px", "map", "features"],
+        "properties": {
+          "region": { "type": "string" },
+          "center_px": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+          "map": { "type": ["number", "null"] },
+          "features": { "type": ["number", "null"] }
+        }
+      }
+    },
+    "limitations": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "alignment": {
+      "description": "rows x columns, row 0 at the top (north). Each value is the alignment 0 to 1 at that grid point, or null for no number.",
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}
