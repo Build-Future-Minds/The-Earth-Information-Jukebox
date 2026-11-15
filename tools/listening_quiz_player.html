@@ -36,7 +36,8 @@
            background: var(--card); color: var(--fg); cursor: pointer; }
   button.primary { background: var(--accent); color: var(--accent-fg); }
   button:disabled { opacity: 0.45; cursor: not-allowed; }
-  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .back { display: inline-block; margin-bottom: 10px; color: var(--fg); text-underline-offset: 2px; }
   label { font-weight: 600; }
   .status { min-height: 1.5em; color: var(--muted); }
   .result.good { color: var(--good); font-weight: 700; }
@@ -49,6 +50,7 @@
 </head>
 <body>
 <main>
+  <a class="back" href="../">← Back to Earth Sonata</a>
   <h1>Listening Quiz Player</h1>
   <p class="sub">Local test tool for Student B's listening questions. Not the Earth Sonata app.</p>
 
