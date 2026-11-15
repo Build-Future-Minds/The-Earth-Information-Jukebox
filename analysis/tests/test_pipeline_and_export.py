@@ -355,6 +355,39 @@ def test_timestamps_must_have_one_entry_per_frame(tmp_path, capsys, timestamps):
     assert code == 2 and f"has {len(timestamps)} entries but frames.count is 3" in err
 
 
+def test_the_command_fails_and_writes_nothing_when_no_step_is_usable(tmp_path, capsys):
+    """All frame files missing (the frames are git-ignored and easy to forget to download)
+    must be an error, and must not overwrite a good features.json with an empty one."""
+    scene_path = stepped_scene(tmp_path)  # no first_index: looks for frames 0, 1, 2, which do not exist
+    out, rhythm_out = tmp_path / "f.json", tmp_path / "r.json"
+    out.write_text("previous good file", encoding="utf-8")
+    code = features.main(["--scene", str(scene_path), "--out", str(out), "--rhythm-out", str(rhythm_out),
+                          "--root", str(tmp_path)])
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "no step is usable" in err and "Frame file not found" in err and "download_frames.sh" in err
+    assert out.read_text(encoding="utf-8") == "previous good file"
+    assert not rhythm_out.exists()
+
+
+def test_the_command_fails_when_every_frame_exists_but_none_is_strong_enough(tmp_path, capsys):
+    """A threshold far above any gradient leaves no pixel voting: every step is missing."""
+    scene_path = stepped_scene(tmp_path, first_index=23000, index_step=4)
+    out = tmp_path / "f.json"
+    code = features.main(["--scene", str(scene_path), "--out", str(out), "--root", str(tmp_path),
+                          "--threshold", "1000"])
+    assert code == 2 and "no step is usable" in capsys.readouterr().err
+    assert not out.exists()
+
+
+def test_the_command_still_succeeds_when_only_some_steps_are_usable(tmp_path):
+    scene_path = stepped_scene(tmp_path, first_index=23000)  # frame 23000 exists, 23001 and 23002 do not
+    out = tmp_path / "f.json"
+    code = features.main(["--scene", str(scene_path), "--out", str(out), "--root", str(tmp_path)])
+    assert code == 0
+    assert [s["status"] for s in json.loads(out.read_text(encoding="utf-8"))["steps"]] == ["ok", "missing", "missing"]
+
+
 def circle_scene(tmp_path: Path, frame: np.ndarray, regions: list[dict]) -> Path:
     cv2.imwrite(str(tmp_path / "TEST_INPUT_c.png"), frame)
     scene = {"is_mock": True, "regions": regions,
