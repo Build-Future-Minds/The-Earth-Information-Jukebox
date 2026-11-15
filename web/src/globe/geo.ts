@@ -35,7 +35,13 @@ export function clamp(value: number, min: number, max: number): number {
 
 /** Share of the circle drawn as flat grey land (same rule as check_motion.py / prepare_scene.py,
  *  with a little more colour tolerance because preview.jpg is a JPEG). rgba is width*height*4. */
-export function landShare(rgba: ArrayLike<number>, width: number, height: number, spot: Spot): number {
+/** What flat land looks like in a source: mean brightness range and the largest channel spread. */
+export type LandRule = [min: number, max: number, spread: number];
+export const OCEAN_LAND: LandRule = [30, 80, 12];
+
+export function landShare(rgba: ArrayLike<number>, width: number, height: number, spot: Spot,
+  rule: LandRule = OCEAN_LAND): number {
+  const [low, high, maxSpread] = rule;
   const [cx, cy] = spot.center_px;
   const r = spot.radius_px;
   let inside = 0;
@@ -50,7 +56,7 @@ export function landShare(rgba: ArrayLike<number>, width: number, height: number
       const blue = rgba[i + 2];
       const spread = Math.max(red, green, blue) - Math.min(red, green, blue);
       const mean = (red + green + blue) / 3;
-      if (spread <= 12 && mean >= 30 && mean <= 80) land++;
+      if (spread <= maxSpread && mean >= low && mean <= high) land++;
     }
   }
   return inside ? land / inside : 0;
