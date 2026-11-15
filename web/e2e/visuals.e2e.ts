@@ -75,5 +75,5 @@ test('Play along links to Student B\'s listening game, labelled as a separate pr
   const game = section.getByRole('link', { name: /Open the listening game/ });
   await expect(game).toHaveAttribute('href', 'tools/listening_game.html');
   await expect(game).not.toHaveAttribute('target', '_blank');
-  await expect(section.getByRole('link', { name: 'quiz player' })).toHaveAttribute('href', 'tools/listening_quiz_player.html');
+  await expect(section.getByRole('link', { name: 'quiz player' })).toHaveCount(0);   // quiz player is not on the site
 });

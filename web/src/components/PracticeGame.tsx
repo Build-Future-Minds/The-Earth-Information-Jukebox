@@ -4,7 +4,6 @@
 import { agree, Key, scatter } from './LookingAt';
 
 const GAME = 'tools/listening_game.html';
-const QUIZ = 'tools/listening_quiz_player.html';
 
 export function PracticeGame() {
   return (
@@ -12,13 +11,7 @@ export function PracticeGame() {
       <div className="practice-text">
         <h2 id="practice-title">Practice: test your ear</h2>
         <p>Hear a mystery rhythm, then pick which of two ocean patches made it.</p>
-        <p className="muted small">
-          A separate practice tool with its own sound settings. For a scored check, use the{' '}
-          <a href={QUIZ} target="_blank" rel="noopener">
-            quiz player
-          </a>
-          .
-        </p>
+        <p className="muted small">A separate practice tool with its own sound settings.</p>
         <a className="button-link primary" href={GAME}>
           Open the listening game
         </a>
