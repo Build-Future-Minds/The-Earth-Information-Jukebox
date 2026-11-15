@@ -92,7 +92,7 @@ test('the explanation follows the sound: reset on Stop, never the old region aft
   }
   await page.keyboard.press('Escape');
   await page.waitForTimeout(300);
-  await expect(explanation).toHaveText(/Press Start/);
+  await expect(explanation).toHaveText(/Press Play/);
 });
 
 test('switching region keeps the position, on the beat', async ({ page }) => {
@@ -146,5 +146,9 @@ test('the explanation opens by keyboard and receives focus', async ({ page }) =>
   await page.getByRole('button', { name: 'Explain', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('.explanation')).toBeFocused();
-  await expect(page.locator('.explanation')).toContainText('computer model');
+  await expect(page.locator('.explanation')).toContainText('Press Play');
+  // The honesty lines are said once, on How it's made, not repeated in every explanation.
+  await expect(page.locator('.explanation')).not.toContainText('computer model');
+  await openApp(page, 'how');
+  await expect(page.getByRole('main')).toContainText('not water speed or ocean health');
 });

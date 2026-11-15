@@ -6,6 +6,7 @@
 import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { EarthTrack } from '../audio/earthVoice';
+import { dayLabels } from '../data/sources';
 import type { PlayState } from '../audio/transport';
 
 interface Props {
@@ -45,12 +46,16 @@ export function BeatTrack({ track, regionLabel, colour, playState, speed, getPos
   }, [playState, getPosition, track]);
 
   const length = track.length;
+  // The model date under the first beat of each day (N2: the sound changes as the model moves on).
+  const days = dayLabels(track);
+  let currentDay = -1;
+  if (active) days.forEach((d, i) => { if (d && track.steps[i].t <= pos + 1e-6) currentDay = i; });
   const notes = track.steps.flatMap((s) => s.events.map((e, i) => ({ t: e.t, second: i === 1 })));
   const beats = track.steps.map((s) => s.t);
   const W = length * U;
   const pct = (100 * pos) / length;
   const real = (s: number) => (s / speed).toFixed(1);
-  const timeText = active ? `${real(pos)} / ${real(length)} s` : 'Press Start to hear the rhythm';
+  const timeText = active ? `${real(pos)} / ${real(length)} s` : 'Press Play to hear the rhythm';
 
   const seekTo = (t: number) => {
     if (!active) return;
@@ -87,15 +92,19 @@ export function BeatTrack({ track, regionLabel, colour, playState, speed, getPos
           <span>{timeText}</span>
         </div>
       )}
-      <p className="track-hint">
-        Tall mark: first pulse. Short grey: second. Drag or use arrow keys.
+      {/* A two-mark legend instead of a sentence (team: less text). */}
+      <p className="track-legend" aria-hidden="true">
+        <span><i className="swatch lo" />First pulse</span>
+        <span><i className="swatch hi" />Second pulse</span>
       </p>
+      <span id="track-keys" className="sr-only">Drag, or use the left and right arrow keys, to move through the rhythm.</span>
       <div
         ref={laneRef}
         className={active ? 'track-lane' : 'track-lane idle'}
         tabIndex={0}
         role="slider"
         aria-label={`Rhythm timeline for ${regionLabel}`}
+        aria-describedby="track-keys"
         aria-disabled={!active}
         aria-valuemin={0}
         aria-valuemax={Number(real(length))}
@@ -137,6 +146,17 @@ export function BeatTrack({ track, regionLabel, colour, playState, speed, getPos
           })}
         </svg>
         <span className="playline" style={{ left: `${pct}%` }} />
+        {days.some(Boolean) && (
+          <span className="track-days" aria-hidden="true">
+            {days.map((d, i) =>
+              d ? (
+                <span key={i} className={i === currentDay ? 'day current' : 'day'} style={{ left: `${(100 * track.steps[i].t) / length}%` }}>
+                  {d}
+                </span>
+              ) : null,
+            )}
+          </span>
+        )}
         <span className="dot" style={{ left: `${pct}%` }} />
       </div>
     </section>
