@@ -92,6 +92,9 @@ Equatorial Pacific and Kuroshio, and the files the app plays: section 10.
   or two tidy sets of crossing lines also score low.
 - Nothing here is a speed, a temperature or a statement about ocean health.
 - The source is ECCO2 model output for one modelled year, not an observation and not a trend.
+- Each region is a circle on the flat map, not on the Earth. Away from the equator it covers less
+  ground east–west than north–south: the Kuroshio circle (28.8° N) is about 12% narrower
+  east–west. Version one keeps flat circles (`science_review.md` section 6, row 11).
 - Labels, colour bars, date stamps and land edges also have lines. Student A's mask must exclude them.
 - Compression can add or blur edges. Use the downloadable frame set, not a compressed video.
 

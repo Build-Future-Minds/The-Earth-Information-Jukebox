@@ -6,7 +6,9 @@ Use role labels, not names. A human must read, understand and be able to explain
 Rules:
 
 - Use only accounts you are eligible and authorised to use.
-- No AI-generated music, images or video in the product or demo.
+- No music, images or video produced by a generative AI model in the product or demo. All sound
+  is synthesised by our own code. Where AI helped write that code or choose its notes (for
+  example the listening game's chords), the row below says so (Mr. E's reading, 15 Nov).
 - No cloud AI service in the audio path.
 - If AI wrote or suggested code, the person merging it reviews and tests it.
 
