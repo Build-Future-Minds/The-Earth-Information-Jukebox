@@ -71,7 +71,8 @@ export function explain(step: TrackStep | null, other?: OtherRegion | null): str
   return (
     `The pulse ${pulse} because ${because}. ` +
     `Alignment is ${why.alignment.toFixed(2)} (0 = every which way, 1 = all the same way), ` +
-    `so the second pulse falls ${pct}% of the way through the beat (rule: ${why.rule}).` +
+    // The formula lives on How it's made (team: less text); the numbers stay.
+    `so the second pulse falls ${pct}% of the way through the beat.` +
     (compare ? ` ${compare}` : '')
   );
 }
@@ -95,7 +96,7 @@ export const RhythmExplanation = forwardRef<HTMLElement, Props>(function RhythmE
     <section ref={ref} tabIndex={-1} className="explanation" aria-labelledby="explain-heading">
       <h2 id="explain-heading">Why it sounds like this: {regionLabel}</h2>
       <p>{explain(step, other)}{when}</p>
-      <p className="muted">{DISCLAIMER}</p>
+      {/* The honesty lines are said once, on How it's made (DISCLAIMER is used there). */}
     </section>
   );
 });

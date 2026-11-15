@@ -1,7 +1,7 @@
 // Layout after Dev B saw it live (15 Nov): real tabs, a player bar, and less scrolling.
 // Practice data: the picture is drawn as a 2:1 placeholder, the same shape as the ocean map.
 import { expect, test, type Page } from '@playwright/test';
-import { openApp } from './helpers';
+import { openApp, startWithKeyboard } from './helpers';
 
 const tabs = (page: Page) => page.getByRole('navigation', { name: 'Pages' });
 
@@ -34,4 +34,23 @@ test('the player bar holds the controls and the timeline', async ({ page }) => {
   await expect(bar.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
   await expect(bar.getByRole('slider', { name: /Rhythm timeline/ })).toBeVisible();
   await expect(bar.getByRole('button', { name: 'Stop', exact: true })).toContainText('Esc');
+});
+
+test('the timeline has a two-mark legend, and the keys are described for screen readers', async ({ page }) => {
+  await openApp(page);
+  const legend = page.locator('.track-legend');
+  await expect(legend).toContainText('First pulse');
+  await expect(legend).toContainText('Second pulse');
+  await expect(page.locator('.track-hint')).toHaveCount(0);
+  const lane = page.getByRole('slider', { name: /Rhythm timeline/ });
+  await expect(lane).toHaveAccessibleDescription(/arrow keys/);
+});
+
+test('Listen still fits one screen at 1440x900 while playing', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openApp(page);
+  await startWithKeyboard(page);
+  await page.waitForTimeout(300);
+  const [scroll, inner] = await page.evaluate(() => [document.documentElement.scrollHeight, window.innerHeight]);
+  expect(scroll).toBeLessThanOrEqual(inner + 2);
 });

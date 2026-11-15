@@ -487,7 +487,7 @@ button.speed[aria-pressed='true'] { background: var(--ink); color: var(--paper);
 .status { font-size: 1.05rem; margin: 0; }
 
 /* Picture: capped to the screen so Listen fits one screen (--aspect = width / height). */
-figure.scene { max-width: min(100%, calc((100svh - 470px) * var(--aspect, 2) + 44px)); margin: 0 auto; width: 100%; }
+figure.scene { max-width: min(100%, calc((100svh - 510px) * var(--aspect, 2) + 44px)); margin: 0 auto; width: 100%; }
 figure.scene figcaption { font-size: 0.85rem; }
 
 /* Player bar: one framed strip like a music player, the timeline in the middle. */
@@ -527,3 +527,16 @@ figure.scene figcaption { font-size: 0.85rem; }
 
 /* A way back to the app from the extra pages (globe.html). */
 .back { display: inline-block; margin-bottom: var(--xs); color: var(--ink-2); font-size: 0.9rem; text-underline-offset: 2px; }
+
+/* Beat timeline legend and dates (N2). */
+.track-legend { display: flex; gap: var(--sm); margin: 0; font-size: 0.75rem; color: var(--ink-2); }
+.track-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.track-legend .swatch { display: inline-block; width: 4px; height: 12px; }
+.track-legend .swatch.lo { background: var(--region, var(--ink)); height: 14px; }
+.track-legend .swatch.hi { background: var(--ink-2); height: 9px; }
+.track-lane { position: relative; }
+.track-days { position: absolute; left: 0; right: 0; bottom: -16px; height: 14px; pointer-events: none; }
+.track-days .day { position: absolute; transform: translateX(-2px); font: 400 0.68rem/1 var(--mono); color: var(--ink-2); white-space: nowrap; }
+.track-days .day.current { font-weight: 700; color: var(--ink); }
+.track:has(.track-days) { padding-bottom: 16px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
