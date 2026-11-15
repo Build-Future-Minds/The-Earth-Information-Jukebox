@@ -1,0 +1,20 @@
+/* Globe prototype: follows DESIGN.md (paper, ink, hairlines, one signal orange; the image owns colour). */
+.globe-figure { margin: 0; display: grid; gap: var(--xs); }
+.globe-well { position: relative; background: #03050d; border-radius: var(--r); aspect-ratio: 1 / 1; max-height: 78vh; width: 100%; }
+.globe-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; border-radius: var(--r); }
+.globe-canvas:active { cursor: grabbing; }
+.globe-canvas:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+.globe-error { position: absolute; inset: auto var(--sm) var(--sm); margin: 0; color: var(--paper); font-weight: 600; }
+.globe-sliders { display: grid; gap: var(--xs); }
+.globe-sliders label.range { display: grid; }
+.globe-data { display: grid; gap: var(--xs); border-top: 1px solid var(--rule); padding-top: var(--sm); }
+.globe-dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px var(--sm); margin: 0; }
+.globe-dl dd { margin: 0; }
+.globe-json { margin: 0; padding: var(--xs); border: 1px solid var(--rule); border-radius: var(--r); font: 400 0.85rem/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; user-select: all; }
+button[aria-pressed='true'] { background: var(--signal); color: var(--ink); border-color: var(--ink); }
+/* Zoom buttons over the top-right corner of the globe: paper keys with an ink border (DESIGN.md buttons). */
+.globe-zoom { position: absolute; top: var(--sm); right: var(--sm); display: grid; gap: 6px; }
+.globe-zoom button { min-height: 44px; min-width: 44px; padding: 0; display: grid; place-items: center; text-align: center; background: var(--paper); font-size: 1.4rem; }
+.globe-zoom button:hover { background: var(--rule-2); }
+.globe-zoom button:disabled { opacity: 0.45; cursor: default; }
+.globe-zoom .globe-zoom-level { font: 600 0.85rem/1 var(--mono); }
