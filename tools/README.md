@@ -71,7 +71,7 @@ limiter keeps two sounds from clipping (one sound at the default volume is uncha
 listening test, note that layering the mystery sound with its own patch makes the two line up exactly
 in Rhythm only mode, which gives the answer away by ear.
 
-**Musical sound** (on by default): the sound becomes a short piece of music. The patch's notes are
+**Musical sound** (off by default): the sound becomes a short piece of music. The patch's notes are
 the melody; timing, pitch and note length still come from the patch exactly as before.
 
 - **The sound** is made in the browser, no samples: a warm, struck tone with rich overtones on two
@@ -82,13 +82,15 @@ the melody; timing, pitch and note length still come from the patch exactly as b
   Every chord uses only the melody's notes (C, D, E, G, A), so the melody never clashes with them,
   and each chord moves to the next by the smallest step, so the harmony flows. On the first beat of a
   chord a bass note sounds with it; on the second the chord sounds again, softly; each chord is held
-  into the next. Two sounds share one set of chords: a sound that joins extends them.
-- **It gives nothing away and does not blur the timing.** The chords are the same for every patch
-  and start only on the beat, where the melody's first note already is (checked by logging every
+  into the next. With Groove lock on, two sounds share one set of chords: a sound that joins extends
+  them. With Groove lock off, a second sound starts its own chords on its own beat.
+- **The chords are the same for every patch and start only on the beat.** Nobody has checked by ear
+  yet whether they hide the spacing, so use Musical sound for practice and the quiz player for the
+  real test. The chords start where the melody's first note already is (checked by logging every
   scheduled start: none of the chords' starts falls between beats). They sit about 4 dB under the
   melody. One sound peaks at 0.90 of full scale, two layered at 0.99.
 
-Switch it off for the plain test tone, the strict setting for a real listening test.
+Leave it off for the plain test tone. Switching on Rhythm only also switches Musical sound off.
 
 **Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5), so pitch gives
 nothing away and the spacing of the pulses carries the answer. This is close to the team's rule
