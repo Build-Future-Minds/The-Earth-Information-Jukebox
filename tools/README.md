@@ -71,21 +71,31 @@ limiter keeps two sounds from clipping (one sound at the default volume is uncha
 listening test, note that layering the mystery sound with its own patch makes the two line up exactly
 in Rhythm only mode, which gives the answer away by ear.
 
-**Musical sound** (on by default): the patch's notes become the melody of a short song. They play
-as a soft, piano-like tone (a round fundamental plus a quiet octave through a filter that closes as
-the note rings) with a little room echo, over a band: chords that move C, Am, F, G and home to C
-(two beats each, so a 10-beat sound is one phrase) and a plucked bass on every beat (the chord's
-root, then its fifth). The C pentatonic melody fits all four chords. The band is the same for every
-patch and its bass lands on the beat, where the first note of each beat already is, so it carries no
-answer and does not blur where the second note falls. Two sounds share one band: a sound that joins
-extends it. Timing, pitch and note length still come from the patch exactly as before (checked by
-rendering the same patch both ways: the melody notes start at the same moments). Switch it off for
-the plain test tone, the strict setting for a real listening test.
+**Musical sound** (on by default): the sound becomes a short piano piece. The patch's notes are the
+melody (right hand); timing, pitch and note length still come from the patch exactly as before.
 
-**Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5) at one fixed
-length, so only the spacing of the pulses carries the answer. That is the team's actual rule
-(`docs/mapping_spec.md`) and the setting for the real test. The speed control at 0.5× gives a
-1-second beat.
+- **The piano** is made in the browser, no samples: a tone with a piano's overtones on two strings
+  tuned a hair apart, a felt-hammer knock, brightness that mellows as the note rings, and a natural
+  fade (low notes ring longer). When a note's length is up, the damper stops it in about 0.2 s, so
+  the length is still heard. Louder notes are brighter; low notes sit left, high notes right.
+- **The left hand** plays C, Am7, Fmaj7, Gsus and home to C, two beats a chord (one 10-beat phrase).
+  Every chord uses only the melody's notes (C, D, E, G, A), so the melody never clashes with it, and
+  each chord moves to the next by the smallest step, so the harmony flows. On the first beat of a
+  chord the bass sounds with it; on the second the chord is touched again, softly; the pedal holds
+  each chord into the next. Two sounds share one left hand: a sound that joins extends it.
+- **It gives nothing away and does not blur the timing.** The left hand is the same for every patch
+  and starts notes only on the beat, where the melody's first note already is (checked by logging
+  every scheduled start: none of the left hand's falls between beats). It sits about 4 dB under the
+  melody. One sound peaks at 0.90 of full scale, two layered at 0.99.
+
+Switch it off for the plain test tone, the strict setting for a real listening test.
+
+**Rhythm only:** switch it on and every patch plays the same two notes (G4 then D5), so pitch gives
+nothing away and the spacing of the pulses carries the answer. This is close to the team's rule
+(`docs/mapping_spec.md`) but not the same: each note is held for half its gap, so note length still
+follows the spacing, while the app uses one pitch and one note length. The real listening check
+uses the quiz player, not this game (`docs/ACCESSIBILITY_LOG.md`, "Listening task"). The speed
+control at 0.5× gives a 1-second beat.
 
 **Line directions on the patches:** after you answer, each patch is drawn with short white ticks,
 one per 24 px cell, showing which way the visible lines run there (the same strong pixels that vote
