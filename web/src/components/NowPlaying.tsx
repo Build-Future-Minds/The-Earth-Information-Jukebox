@@ -27,7 +27,7 @@ export function NowPlaying({ step, regionLabel }: Props) {
             ? `second pulse at ${Math.round(why.long_fraction * 100)}% of the beat · wght ${weightFor(why.alignment)}`
             : missing
               ? 'missing information · Earth voice quiet'
-              : 'press Start'}
+              : 'press Play'}
         </span>
       </span>
     </div>

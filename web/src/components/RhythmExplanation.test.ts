@@ -76,6 +76,13 @@ describe('explain with a comparison', () => {
     expect(text).toContain('Region B');
   });
 
+  it('leaves the formula to How it\'s made: no "rule:", but the numbers and the comparison stay', () => {
+    const text = explain(playing(ok('a', 0.45)), regionB(ok('b', 0.15)));
+    expect(text).not.toContain('rule:');
+    expect(text).toContain('Alignment is 0.45');
+    expect(text).toContain('Compared with Region B');
+  });
+
   it('is unchanged when there is nothing to compare with', () => {
     const s = playing(ok('a', 0.45));
     expect(explain(s, null)).toBe(explain(s));
