@@ -70,6 +70,6 @@ test('the landing page links to Student B\'s listening game, labelled as a separ
   await expect(section).toContainText('A separate practice tool');
   const game = section.getByRole('link', { name: /Open the listening game/ });
   await expect(game).toHaveAttribute('href', 'tools/listening_game.html');
-  await expect(game).toHaveAttribute('target', '_blank');
+  await expect(game).not.toHaveAttribute('target', '_blank');
   await expect(section.getByRole('link', { name: 'quiz player' })).toHaveAttribute('href', 'tools/listening_quiz_player.html');
 });

@@ -74,6 +74,8 @@
               color: #000; font: 700 0.8rem/1.3 var(--sans); padding: 0 5px; }
   .credit { font-size: 0.8rem; line-height: 1.45; color: var(--ink-2); margin: 8px 0 0; }
   .credit a { color: var(--ink); text-underline-offset: 2px; }
+  .back { display: inline-block; margin-bottom: 10px; font-size: 0.9rem; color: var(--ink-2); text-underline-offset: 2px; }
+  .back:hover { color: var(--ink); }
 
   .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .actions .primary { grid-column: 1 / -1; justify-content: space-between; }
@@ -210,6 +212,7 @@
 <div class="app">
   <aside class="rail rail-top" aria-label="Map and playback">
     <div>
+      <a class="back" href="../">← Back to Earth Sonata</a>
       <h1>Which patch made this rhythm?</h1>
       <p class="lede">An Earth Sonata: Play the Planet practice game. Hear one sound, then pick the patch that made it.</p>
     </div>
