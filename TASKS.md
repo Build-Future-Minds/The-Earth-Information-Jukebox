@@ -43,7 +43,10 @@ tests and 73 app unit tests pass, and CI (unit, build, browser tests) is green.
   `AI_USE.md`. The game's Musical sound (#21) waits until the listening test is logged, and then
   needs Dev B's two fixes.
 - **MIDI piano** (Dev A, 15 Nov): after the core work. It is in the demo only if it is built and
-  tested on the demo laptop before the 2 PM freeze.
+  tested on the demo laptop before Dev B's final recording.
+- **No feature freeze** (Dev A, Sun 9 AM): reviewed work keeps merging after 2 PM. Every change
+  still needs a pull request and a teammate's review. The video shows the app as it is when Dev B
+  records it, and Student A's 8 PM link check should see the final version.
 - **Regions stay circles on the flat map** in version one (Dev A, 15 Nov). The limitation is
   written in `mapping_spec.md` and `science_review.md` section 6. True circles on the globe come
   later, with the map-stretch correction.
@@ -114,9 +117,9 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 - [ ] **SB + A** Review Dev B's #13, #17 and #19, merged without a teammate review — *Student B: the design in the running app; Dev A: the wording*
 - [ ] **SA** 7-slide backup deck drafted from `docs/submission/slides_7.md` — *slides 1, 2, 3 and 7 drafted outside the repo (`slides_7.md` is still the template). Slide 5 screenshot: `docs/submission/stills/app_live_real_data.png` (#26). Dev A gives the team name and slide 4 wording; slide 6 waits on listening counts*
 - [x] **SB** Detailed description drafted in `docs/submission/project_page_draft.md` — *#23 (reviewed by Dev B); Student A's source paragraph and "What we tested" still blank*
-- [x] **B** After the core passes: optional keyboard melody with its own volume. MIDI only after that. — *melody merged in PR #4 (Earth rhythm proven unchanged). MIDI after the core work: in the demo only if built and tested on the demo laptop before the freeze (Dev A, 15 Nov)*
+- [x] **B** After the core passes: optional keyboard melody with its own volume. MIDI only after that. — *melody merged in PR #4 (Earth rhythm proven unchanged). MIDI after the core work: in the demo only if built and tested on the demo laptop before Dev B's final recording (Dev A, 15 Nov)*
 
-## Checkpoint 3 — Rehearse it (Sun 2:00 PM) — feature freeze
+## Checkpoint 3 — Rehearse it (Sun 2:00 PM)
 
 - [ ] **All** A fresh person tries the core steps
 - [ ] **All** 90 seconds each: your work, a test, one limitation
