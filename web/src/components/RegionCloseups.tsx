@@ -1,12 +1,13 @@
+import type { CSSProperties } from 'react';
 // Region close-ups: Student B's patch columns from tools/listening_game.html, brought into the app.
 // Each region circle is shown enlarged from the NASA preview frame, with white-over-black ticks for
 // the line directions (illustration: lineTicks.ts) and a giant numeral whose weight is the region's
-// alignment in this frame (DESIGN.md "Weight Is the Value"). Black and white only on the image.
+// alignment in this frame (DESIGN.md). The letter takes the region's colour; the ticks stay black and white.
 import { useEffect, useRef, useState } from 'react';
 import { longFraction } from '../audio/earthVoice';
 import { lineTicks, type Tick } from '../data/lineTicks';
 import type { Features, Region, Scene } from '../data/types';
-import { regionLabel } from './ExploreControls';
+import { regionLabel, regionStyle } from './ExploreControls';
 import { weightFor } from './NowPlaying';
 
 interface Props {
@@ -43,6 +44,7 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }
             key={r.id}
             region={r}
             label={regionLabel(scene.regions, r.id)}
+            colour={regionStyle(scene.regions, r.id)}
             step={firstStep(r.id)}
             image={image}
             frameWidth={scene.frames.width}
@@ -64,6 +66,7 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen }
 interface CloseupProps {
   region: Region;
   label: string;
+  colour: CSSProperties;
   step: Features['steps'][number] | undefined;
   image: HTMLImageElement | null;
   frameWidth: number;
@@ -73,7 +76,7 @@ interface CloseupProps {
   onListen: () => void;
 }
 
-function Closeup({ region, label, step, image, frameWidth, threshold, current, frameNote, onListen }: CloseupProps) {
+function Closeup({ region, label, colour, step, image, frameWidth, threshold, current, frameNote, onListen }: CloseupProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ticks, setTicks] = useState<Tick[]>([]);
   const [x0, y0, w, h] = region.box_px;
@@ -114,7 +117,7 @@ function Closeup({ region, label, step, image, frameWidth, threshold, current, f
   const ok = step?.status === 'ok';
   const a = ok ? step!.alignment : null;
   return (
-    <figure className={current ? 'patch current' : 'patch'}>
+    <figure className={current ? 'patch current' : 'patch'} style={colour}>
       <canvas
         ref={canvasRef}
         width={w * SCALE}
@@ -135,9 +138,10 @@ function Closeup({ region, label, step, image, frameWidth, threshold, current, f
           <small>alignment</small>
         </span>
         <span>
-          {a === null ? 'missing in this frame' : `second pulse at ${Math.round(longFraction(a) * 100)}%`}
+          <span className="nw">{a === null ? 'missing in this frame' : `second pulse at ${Math.round(longFraction(a) * 100)}%`}</span>
           <br />
-          {frameNote}
+          {/* "model time" may wrap; the timestamp itself never breaks. */}
+          {frameNote.split(' ').slice(0, -1).join(' ')} <span className="nw">{frameNote.split(' ').slice(-1)[0]}</span>
         </span>
       </div>
       <button type="button" className="hear" onClick={onListen} aria-pressed={current}>
