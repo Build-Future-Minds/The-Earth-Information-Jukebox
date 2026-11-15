@@ -299,7 +299,7 @@
       <p class="hint-note">Two sounds lock to one beat.</p>
     </div>
     <div class="axis">
-      <label class="switch"><input type="checkbox" id="musical" checked> Musical sound</label>
+      <label class="switch"><input type="checkbox" id="musical"> Musical sound</label>
       <p class="hint-note">Off for a strict test.</p>
     </div>
     <div class="axis">
@@ -586,6 +586,7 @@
   // MAX_VOICES. `loose` holds single notes played by dragging the timeline.
   const MAX_VOICES = 2;
   let ctx = null, master = null, roomSend = null, voices = [], loose = [], timers = [];
+  let roomOut = null, roomBuffer = null, roomLimiter = null;
   const musical = () => $("musical").checked;
   const ROOM_LEVEL = 0.22;
 
@@ -610,13 +611,27 @@
       limiter.threshold.value = -3; limiter.knee.value = 0; limiter.ratio.value = 20;
       limiter.attack.value = 0.002; limiter.release.value = 0.1;
       master.connect(limiter).connect(ctx.destination);
-      const room = ctx.createConvolver();
-      room.buffer = roomImpulse(1.8);
-      roomSend = ctx.createGain();
-      roomSend.gain.value = musical() ? ROOM_LEVEL : 0;
-      master.connect(roomSend).connect(room).connect(limiter);
+      roomBuffer = roomImpulse(1.8);
+      roomLimiter = limiter;
+      freshRoom();
     }
     if (ctx.state === "suspended") ctx.resume();
+  }
+
+  // A new echo chain. The old one fades out and is unplugged, so its tail can't ring on.
+  function freshRoom() {
+    if (roomSend) {
+      const oldSend = roomSend, oldOut = roomOut;
+      master.disconnect(oldSend);
+      oldOut.gain.setTargetAtTime(0, ctx.currentTime, 0.03);
+      setTimeout(() => oldOut.disconnect(), 200);
+    }
+    const room = ctx.createConvolver();
+    room.buffer = roomBuffer;
+    roomSend = ctx.createGain();
+    roomSend.gain.value = musical() ? ROOM_LEVEL : 0;
+    roomOut = ctx.createGain();
+    master.connect(roomSend).connect(room).connect(roomOut).connect(roomLimiter);
   }
 
   // One note. Timing, pitch and length are set by the caller from the patch's alignment; this only
@@ -767,6 +782,7 @@
     voices.forEach((v) => silence(v.sources)); voices = [];
     silence(loose); loose = [];
     bandStop(0.05);
+    if (ctx) freshRoom();
     timers.forEach(clearTimeout); timers = [];
     cancelAnimationFrame(anim);
     $("track").querySelectorAll(".note.live").forEach((r) => r.classList.remove("live"));
@@ -796,7 +812,7 @@
     notesFor(p, variant).forEach((n) =>
       pulse(start + n.at * beat, SCALE[n.idx], n.second ? 0.65 : 0.9, n.len * beat, v.sources));
     voices.push(v);
-    bandFor(v, anchor);
+    bandFor(v, anchor && $("grooveLock").checked ? anchor : null);
     followVoices();
     return { v, joined: anchor };
   }
@@ -1113,6 +1129,12 @@
     if (!ctx) return;
     roomSend.gain.setTargetAtTime(e.target.checked ? ROOM_LEVEL : 0, ctx.currentTime, 0.05);
     if (!e.target.checked) bandStop(0.2);   // switched on mid-sound, the band joins from the next sound
+  });
+  $("rhythmOnly").addEventListener("change", (e) => {
+    if (e.target.checked && $("musical").checked) {
+      $("musical").checked = false;
+      $("musical").dispatchEvent(new Event("change"));
+    }
   });
   $("hear0").addEventListener("click", () => playPatch(0));
   $("hear1").addEventListener("click", () => playPatch(1));
