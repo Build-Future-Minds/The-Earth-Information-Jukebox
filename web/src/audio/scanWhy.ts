@@ -4,13 +4,13 @@
 // tested against the numbers it quotes. The Earth voice does the same with its `why` record and
 // "Explain this rhythm"; this is the scan's equivalent.
 //
-// A sentence is built from the score and the rule's own constants only. It cannot say anything the
-// score does not hold, so it cannot disagree with the sound.
+// A sentence is built from the score, the rule's own constants and the picture being played. It
+// cannot say anything the score does not hold, so it cannot disagree with the sound. It speaks of
+// one picture only: its own floor, full level, never-read pixels and instrument meanings.
 import {
   CHIME_RULE,
   ROOT_PROGRESSION,
   ROOT_STEP_SECONDS,
-  STRENGTH_FLOOR,
   bandNote,
   chimeNote,
   chimeVelocity,
@@ -20,22 +20,39 @@ import {
   rootNoteAt,
   smoothedLevel,
   type Chime,
+  type ChimeColour,
   type ScanScore,
 } from './scanScore';
 
 export interface WhyContext {
-  /** `world`: the picture is a whole-world equirectangular map, so places are longitudes and
-   *  latitudes. `plain`: any other picture, so places are shares of the way across and up. */
+  /** `world`: the picture is a whole-world map (stated for each picture in data/sources.ts,
+   *  `scan.worldMap`), so places are longitudes and latitudes. `plain`: any other picture, so
+   *  places are shares of the way across and up. */
   geometry: 'world' | 'plain';
-  /** The names the screen uses for the sounds of the chosen scan sound. */
-  names: { held: string; warm: string; cool: string };
+  /** The names the screen uses for the sounds of the chosen scan sound. `blue`: the third
+   *  instrument, for a picture that has one. */
+  names: { held: string; warm: string; cool: string; blue?: string };
+  /** The picture being played: what each instrument means in its own legend, and what its
+   *  never-read pixels are. With it, sentences say what a note means "in this picture". */
+  picture?: { instruments: { warm: string; cool: string; blue?: string }; noData?: string };
 }
 
 /** What happens to one cell's peak, if it has one. */
 export type ChimeWhy =
-  | { status: 'struck'; midi: number; name: string; instrument: string; velocity: number; smoothed: number; warmShare: number }
+  | {
+      status: 'struck';
+      midi: number;
+      name: string;
+      instrument: string;
+      colour: ChimeColour;
+      velocity: number;
+      smoothed: number;
+      warmShare: number;
+      /** Share on the blue side, or null when the picture has no third instrument. */
+      blueShare: number | null;
+    }
   | { status: 'left out'; reason: 'spacing' | 'column'; by: { column: number; band: number }; smoothed: number }
-  | { status: 'none'; reason: 'no colour' | 'below level' | 'not a peak'; smoothed: number };
+  | { status: 'none'; reason: 'no data' | 'no colour' | 'below level' | 'not a peak'; smoothed: number };
 
 /** Everything the scan knows about one cell: one band in one column. */
 export interface BandWhy {
@@ -51,16 +68,21 @@ export interface BandWhy {
   along: string;
   /** The band's share of the globe's surface, 0 to 1: only for a map sweep on a world map. */
   groundShare: number | null;
-  /** Pixels read (sample points on the radar). */
+  /** Pixels read (sample points on the radar). 0 is no data. */
   reads: number;
   measure: ScanScore['measure'];
   /** The mean of the measure over what was read, 0 to 1. */
   mean: number;
+  /** This picture's floor and full level. */
   floor: number;
   full: number;
   level: number;
   held: { midi: number; name: string };
   chime: ChimeWhy;
+  /** What the struck note's instrument means in this picture, or null. */
+  meaning: string | null;
+  /** What this picture's never-read pixels are, or null. */
+  noData: string | null;
 }
 
 const trim = (x: number, digits = 1) => x.toFixed(digits).replace(/\.0+$/, '');
@@ -102,6 +124,11 @@ export function placeOf(
   );
 }
 
+/** The name of the instrument that strikes a note of this colour, in the chosen scan sound. */
+function instrumentName(colour: ChimeColour, ctx: WhyContext): string {
+  return colour === 'warm' ? ctx.names.warm : colour === 'blue' ? (ctx.names.blue ?? ctx.names.cool) : ctx.names.cool;
+}
+
 /** What the scan knows about one cell. Columns and bands outside the score are brought inside it. */
 export function whyBand(score: ScanScore, column: number, band: number, ctx: WhyContext): BandWhy {
   const { columns, bands } = score.grid;
@@ -109,21 +136,25 @@ export function whyBand(score: ScanScore, column: number, band: number, ctx: Why
   band = Math.min(bands - 1, Math.max(0, Math.round(band)));
   const cell = column * bands + band;
   const cyclic = score.shape === 'radar';
-  const smoothed = smoothedLevel(score.levels, score.grid, cyclic, column, band);
+  const smoothed = smoothedLevel(score.levels, score.grid, cyclic, column, band, score.reads);
   const place = placeOf(score, column, band, ctx.geometry);
 
   let chime: ChimeWhy;
   const struck: Chime | undefined = score.chimes.find((c) => c.column === column && c.band === band);
   const dropped = score.dropped.find((d) => d.column === column && d.band === band);
-  if (struck) {
+  if (score.reads[cell] === 0) {
+    chime = { status: 'none', reason: 'no data', smoothed: 0 };
+  } else if (struck) {
     chime = {
       status: 'struck',
       midi: chimeNote(struck),
       name: noteName(chimeNote(struck)),
-      instrument: struck.warm ? ctx.names.warm : ctx.names.cool,
+      instrument: instrumentName(struck.colour, ctx),
+      colour: struck.colour,
       velocity: chimeVelocity(struck.level),
       smoothed: struck.level,
       warmShare: score.warmShare[cell],
+      blueShare: score.blueClass ? score.blueShare[cell] : null,
     };
   } else if (dropped) {
     chime = { status: 'left out', reason: dropped.reason, by: dropped.by, smoothed: dropped.level };
@@ -134,6 +165,7 @@ export function whyBand(score: ScanScore, column: number, band: number, ctx: Why
       smoothed,
     };
   }
+  const meanings = ctx.picture?.instruments;
   return {
     column,
     band,
@@ -146,11 +178,13 @@ export function whyBand(score: ScanScore, column: number, band: number, ctx: Why
     reads: score.reads[cell],
     measure: score.measure,
     mean: score.means[cell],
-    floor: STRENGTH_FLOOR,
+    floor: score.floor,
     full: score.grid.fullStrength,
     level: score.levels[cell],
     held: { midi: bandNote(band), name: noteName(bandNote(band)) },
     chime,
+    meaning: chime.status === 'struck' && meanings ? (meanings[chime.colour] ?? meanings.cool) : null,
+    noData: ctx.picture?.noData ?? null,
   };
 }
 
@@ -159,32 +193,43 @@ export function whyColumn(score: ScanScore, column: number, ctx: WhyContext) {
   const { columns, bands } = score.grid;
   column = Math.min(columns - 1, Math.max(0, Math.round(column)));
   const root = rootNoteAt(score.grid, column);
+  let bandsWithData = 0;
+  for (let band = 0; band < bands; band++) if (score.reads[column * bands + band] > 0) bandsWithData++;
   return {
     column,
     seconds: columnTime(score.grid, column),
-    root: { midi: root, name: noteName(root), loudness: columnMean(score, column) },
+    root: { midi: root, name: noteName(root), loudness: columnMean(score, column), bandsWithData },
     bands: Array.from({ length: bands }, (_, band) => whyBand(score, column, band, ctx)),
   };
 }
 
 const measureName = (m: ScanScore['measure']) => (m === 'colour' ? 'colour strength' : 'brightness');
 const num = (x: number, digits = 3) => x.toFixed(digits);
+const capital = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
+
+/** Which share of the drawn colour chose the instrument, as a clause. */
+function whichSide(c: Extract<ChimeWhy, { status: 'struck' }>): string {
+  if (c.blueShare === null) {
+    return c.warmShare >= 0.5
+      ? `${percent(c.warmShare)} of the colour drawn there is on the red side of yellow (half or more)`
+      : c.warmShare === 0
+        ? 'none of the colour drawn there is on the red side of yellow'
+        : `only ${percent(c.warmShare)} of the colour drawn there is on the red side of yellow (less than half)`;
+  }
+  const neither = Math.max(0, 1 - c.warmShare - c.blueShare);
+  return `of the colour drawn there, ${percent(c.warmShare)} is on the red side of yellow, ${percent(c.blueShare)} on the blue side and ${percent(neither)} neither, and the largest share wins`;
+}
 
 /** What the scan did with one cell's peak, as a sentence. */
 export function explainChime(why: BandWhy): string {
   const c = why.chime;
   const rule = `a level of ${num(CHIME_RULE.minLevel, 2)} or more once smoothed over three columns, higher than the column before it and at least as high as the one after`;
   if (c.status === 'struck') {
-    const side =
-      c.warmShare >= 0.5
-        ? `${percent(c.warmShare)} of its colour is on the red side of yellow (half or more)`
-        : c.warmShare === 0
-          ? 'none of its colour is on the red side of yellow'
-          : `only ${percent(c.warmShare)} of its colour is on the red side of yellow (less than half)`;
+    const meaning = why.meaning ? ` In this picture the ${c.instrument} stands for ${why.meaning}.` : '';
     return (
       `A note is struck here: this cell is a peak (smoothed level ${num(c.smoothed, 2)}; a peak needs ${rule}). ` +
-      `${side[0].toUpperCase()}${side.slice(1)}, so the note is played on the ${c.instrument}, ` +
-      `an octave above the held note: ${c.name}, at strength ${num(c.velocity, 2)} (0.35 + 0.65 × ${num(c.smoothed, 2)}).`
+      `${capital(whichSide(c))}, so the note is played on the ${c.instrument}, ` +
+      `an octave above the held note: ${c.name}, at strength ${num(c.velocity, 2)} (0.35 + 0.65 × ${num(c.smoothed, 2)}).${meaning}`
     );
   }
   if (c.status === 'left out') {
@@ -192,6 +237,9 @@ export function explainChime(why: BandWhy): string {
     return c.reason === 'spacing'
       ? `No note is struck here. This cell is a peak (smoothed level ${num(c.smoothed, 2)}), but a stronger one in the same band, ${where}, is closer than ${CHIME_RULE.minGap} columns, so it gives way.`
       : `No note is struck here. This cell is a peak (smoothed level ${num(c.smoothed, 2)}), but a stronger peak in band ${c.by.band + 1} starts in the same column, and a column starts at most ${CHIME_RULE.perColumn} note${CHIME_RULE.perColumn === 1 ? '' : 's'}.`;
+  }
+  if (c.reason === 'no data') {
+    return 'No note is struck here: the cell read nothing, so there is no data to strike.';
   }
   if (c.reason === 'no colour') {
     return `No note is struck here: the cell has no ${why.measure === 'colour' ? 'colour' : 'light'} to speak of (its mean ${num(why.mean)} is at or below the floor, ${num(why.floor)}).`;
@@ -208,6 +256,13 @@ export function explainBand(why: BandWhy): string {
   const ground = why.groundShare !== null ? ` (${percent(why.groundShare, 1)} of the globe's surface)` : '';
   const measure = measureName(why.measure);
   const sentence1 = `Band ${why.band + 1}, ${why.place}${ground}, ${trim(why.seconds)} s into the sweep at normal speed.`;
+  if (why.reads === 0) {
+    const what = why.noData ? ` (in this picture, ${why.noData})` : ' (masked, or outside the picture)';
+    return (
+      `${sentence1} The line read nothing there: every ${unit === 'pixels' ? 'pixel' : 'sample point'} of this cell is never read${what}. ` +
+      `No data, so the held note ${why.held.name} is silent and no note can be struck. This is not a zero: the picture says nothing here.`
+    );
+  }
   const sentence2 =
     `The line read ${why.reads.toLocaleString('en')} ${unit} there. Their mean ${measure} is ${num(why.mean)}, so the level is ` +
     `(${num(why.mean)} − ${num(why.floor)}) ÷ (${num(why.full, 2)} − ${num(why.floor)}) = ${num(why.level, 2)}, kept between 0 and 1.`;
@@ -222,11 +277,14 @@ export function explainBand(why: BandWhy): string {
 export function chimeSummary(c: ChimeWhy): string {
   if (c.status === 'struck') return `${c.instrument} ${c.name}`;
   if (c.status === 'left out') return c.reason === 'spacing' ? 'peak, left out: too close to a stronger one' : 'peak, left out: a stronger peak in this column';
+  if (c.reason === 'no data') return 'none: no data';
   return c.reason === 'no colour' ? 'none: no colour' : c.reason === 'below level' ? 'none: below the peak level' : 'none: not a peak';
 }
 
-/** A cell's held note in a few words, as the table's "Held note" column gives it. */
+/** A cell's held note in a few words, as the table's "Held note" column gives it. A cell that read
+ *  nothing says so: it is silent because there is no data, not because its level is 0. */
 export function heldSummary(why: BandWhy): string {
+  if (why.reads === 0) return `${why.held.name}, silent: no data`;
   return why.level > 0 ? `${why.held.name} at ${Math.round(100 * why.level)}%` : `${why.held.name}, silent`;
 }
 
@@ -270,14 +328,21 @@ export function explainPick(why: BandWhy, score: ScanScore, ctx: WhyContext): st
   if (!near) return `${head} No note is struck in this band in this sweep.`;
   const steps = Math.abs(near.offset);
   const when = `${steps} column${steps === 1 ? '' : 's'} ${near.offset < 0 ? 'earlier' : 'later'} (${trim((steps * seconds) / columns)} s at normal speed)`;
-  const name = `${near.chime.warm ? ctx.names.warm : ctx.names.cool} ${noteName(chimeNote(near.chime))}`;
+  const name = `${instrumentName(near.chime.colour, ctx)} ${noteName(chimeNote(near.chime))}`;
   return `${head} Nearest struck note in this band: column ${near.chime.column + 1}, ${when}: ${name}.`;
 }
 
 /** The low note: which one, why, and what the picture sets about it. */
-export function explainRoot(root: { name: string; loudness: number }, seconds: number, bands: number): string {
+export function explainRoot(root: { name: string; loudness: number; bandsWithData?: number }, seconds: number, bands: number): string {
+  const withData = root.bandsWithData ?? bands;
+  const over =
+    withData === bands
+      ? `the mean level of the ${bands} bands`
+      : withData === 0
+        ? `nothing: none of the ${bands} bands read anything here, so it is silent`
+        : `the mean level of the ${withData} bands that read something (the other ${bands - withData} have no data)`;
   return (
     `Low note ${root.name}, fixed by a timetable and not by the picture: it steps through ${ROOT_PROGRESSION.join(', ')} in C, one step every ${ROOT_STEP_SECONDS} s ` +
-    `(${trim(seconds)} s into the sweep at normal speed). The picture sets only how loud it is: the mean level of the ${bands} bands, ${percent(root.loudness)}.`
+    `(${trim(seconds)} s into the sweep at normal speed). The picture sets only how loud it is: ${over}${withData === 0 ? '' : `, ${percent(root.loudness)}`}.`
   );
 }

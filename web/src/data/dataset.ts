@@ -33,7 +33,9 @@ export interface Dataset {
 
 function pick(): Dataset {
   // Browser tests set VITE_DATASET=practice: their expected rhythms come from the practice files.
-  if (import.meta.env.VITE_DATASET === 'practice') {
+  // `practice-pictures` is the same practice data, plus made-up pictures for each picture's scan
+  // rule (data/sources.ts, data/testPictures.ts).
+  if (import.meta.env.VITE_DATASET === 'practice' || import.meta.env.VITE_DATASET === 'practice-pictures') {
     return { scene: mockScene, features: mockFeatures, imageUrl: null, origin: 'fixtures/mock/' };
   }
   const scene = realJson['../../../data/scene.json']?.default as Scene | undefined;

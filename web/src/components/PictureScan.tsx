@@ -8,37 +8,41 @@
 // and the legend are shared with the globe (web/src/scan/); this file draws the line on the flat
 // picture.
 //
+// Each picture is read by its own rule (data/sources.ts, `scan`), measured on its own still; its
+// numbers are never compared with another picture's.
+//
 // What you see is what you hear, drawn from the same score and the same audio clock as the sound:
 //   - the picture lights up as the line passes (the part not played yet is dimmed);
 //   - a white shape rides the line: wide where a band is loud;
-//   - every chime leaves a mark on the picture (round for warm colours, a diamond for cool ones);
+//   - every chime leaves a mark on the picture (round for warm colours, a diamond for cool ones,
+//     an asterisk for the third instrument of a picture that has one);
+//   - pixels the picture's rule never reads are hatched: no data, never a zero;
 //   - the bars beside the picture are the low note and the twelve held notes, low to high;
 //   - the legend names every one of these, with the same shapes.
 // Everything drawn over the NASA image is black or white: its colours are never changed.
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import type { Region, Scene } from '../data/types';
-import type { ScanMeasure } from '../audio/scanScore';
+import type { Region } from '../data/types';
 import { cellAt, cellOutline, cellTicks, type ScanPlacement } from '../audio/scanPick';
 import { chosenBand, explainPick, whyColumn } from '../audio/scanWhy';
 import { ScanButtons, ScanSettings, ScanStatus } from '../scan/ScanControls';
+import { starPath } from '../scan/ScanLegend';
 import { ScanSide } from '../scan/ScanSide';
 import { groundNote } from '../scan/groundNote';
-import { useScan, type ScanHandle } from '../scan/useScan';
+import { useScan, type ScanHandle, type ScanPicture } from '../scan/useScan';
 import { useScanFrame } from '../scan/useScanFrame';
 import { ScanExplanation, WHY_START, type WhyView } from './ScanExplanation';
 
 export type PictureScanHandle = ScanHandle;
+export type { ScanPicture };
 
 interface Props {
-  scene: Scene;
-  /** The NASA still, or null in practice mode. */
-  imageUrl: string | null;
+  /** The picture the scan plays, with its measured rule. The view remounts this (a React `key`)
+   *  when the picture changes, so a new picture starts stopped, on the whole picture. */
+  picture: ScanPicture;
   /** The page's speed setting: the scan follows it. */
   speed: number;
   /** Change the page's speed from the scan's settings (the Earth rhythm follows it too). */
   onSpeed?: (speed: number) => void;
-  /** What counts as light in this picture. Colour suits the ocean picture (grey land is silent). */
-  measure?: ScanMeasure;
 }
 
 /** Widest the shape riding the line gets (each side), as a share of the picture's width or the circle's radius. */
@@ -55,14 +59,16 @@ const RANGE_RINGS = [3, 6, 9];
 /** A press that moves further than this (CSS pixels) before it lets go is a drag, not a tap: it picks nothing. */
 const TAP_SLOP = 10;
 
-export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, onSpeed, measure = 'colour' }, ref) {
-  const scan = useScan({ scene, imageUrl, speed, measure });
+export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ picture, speed, onSpeed }, ref) {
+  const scan = useScan({ picture, speed });
+  const { scene, rule, mask, blueClass, choices, sound } = scan;
   const { loaded, target, state, traces, frame, region, worldMap, score, bands, labelOf, why, liveColumn, lastStruck, reducedMotion } = scan;
+  const nodataNote = mask ? (rule.mask?.what ?? 'the hatched part of the picture') : null;
   const sweep = useRef<SVGGElement>(null);
   const profile = useRef<SVGPathElement>(null);
   const unplayed = useRef<SVGPathElement>(null);
   const played = useRef<SVGPathElement>(null);
-  const picture = useRef<SVGSVGElement>(null);
+  const svg = useRef<SVGSVGElement>(null);
   /** The pointer pressed on the picture and where, until it lets go. */
   const press = useRef<{ id: number; x: number; y: number } | null>(null);
   const bandSentenceId = useId();
@@ -108,7 +114,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
     const p = press.current;
     press.current = null;
     if (!p || p.id !== e.pointerId || Math.hypot(e.clientX - p.x, e.clientY - p.y) > TAP_SLOP) return;
-    const m = picture.current?.getScreenCTM();
+    const m = svg.current?.getScreenCTM();
     if (!m || !score || !placement) return;
     // Screen to picture units, through the SVG's own viewBox (the radar view is zoomed to its circle).
     const at = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
@@ -147,6 +153,11 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
     <div className="scan" role="group" aria-labelledby="scan-heading">
       <h3 id="scan-heading">Play the picture</h3>
       <p className="muted">A line sweeps the picture and plays the colours it crosses. A rule we chose; the Earth rhythm is unchanged.</p>
+      {!loaded?.isTest && (
+        <p className="muted scan-which">
+          Reading {picture.label === 'Ocean' ? 'the ocean picture' : `the ${picture.label.toLowerCase()} picture`}: {scene.source.title}, with its own settings.
+        </p>
+      )}
 
       <ScanButtons scan={scan} />
       <ScanSettings scan={scan} speed={speed} onSpeed={onSpeed} />
@@ -156,12 +167,14 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
         <div className="scan-picture">
           {loaded?.isTest && <span className="scan-test">TEST INPUT — a made-up picture, not NASA data</span>}
           <svg
-            ref={picture}
+            ref={svg}
             viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
             role="img"
             aria-label={
               loaded?.isTest
-                ? 'Test picture for the scan: three coloured dots and a grey block on black.'
+                ? picture.test
+                  ? `Test picture for the scan (made up, not NASA data): dots in the colours of the ${picture.label.toLowerCase()} picture's legend${mask ? ', and a hatched block that is never read' : ''}.`
+                  : 'Test picture for the scan: three coloured dots and a grey block on black.'
                 : `${scene.source.title}, with the scan line${region ? ` on ${labelOf(target)}, ${region.name}` : ''}.`
             }
             aria-describedby={hintId}
@@ -180,6 +193,18 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                 <stop offset="0" stopColor="#fff" stopOpacity="0" />
                 <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
               </linearGradient>
+              {mask && (
+                <>
+                  {/* Black and white stripes, seen only where the mask is white: the pixels never read. */}
+                  <pattern id="scan-nodata-hatch" patternUnits="userSpaceOnUse" width={unit * 1.6} height={unit * 1.6} patternTransform="rotate(45)">
+                    <rect width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-light" />
+                    <rect x={unit * 0.8} width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-dark" />
+                  </pattern>
+                  <mask id="scan-nodata-mask" maskUnits="userSpaceOnUse" x={0} y={0} width={frame.width} height={frame.height}>
+                    <image href={mask.href} width={frame.width} height={frame.height} preserveAspectRatio="none" />
+                  </mask>
+                </>
+              )}
             </defs>
 
             {loaded ? (
@@ -187,6 +212,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             ) : (
               <rect width={frame.width} height={frame.height} className="frame-placeholder" />
             )}
+            {mask && <rect className="nodata-hatch" width={frame.width} height={frame.height} fill="url(#scan-nodata-hatch)" mask="url(#scan-nodata-mask)" />}
 
             {region && (
               <>
@@ -224,15 +250,18 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             {/* Marks left by the chimes of this sweep. */}
             <g className="traces">
               {traces.map((t) => (
-                <g key={t.id} className={t.warm ? 'trace warm' : 'trace cool'} transform={`translate(${t.x} ${t.y})`}>
+                <g key={t.id} className={`trace ${t.colour}`} transform={`translate(${t.x} ${t.y})`}>
                   <circle className="ripple" r={unit * 5.5} />
-                  {t.warm ? (
+                  {t.colour === 'warm' ? (
                     <circle className="chime-dot" r={unit * 1.15} />
+                  ) : t.colour === 'blue' ? (
+                    <path className="chime-star-outline" d={starPath(unit * 1.5)} />
                   ) : (
                     <g transform="rotate(45)">
                       <rect className="chime-dot" x={-unit * 1.1} y={-unit * 1.1} width={unit * 2.2} height={unit * 2.2} />
                     </g>
                   )}
+                  {t.colour === 'blue' && <path className="chime-star" d={starPath(unit * 1.5)} />}
                 </g>
               ))}
             </g>
@@ -284,6 +313,11 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             )}
           </svg>
           {!loaded?.isTest && <span className="credit">Visualization: {scene.source.credit}</span>}
+          {nodataNote && (
+            <p className="scan-nodata-note">
+              The hatched part is never read: {nodataNote}. There the scan has no data, so it is silent; that is not a zero.
+            </p>
+          )}
           <p className="scan-pick-hint" id={hintId}>
             Click or tap a place on the picture to see why it sounds as it does, or use the column slider in “Why the scan sounds like this”.
           </p>
@@ -319,13 +353,23 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
         <ul>
           {loaded && !loaded.isTest && (
             <li>
-              <strong>Which picture.</strong> One still: {scene.source.title}
-              {stillTime(scene.frames.timestamps?.[0])}. It is the only picture this rule has been checked on, so the scan
-              stays on it whichever picture is chosen on Listen.
+              <strong>Which picture.</strong> One still: {scene.source.title}, {rule.still.frame}
+              {stillTime(rule.still.time ?? undefined)}, {rule.still.how}. This picture has its own settings, measured on
+              this still; its numbers are never compared with another picture's.
             </li>
           )}
           <li><strong>Where.</strong> Higher on the picture is a higher note (on the radar: further from the centre). There are 12 bands, on the five notes C, D, E, G and A. Low bands are far apart and high bands close together, as a choir is spaced.</li>
-          <li><strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone. Black sea and grey land are silent. A soft held note sounds for every band the line is crossing.</li>
+          <li>
+            <strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone. In this
+            picture a cell at or below {Number((rule.floor * 255).toFixed(2))} of 255 is silent
+            {rule.floor === 12 / 255 ? ' (black sea and grey land)' : ', just above the colour drawn where there is nothing'}. A soft held note sounds for every band the line is crossing.
+          </li>
+          {rule.mask && !loaded?.isTest && (
+            <li>
+              <strong>Pixels never read.</strong> The scan never reads {rule.mask.what}. There it has no data: it is silent, it
+              strikes no note, and it does not count as a zero. They are hatched on the picture.
+            </li>
+          )}
           <li>
             <strong>Peaks of colour.</strong> When a band has more colour under the line than just before and just after, one
             note is struck, an octave above that band's held note. Peaks that follow each other too closely are left out, so
@@ -333,16 +377,23 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
           </li>
           <li>
             <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is
-            struck on one instrument. Where it is not (yellow-green, green and blue), it is struck on another.
+            struck on one instrument.{' '}
+            {blueClass
+              ? 'Where most of it has blue as its largest channel, it is struck on a third. Otherwise it is struck on the second.'
+              : 'Where it is not (yellow-green, green and blue), it is struck on another.'}
             {loaded && !loaded.isTest && (
-              <> On NASA's colour bar for this picture the switch falls at about 23.6 °C, and the picture's lines use the bar's hues. We measured the bar and the picture's colours, not the sea.</>
+              <>
+                {' '}In this picture the {sound.warmName} means {rule.instruments.warm}; the {sound.coolName}, {rule.instruments.cool}
+                {rule.instruments.blue ? <>; the {sound.blueName}, {rule.instruments.blue}</> : null}.
+                {rule.measured.bar0SwitchValue !== undefined && (
+                  <> On NASA's colour bar for this picture the switch falls at about {rule.measured.bar0SwitchValue.toFixed(1)} °C, and the picture's lines use the bar's hues. We measured the bar and the picture's colours, not the sea.</>
+                )}
+              </>
             )}
           </li>
           {loaded && !loaded.isTest && (
             <li>
-              <strong>What the scan cannot tell you.</strong> Lines of some colours are drawn paler than others (light blue
-              the most), so the same amount of line sounds a little quieter in those colours. The still is a
-              compressed copy of NASA's frame, which blurs its finest lines.
+              <strong>What the scan cannot tell you.</strong> {rule.limits.join(' ')}
             </li>
           )}
           <li><strong>Left and right.</strong> The sound sits where the line is: it travels from the left speaker to the right with the line.</li>
@@ -361,6 +412,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
         <ScanExplanation
           score={score}
           ctx={why}
+          choices={choices}
           playing={state === 'playing'}
           getColumn={liveColumn}
           lastStruck={lastStruck}

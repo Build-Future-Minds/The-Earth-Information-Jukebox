@@ -4,7 +4,6 @@
 // picture" plays the same scan as Play along (the same pixels, score and sound), with its line drawn
 // round the globe, on the picture shown here. The team's region-picking tools stay in globe.html.
 import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState, type Ref } from 'react';
-import type { ScanMeasure } from '../audio/scanScore';
 import { regionLabel } from '../components/ExploreControls';
 import { ScanExplanation, WHY_START, type WhyView } from '../components/ScanExplanation';
 import type { Region } from '../data/types';
@@ -14,7 +13,7 @@ import { ScanGlobe } from '../scan/ScanGlobe';
 import { ScanSide } from '../scan/ScanSide';
 import { groundNote } from '../scan/groundNote';
 import { NO_SCAN_RULE, scanRuleOf } from '../scan/scanRule';
-import { useScan, type ScanHandle } from '../scan/useScan';
+import { useScan, type ScanHandle, type ScanPicture } from '../scan/useScan';
 import { GlobeView } from './GlobeView';
 import './globe.css';
 
@@ -34,8 +33,9 @@ interface Props {
 
 export default function GlobeSection(props: Props) {
   const rule = scanRuleOf(props.source);
-  // A picture with a scan rule gets the scan on the globe; any other picture, the globe and its regions.
-  return rule ? <GlobeWithScan key={props.source.key} {...props} measure={rule.measure} /> : <GlobeOnly {...props} />;
+  // A picture with a scan rule gets the scan on the globe, read by that rule; any other picture, the
+  // globe and its regions. A new picture remounts the scan (the key): it starts stopped.
+  return rule ? <GlobeWithScan key={props.source.key} {...props} picture={props.source as ScanPicture} /> : <GlobeOnly {...props} />;
 }
 
 /** The Earth voice's regions: choosing one turns the globe to it and plays it. */
@@ -85,15 +85,15 @@ function GlobeOnly({ source, regionId, onPlayRegion, playing, onStop }: Props) {
   );
 }
 
-function GlobeWithScan({ source, regionId, onPlayRegion, playing, onStop, speed, onSpeed, scanRef, measure }: Props & { measure: ScanMeasure }) {
+function GlobeWithScan({ source, regionId, onPlayRegion, playing, onStop, speed, onSpeed, scanRef, picture }: Props & { picture: ScanPicture }) {
   const [token, setToken] = useState(0);
   // Turn with the line: on each time a scan starts from Stop; off when the person turns the globe.
   const [follow, setFollow] = useState(true);
   const [followOff, setFollowOff] = useState(false);
   const { scene, imageUrl } = source;
   const region = scene.regions.find((r) => r.id === regionId) ?? scene.regions[0];
-  const scan = useScan({ scene, imageUrl, speed, measure });
-  const { state, loaded, region: scanRegion, frame, worldMap, score, why, liveColumn, lastStruck } = scan;
+  const scan = useScan({ picture, speed });
+  const { state, loaded, region: scanRegion, frame, worldMap, score, why, choices, liveColumn, lastStruck } = scan;
 
   useImperativeHandle(scanRef, () => ({ stop: scan.stop }), []);
 
@@ -119,7 +119,7 @@ function GlobeWithScan({ source, regionId, onPlayRegion, playing, onStop, speed,
   }, [state]);
 
   // The picture on the globe: the NASA still, or in practice mode the TEST INPUT picture the scan reads.
-  const picture = imageUrl ?? loaded?.href ?? null;
+  const globePicture = imageUrl ?? loaded?.href ?? null;
   const label = loaded?.isTest
     ? `Test picture for the scan, wrapped on a globe: three coloured dots and a grey block on black, not NASA data.`
     : `Globe of ${scene.source.title}, turned to ${regionLabel(scene.regions, region.id, source.firstLetter)}.`;
@@ -129,10 +129,10 @@ function GlobeWithScan({ source, regionId, onPlayRegion, playing, onStop, speed,
   return (
     <div className="globe-section">
       {loaded?.isTest && <span className="scan-test">TEST INPUT — a made-up picture, not NASA data</span>}
-      {picture ? (
+      {globePicture ? (
         <ScanGlobe
           scan={scan}
-          imageUrl={picture}
+          imageUrl={globePicture}
           spot={{ center_px: region.center_px, radius_px: region.radius_px }}
           sceneFrame={{ width: scene.frames.width, height: scene.frames.height }}
           faceSpotToken={token}
@@ -175,12 +175,13 @@ function GlobeWithScan({ source, regionId, onPlayRegion, playing, onStop, speed,
         </ScanStatus>
         {ground && <p className="muted small">{ground}</p>}
         <div className="scan-view globe-scan-side">
-          <ScanSide scan={scan} />
+          <ScanSide scan={scan} hatchDrawn={false} />
         </div>
         {score && (
           <ScanExplanation
             score={score}
             ctx={why}
+            choices={choices}
             playing={state === 'playing'}
             getColumn={liveColumn}
             lastStruck={lastStruck}

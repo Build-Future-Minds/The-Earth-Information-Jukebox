@@ -7,8 +7,7 @@ import { NowChip } from '../components/NowChip';
 import type { MelodyInstrumentId } from '../audio/instruments';
 import type { PlayState } from '../audio/transport';
 import type { InputSource } from '../audio/userVoice';
-import type { Scene } from '../data/types';
-import { PictureScan, type PictureScanHandle } from '../components/PictureScan';
+import { PictureScan, type PictureScanHandle, type ScanPicture } from '../components/PictureScan';
 import { IconButton } from '../components/IconButton';
 import { PauseIcon, PlayIcon, StopIcon } from '../components/icons';
 import { MelodyPad } from '../components/MelodyPad';
@@ -16,10 +15,10 @@ import { PracticeGame } from '../components/PracticeGame';
 
 
 interface Props {
-  /** The picture the scan plays: always the ocean picture (see App.tsx), not the one chosen on Listen. */
-  scene: Scene;
-  /** That picture's NASA still, or null in practice mode. */
-  imageUrl: string | null;
+  /** The picture the scan plays, with its measured rule: the one chosen on Listen (see App.tsx). */
+  scanPicture: ScanPicture;
+  /** Said when the chosen picture has no measured rule and the scan plays another; else null. */
+  scanNote: string | null;
   /** The page's speed setting: the picture scan follows it. */
   speed: number;
   /** Change the page's speed from the scan's settings (the Earth rhythm follows it too). */
@@ -49,7 +48,9 @@ export function PlayView(p: Props) {
   return (
     <div className="play-grid">
       <div className="play-scan">
-        <PictureScan ref={p.scanRef} scene={p.scene} imageUrl={p.imageUrl} speed={p.speed} onSpeed={p.onSpeed} />
+        {p.scanNote && <p className="muted">{p.scanNote}</p>}
+        {/* A new picture remounts the scan: it starts stopped, on the whole picture, with no marks. */}
+        <PictureScan key={p.scanPicture.key} ref={p.scanRef} picture={p.scanPicture} speed={p.speed} onSpeed={p.onSpeed} />
       </div>
       <section className="jam" aria-label="Play along with the Earth rhythm" style={p.colour}>
         <h3>Play along with the Earth rhythm</h3>

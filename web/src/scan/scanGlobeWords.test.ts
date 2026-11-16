@@ -1,6 +1,7 @@
 // The words the globe scan adds, and which pictures have a scan rule. The circles are the real
 // approved regions from data/ (the same files the app plays).
 import { describe, expect, it } from 'vitest';
+import { AEROSOLS_SCAN, IMERG_SCAN, OCEAN_SCAN, PRACTICE_SCAN } from '../data/sources';
 import type { Scene } from '../data/types';
 import { groundNote } from './groundNote';
 import { scanRuleOf } from './scanRule';
@@ -29,10 +30,14 @@ describe('the sentence about a circle on the ground', () => {
 });
 
 describe('which pictures the scan may play', () => {
-  it('has the colour rule for the ocean picture and the practice picture only, until the others are measured', () => {
-    expect(scanRuleOf({ key: 'ocean' })).toEqual({ measure: 'colour' });
-    expect(scanRuleOf({ key: 'practice' })).toEqual({ measure: 'colour' });
-    expect(scanRuleOf({ key: 'aerosols' })).toBeNull();
-    expect(scanRuleOf({ key: 'imerg' })).toBeNull();
+  it('gives each picture its own measured rule, the same one the flat picture reads', () => {
+    expect(scanRuleOf({ scan: OCEAN_SCAN })).toBe(OCEAN_SCAN);
+    expect(scanRuleOf({ scan: PRACTICE_SCAN })).toBe(PRACTICE_SCAN);
+    expect(scanRuleOf({ scan: AEROSOLS_SCAN })).toBe(AEROSOLS_SCAN);
+    if (IMERG_SCAN) expect(scanRuleOf({ scan: IMERG_SCAN })).toBe(IMERG_SCAN);
+  });
+
+  it('plays no picture that has no measured rule', () => {
+    expect(scanRuleOf({ scan: null })).toBeNull();
   });
 });

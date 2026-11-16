@@ -4,7 +4,7 @@ import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
 import { DEFAULT_MELODY_INSTRUMENT, type MelodyInstrumentId } from './audio/instruments';
-import type { PictureScanHandle } from './components/PictureScan';
+import type { PictureScanHandle, ScanPicture } from './components/PictureScan';
 import { BeatTrack } from './components/BeatTrack';
 import { PlayerBar, RegionChoice, regionColour, regionLabel, regionStyle } from './components/ExploreControls';
 import { PageLinks } from './components/PageLinks';
@@ -28,10 +28,13 @@ export function App() {
   const source = sourceByKey(sourceKey);
   const { scene, features, imageUrl } = source;
   const look = { firstLetter: source.firstLetter, neutral: source.regionStyle === 'neutral' };
-  // The picture scan (Play along) always plays the ocean picture, whichever picture is chosen on
-  // Listen: its colour rule was built and checked on the ocean's temperature colours only, and the
-  // ocean's regions are A and B, as the scan labels them (Dev B's review of #45).
-  const scanPicture = sourceByKey('ocean');
+  // The picture scan (Play along) plays the picture chosen on Listen, with that picture's own
+  // measured rule (data/sources.ts, `scan`). A picture whose rule has not been measured is never
+  // scanned: the scan keeps a picture that has one, and says so (page plan P1b; Developer A, 15 Nov).
+  const scanPicture = (source.scan ? source : (SOURCES.find((s) => s.scan) ?? source)) as ScanPicture;
+  const scanNote = source.scan
+    ? null
+    : `The ${source.label.toLowerCase()} picture's scan rule has not been measured yet, so the scan plays the ${scanPicture.label.toLowerCase()} picture.`;
   const [regionId, setRegionId] = useState(SOURCES[0].scene.regions[0].id);
   const [playState, setPlayState] = useState<PlayState>('stopped');
   const [sounding, setSounding] = useState<TrackStep | null>(null);
@@ -198,7 +201,8 @@ export function App() {
             Home has its own visible heading (the problem sentence), which takes this role there. */}
         {view !== 'home' && <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>}
 
-        {(view === 'listen' || view === 'compare' || view === 'globe') && (
+        {/* Play along shows the picture choice too: the scan and the Earth rhythm there follow it. */}
+        {(view === 'listen' || view === 'compare' || view === 'globe' || (view === 'play' && SOURCES.length > 1)) && (
           <div className="pickers">
             <SourceChoice sources={SOURCES} current={sourceKey} onChoose={chooseSource} />
             {view === 'listen' && (
@@ -298,8 +302,8 @@ export function App() {
           {view === 'how' && <HowView />}
           {view === 'play' && (
             <PlayView
-              scene={scanPicture.scene}
-              imageUrl={scanPicture.imageUrl}
+              scanPicture={scanPicture}
+              scanNote={scanNote}
               speed={speed}
               onSpeed={changeSpeed}
               scanRef={scan}

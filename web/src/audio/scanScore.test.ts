@@ -19,6 +19,7 @@ import {
   scanPan,
   bandNote,
   buildScanScore,
+  chimeColour,
   chimeNote,
   chimeVelocity,
   colourStrength,
@@ -26,10 +27,15 @@ import {
   columnTime,
   cropPixels,
   findChimes,
+  findChimesDetailed,
+  hasData,
+  isBlue,
   isWarm,
   levelOf,
   makeTestPicture,
   radarPoint,
+  resampleMask,
+  smoothedLevel,
   type Pixels,
   type ScanGrid,
 } from './scanScore';
@@ -476,5 +482,277 @@ describe('other kinds of picture: brightness in place of colour', () => {
     const s = buildScanScore(flat(240, 120, [70, 70, 70]), { kind: 'line' }, { measure: 'brightness' });
     expect(s.status).toBe('ok');
     expect(level(s, 10, 5)).toBeGreaterThan(0.4);
+  });
+});
+
+// ---------- Each picture's own settings: floor, mask, no data ----------
+
+/** TEST INPUT: the test picture with its black ground painted another colour. */
+function onGround(rgb: [number, number, number]): Pixels {
+  const p = makeTestPicture();
+  const data = p.data as Uint8ClampedArray;
+  for (let i = 0; i < data.length; i += 4) if (data[i] === 0 && data[i + 1] === 0 && data[i + 2] === 0) data.set(rgb, i);
+  return p;
+}
+/** TEST INPUT: dark navy, like an empty sea drawn in colour (colour strength 36/255). */
+const NAVY: [number, number, number] = [4, 10, 40];
+const NAVY_FLOOR = 36 / 255 + 12 / 255; // the ground's own strength plus the 12-level tolerance
+const chimesOf = (s: ReturnType<typeof buildScanScore>) => s.chimes.map((c) => [c.column, c.band, c.warm, c.level]);
+
+describe('a picture whose empty ground has colour needs its own floor (TEST INPUT)', () => {
+  it('the level is a straight line from the given floor to the full level', () => {
+    expect(levelOf(0.3, 0.5, 0.1)).toBeCloseTo(0.5, 12);
+    expect(levelOf(0.1, 0.5, 0.1)).toBe(0);
+    expect(levelOf(0.5, 0.5, 0.1)).toBe(1);
+    expect(levelOf(0.3, 0.5)).toBe(levelOf(0.3, 0.5, STRENGTH_FLOOR)); // the default is the ocean's floor
+  });
+  it('at the ocean floor (12/255) every cell of a navy sea sounds', () => {
+    const s = buildScanScore(flat(240, 120, NAVY), { kind: 'line' });
+    expect(s.floor).toBe(STRENGTH_FLOOR);
+    expect(s.levels.every((l) => l > 0)).toBe(true);
+  });
+  it('at the navy plus 12 levels no cell sounds, and the picture says it is missing', () => {
+    const s = buildScanScore(flat(240, 120, NAVY), { kind: 'line' }, { floor: NAVY_FLOOR });
+    expect(s.floor).toBe(NAVY_FLOOR);
+    expect(s.levels.every((l) => l === 0)).toBe(true);
+    expect(s.status).toBe('missing');
+    expect(s.reason).toMatch(/no coloured lines/);
+  });
+  it('the three dots on navy, at that floor, give exactly the chimes they give on black', () => {
+    const black = buildScanScore(makeTestPicture(), { kind: 'line' });
+    const navy = buildScanScore(onGround(NAVY), { kind: 'line' }, { floor: NAVY_FLOOR });
+    expect(chimesOf(navy)).toEqual(chimesOf(black));
+    expect(chimesOf(navy).map(([column, band, warm]) => [column, band, warm])).toEqual([[41, 1, true], [81, 8, false], [201, 5, false]]);
+  });
+});
+
+describe('a mask: pixels the scan never reads (TEST INPUT)', () => {
+  /** A mask the size of a 240 × 120 picture, set where `masked(x, y)` is true. */
+  const maskOf = (masked: (x: number, y: number) => boolean, width = 240, height = 120) => {
+    const m = new Uint8Array(width * height);
+    for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) m[y * width + x] = masked(x, y) ? 1 : 0;
+    return m;
+  };
+
+  it('no mask and an empty mask give exactly the same score as before', () => {
+    const before = buildScanScore(makeTestPicture(), { kind: 'line' });
+    for (const mask of [null, maskOf(() => false)]) {
+      const s = buildScanScore(makeTestPicture(), { kind: 'line' }, { mask });
+      expect(Array.from(s.levels)).toEqual(Array.from(before.levels));
+      expect(Array.from(s.means)).toEqual(Array.from(before.means));
+      expect(s.chimes).toEqual(before.chimes);
+      expect(s.dropped).toEqual(before.dropped);
+    }
+  });
+  it('a masked pixel is not read: a fully masked cell read nothing and is no data', () => {
+    // One pixel column per scan column: mask columns 100 to 119 (the left half of the grey block).
+    const s = buildScanScore(makeTestPicture(), { kind: 'line' }, { mask: maskOf((x) => x >= 100 && x < 120) });
+    for (let band = 0; band < 12; band++) {
+      expect(s.reads[110 * 12 + band]).toBe(0);
+      expect(hasData(s, 110 * 12 + band)).toBe(false);
+      expect(s.reads[130 * 12 + band]).toBe(10);
+    }
+  });
+  it('a half-masked cell has the mean of the pixels it read, not of the whole cell', () => {
+    // 480 wide: two pixels per column. Column 0 is a red pixel and a black one; mask the black one.
+    const p = paint(flat(480, 120, [0, 0, 0]), 0, 0, 1, 120, [255, 0, 0]);
+    const plain = buildScanScore(p, { kind: 'line' });
+    const masked = buildScanScore(p, { kind: 'line' }, { mask: maskOf((x) => x === 1, 480, 120) });
+    expect(plain.means[0]).toBeCloseTo(0.5, 6);
+    expect(masked.means[0]).toBeCloseTo(1, 6);
+    expect(masked.reads[0]).toBe(10);
+  });
+  it('a cell with no data is silent and is never a chime, even under a bright dot', () => {
+    // Mask the green dot exactly (x 80–87, y 30–39): its chime in column 81, band 8 must go.
+    const s = buildScanScore(makeTestPicture(), { kind: 'line' }, { mask: maskOf((x, y) => x >= 80 && x < 88 && y >= 30 && y < 40) });
+    expect(s.chimes.map((c) => [c.column, c.band])).toEqual([[41, 1], [201, 5]]);
+    expect(s.dropped.some((d) => d.band === 8 && d.column >= 79 && d.column <= 88)).toBe(false);
+    for (let column = 80; column < 88; column++) expect(level(s, column, 8)).toBe(0);
+  });
+  it('the low note leaves out bands with no data: it is the mean of the bands that read something', () => {
+    // A full red column 40 (every band at level 1), with the top six bands masked.
+    const p = paint(flat(240, 120, [0, 0, 0]), 40, 0, 1, 120, [255, 0, 0]);
+    const s = buildScanScore(p, { kind: 'line' }, { mask: maskOf((x, y) => x === 40 && y < 60) });
+    expect(columnMean(s, 40)).toBe(1); // six bands at 1, six with no data: not 0.5
+    const all = buildScanScore(p, { kind: 'line' }, { mask: maskOf((x) => x === 40) });
+    expect(columnMean(all, 40)).toBe(0); // a column with no data at all is silent
+  });
+  it('everything masked: the scan is missing, and says that nothing was read', () => {
+    const s = buildScanScore(makeTestPicture(), { kind: 'line' }, { mask: maskOf(() => true) });
+    expect(s.status).toBe('missing');
+    expect(s.reason).toMatch(/nothing under the scan was read/);
+    expect(s.reads.every((r) => r === 0)).toBe(true);
+  });
+  it('a mask of the wrong size is an error, not a guess', () => {
+    expect(() => buildScanScore(makeTestPicture(), { kind: 'line' }, { mask: new Uint8Array(10) })).toThrow(/240 × 120/);
+  });
+  it('the radar reads the mask too: masked sample points are not read', () => {
+    const picture = flat(122, 122, [0, 255, 0]);
+    const shape = { kind: 'radar' as const, cx: 61, cy: 61, r: 61 };
+    const s = buildScanScore(picture, shape, { mask: maskOf((x) => x < 61, 122, 122) }); // the west half
+    // Column 60 of 120 points due west: every band there read nothing. Column 0 points east: all read.
+    for (let band = 0; band < 12; band++) {
+      expect(s.reads[60 * 12 + band]).toBe(0);
+      expect(s.reads[0 * 12 + band]).toBe(16);
+    }
+  });
+});
+
+describe('no data next to a peak: compared only with the neighbour that has data', () => {
+  const grid: ScanGrid = { columns: 40, bands: 1, seconds: 5, fullStrength: 0.5 };
+  const row = (values: Record<number, number>) => {
+    const levels = new Float32Array(40);
+    for (const [c, v] of Object.entries(values)) levels[Number(c)] = v;
+    return levels;
+  };
+  const allRead = () => new Uint32Array(40).fill(10);
+
+  it('smoothing leaves a no-data neighbour out, and the others share its weight', () => {
+    const levels = row({ 10: 0.8, 11: 0.4 });
+    const reads = allRead();
+    reads[9] = 0;
+    expect(smoothedLevel(levels, grid, false, 10, 0)).toBeCloseTo((0 + 2 * 0.8 + 0.4) / 4, 6);
+    expect(smoothedLevel(levels, grid, false, 10, 0, reads)).toBeCloseTo((2 * 0.8 + 0.4) / 3, 6);
+    expect(smoothedLevel(levels, grid, false, 10, 0, allRead())).toBe(smoothedLevel(levels, grid, false, 10, 0));
+  });
+  it('a no-data cell has no smoothed level', () => {
+    const reads = allRead();
+    reads[10] = 0;
+    expect(smoothedLevel(row({ 10: 0.9 }), grid, false, 10, 0, reads)).toBe(0);
+  });
+  it('on a coast the peak is the first cell with data, not one column further on', () => {
+    // Column 9 is no data (land); the sea from column 10 is bright, then fades.
+    const levels = row({ 10: 0.6, 11: 0.6, 12: 0.2 });
+    const reads = allRead();
+    reads[9] = 0;
+    const warm = new Float32Array(40);
+    expect(findChimes(levels, warm, grid, false).map((c) => c.column)).toEqual([11]); // land counted as 0
+    expect(findChimes(levels, warm, grid, false, undefined, reads).map((c) => c.column)).toEqual([10]);
+  });
+  it('a cell with no data is never a peak, whatever level it holds', () => {
+    const levels = row({ 20: 1 });
+    const reads = allRead();
+    reads[20] = 0;
+    const found = findChimesDetailed(levels, new Float32Array(40), grid, false, undefined, reads);
+    expect(found.chimes).toEqual([]);
+    expect(found.dropped).toEqual([]);
+  });
+  it('beyond the map sweep\'s ends is not no data: the first column is still compared with 0', () => {
+    const levels = row({ 0: 0.8 });
+    const reads = allRead();
+    expect(findChimes(levels, new Float32Array(40), grid, false, undefined, reads).map((c) => c.column)).toEqual([0]);
+  });
+});
+
+describe('which instrument: two classes, or three where a picture gives blue its own meaning', () => {
+  // The step colours of NASA's rain and snow bars for SVS 4285, as `npm run measure` read them from
+  // rainbarwhite2.png and snowbarwhite2.png (docs/measurements/scan_pictures.md, "Rain").
+  const RAIN_STEPS: [number, number, number][] = [
+    [0, 179, 48], [96, 211, 0], [180, 231, 0], [255, 251, 0], [255, 196, 0],
+    [255, 147, 0], [255, 73, 0], [255, 0, 0], [200, 0, 0], [145, 0, 0],
+  ];
+  const SNOW_STEPS: [number, number, number][] = [
+    [69, 255, 255], [73, 221, 255], [77, 187, 255], [79, 154, 255], [81, 122, 255],
+    [82, 93, 255], [83, 70, 255], [90, 47, 217], [115, 33, 187], [140, 20, 156],
+  ];
+
+  it('on NASA\'s bars the blue side is every snow step and no rain step', () => {
+    expect(RAIN_STEPS.filter((c) => isBlue(...c))).toEqual([]);
+    expect(SNOW_STEPS.every((c) => isBlue(...c))).toBe(true);
+    // And red-side-of-yellow is rain steps 4 to 10 (yellow to dark red), never snow.
+    expect(RAIN_STEPS.map((c) => isWarm(...c))).toEqual([false, false, false, true, true, true, true, true, true, true]);
+    expect(SNOW_STEPS.some((c) => isWarm(...c))).toBe(false);
+  });
+  it('ties: cyan (green equal to blue) is blue; magenta (red equal to blue) is warm, not blue', () => {
+    expect(isBlue(0, 255, 255)).toBe(true);
+    expect(isWarm(255, 0, 255)).toBe(true);
+    expect(isBlue(255, 0, 255)).toBe(false);
+    expect(isBlue(0, 255, 0)).toBe(false);
+  });
+  it('two classes: warm when half or more of the drawn colour is warm, as before', () => {
+    expect(chimeColour(0.5, null)).toBe('warm');
+    expect(chimeColour(0.49, null)).toBe('cool');
+  });
+  it('three classes: the largest share wins; a tie goes to warm, then to cool', () => {
+    expect(chimeColour(0.2, 0.7)).toBe('blue');
+    expect(chimeColour(0.4, 0.3)).toBe('warm');
+    expect(chimeColour(0.2, 0.3)).toBe('cool'); // cool 0.5
+    expect(chimeColour(0.4, 0.4)).toBe('warm'); // warm ties with blue
+    expect(chimeColour(0.2, 0.4)).toBe('cool'); // cool 0.4 ties with blue
+  });
+  it('the three dots: the same notes at the same times; with a third class the blue dot moves to it', () => {
+    const two = buildScanScore(makeTestPicture(), { kind: 'line' });
+    const three = buildScanScore(makeTestPicture(), { kind: 'line' }, { blueClass: true });
+    expect(three.chimes.map((c) => [c.column, c.band, c.level])).toEqual(two.chimes.map((c) => [c.column, c.band, c.level]));
+    expect(two.chimes.map((c) => c.colour)).toEqual(['warm', 'cool', 'cool']);
+    expect(three.chimes.map((c) => c.colour)).toEqual(['warm', 'cool', 'blue']); // red, green (0, 220, 60), blue (0, 80, 255)
+    expect(three.chimes.every((c) => c.warm === (c.colour === 'warm'))).toBe(true);
+    expect(two.blueClass).toBe(false);
+    expect(Array.from(two.blueShare).every((s) => s === 0)).toBe(true);
+  });
+  it('only what is drawn above the floor chooses the instrument: a navy sea never makes light rain into snow', () => {
+    // Each scan column is one pixel wide: rows 0–8 of band 11 navy, row 9 green rain. 240 × 120 picture.
+    const p = paint(flat(240, 120, NAVY), 50, 9, 1, 1, [0, 179, 48]);
+    const cell = 50 * 12 + 11;
+    const atItsFloor = buildScanScore(p, { kind: 'line' }, { floor: NAVY_FLOOR, blueClass: true });
+    expect(atItsFloor.warmShare[cell]).toBe(0);
+    expect(atItsFloor.blueShare[cell]).toBe(0); // the navy is below the floor: it does not vote
+    expect(chimeColour(atItsFloor.warmShare[cell], atItsFloor.blueShare[cell])).toBe('cool');
+    const atOceanFloor = buildScanScore(p, { kind: 'line' }, { blueClass: true });
+    expect(atOceanFloor.blueShare[cell]).toBeGreaterThan(0.5); // at 12/255 the navy would outvote the rain
+  });
+  it('a cell with nothing drawn above the floor has no shares, and the ocean\'s grey and black never vote', () => {
+    const s = buildScanScore(makeTestPicture(), { kind: 'line' }, { blueClass: true });
+    const greyCell = 110 * 12 + 5; // inside the grey block
+    expect(s.warmShare[greyCell]).toBe(0);
+    expect(s.blueShare[greyCell]).toBe(0);
+  });
+});
+
+describe('resampleMask: one mask on a picture of another size (nearest pixel)', () => {
+  it('the same size gives the same mask', () => {
+    const m = Uint8Array.from([1, 0, 0, 1, 1, 1]);
+    expect(Array.from(resampleMask(m, 3, 2, 3, 2))).toEqual([1, 0, 0, 1, 1, 1]);
+  });
+  it('twice the size repeats each pixel in a 2 × 2 square', () => {
+    const m = Uint8Array.from([1, 0, 0, 1]); // 2 × 2
+    expect(Array.from(resampleMask(m, 2, 2, 4, 4))).toEqual([1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]);
+  });
+  it('half the size takes the pixel nearest each new centre', () => {
+    // 4 × 2 → 2 × 1: centres fall on source x 1 and 3, row 1.
+    const m = Uint8Array.from([0, 0, 0, 0, 0, 1, 0, 0]);
+    expect(Array.from(resampleMask(m, 4, 2, 2, 1))).toEqual([1, 0]);
+  });
+  it('any non-zero value means masked', () => {
+    expect(Array.from(resampleMask(Uint8Array.from([255, 0]), 2, 1, 2, 1))).toEqual([1, 0]);
+  });
+  it('a mask that is not the size it claims is an error', () => {
+    expect(() => resampleMask(new Uint8Array(5), 2, 2, 4, 4)).toThrow(/2 × 2/);
+  });
+});
+
+describe('regionScan cuts the mask out with the circle', () => {
+  it('with no mask and a circle inside the picture, nothing is masked (the ocean as before)', () => {
+    expect(regionScan(makeTestPicture(), 240, TEST_CIRCLE).mask).toBeNull();
+  });
+  it('the mask is cut from the same square as the picture', () => {
+    const mask = new Uint8Array(240 * 120);
+    for (let y = 0; y < 120; y++) for (let x = 0; x < 120; x++) mask[y * 240 + x] = 1; // the left half
+    const { crop, mask: cut } = regionScan(makeTestPicture(), 240, TEST_CIRCLE, mask);
+    expect(cut).not.toBeNull();
+    expect(cut!.length).toBe(crop.width * crop.height);
+    // The square starts at x 65, so picture x 119 is crop x 54 and picture x 120 is crop x 55.
+    expect(cut![50 * crop.width + 54]).toBe(1);
+    expect(cut![50 * crop.width + 55]).toBe(0);
+  });
+  it('a square that sticks out of the picture: the part outside is no data, not black', () => {
+    const region = { box_px: [-10, 0, 40, 40] as [number, number, number, number], radius_px: 20 };
+    const { crop, shape, mask } = regionScan(flat(240, 120, [0, 255, 0]), 240, region);
+    expect(mask).not.toBeNull();
+    expect(mask![20 * 40 + 9]).toBe(1); // picture x -1
+    expect(mask![20 * 40 + 10]).toBe(0); // picture x 0
+    const s = buildScanScore(crop, shape, { mask });
+    expect(s.reads[60 * 12 + 11]).toBe(0); // due west at the rim: outside the picture
+    expect(s.reads[0 * 12 + 11]).toBe(16); // due east at the rim: inside
   });
 });
