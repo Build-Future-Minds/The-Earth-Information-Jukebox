@@ -31,13 +31,14 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      # Publish Student B's listening game and quiz player next to the app, at /tools/.
+      # Publish Student B's listening game next to the app, at /tools/. The quiz player stays in
+      # tools/ for the team's own listening test and is not published.
       # The game loads ../assets/frames/svs3912/<still>.jpg. That NASA still is not committed
       # (assets/frames/ is git-ignored), so it is downloaded here, straight from NASA SVS 3912.
       - name: Add listening tools and their NASA still
         run: |
           mkdir -p dist/tools dist/assets/frames/svs3912
-          cp ../tools/listening_game.html ../tools/listening_quiz_player.html dist/tools/
+          cp ../tools/listening_game.html dist/tools/
           curl --fail --silent --show-error --retry 3 \
             -o dist/assets/frames/svs3912/flat_global_ecco2_2028x1024.25000.jpg \
             https://svs.gsfc.nasa.gov/vis/a000000/a003900/a003912/flat_global_ecco2_2028x1024.25000.jpg
