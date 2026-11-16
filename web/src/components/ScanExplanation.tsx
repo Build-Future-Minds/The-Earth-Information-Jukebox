@@ -10,8 +10,9 @@
 // follows the line, until a place is chosen (with the slider, the buttons or a click on the picture);
 // "Follow the line" brings it back. Every column can be reached by keyboard, playing or not.
 //
-// What it shows (open or not, which column, which band, following or not) is kept by PictureScan, so
-// a click on the picture can choose a place here, and the picture can mark the place explained.
+// What it shows (open or not, which column, which band, following or not) is kept by the view that
+// shows the scan (PictureScan, or the globe), so a click on the flat picture can choose a place here,
+// and the picture can mark the place explained. The globe has no such click: a press on it turns it.
 import { useEffect, useMemo } from 'react';
 import { SCAN_CHOICES, type ScanChoice } from '../audio/scanChoices';
 import { chimeSummary, chosenBand, explainBand, explainRoot, heldSummary, placeOf, whyBand, whyColumn, type WhyContext } from '../audio/scanWhy';
@@ -42,11 +43,13 @@ interface Props {
   onChange: (change: Partial<WhyView>) => void;
   /** id for the full sentence about the chosen band, so "Read why" under the picture can move focus to it. */
   bandSentenceId: string;
+  /** A click on the picture chooses a place (the flat picture). False on the globe, where it does not. */
+  pickOnPicture?: boolean;
 }
 
 const FOLLOW_MS = 250;
 
-export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, view, onChange, bandSentenceId }: Props) {
+export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, view, onChange, bandSentenceId, pickOnPicture = true }: Props) {
   const { open, column, pick, follow } = view;
   const { columns, bands } = score.grid;
   const following = playing && follow;
@@ -117,10 +120,10 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, vi
             </div>
             <p className="muted">
               {following
-                ? 'Following the line while the scan plays. Untick “Follow the line”, or click the picture, to look at another place.'
+                ? `Following the line while the scan plays. Untick “Follow the line”${pickOnPicture ? ', or click the picture,' : ''} to look at another place.`
                 : playing
                   ? 'Showing the place you chose while the scan plays on. Tick “Follow the line” to follow it again. Choosing a place does not move the scan or make a sound.'
-                  : 'Choose a column with the slider or the two buttons, or click the picture. This does not move the scan or make a sound.'}
+                  : `Choose a column with the slider or the two buttons${pickOnPicture ? ', or click the picture' : ''}. This does not move the scan or make a sound.`}
             </p>
 
             <div className="why-table" role="region" aria-label="Table of the bands in this column" tabIndex={0}>
