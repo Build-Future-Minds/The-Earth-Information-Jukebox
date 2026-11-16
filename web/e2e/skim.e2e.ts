@@ -117,6 +117,7 @@ for (const [w, h] of [[1024, 768], [920, 700], [768, 1024]] as const) {
 test('Explain before Play says no note has been struck yet and shows no "no data" (nothing is missing)', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'Explain', exact: true }).click();
+  await page.locator('.explain-scan').getByText('Why the scan sounds like this', { exact: true }).click();
   await expect(page.locator('.explain-scan .why-last')).toHaveText('No note has been struck in this sweep yet.');
   await expect(page.locator('.explain-scan .why-last')).not.toContainText('no data');
 });

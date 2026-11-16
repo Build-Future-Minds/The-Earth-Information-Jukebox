@@ -98,8 +98,9 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
     }
   });
 
-  // "Why the scan sounds like this", open from the start: Explain is already a choice to read it.
-  const [whyView, setWhyView] = useState<WhyView>({ ...WHY_START, open: true });
+  // "Why the scan sounds like this": folded under Explain until asked for. Explain opens on the key
+  // to the marks, which is what a first look needs (critique, 16 Nov).
+  const [whyView, setWhyView] = useState<WhyView>(WHY_START);
   const changeWhy = useCallback(
     (change: Partial<WhyView>) =>
       setWhyView((v) => ((Object.keys(change) as (keyof WhyView)[]).some((k) => v[k] !== change[k]) ? { ...v, ...change } : v)),
@@ -115,8 +116,8 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
   const status =
     state === 'playing'
       ? region
-        ? `Playing ${fullName}: a radar line turns once around the circle.`
-        : `Playing the whole picture: a line moves ${across}.`
+        ? `Playing ${fullName}: a radar line turns around the circle, again until you stop.`
+        : `Playing the whole picture: a line moves ${across}, again until you stop.`
       : state === 'paused'
         ? `Paused on ${fullName}.`
         : `Stopped. ${region ? fullName : 'The whole picture'} selected.`;
@@ -151,8 +152,7 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
                   {letter && <span className="region-badge" aria-hidden="true">{letter}</span>}
                   {test ? name : `${name}: ${region.name}`}
                 </p>
-                {!test && <p className="where-desc">{region.description}</p>}
-                <p className="where-desc">The radar reads only inside the circle. The centre is low, the rim high.</p>
+                <p className="where-desc">The radar reads only inside this circle: the centre is low, the rim high.</p>
                 {loaded && !test && (
                   <svg className="where-map" viewBox={`0 0 ${frame.width} ${frame.height}`} role="img" aria-label={`Where ${name} is on the whole picture.`}>
                     <image href={loaded.href} width={frame.width} height={frame.height} preserveAspectRatio="none" />
@@ -199,6 +199,7 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
           {/* The y axis: the twelve held notes, highest at the top, each beside the band it reads.
               Filled by the shared drawing loop through `side.bars`; empty while stopped (styles.css). */}
           <div className="band-meter" aria-hidden="true">
+            <span className="meter-cap">Held notes</span>
             {Array.from({ length: bands }, (_, i) => bands - 1 - i).map((band) => (
               <span key={band} className="band" ref={(el) => void (side.bars.current[band] = el)}>
                 <b>{noteName(bandNote(band))}</b>
@@ -257,6 +258,9 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
                 <span>{name} · {WORD[state]}</span>
               </span>
               <span className="sl-where" ref={whereText} />
+              <span className="sl-key">
+                <i className="warm" /> red or orange <i className="cool" /> other colours
+              </span>
               <span className="sl-time" ref={timeText}>0:00 / {clock(seconds / p.speed)}</span>
             </div>
             <div className={state === 'stopped' ? 'sl-lane idle' : 'sl-lane'} ref={lane}>
@@ -277,8 +281,13 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
 
       {p.explaining && (
         <section className="explain-scan" ref={p.explanationRef} tabIndex={-1} aria-labelledby="explain-scan-title">
-          {/* The honesty lines are said once, on How it's made (team rule), not in every explanation. */}
-          <h3 id="explain-scan-title">Where each note comes from</h3>
+          {/* The honesty lines are said once, on How it's made (team rule), not in every explanation.
+              First the key to what is on screen, open; the full working, folded, for whoever wants it. */}
+          <h3 id="explain-scan-title">Explain</h3>
+          <div className="explain-key">
+            <h4>What the marks mean</h4>
+            <ScanLegend sound={sound} order={order} radar={!!region} bars="beside" />
+          </div>
           {score ? (
             <ScanExplanation
               score={score}
@@ -294,10 +303,6 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
           ) : (
             <p className="muted">Nothing to explain yet: the scan has no score for this picture.</p>
           )}
-          <details className="scan-legend-box">
-            <summary>What the marks mean</summary>
-            <ScanLegend sound={sound} order={order} radar={!!region} bars="beside" />
-          </details>
           <details className="scan-how">
             <summary>How the picture becomes sound</summary>
             <ScanHow scene={picture.scene} rule={rule} isTest={test} />
@@ -356,6 +361,8 @@ function MapTags({ picture, regions, frame, look }: { picture: Source; regions: 
       {regions.map((r) => {
         const [cx, cy] = r.center_px;
         const below = hits(cx - tagW / 2, cy - r.radius_px - gap - tagH, r);
+        // Near an edge the tag slides in, so it never runs into the graticule.
+        const x = Math.min(frame.width - tagW / 2, Math.max(tagW / 2, cx));
         const letter = regionLetter(picture, r.id);
         return (
           <span
@@ -364,7 +371,7 @@ function MapTags({ picture, regions, frame, look }: { picture: Source; regions: 
             aria-hidden="true"
             style={{
               ...regionStyle(picture.scene.regions, r.id, look),
-              left: `${(cx / frame.width) * 100}%`,
+              left: `${(x / frame.width) * 100}%`,
               top: `${((below ? cy + r.radius_px : cy - r.radius_px) / frame.height) * 100}%`,
             }}
           >

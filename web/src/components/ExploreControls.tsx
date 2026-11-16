@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { IconButton } from './IconButton';
 import { ExplainIcon, PauseIcon, PlayIcon, ReplayIcon, SoundIcon, StopIcon } from './icons';
 // Owner: Student B (v1 by Dev B — refine wording, order and labels; review together).
@@ -71,6 +71,11 @@ interface PlayerProps {
 export function PlayerBar(p: PlayerProps) {
   const playing = p.playState === 'playing';
   const [soundOpen, setSoundOpen] = useState(false);
+  // The settings open under the bar: bring them into view, which may be below the fold.
+  const settingsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (soundOpen) settingsRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [soundOpen]);
   return (
     <section className={p.className ? `player ${p.className}` : 'player'} aria-label={p.label ?? 'Playback controls'}>
       <div className="player-row">
@@ -89,7 +94,7 @@ export function PlayerBar(p: PlayerProps) {
           <IconButton icon={SoundIcon} label="Sound" onClick={() => setSoundOpen((o) => !o)} expanded={soundOpen} controls="sound-settings" />
         </div>
       </div>
-      <div id="sound-settings" className="sound-settings" hidden={!soundOpen}>
+      <div id="sound-settings" className="sound-settings" hidden={!soundOpen} ref={settingsRef}>
         {p.settings}
         <div className="row" role="group" aria-label="Speed">
           {SPEEDS.map((v) => (

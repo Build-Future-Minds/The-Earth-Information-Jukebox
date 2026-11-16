@@ -25,8 +25,9 @@ export function HearChoice({ picture, value, onChange, look, speed }: Props) {
   const regions = scanRegions(picture);
   const test = !picture.imageUrl;
   const across = !test && picture.scan?.worldMap ? 'west to east' : 'left to right';
-  const lineWords = `A line crosses it ${across} in ${seconds(LINE_GRID.seconds / speed)}`;
-  const radarWords = `A radar line turns once around the circle in ${seconds(RADAR_GRID.seconds / speed)}`;
+  // The scan repeats until Stop: "each time", never "once".
+  const lineWords = `A line sweeps it ${across}, ${seconds(LINE_GRID.seconds / speed)} each time`;
+  const radarWords = `A radar line turns around the circle, ${seconds(RADAR_GRID.seconds / speed)} each turn`;
   const options: ScanTarget[] = ['map', ...regions.map((r) => r.id)];
   const chosen = value === 'map' ? null : regions.find((r) => r.id === value) ?? null;
 
@@ -48,7 +49,7 @@ export function HearChoice({ picture, value, onChange, look, speed }: Props) {
       </legend>
       <div className="step-rows hear-rows">
         <label className={value === 'map' ? 'hear-row on' : 'hear-row'}>
-          <input type="radio" name="hear" value="map" checked={value === 'map'} onChange={() => onChange('map')} />
+          <input type="radio" name="hear" value="map" checked={value === 'map'} onChange={() => onChange('map')} aria-label={`Whole picture: ${lineWords.toLowerCase()}`} />
           <span className="hear-icon" aria-hidden="true"><span className="sweep-icon" /></span>
           <span className="hear-name">
             <b>Whole picture</b>
@@ -62,7 +63,14 @@ export function HearChoice({ picture, value, onChange, look, speed }: Props) {
           const style = regionStyle(picture.scene.regions, r.id, look);
           return (
             <label key={r.id} className={value === r.id ? 'hear-row on' : 'hear-row'} style={style}>
-              <input type="radio" name="hear" value={r.id} checked={value === r.id} onChange={() => onChange(r.id)} />
+              <input
+                type="radio"
+                name="hear"
+                value={r.id}
+                checked={value === r.id}
+                onChange={() => onChange(r.id)}
+                aria-label={test ? `${name}: ${radarWords.toLowerCase()}` : `${name}: ${r.name}. ${radarWords}`}
+              />
               <span className="hear-icon" aria-hidden="true">
                 {picture.imageUrl ? (
                   <span className="region-thumb" style={{ backgroundImage: `url(${picture.imageUrl})`, ...thumbCss(r, picture.scene.frames, 40) }} />

@@ -178,7 +178,9 @@ test('the explanation opens by keyboard and receives focus', async ({ page }) =>
   await page.keyboard.press('Enter');
   const explanation = page.locator('.explain-scan');
   await expect(explanation).toBeFocused();
-  await expect(explanation).toContainText('Why the scan sounds like this');
+  // First the key to the marks; the full working is folded until asked for.
+  await expect(explanation.getByRole('heading', { name: 'What the marks mean' })).toBeVisible();
+  await explanation.getByText('Why the scan sounds like this', { exact: true }).click();
   await expect(explanation).toContainText('No note has been struck in this sweep yet.');
   // The honesty lines are said once, on How it's made, not repeated in every explanation.
   await expect(explanation).not.toContainText('computer model');

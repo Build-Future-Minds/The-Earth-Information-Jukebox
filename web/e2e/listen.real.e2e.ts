@@ -82,7 +82,7 @@ for (const p of PICTURES) {
     expect([line!.shape, line!.floor, line!.full]).toEqual(['line', measured.floor, measured.full.line]);
     const from = (await notes(page)).length;
     await play(page).click();
-    await expect(page.getByRole('status')).toHaveText('Playing the whole picture: a line moves west to east.');
+    await expect(page.getByRole('status')).toHaveText('Playing the whole picture: a line moves west to east, again until you stop.');
     const heard = await notesAfter(page, from, 1);
     for (const n of heard) expect(line!.chimes).toContainEqual({ column: n.column, band: n.band, warm: n.warm });
 

@@ -816,16 +816,22 @@ fieldset.step { border: 0; margin: 0; padding: 0; min-width: 0; }
 
 /* Step 1: one row per picture. The label holds the radio, thumbnail, name and kind; NASA's title is
    a link of its own on the second line. */
-.pic-row { display: grid; grid-template-columns: 22px 64px minmax(0, 1fr) auto; grid-template-areas: "radio thumb name kind" "radio thumb title kind";
+.pic-row { display: grid; grid-template-columns: 22px 64px minmax(0, 1fr) auto; grid-template-areas: "radio thumb name kind" "radio thumb title link";
   column-gap: 12px; row-gap: 1px; align-items: center; padding: 6px 4px 6px 0; border-bottom: 1px solid var(--rule); }
 .pic-row:hover { background: var(--rule-2); }
 .pic-pick { display: contents; cursor: pointer; font-weight: 400; }
+.pic-pick > * { cursor: pointer; }
 .pic-pick input { grid-area: radio; }
 .pic-thumb { grid-area: thumb; width: 64px; height: 32px; border-radius: var(--r-key); border: 1px solid var(--ink); background: var(--well) center / cover no-repeat; }
 .pic-name { grid-area: name; align-self: end; justify-self: start; font-size: 1rem; font-weight: 700; line-height: 1.25; }
-.pic-title { grid-area: title; align-self: start; justify-self: start; font-size: 0.82rem; line-height: 1.3; color: var(--ink-2); text-decoration-thickness: 1px; }
-a.pic-title:hover { color: var(--ink); }
-.pic-kind { grid-area: kind; display: grid; gap: 1px; justify-items: end; font-size: 0.82rem; line-height: 1.3; color: var(--ink-2); white-space: nowrap; }
+.pic-title { grid-area: title; align-self: start; justify-self: start; font-size: 0.82rem; line-height: 1.3; color: var(--ink-2); }
+/* NASA's page: its own small link, so a tap on the title chooses the picture and never leaves the app. */
+.pic-link { grid-area: link; justify-self: end; align-self: start; display: inline-flex; align-items: center; gap: 3px;
+  font-size: 0.78rem; color: var(--ink-2); text-decoration-thickness: 1px; white-space: nowrap; }
+.pic-link:hover { color: var(--ink); }
+.pic-link svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.pic-kind { grid-area: kind; align-self: end; justify-self: end; display: flex; gap: 0 6px; font-size: 0.82rem; line-height: 1.3; color: var(--ink-2); white-space: nowrap; }
+.pic-kind > span + span::before { content: "· "; }
 .pic-kind .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .pic-note { font-weight: 650; color: var(--ink); }
 /* The chosen picture and the chosen thing to hear: the signal underline (DESIGN.md: signal = chosen). */
@@ -857,16 +863,18 @@ a.pic-title:hover { color: var(--ink); }
 .listen-area { display: grid; gap: 12px; min-width: 0; align-content: start; }
 .listen-axes { display: grid; grid-template-columns: var(--side) minmax(0, 1fr) 112px; align-items: start; min-width: 0; }
 .listen-figure { grid-column: 2; grid-row: 1; margin: 0; min-width: 0; justify-items: stretch; } /* .scan-view sets start, for Play along */
-.listen-figure .chart { margin: 22px 0 0 0; }
+.listen-figure .chart { margin: 22px 0 0 0; container-type: inline-size; }
+@container (max-width: 640px) { .listen-figure .g-lon:nth-of-type(even) b { display: none; } }
 .listen-figure svg { display: block; width: 100%; height: auto; background: var(--well); }
 .listen-figure .box .ring-outline { stroke-width: 6px; vector-effect: non-scaling-stroke; }
 .listen-figure .box .ring { stroke-width: 3px; vector-effect: non-scaling-stroke; }
 .map-tag.below { transform: translate(-50%, 6px); }
 .listen-under { grid-column: 2 / -1; grid-row: 2; display: grid; gap: 6px; padding-top: 6px; min-width: 0; }
 .listen-notes:empty { display: none; }
-.band-meter { grid-column: 3; grid-row: 1; display: grid; grid-template-rows: repeat(12, minmax(0, 1fr)); margin: 22px 0 0 16px; }
-.band { display: grid; grid-template-columns: 26px minmax(0, 1fr); align-items: center; gap: 6px; min-height: 0; }
-.band b { font: 400 0.66rem/1 var(--mono); color: var(--ink-2); }
+.band-meter { position: relative; grid-column: 3; grid-row: 1; display: grid; grid-template-rows: repeat(12, minmax(0, 1fr)); margin: 22px 0 0 16px; }
+.meter-cap { position: absolute; bottom: calc(100% + 6px); left: 0; font-size: 0.75rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+.band { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 6px; min-height: 0; }
+.band b { font: 400 0.72rem/1 var(--mono); color: var(--ink-2); }
 .band i { display: block; position: relative; height: 6px; overflow: hidden; background: var(--rule-2); border-radius: 2px; }
 .band i::after { content: ""; position: absolute; inset: 0; background: var(--ink); transform-origin: left; transform: scaleX(var(--level, 0)); }
 .band.hit i { animation: band-hit 0.6s ease-out; }
@@ -875,9 +883,8 @@ a.pic-title:hover { color: var(--ink); }
 @keyframes band-hit { from { background: var(--signal); } to { background: var(--rule-2); } }
 /* The radar: the zoomed circle, and beside it where it is and what it is. */
 .listen-scan.radar .listen-figure { grid-column: auto; grid-row: auto; }
-.listen-radar { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: 22px; align-items: start; min-width: 0; }
+.listen-radar { grid-column: 2; grid-row: 1; margin-top: 22px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: 22px; align-items: start; min-width: 0; }
 .listen-radar .zoom { border: 1px solid var(--ink); }
-.listen-scan.radar .band-meter { margin-top: 0; }
 .listen-where { display: grid; gap: 8px; align-content: start; min-width: 0; font-size: 0.9rem; color: var(--ink-2); }
 .where-name { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700; color: var(--ink); }
 .where-desc { max-width: 46ch; }
@@ -888,28 +895,38 @@ a.pic-title:hover { color: var(--ink); }
 /* Step 3's sound line: every struck note by time and pitch, the played part in ink, the playhead
    in signal. Shapes match the marks on the picture: round = warm instrument, diamond = cool. */
 .player.axis .player-track { min-width: 0; }
-.sound-line { display: grid; gap: 2px; min-width: 0; }
+.sound-line { display: grid; gap: 2px; min-width: 0; container-type: inline-size; }
+/* A narrow sound line keeps the chip and the time on one line; the key and the readout step aside. */
+@container (max-width: 560px) { .sl-key, .sl-where { display: none; } }
 .sl-head { display: flex; align-items: center; gap: 12px; min-height: 20px; font-size: 0.82rem; }
 .sl-head .now-chip .region-badge { background: var(--region, var(--ink)); }
 .sl-where, .sl-time { font: 400 0.75rem/1 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sl-time { margin-left: auto; }
+/* The key to the marks, beside them: the same shapes as on the picture. */
+.sl-key { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; color: var(--ink-2); white-space: nowrap; }
+.sl-key i { display: inline-block; width: 6px; height: 6px; background: var(--ink); border-radius: 50%; }
+.sl-key i.cool { width: 5px; height: 5px; border-radius: 1px; transform: rotate(45deg); margin-left: 6px; }
 .sl-lane { --pos: 0; position: relative; height: 46px; margin-top: 6px; border-bottom: 1px solid var(--ink-2); }
 .sl-marks { position: absolute; inset: 4px 0; }
-.sl-marks i { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: var(--ink-2); opacity: 0.35; }
+.sl-marks i { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: var(--ink-2); opacity: 0.6; }
 .sl-marks i.cool { width: 4.4px; height: 4.4px; margin: -2.2px 0 0 -2.2px; border-radius: 1px; transform: rotate(45deg); }
 .sl-marks.played { clip-path: inset(0 calc(100% - var(--pos) * 100%) 0 0); }
 .sl-marks.played i { background: var(--ink); opacity: 1; }
 .sl-playhead { position: absolute; top: -8px; bottom: 0; left: calc(var(--pos) * 100%); width: 2px; margin-left: -1px; background: var(--signal); }
 .sl-playhead::before { content: ""; position: absolute; top: -4px; left: 50%; width: 12px; height: 12px; transform: translateX(-50%); border-radius: var(--r-key); background: var(--signal); }
 .sl-lane.idle .sl-marks.played, .sl-lane.idle .sl-playhead { display: none; }
-.sl-axis { position: relative; height: 14px; font: 400 0.66rem/1 var(--mono); color: var(--ink-2); }
+.sl-axis { position: relative; height: 15px; font: 400 0.75rem/1 var(--mono); color: var(--ink-2); }
 .sl-axis span { position: absolute; top: 3px; transform: translateX(-50%); white-space: nowrap; }
 .sl-axis span:first-child { transform: none; }
 .sl-axis span:last-child { transform: translateX(-100%); }
 .scan-sound select { margin-left: 6px; }
 
 /* Explain: a hairline section under the player, opened by the Explain button. */
-.explain-scan { display: grid; gap: var(--sm); border-top: 1px solid var(--rule); padding-top: var(--sm); }
+.explain-scan { display: grid; gap: var(--sm); border-top: 1px solid var(--rule); padding-top: var(--sm);
+  scroll-margin-top: calc(var(--chrome, 70px) + 12px); scroll-margin-bottom: 96px; } /* clear of the sticky bars when it takes focus */
+.explain-key { display: grid; gap: var(--xs); }
+.explain-key h4 { margin: 0; font-size: 0.95rem; font-weight: 650; }
+.why-choices li { max-width: 74ch; }
 .explain-scan:focus-visible { outline-offset: 6px; }
 .explain-scan h3 { margin: 0; font-size: 1.05rem; font-weight: 700; }
 .explain-scan .scan-why { margin-top: 0; }
@@ -923,7 +940,7 @@ a.pic-title:hover { color: var(--ink); }
   .listen-scan { --side: 156px; }
   .listen-area {
     container-type: size;
-    height: max(420px, calc(100svh - var(--chrome, 70px) - var(--steps-h, 200px) - 52px));
+    height: max(360px, calc(100svh - var(--chrome, 70px) - var(--steps-h, 200px) - 52px));
   }
   .listen-axes, .listen-area .player {
     /* Height left for the picture: the area minus the longitude labels (22), the credit (28),
@@ -938,8 +955,10 @@ a.pic-title:hover { color: var(--ink); }
   .listen-scan.radar .band-meter { height: var(--sq); }
   .player.axis { padding: 8px 0; }
   .player.axis .player-row { display: grid; grid-template-columns: minmax(calc(var(--side) - 2px), 1fr) var(--pic-w) minmax(calc(var(--side) - 2px), 1fr); gap: 0; }
-  .player.axis .player-row > .player-buttons:first-child { justify-content: flex-end; padding-right: 14px; }
-  .player.axis .player-row > .player-buttons:last-child { padding-left: 14px; }
+  /* The buttons keep their place at the bar's two ends, whatever the picture's width. */
+  .player.axis .player-row > .player-buttons:first-child { justify-content: flex-start; padding: 0 14px; }
+  .player.axis .player-row > .player-buttons:last-child { justify-content: flex-end; padding: 0 14px; }
+  .player.axis .sound-settings { padding: 4px 14px; }
 }
 /* Not fitting the screen: the band meter is as tall as the picture it sits beside. */
 @media not ((min-width: 1024px) and (min-height: 640px)) {
@@ -947,6 +966,8 @@ a.pic-title:hover { color: var(--ink); }
 }
 @media (max-width: 1023px) {
   .steps { grid-template-columns: minmax(0, 1fr); }
+  /* The player sticks above the tabs only while it plays, so the picture is on the first screen. */
+  .listen-scan.stopped .player.axis { position: static; }
 }
 /* Phones: the steps stack; step 2 becomes chips with the chosen one's full name under them; the
    picture keeps a 34px gutter for its latitude labels; the meter gives its room to the picture;
@@ -957,10 +978,10 @@ a.pic-title:hover { color: var(--ink); }
   .band-meter { display: none; }
   .listen-scan.radar .listen-radar { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr); }
   .step-hint { display: none; }
-  .pic-row { grid-template-columns: 22px 56px minmax(0, 1fr); grid-template-areas: "radio thumb name" "radio thumb title" "radio thumb kind"; }
+  .pic-row { grid-template-columns: 22px 56px minmax(0, 1fr) auto; grid-template-areas: "radio thumb name name" "radio thumb title title" "radio thumb kind link"; }
   .pic-thumb { width: 56px; height: 28px; }
-  .pic-kind { display: flex; flex-wrap: wrap; gap: 0 6px; white-space: normal; }
-  .pic-kind > span + span::before { content: "· "; }
+  .pic-kind { display: flex; flex-wrap: wrap; gap: 0 6px; white-space: normal; justify-self: start; align-self: center; }
+  .pic-link { align-self: center; min-height: 32px; } /* a fingertip's target */
   .hear-rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 6px; padding-top: 8px; }
   .hear-row { position: relative; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 4px; min-height: 0; padding: 6px 2px;
     border: 2px solid var(--ink); border-radius: var(--r); text-align: center; }
@@ -980,7 +1001,8 @@ a.pic-title:hover { color: var(--ink); }
   .hear-chosen { display: block; margin-top: 6px; font-size: 0.85rem; color: var(--ink-2); }
   .hear-chosen b { color: var(--ink); }
   .player.axis .player-row { grid-template-columns: repeat(4, 1fr); }
-  .player.axis .player-track { padding-left: 22px; }
+  .player.axis .player-track { padding-left: 22px; margin-right: -10px; }
+  .sl-axis span:nth-child(even), .sl-key { display: none; }
   .sl-where { display: none; }
   .sl-lane { height: 34px; }
 }
