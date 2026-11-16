@@ -141,6 +141,10 @@ test('half speed doubles the beat and keeps the split', async ({ page }) => {
   await page.getByRole('button', { name: 'Sound', exact: true }).click();
   await page.getByRole('button', { name: '½×', exact: true }).click();
   await page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name: 'Play along' }).click();
+  // Changing view moves focus to the new page's heading, so a screen reader says where you are.
+  // Wait for that before reaching for Play: until then the old page's Play still exists, and the
+  // focus move would take the key press away from the button.
+  await expect(page.getByRole('heading', { name: 'Play along', level: 2 })).toBeFocused();
   await startWithKeyboard(page);
   await page.waitForTimeout(1200);
   const notes = await notesAfter(page, await noteCount(page), 10);
