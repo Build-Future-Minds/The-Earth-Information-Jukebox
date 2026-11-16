@@ -15,14 +15,17 @@ interface Props {
   hint?: string;
   /** A step number in the corner (Listen: 3 Play); decoration, hidden from screen readers. */
   step?: number;
+  /** Nothing to play yet (the picture is loading, or the scan has not been measured on it). */
+  disabled?: boolean;
 }
 
-export function IconButton({ icon: Icon, label, onClick, primary, pressed, expanded, controls, keyshortcuts, hint, step }: Props) {
+export function IconButton({ icon: Icon, label, onClick, primary, pressed, expanded, controls, keyshortcuts, hint, step, disabled }: Props) {
   return (
     <button
       type="button"
       className={primary ? 'icon-button primary' : 'icon-button'}
       onClick={onClick}
+      disabled={disabled}
       aria-pressed={pressed}
       aria-expanded={expanded}
       aria-controls={controls}

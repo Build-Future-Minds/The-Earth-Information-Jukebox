@@ -1,16 +1,21 @@
 // Browser tests for the Dev B checklist (docs/roles/developer-b.md). Run: npm run test:e2e
-// They drive the real app with real key presses and read the dev-only note log
-// (window.__earthNotes) to check the actual sound schedule, not just the screen.
+// They drive the real app with real key presses and read the dev-only note logs
+// (window.__earthNotes, window.__scanNotes) to check the actual sound schedule, not just the screen.
 //
-// Two projects, each with its own server:
-//   practice   the practice data (one picture). Every test file except scan-pictures.
-//   pictures   the practice data plus made-up pictures read with the real rain and aerosol scan
-//              rules (VITE_DATASET=practice-pictures). Only scan-pictures.e2e.ts.
-// E2E_PORT and E2E_PICTURES_PORT move the servers, so two copies of the repo can test at once.
+// Three projects, each with its own dev server:
+//   practice   every *.e2e.ts except the two below: the practice data, always (one picture): the
+//              expected rhythms are theirs
+//   real       *.real.e2e.ts: the NASA pictures in data/: Listen's scan on each picture (P1)
+//   pictures   scan-pictures.e2e.ts: the practice data plus made-up pictures read with the real rain
+//              and aerosol scan rules (VITE_DATASET=practice-pictures)
+//
+// Ports: 5174, 5186 and 5176, or E2E_PORT, E2E_REAL_PORT and E2E_PICTURES_PORT, so two copies of
+// the repo can run their tests at once on one machine (each needs its own ports).
 import { defineConfig, devices } from '@playwright/test';
 
-const port = Number(process.env.E2E_PORT ?? 5174);
-const picturesPort = Number(process.env.E2E_PICTURES_PORT ?? 5176);
+const PRACTICE_PORT = Number(process.env.E2E_PORT ?? 5174);
+const REAL_PORT = Number(process.env.E2E_REAL_PORT ?? 5186);
+const PICTURES_PORT = Number(process.env.E2E_PICTURES_PORT ?? 5176);
 
 export default defineConfig({
   testDir: 'e2e',
@@ -23,20 +28,27 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
   },
   projects: [
-    { name: 'practice', testIgnore: 'scan-pictures.e2e.ts', use: { ...devices['Desktop Chrome'], baseURL: `http://localhost:${port}` } },
-    { name: 'pictures', testMatch: 'scan-pictures.e2e.ts', use: { ...devices['Desktop Chrome'], baseURL: `http://localhost:${picturesPort}` } },
+    { name: 'practice', testIgnore: ['*.real.e2e.ts', 'scan-pictures.e2e.ts'], use: { baseURL: `http://localhost:${PRACTICE_PORT}` } },
+    { name: 'real', testMatch: '*.real.e2e.ts', use: { baseURL: `http://localhost:${REAL_PORT}` } },
+    { name: 'pictures', testMatch: 'scan-pictures.e2e.ts', use: { baseURL: `http://localhost:${PICTURES_PORT}` } },
   ],
   webServer: [
     {
-      command: `npx vite --port ${port} --strictPort`,
-      url: `http://localhost:${port}`,
+      command: `npx vite --port ${PRACTICE_PORT} --strictPort`,
+      url: `http://localhost:${PRACTICE_PORT}`,
       reuseExistingServer: false, // a running dev server may be showing real data
       // Always the practice data, even when real files are in data/: the expected rhythms are theirs.
       env: { VITE_DATASET: 'practice' },
     },
     {
-      command: `npx vite --port ${picturesPort} --strictPort`,
-      url: `http://localhost:${picturesPort}`,
+      // No VITE_DATASET: the app shows the real pictures in data/.
+      command: `npx vite --port ${REAL_PORT} --strictPort`,
+      url: `http://localhost:${REAL_PORT}`,
+      reuseExistingServer: false,
+    },
+    {
+      command: `npx vite --port ${PICTURES_PORT} --strictPort`,
+      url: `http://localhost:${PICTURES_PORT}`,
       reuseExistingServer: false,
       // Practice data plus TEST INPUT pictures for each picture's scan rule (data/testPictures.ts).
       env: { VITE_DATASET: 'practice-pictures' },

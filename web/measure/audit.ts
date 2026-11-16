@@ -7,7 +7,7 @@
 // two differently in another program. Measured here, the numbers are the ones the app plays.
 //
 // Each picture is measured with its own settings and returned on its own. No number of one picture
-// is ever set beside another picture's (docs/mapping_spec.md, "Play along: the picture scan").
+// is ever set beside another picture's (docs/mapping_spec.md, "The picture scan: what Listen plays").
 //
 // A picture with a scan rule (src/data/sources.ts, `scan`) is measured as played, with its rule.
 // A picture without one is measured with the settings the procedure gives, so that its rule can be

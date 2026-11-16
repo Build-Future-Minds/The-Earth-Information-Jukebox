@@ -1,24 +1,22 @@
-// What every mark and bar of the picture scan means, with the same shapes as on the picture. Real
-// text, read by screen readers. Shared by every view that shows the scan. Two groups, kept apart
-// in words: what comes from the picture, and what is fixed by us.
+// What the picture scan's marks mean, and how a picture becomes sound, in words. Real text, read by
+// screen readers. Shared by every view that shows the scan (Listen's Explain panel, Play along, the
+// globe). Two groups, kept apart in words: what comes from the picture, and what is fixed by us.
+// Each picture brings its own facts (data/sources.ts, ScanRule): which still is read, what each
+// instrument means in its legend, what is never read, and what the scan cannot tell you about it.
 import type { ScanSoundDef } from '../audio/instruments';
+import type { ScanRule } from '../data/sources';
+import type { Scene } from '../data/types';
+import { starPath, stillTime } from './ScanOverlay';
 
-/** An asterisk of three crossing strokes, radius r, centred on (cx, cy): the third instrument's mark. */
-export function starPath(r: number, cx = 0, cy = 0): string {
-  return [90, 30, 150]
-    .map((deg) => {
-      const a = (deg * Math.PI) / 180;
-      const dx = r * Math.cos(a);
-      const dy = r * Math.sin(a);
-      return `M${(cx - dx).toFixed(2)} ${(cy - dy).toFixed(2)}L${(cx + dx).toFixed(2)} ${(cy + dy).toFixed(2)}`;
-    })
-    .join('');
-}
+// The third instrument's mark is drawn by ScanOverlay; the globe and the legend use the same shape.
+export { starPath };
 
+/** What every mark and bar means, with the same shapes as on the picture. */
 export function ScanLegend({
   sound,
   order,
   radar,
+  bars = 'below',
   instruments = null,
   third = false,
   hatched = false,
@@ -27,6 +25,8 @@ export function ScanLegend({
   sound: ScanSoundDef;
   order: string;
   radar: boolean;
+  /** Where the bars are: below the legend's own picture (Play along), or beside the picture (Listen). */
+  bars?: 'below' | 'beside';
   /** What each instrument means in this picture's legend (data/sources.ts, `scan.instruments`). */
   instruments?: { warm: string; cool: string; blue?: string } | null;
   /** The picture has a third instrument, for colours on the blue side. */
@@ -102,22 +102,6 @@ export function ScanLegend({
         </svg>
         <span><strong>Ring.</strong> Spreads from a mark at the moment its note sounds. The mark stays until the sweep ends.</span>
       </li>
-      <li>
-        <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
-          <g fill="none" strokeLinecap="round" stroke="#000" strokeWidth="3.5">
-            <rect x="13" y="6" width="4" height="10" />
-            <path d="M15 1V3.5M15 18.5V21M5 11H10M20 11H25" />
-          </g>
-          <g fill="none" strokeLinecap="round" stroke="#fff" strokeWidth="1.5">
-            <rect x="13" y="6" width="4" height="10" />
-            <path d="M15 1V3.5M15 18.5V21M5 11H10M20 11H25" />
-          </g>
-        </svg>
-        <span>
-          <strong>Outlined cell with four ticks.</strong> The place explained in “Why the scan sounds like this”, chosen with its
-          column slider or by clicking the picture.
-        </span>
-      </li>
       {radar && (
         <li>
           <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
@@ -137,10 +121,25 @@ export function ScanLegend({
           <rect x="21" y="15" width="6" height="4" className="g-ink" />
         </svg>
         <span>
-          <strong>Bars: the 12 held notes ({sound.heldName}),</strong> from {order}, low to high. The filled part is how loud each is
-          now. A bar flashes orange when a note is struck in its band.
+          <strong>Bars: the 12 held notes ({sound.heldName}),</strong>{' '}
+          {bars === 'beside' ? `beside the picture, one beside each band it reads, from ${order}, low to high.` : `from ${order}, low to high.`} The filled
+          part is how loud each is now. A bar flashes when a note is struck in its band.
         </span>
       </li>
+      {bars === 'beside' && (
+        <li>
+          <svg className="glyph light" viewBox="0 0 30 22" aria-hidden="true">
+            <line x1="2" y1="18" x2="28" y2="18" className="g-axis" />
+            <circle cx="8" cy="12" r="2" className="g-ink-fill" />
+            <rect x="15" y="6" width="3.6" height="3.6" transform="rotate(45 16.8 7.8)" className="g-ink-fill" />
+            <line x1="21" y1="2" x2="21" y2="18" className="g-signal-line" />
+          </svg>
+          <span>
+            <strong>The sound line, under the picture.</strong> Every struck note of the scan, by time and pitch, with the same shapes. The upright line, in the playing region's colour (ink for the whole picture), is
+            where the sound is now.
+          </span>
+        </li>
+      )}
       <li className="legend-group"><strong>Fixed by us, not from the picture</strong></li>
       <li>
         <svg className="glyph light" viewBox="0 0 30 22" aria-hidden="true">
@@ -148,9 +147,84 @@ export function ScanLegend({
           <rect x="6" y="10" width="18" height="9" className="g-ink" />
         </svg>
         <span>
-          <strong>First bar: the low note.</strong> It steps C, A, F, G by the clock. That is decoration, not data: the picture sets
-          only how loud it is.
+          <strong>{bars === 'below' ? 'First bar: the low note.' : 'The low note.'}</strong> It steps C, A, F, G by the clock. That is decoration, not data:
+          the picture sets only how loud it is.
         </span>
+      </li>
+    </ul>
+  );
+}
+
+/**
+ * "How the picture becomes sound": the rule in a few lines, with this picture's own facts (its floor,
+ * what it never reads, what each instrument means in its legend, what the scan cannot tell you).
+ * `sound` gives the chosen scan sound's names for the instruments.
+ */
+export function ScanHow({ scene, rule, isTest, sound }: { scene: Scene; rule: ScanRule | null; isTest: boolean; sound?: ScanSoundDef }) {
+  const blueClass = !!rule?.instruments.blue;
+  const warmName = sound?.warmName ?? 'warm instrument';
+  const coolName = sound?.coolName ?? 'cool instrument';
+  const blueName = sound?.blueName ?? 'third instrument';
+  return (
+    <ul>
+      {!isTest && rule && (
+        <li>
+          <strong>Which picture.</strong> One still: {scene.source.title}, {rule.still.frame}
+          {stillTime(rule.still.time)}, {rule.still.how}. This picture has its own settings, measured on this still; its numbers are never compared with
+          another picture's.
+        </li>
+      )}
+      <li><strong>Where.</strong> Higher on the picture is a higher note (on the radar: further from the centre). There are 12 bands, on the five notes C, D, E, G and A. Low bands are far apart and high bands close together, as a choir is spaced.</li>
+      <li>
+        <strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone.
+        {rule ? (
+          <>
+            {' '}In this picture a cell at or below {Number((rule.floor * 255).toFixed(2))} of 255 is silent
+            {rule.floor === 12 / 255 ? ' (black sea and grey land)' : ', just above the colour drawn where there is nothing'}.
+          </>
+        ) : (
+          ' What the picture draws as its background is silent.'
+        )}{' '}
+        A soft held note sounds for every band the line is crossing.
+      </li>
+      {!isTest && rule?.mask && (
+        <li>
+          <strong>Pixels never read.</strong> The scan never reads {rule.mask.what}. There it has no data: it is silent, it strikes no note, and it does not
+          count as a zero. They are hatched on the picture.
+        </li>
+      )}
+      <li>
+        <strong>Peaks of colour.</strong> When a band has more colour under the line than just before and just after, one note is struck, an octave above that
+        band's held note. Peaks that follow each other too closely are left out, so each struck note can be heard.
+      </li>
+      <li>
+        <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is struck on one instrument.{' '}
+        {blueClass
+          ? 'Where most of it has blue as its largest channel, it is struck on a third. Otherwise it is struck on the second.'
+          : 'Where it is not (yellow-green, green and blue), it is struck on another.'}
+        {rule && !isTest && (
+          <>
+            {' '}In this picture the {warmName} means {rule.instruments.warm}; the {coolName}, {rule.instruments.cool}
+            {rule.instruments.blue ? <>; the {blueName}, {rule.instruments.blue}</> : null}.
+            {rule.measured.bar0SwitchValue !== undefined && (
+              <> On NASA's colour bar for this picture the switch falls at about {rule.measured.bar0SwitchValue.toFixed(1)} °C, and the picture's lines use the bar's hues. We measured the bar and the picture's colours, not the sea.</>
+            )}
+          </>
+        )}
+      </li>
+      {!isTest && rule && rule.limits.length > 0 && (
+        <li>
+          <strong>What the scan cannot tell you.</strong> {rule.limits.join(' ')}
+        </li>
+      )}
+      <li><strong>Left and right.</strong> The sound sits where the line is: it travels from the left speaker to the right with the line.</li>
+      <li>
+        <strong>Decoration, not data.</strong> The scale is fixed. The low note steps through C, A, F and G on a fixed timetable, so the same held notes sound
+        like four chords. The picture sets only how loud that low note is.
+      </li>
+      <li>
+        <strong>Scan sound.</strong> Every choice plays the same notes at the same times. Only the instruments change, and all of them are made by this page's
+        own code.
       </li>
     </ul>
   );

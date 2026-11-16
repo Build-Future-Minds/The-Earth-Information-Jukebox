@@ -32,10 +32,24 @@ ear? Success is an honest count of right answers against 50 % chance.
 
 ## Positioning
 
-One explainable rule links a measured image property to one sound property: how strongly visible
-lines share a direction (alignment, 0–1) sets the spacing of two pulses per beat
-(second pulse at `0.75 − 0.25 × alignment` of the beat). Every sound can explain itself from the
-numbers that made it.
+Two explainable sound rules, each linking what is drawn in a NASA picture to what you hear.
+
+- **Listen plays the picture scan** (decision D1, 16 Nov; **Design choice**). A line sweeps the
+  whole picture west to east, or a radar line turns once around one region's circle, and plays
+  what it crosses: higher on the picture is a higher note, more colour is louder, and colours on
+  the red side of yellow strike one instrument, the rest another (`docs/mapping_spec.md`, "The
+  picture scan"). The method follows NASA's own image sonifications (**Verified**: NASA's pages,
+  sources S9 to S11 in `docs/DECISIONS.md`). Each picture is read with its own measured settings,
+  never another picture's (**Verified**: `docs/measurements/scan_pictures.md`, and a unit test
+  checks the app uses exactly those settings).
+- **The rhythm rule** is the team's tested rule and the sound of Compare and the listening game
+  (**Design choice**): how strongly visible lines share a direction (alignment, 0–1) sets the
+  spacing of two pulses per beat (second pulse at `0.75 − 0.25 × alignment` of the beat).
+  It comes back to Listen as a switch in P4 (`docs/page_plan.md`).
+
+Every sound can explain itself from the numbers that made it: Explain on Listen says where each
+scan note came from, and Explain on the rhythm says why each beat is split as it is (**Verified**:
+`web/src/audio/scanWhy.test.ts` and the browser tests `scan-why.e2e.ts`).
 
 ## Operating Context
 

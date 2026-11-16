@@ -1,5 +1,8 @@
 # Mapping spec: one rhythm rule
 
+> Listen plays the picture scan (section "The picture scan: what Listen plays", decision D1).
+> The rhythm rule below is the sound of Compare and the listening game.
+
 Owner: Developer A. This follows the Team Briefing. Everything here is a **sound rule we choose**.
 It describes the rendered image. It does not measure water speed, turbulence or ocean health.
 
@@ -107,11 +110,17 @@ Equatorial Pacific and Kuroshio, and the files the app plays: section 10.
 A second feature (for example on-screen motion between frames, or legend colour band) may
 control a second sound property. It needs its own tests and its own honest wording first.
 
-## Play along: the picture scan (an extra, not part of the rule)
+## The picture scan: what Listen plays
 
-Added 15 Nov by Developer A, in the app's "Play along" section. It is a second way to listen and
-it is **not** the rhythm rule above: the Earth voice, its tests and the listening check do not
-change. A browser test proves the Earth notes keep their schedule while the scan plays.
+Added 15 Nov by Developer A on "Play along". Since 16 Nov it is **Listen's sound** (decision D1 in
+`docs/page_plan.md`; **Design choice**): Listen's three steps choose a NASA picture, then the whole
+picture or one region, then play the scan. It is a second rule beside the rhythm rule above, not
+a change to it: the rhythm rule stays the rule the listening game tests and the sound of Compare,
+and its tests do not change. A browser test proves the Earth notes keep their schedule while the
+scan plays (Play along). The rhythm comes back to Listen as a switch in P4.
+
+Each picture is read with **its own settings**, measured on its own still (decision D2; see "Each
+picture's own settings" below). The rule is the same for every picture.
 
 **Where the idea comes from. Verified** (read on NASA's pages, 15 Nov; sources S9 to S11 in
 `DECISIONS.md`). NASA's image sonifications, made by SYSTEM Sounds (M. Russo, A. Santaguida),
@@ -164,6 +173,13 @@ hatched, and every sentence says "no data". It is never written or played as a z
 | How a cell is read | Every pixel once, except pixels never read | 16 points, 4 along the radius × 4 along the arc |
 | Floor and full level | Each picture's own (below) | Each picture's own (below) |
 
+The floor, the full levels and the pixels never read are each picture's own, measured on that
+picture's own still, with the procedure and the numbers in "Each picture's own rule" below.
+**Measured, 16 Nov: the app plays what was measured.** On Listen, the score the app builds for
+each picture and each scan has the same struck notes as the measuring tool counted: ocean 68 (map
+sweep), 56 and 72 (regions A and B); aerosols 36, 34 and 0 (Region D's strongest cell is 0.15,
+under the chime level); rain 16, 31 and 7. Read from the running app on real data, not heard.
+
 A chime needs a level of 0.3 or more at its peak, after smoothing over three columns with
 weights 1, 2, 1. Two chimes in one band are at least 6 columns (0.75 s) apart, and one column
 starts at most one chime; the stronger spot wins. A "spot" here is a whole cell: on the map sweep
@@ -214,7 +230,7 @@ Note names, the scale and the chord steps are written with Tonal, a music-theory
 so the code says "C major pentatonic" and "I, VIm, IV, V" and a test checks the note names.
 
 **Explaining a note.** The app can say why any note sounds, the way "Explain this rhythm" does for
-the Earth voice. The fold-out "Why the scan sounds like this" (Play along) has four parts:
+the Earth voice. "Why the scan sounds like this" (opened by Explain on Listen, and a fold-out on Play along) has four parts:
 
 - *Last struck note.* The place on the picture, what was measured there, and how that became the
   held note's loudness and the struck note's pitch, instrument and strength.
@@ -353,10 +369,10 @@ section of the report gives the brightness numbers for the record.
 
 ### Each picture's own rule
 
-Added 15 Nov by Developer A. The scan plays the picture chosen on Listen, with that picture's own
-rule (`web/src/data/sources.ts`, `scan`); the picture choice also shows on Play along. A picture
-whose rule has not been measured is never scanned: the scan keeps one that has a rule, and says so.
-Every number below was measured by `npm run measure` (`docs/measurements/scan_pictures.md`, one
+Added 15 Nov by Developer A. The scan plays the picture chosen on Listen (step 1), with that
+picture's own rule (`web/src/data/sources.ts`, `scan`); Play along and the Globe tab play the same
+picture. A picture whose rule has not been measured is never scanned with another picture's rule,
+and says so. Every number below was measured by `npm run measure` (`docs/measurements/scan_pictures.md`, one
 section per picture). **The numbers of one picture are never compared with another's**: each table
 here is one picture's.
 

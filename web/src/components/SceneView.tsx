@@ -14,6 +14,31 @@ const latText = (l: number) => (l === 0 ? '0°' : `${Math.abs(l)}°${l < 0 ? 'S'
 const xPct = (lon: number) => `${((lon + 180) / 360) * 100}%`;
 const yPct = (lat: number) => `${((90 - lat) / 180) * 100}%`;
 
+/** Latitude and longitude ticks around a whole-world map, labelled every 30°. Place it inside the
+ *  positioned box that holds the picture (`.chart`). Decoration for sighted readers. */
+export function Graticule() {
+  return (
+    <div className="graticule" aria-hidden="true">
+      {LONS.map((l) => (
+        <span key={`x${l}`} className="g-lon" style={{ left: xPct(l) }}>
+          <b>{lonText(l)}</b>
+        </span>
+      ))}
+      {LATS.map((l) => (
+        <span key={`y${l}`} className="g-lat" style={{ top: yPct(l) }}>
+          <b>{latText(l)}</b>
+        </span>
+      ))}
+      {MINOR_LONS.map((l) => (
+        <span key={`mx${l}`} className="g-lon minor" style={{ left: xPct(l) }} />
+      ))}
+      {MINOR_LATS.map((l) => (
+        <span key={`my${l}`} className="g-lat minor" style={{ top: yPct(l) }} />
+      ))}
+    </div>
+  );
+}
+
 interface Props {
   scene: Scene;
   imageUrl: string | null;
@@ -73,24 +98,7 @@ export function SceneView({ scene, imageUrl, regionId, look = {}, onSelect, labe
             <span>{regionLabel(scene.regions, r.id, look.firstLetter)}</span>
           </span>
         ))}
-        <div className="graticule" aria-hidden="true">
-          {LONS.map((l) => (
-            <span key={`x${l}`} className="g-lon" style={{ left: xPct(l) }}>
-              <b>{lonText(l)}</b>
-            </span>
-          ))}
-          {LATS.map((l) => (
-            <span key={`y${l}`} className="g-lat" style={{ top: yPct(l) }}>
-              <b>{latText(l)}</b>
-            </span>
-          ))}
-          {MINOR_LONS.map((l) => (
-            <span key={`mx${l}`} className="g-lon minor" style={{ left: xPct(l) }} />
-          ))}
-          {MINOR_LATS.map((l) => (
-            <span key={`my${l}`} className="g-lat minor" style={{ top: yPct(l) }} />
-          ))}
-        </div>
+        <Graticule />
       </div>
       <figcaption>
         {/* DESIGN.md: keep the NASA credit directly under the image it credits. */}

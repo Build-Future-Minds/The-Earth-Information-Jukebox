@@ -1,7 +1,8 @@
-// Play along with each picture's own scan rule, on made-up pictures (TEST INPUTS, not NASA data).
-// Served with VITE_DATASET=practice-pictures (playwright.config.ts, project "pictures"): the
-// practice data plus a rain picture and an aerosol picture read with the REAL rain and aerosol
+// Listen and Play along with each picture's own scan rule, on made-up pictures (TEST INPUTS, not
+// NASA data). Served with VITE_DATASET=practice-pictures (playwright.config.ts, project "pictures"):
+// the practice data plus a rain picture and an aerosol picture read with the REAL rain and aerosol
 // rules (data/sources.ts). Each made-up picture's answer is worked out in data/testPictures.ts.
+// A picture is chosen on Listen (step 1), like a person does; Play along plays the one chosen there.
 // Reads the dev-only logs window.__scanNotes (every struck note) and window.__scanScore.
 import { expect, test, type Page } from '@playwright/test';
 import { followsSchedule, noteCount, notesAfter, openApp, startWithKeyboard } from './helpers';
@@ -33,11 +34,22 @@ const playButton = (page: Page) => page.getByRole('button', { name: 'Play the pi
 const waitForNotes = (page: Page, n: number, timeout = 40_000) =>
   page.waitForFunction((k) => ((window as unknown as { __scanNotes?: unknown[] }).__scanNotes?.length ?? 0) >= k, n, { timeout });
 
-/** Choose a picture with the picture buttons on Play along, as a person would, and open the scan's settings and legend. */
-async function choosePicture(page: Page, name: 'Practice' | 'Aerosols' | 'Rain') {
-  await page.getByRole('radio', { name }).check();
-  await expect(page.getByRole('radio', { name })).toBeChecked();
-  // Choosing a picture starts the scan afresh, with its settings folded away.
+/** Each made-up picture's key in the app: the value of its radio in Listen's step 1. */
+const KEY = { Practice: 'practice', Aerosols: 'aerosols', Rain: 'imerg' } as const;
+type PictureName = keyof typeof KEY;
+/** Listen's step 1 (the picture list) is the only place a picture is chosen on the pages these tests drive. */
+const listenRadio = (page: Page, name: PictureName) => page.locator(`input[name="picture"][value="${KEY[name]}"]`);
+
+/**
+ * Choose a picture on Listen, as a person does, then open Play along, which plays it, and open the
+ * scan's settings and legend. Changing view keeps the choice, and starts Play along's scan afresh.
+ */
+async function choosePicture(page: Page, name: PictureName) {
+  await page.goto('/#listen');
+  await listenRadio(page, name).check();
+  await expect(listenRadio(page, name)).toBeChecked();
+  await page.goto('/#play');
+  // A picture's scan starts afresh, with its settings folded away.
   for (const fold of ['Scan settings', 'What the marks mean']) await page.getByText(fold, { exact: true }).click();
 }
 
@@ -80,20 +92,23 @@ test('the rain picture plays by its own rule: the navy sea is silent, its land i
   await expect(page.getByText(/last chime: harp/)).toBeVisible();
 });
 
-test('changing the picture while the scan plays stops everything, and the new picture plays by its own rule', async ({ page }) => {
-  await choosePicture(page, 'Rain');
-  await startWithKeyboard(page); // the Earth rhythm
-  await startScanWithKeyboard(page);
+test('changing the picture on Listen while its scan plays stops the sound, and the new picture plays by its own rule', async ({ page }) => {
+  // The picture list and the scan share one page only on Listen, so this is where a picture is
+  // changed while the scan plays. (Choosing a picture is like Stop: App.tsx, chooseSource.)
+  await page.goto('/#listen');
+  await listenRadio(page, 'Rain').check();
+  const play = page.getByRole('button', { name: 'Play', exact: true });
+  await expect(play).toBeEnabled();
+  await play.focus();
+  await page.keyboard.press('Enter');
   await waitForNotes(page, 1, 15_000);
+  await expect(page.getByRole('status')).toHaveText(/^Playing the whole picture/);
 
-  await page.getByRole('radio', { name: 'Aerosols' }).check();
-  await expect(page.getByText('Scan stopped.')).toBeVisible();
-  await expect(page.getByRole('status')).toHaveText(/^Stopped/); // the Earth rhythm stopped too
+  await listenRadio(page, 'Aerosols').check();
+  await expect(page.getByRole('status')).toHaveText(/^Stopped/);
   const after = (await scanNotes(page)).length;
   await page.waitForTimeout(1500);
   expect((await scanNotes(page)).length).toBe(after); // nothing more sounds
-  await expect(page.locator('.scan-view .trace')).toHaveCount(0);
-  await expect(page.locator('.scan-view .nodata-hatch')).toHaveCount(0); // the aerosol rule reads every pixel
 
   // The aerosol rule: its own floor, two instruments, sea salt too faint to strike.
   const s = (await score(page))!;
@@ -101,14 +116,19 @@ test('changing the picture while the scan plays stops everything, and the new pi
   expect(s.chimes).toEqual([[41, 1, 'warm'], [81, 8, 'cool'], [201, 5, 'cool']]);
   expect(s.levels[150 * s.bands + 3]).toBeGreaterThan(0); // the sea-salt dot holds a note...
   for (let column = 148; column < 160; column++) expect(s.chimes.some(([c]) => c === column)).toBe(false); // ...but strikes none
-  await page.getByText('What the marks mean', { exact: true }).click();
-  await expect(page.getByRole('list', { name: 'What the marks and bars mean' }).getByText(/Asterisk/)).toHaveCount(0);
 
   // And it plays: the first note is black carbon, on the warm instrument.
-  await startScanWithKeyboard(page);
+  await play.focus();
+  await page.keyboard.press('Enter');
   await waitForNotes(page, after + 1, 15_000);
   const first = (await scanNotes(page))[after];
   expect([first.column, first.band, first.colour]).toEqual([41, 1, 'warm']);
+
+  // Play along shows the same picture: no hatch (the aerosol rule reads every pixel), no third instrument.
+  await page.goto('/#play');
+  await expect(page.locator('.scan-view .nodata-hatch')).toHaveCount(0);
+  await page.getByText('What the marks mean', { exact: true }).click();
+  await expect(page.getByRole('list', { name: 'What the marks and bars mean' }).getByText(/Asterisk/)).toHaveCount(0);
 });
 
 test('changing the scan sound while the rain scan plays: the same notes, and each instrument keeps its meaning', async ({ page }) => {
@@ -183,7 +203,7 @@ test('the explanation speaks of this picture, with its own numbers, and nothing 
   await expect(fixed).not.toContainText('12 of 255');
   await expect(page.locator('.scan-why [aria-live], .scan-why [role="status"], .scan-why [role="alert"]')).toHaveCount(0);
 
-  await page.getByRole('radio', { name: 'Aerosols' }).check();
+  await choosePicture(page, 'Aerosols'); // on Listen, then back to Play along: a fresh scan, its explanation folded
   await page.getByText('Why the scan sounds like this', { exact: true }).click();
   const aerosols = page.getByRole('region', { name: 'Fixed by us, for this picture' });
   await expect(aerosols).toContainText('20 of 255');

@@ -143,7 +143,7 @@ browser.** Test on the demo machine before relying on it.
 **Design choice**, after **Verified** NASA examples. Owner: Dev A, 15 Nov. Code:
 `web/src/audio/scanScore.ts`, `scanPlayer.ts`, `instruments.ts`, `components/PictureScan.tsx`, and
 `web/src/scan/` (what every view of the scan shares: picture, score, player, drawing loop, controls, legend).
-Rule, settings, measurements and limits: `mapping_spec.md`, "Play along: the picture scan".
+Rule, settings, measurements and limits: `mapping_spec.md`, "The picture scan: what Listen plays".
 
 **What:** the "Play along" section has two extras. "Play the picture" sweeps a line over the
 NASA image (west to east over the whole picture, or a radar turn inside a region's circle) and

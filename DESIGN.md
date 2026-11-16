@@ -144,7 +144,7 @@ Two sleeves of one record. Light is a white sleeve with black ink and grey hairl
 
 Colour is held back for the side. It appears only on what is live or chosen, and then it is the playing side's colour: Side A violet or Side B rose. Everything else, including focus, is ink.
 
-The system is keyboard-first. The Tab order follows the screen: the tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.
+The system is keyboard-first. The Tab order follows the screen: the tabs, the theme switch, then on Listen step 1 (the picture list, then its links to NASA's pages), step 2 (what to hear), then Play. Colour is never the only cue: every region mark carries its letter.
 
 **Key Characteristics:**
 - One face, Geist. Geist Mono only for numbers, coordinates, key caps and readouts.
@@ -249,6 +249,14 @@ Seven tabs in the top bar: six views (Home first) and Game (opens the listening 
 ### Player bar
 One framed strip under the picture, like a music player: 1px ink frame, square corners, 10px 12px 12px padding, paper ground. Left: Play / Pause, Stop with a small "Esc" hint in mono (hidden from screen readers; `aria-keyshortcuts` says it), Replay. Middle: the beat lane, taking the free width. Right: Explain and Sound. On phones it sticks above the tabs, the lane takes its own row and the five buttons share one row.
 
+On Listen (P1) the bar plays the picture scan: no Replay (Stop then Play does the same), its name for screen readers is "Step 3 of 3: play", and on desktop its middle column is the picture's own column, so the sound line runs exactly under the picture; the button clusters keep their place at the bar's two ends. Below 1024px it sticks above the tabs only while it plays or is paused, so the picture is on the first screen.
+
+### Sound line (Listen, signature)
+The scan's timeline in Listen's player bar, built like the beat lane: a 46px lane with a hairline top and an ink baseline. Every struck note of the score is a 5px mark, x by time (on the map sweep the picture's own x, so the needle stands under the scan line; on the radar the turn, 0 to 360 from east), y by pitch; round for the warm instrument, a square turned 45 degrees for the cool one, the same shapes as on the picture. Notes still to come are grey at 60%, played notes ink. The needle and the played wash are the beat lane's, in `--live`: the playing region's colour, ink while the whole picture plays and on pictures with neutral regions. Above the lane: the now chip, the line's place and the time in mono, and a caps key to the two shapes. Mono axis labels under it: longitudes, or E N W S.
+
+### Held-note bars (Listen)
+Twelve 6px bars in the gutter right of the picture, highest note at the top, each beside the band of the picture it reads (on the radar, beside the zoomed circle: centre low, rim high), with mono note names and a caps "Held notes" caption. The ink fill is how loud the note is now; a bar flashes like a note bar when its band chimes. Empty while stopped. Hidden on phones, where the sound line carries the notes.
+
 ### Sound settings
 One Sound icon button shows and hides the speed buttons (½× ¾× 1× 1¼×, mono, the chosen one pressed in ink) and a Volume slider. No decibel numbers on screen; screen readers hear a percentage.
 
@@ -259,6 +267,12 @@ Two joined buttons (Light, Dark) with 16px line icons and caps words, a 1px hair
 - **Range:** 2px grey track, 18px square ink thumb (ink on focus too); label row above with the name left and a mono readout right.
 - **Select:** 1px ink border, square, 44px height.
 - **Radio and checkbox:** 22px, ink accent, 44px hit row.
+
+### Picture list (Listen, step 1)
+One ruled row per picture under a 1px ink rule, hairlines between: radio, a 64 by 32px thumbnail with a 1px ink frame, the team's short name (600), NASA's own title under it in grey, the kind of data and the frame count (the number in mono) on the right, and NASA's page as its own small link ("SVS 3912" in mono with an arrow), so a tap on the title chooses the picture and never leaves the app. The chosen row's name has the 3px ink underline. A picture whose scan has not been measured says so in its row.
+
+### What to hear (Listen, step 2)
+The same ruled rows: "Whole picture" with a small sweep drawing (a 1px framed well with a line across it), then each region with its round crop, square letter badge and name, and one grey line on what you hear ("A line sweeps it west to east, 30 s each time", following the speed). The chosen crop gets the 3px ring in its region colour. Number keys 1, 2, 3 work while the group has focus. On phones the rows become square chips with a 1px ink border (the chosen one filled in ink), the focus ring drawn on the chip, and the chosen option's full name spelled out under them.
 
 ### Picture choice
 A 88 by 50px thumbnail with a 1px ink frame and one word under it. The chosen one has a 3px ink underline and its word turns ink at 600.
@@ -291,7 +305,7 @@ Marks drawn over the NASA picture are black and white only. The place a click or
 A 1px ink-bordered pad of 48px square key caps; the active pad gains a 1px inset ink ring and the held key fills with ink.
 
 ### Step marks
-A square ink block with a mono numeral in paper, used only for the real sequence on Listen (1 Picture, 2 Region, 3 Play).
+A square ink block with a mono numeral in paper, used only for the real sequence on Listen (1 Choose a NASA picture, 2 Choose what to hear, 3 Play), beside each step's caps legend; screen readers hear "Step 1 of 3" and so on.
 
 ### Index rows (Home)
 The catalogue index: ruled rows under a 1px ink rule, hairlines between, each whole row one link (56px, 48px for quick links). A mono index numeral in grey ink on the left (01 to 05; screen readers hear "Step 1"), the words in the middle, and the page it opens on the right as a caps label with its line icon and an arrow. Hover fills with the faint hairline; focus is the ink ring drawn inside the row. Column labels above a ruled list are caps in grey with an ink rule under them, as in the tide table. Used for How to use it, the quick links and What it is and is not.
@@ -320,7 +334,7 @@ A picture with a single frame (aerosols) has one value per region. Its tide curv
 - **Do** let font weight (200 to 800) carry alignment on the numeral and live value.
 - **Do** draw a missing frame as a break, a dashed box or a dashed flat line.
 - **Do** give both themes the same structure; only the inks flip.
-- **Do** keep the Tab order the same as the screen order: tabs, theme, picture, region, then Play.
+- **Do** keep the Tab order the same as the screen order: tabs, theme, step 1, step 2, then Play.
 
 ### Don't:
 - **Don't** round corners or add drop shadows.

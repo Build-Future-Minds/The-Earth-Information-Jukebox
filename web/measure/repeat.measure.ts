@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { choosePicture } from './choose';
 
 const repo = fileURLToPath(new URL('../..', import.meta.url));
 /** How many sweeps under each condition. MEASURE_RUNS=1 gives a quick check that the test works; its numbers mean nothing. */
@@ -54,7 +55,7 @@ const seeded = (seed: number) => `(() => {
 
 /** Open the app with the real pictures, ready to record. */
 async function open(page: Page) {
-  await page.goto('/#play');
+  await choosePicture(page, { key: 'ocean', label: 'Ocean' }, 'play'); // the ocean picture, chosen on Listen
   await expect(page.getByRole('heading', { name: /Earth Sonata/ })).toBeVisible();
   await expect(playButton(page)).toBeEnabled();
   await expect(page.getByText('TEST INPUT — a made-up picture, not NASA data')).toHaveCount(0);

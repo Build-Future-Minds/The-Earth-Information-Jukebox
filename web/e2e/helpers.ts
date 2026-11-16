@@ -21,7 +21,22 @@ export async function openApp(page: Page, view: 'listen' | 'compare' | 'how' | '
   await expect(page.getByRole('heading', { name: /Earth Sonata/ })).toBeVisible();
 }
 
-/** Start playback with the keyboard: focus Play, press Enter. (Tab order has its own test.) */
+/** Notes struck by the picture scan (Listen's sound, P1): window.__scanNotes, dev only. */
+export const scanNoteCount = (page: Page) =>
+  page.evaluate(() => (window as unknown as { __scanNotes?: unknown[] }).__scanNotes?.length ?? 0);
+
+/** Wait until `n` more scan notes have been struck after `from`. On the practice data the TEST
+ *  picture's first dot is struck about 5 s into the 30 s sweep. */
+export async function scanNotesAfter(page: Page, from: number, n: number, timeout = 35_000) {
+  await page.waitForFunction(
+    ([f, k]) => ((window as unknown as { __scanNotes?: unknown[] }).__scanNotes?.length ?? 0) >= f + k,
+    [from, n],
+    { timeout },
+  );
+}
+
+/** Start playback with the keyboard: focus Play, press Enter. (Tab order has its own test.)
+ *  On Listen this plays the picture scan; on Play along, the Earth rhythm. */
 export async function startWithKeyboard(page: Page) {
   await page.getByRole('button', { name: 'Play', exact: true }).focus();
   await page.keyboard.press('Enter');

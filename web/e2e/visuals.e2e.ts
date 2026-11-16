@@ -7,7 +7,10 @@ test.beforeEach(async ({ page }) => openApp(page));
 
 const lane = (page: import('@playwright/test').Page) => page.getByRole('slider', { name: /Rhythm timeline/ });
 
-test('the beat lane is idle until Start, then follows the audio', async ({ page }) => {
+// The beat lane is the Earth rhythm's timeline on Listen. Since P1 (decision D1) Listen plays the
+// picture scan, and the lane comes back with P4's "Add the Earth rhythm" switch. These three tests
+// are kept, not deleted, so P4 turns them back on.
+test.fixme('the beat lane is idle until Start, then follows the audio (returns with P4)', async ({ page }) => {
   await expect(lane(page)).toHaveAttribute('aria-disabled', 'true');
   await startWithKeyboard(page);
   await notesAfter(page, 0, 6);
@@ -19,7 +22,7 @@ test('the beat lane is idle until Start, then follows the audio', async ({ page 
   expect((t2 - t1 + 4) % 4).toBeGreaterThan(0.3); // the playhead moves with the sound
 });
 
-test('clicking the lane moves playback to that point', async ({ page }) => {
+test.fixme('clicking the lane moves playback to that point (returns with P4)', async ({ page }) => {
   await startWithKeyboard(page);
   await notesAfter(page, 0, 2);
   await lane(page).scrollIntoViewIfNeeded();
@@ -33,7 +36,7 @@ test('clicking the lane moves playback to that point', async ({ page }) => {
   expect(firstNew?.pulse).toBe(0);
 });
 
-test('the arrow keys on the lane step through beats', async ({ page }) => {
+test.fixme('the arrow keys on the lane step through beats (returns with P4)', async ({ page }) => {
   await startWithKeyboard(page);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await lane(page).focus();
