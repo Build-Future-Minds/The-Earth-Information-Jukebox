@@ -13,14 +13,14 @@ Constraints: PRODUCT.md honesty lines and credit; keyboard first; colour never t
 
 ## Direction contract
 
-THESIS: Earth Sonata reads like a tide table printed on a sea chart: the NASA picture sits inside a chart graticule, and each region's numbers are set in ruled columns. It refuses the category default of a dark map viewer with floating panels and coloured cards.
+THESIS: Earth Sonata is a record catalogue: each NASA picture is a catalogue entry, each region a side, and the rhythm is drawn as a stack of hairline pulse lines from the real alignment numbers. It refuses both the dark map viewer with glowing floating panels and the previous tide-table print.
 
-OWN-WORLD: Two-ink tide-table print. Light: cool almanac white ground, navy ink, tide blue for actions, high-water red-orange only for live and focus, violet Region A and rose Region B (both off the NASA temperature scale). Dark is the night edition: deep navy ground, the same inks lifted. Structure is 1px hairline rules only, no boxes, no side stripes, 4px corners. One face, Atkinson Hyperlegible Next, mono for numbers.
+OWN-WORLD: Record sleeve. Light: white sleeve (oklch 0.975, no hue), black ink, hairline grey rules. Dark: matte black sleeve, white ink. Square corners everywhere; boxed controls joined by 1px rules like a catalogue index. Labels in letterspaced caps (Geist), numbers in Geist Mono. Colour appears only where something is live or chosen, and then it is the playing side's colour (Side A violet, Side B rose): the needle, the end block on the current tab and on Play. Focus is an ink ring.
 
-STORY: The visitor sees where the two regions are on Earth, presses Start, hears the rhythm, reads the numbers in the table, and sees alignment over the 30 model frames as two tide curves.
+STORY: The visitor picks a catalogue entry (picture) and a side (region), presses Play, and watches a needle in the side's colour run along the sound bars as each pulse lights; Compare shows the two sides' numbers.
 
-FIRST VIEWPORT: Rail left: title, Light/Dark switch, playback buttons (Start in tide blue), region choice with A/B badges. Main: the NASA picture large inside a chart frame with latitude ticks left and right and longitude ticks top and bottom (every 30°), region rings in their colours; credit under it; status line.
+FIRST VIEWPORT: Layout unchanged from the page owners' Listen (page plan P1): letterspaced EARTH SONATA left, boxed caps tabs, boxed Light/Dark; picture and region choice; the NASA picture inside its 1px ink frame on the black well; the boxed player bar with Play filled in ink and the coloured needle on the sound bars.
 
-FORM: Tide Table, assigned (candidate 5 of 7), fused with the user's pick of Nautical Chart's graticule. seed:02fbaf580729fa0a. Signature move: alignment over the 30 frames drawn as two tide curves on one time line, inside the rhythm section.
+FORM: Pulse Catalogue: dealt challenger (Factory catalogue sleeve) fused with Impeccable's pick (record sleeve, Side A / Side B), chosen by the team from three mockups; seed adcae389. Scope by user decision: look only; page layouts stay with their owners in docs/page_plan.md. Signature: the side-coloured needle with a square cap and dot on the sound bars, and the PulsePlot component (ridge plot with a per-beat needle) offered to Compare (P2).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

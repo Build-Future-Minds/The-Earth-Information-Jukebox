@@ -121,6 +121,8 @@ export function BeatTrack({ track, regionLabel, colour, playState, speed, getPos
         onPointerUp={() => (dragging.current = false)}
         onPointerCancel={() => (dragging.current = false)}
       >
+        {/* The part of the loop already played, washed in the side's colour behind the needle. */}
+        <span className="played-wash" style={{ width: `${pct}%` }} />
         <svg viewBox={`0 0 ${W} ${LANE_H}`} preserveAspectRatio="none" aria-hidden="true">
           {track.steps.map((s) => (
             <g key={s.t}>
