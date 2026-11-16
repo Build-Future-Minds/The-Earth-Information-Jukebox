@@ -19,7 +19,7 @@ import {
   noteName,
 } from '../audio/scanScore';
 import { ChartFigure, LegendItem, Plot } from './charts';
-import { barRoots, OCEAN_SCAN, SCAN, SOUND } from './data';
+import { BAR_LABELS_OFF_C, BAR_SWITCH_C, barRoots, OCEAN_SCAN, SCAN, SOUND } from './data';
 import { Entry, Field, fmt, Formula, M, N, RepoLink, Stage, Table, Tag, TestName } from './parts';
 
 const R = String.raw;
@@ -158,8 +158,9 @@ export function PictureScan() {
           <Field label="Check">
             <Tag t="Verified" /> in a recording of the map sweep: the left speaker is <N>{fmt(lineSweep?.firstSixth.leftMinusRightDb ?? NaN, 1)}</N> dB louder in the
             first sixth and <N>{fmt(-(lineSweep?.lastSixth.leftMinusRightDb ?? NaN), 1)}</N> dB quieter in the last. The warm/cool switch falls at{' '}
-            <N>{fmt(100 * SCAN.bar.switches[0], 1)}%</N> of NASA’s colour bar: a rule about pixels, not degrees. <Tag t="Unverified" />: what that is in °C,
-            since we read the bar’s labels by eye.
+            <N>{fmt(100 * SCAN.bar.switches[0], 1)}%</N> of NASA’s colour bar, at <N>{fmt(BAR_SWITCH_C, 1)}</N> °C: <Tag t="Verified" />, since
+            the bar’s four printed labels lie on one straight line within <N>{fmt(BAR_LABELS_OFF_C, 2)}</N> °C. A rule about pixels, not degrees: we
+            measured the bar and the picture’s colours, not the sea.
           </Field>
         </Entry>
       </Stage>

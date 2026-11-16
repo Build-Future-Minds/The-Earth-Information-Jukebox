@@ -161,12 +161,30 @@ change them. The app says so in "How the picture becomes sound".
 
 - The scale, C major pentatonic. It has no clashing pair of notes, and the melody keys use it too.
 - How the 12 notes are spaced: far apart at the bottom (a fifth, then a fourth) and close at the
-  top, the way a choir is spaced. Notes a step apart sound muddy when they are low. The first
-  version climbed step by step from C3, so C3, D3 and E3 blurred together whenever they sounded
-  at once, which on the radar is all the time.
+  top, the way a choir is spaced. The first version climbed step by step from C3, so C3, D3 and E3
+  blurred together whenever they sounded at once, which on the radar is all the time.
+  **Source, read 15 Nov (S13 in `DECISIONS.md`):** Plomp and Levelt (1965) found two pure tones
+  most dissonant a quarter of a critical bandwidth apart and consonant from a whole bandwidth on
+  (p. 555), and wrote that below about 500 Hz "the intervals become more and more dissonant", which
+  "reflects the musical practice to avoid thirds at low frequencies and to use mostly octaves or
+  wider intervals" (p. 556). **Measured, 15 Nov** (`docs/measurements/scan_spacing.md`), with their
+  bandwidth curve:
+  - the first version's lowest neighbours, C3–D3 and D3–E3, were 0.18 and 0.20 of a bandwidth
+    apart, close to the roughest point;
+  - the current C3–G3 and G3–C4 are 0.72 and 0.71;
+  - 8 of the first spacing's 11 neighbouring pairs were closer than half a bandwidth, and 1 of the
+    current's 11 is.
+
+  Over the choir's real partials, with all twelve notes at full level, Sethares's roughness formula
+  (S14) gives the current spacing 0.49 of the first spacing's roughness. Summed only over
+  neighbouring partials, as Plomp and Levelt did, it gives 0.66. **Unverified:** that the current
+  spacing sounds clearer. These are calculations from a model of hearing; nobody has listened to
+  compare, and the app cannot play the first spacing.
 - The instruments. "Scan sound" offers three: Ocean choir (choir, marimba, bells), Music box
   (soft organ, kalimba, music box) and Plain (the first version's instruments). All three play
-  the same score, the same notes at the same times; a browser test checks it.
+  the same score, the same notes at the same times. A browser test compares every chime in 10 s
+  on the test picture, and `npm run measure` compares the 21 chimes in the first 10 s of the
+  ocean picture's map sweep.
 - Which low note sounds. It steps through the roots of four chords, I, VIm, IV and V in C (the
   notes C2, A1, F2, G2), one every 3.75 s. The same held notes are heard over four roots, as
   four chords, so the scan moves like music. C, A and G are notes of the scale. F is not: under
@@ -310,7 +328,8 @@ The app's scan plays the ocean picture only, whichever picture is chosen on List
 of #45). The aerosol and rain stills were measured with the same rule on 15 Nov and are **not
 ready**. By colour, the rain picture's empty sea sounds in every cell (it is drawn dark navy, not
 black: mean level 0.141) and its land, a photo, sounds in 61% of land cells. On the aerosol still
-93% of sea cells sound, and its sea-salt circle gives no chime at all. Each picture needs its own
+93% of sea cells sound, and its circle of sea-salt cells in the southeast Pacific gives no chime at
+all. Each picture needs its own
 floor, land rule and legend before the scan may play it, and its numbers are never compared with
 another picture's.
 
@@ -349,33 +368,84 @@ Stop the output was below −84 dB from 0.15 s on. These last two figures were m
 first instruments; the next paragraph repeats them with today's.
 
 **Measured again, 15 Nov**, by `npm run measure`, which records the running app in headless
-Chromium (two runs; `docs/measurements/scan_sound.md` holds the latest). Ocean choir, default
-volumes.
+Chromium (four runs; `docs/measurements/scan_sound.md` holds the fourth, on the code merged with
+the globe scan). Ocean choir, default volumes.
 
-| | First run | Second run | The table above |
-| --- | --- | --- | --- |
-| Whole picture, one sweep | −25.1 LUFS | −24.4 LUFS | −25.0 LUFS |
-| Region A, one turn | −24.7 LUFS | −24.2 LUFS | −24.6 LUFS |
-| Region B, one turn | −21.8 LUFS | −21.6 LUFS | −21.4 LUFS |
-| Largest sample in the three sweeps | −6.6 dBFS | −7.0 dBFS | −5.6 dBFS |
-| Earth voice, map sweep and a four-key chord: largest sample | −5.0 dBFS | −5.2 dBFS | −4.4 dBFS (first instruments) |
-| From 0.15 s to 2.15 s after Stop | every sample 0 | every sample 0 | below −84 dB |
+| | First run | Second run | Third run | Fourth run | The table above |
+| --- | --- | --- | --- | --- | --- |
+| Whole picture, one sweep | −25.1 LUFS | −24.4 LUFS | −24.9 LUFS | −24.9 LUFS | −25.0 LUFS |
+| Region A, one turn | −24.7 LUFS | −24.2 LUFS | −24.8 LUFS | −24.2 LUFS | −24.6 LUFS |
+| Region B, one turn | −21.8 LUFS | −21.6 LUFS | −21.9 LUFS | −21.6 LUFS | −21.4 LUFS |
+| Largest sample in the three sweeps | −6.6 dBFS | −7.0 dBFS | −5.4 dBFS | −5.0 dBFS | −5.6 dBFS |
+| Earth voice, map sweep and a four-key chord: largest sample | −5.0 dBFS | −5.2 dBFS | −3.1 dBFS | −4.9 dBFS | −4.4 dBFS (first instruments) |
+| From 0.15 s to 2.15 s after Stop | every sample 0 | every sample 0 | every sample 0 | every sample 0 | below −84 dB |
 
 So nothing clipped and Stop leaves silence. A loudness on this page is good to about half a
-LUFS, not to the decimal it is written with: the same sweep differed by up to 0.7 between two
-runs. **Unverified:** why. Our guess is that the held notes' detuned copies start at random
-phases.
+LUFS, not to the decimal it is written with.
+
+**The same sweep is not equally loud twice. Measured, 15 Nov** (`docs/measurements/scan_repeat.md`):
+the map sweep recorded 10 times, each in a page loaded afresh as the app is, has a mean of
+−24.79 LUFS, a standard deviation of 0.24 LU (95% interval 0.16 to 0.44) and a range of 0.66 LU.
+Ten recordings fix a standard deviation only to within about −30% and +80%.
+
+Why: each time a page builds the scan's sound, two things fall out by chance. Neither comes from
+the picture.
+
+- **The reverb.** Tone.js makes the reverb's echo from random noise (`Reverb.generate` starts its
+  noise at a random point of a buffer filled with random numbers), a new echo for each page.
+  Offline, the 12 held notes through 20 new reverbs vary in loudness by 0.16 LU (standard
+  deviation; range 0.58), and the level around each note moves by 2.4 to 5.4 dB; without the
+  reverb, two renders are identical. In the app, with the page's random numbers fixed (so the
+  reverb is the same every time), the level around E4, A4 and D5 repeats within 0.4 dB from one
+  sweep to the next; as the app is, it moves by 2.2 to 2.9 dB.
+- **When each held oscillator starts.** Each one starts at "now", read as it is made, and the
+  audio clock moves while they are made. In 20 real builds, the 21 oscillators of the held notes
+  started at 8 to 14 different moments, 61 ms from the first to the last (middle of the 20). Two
+  notes that share a partial at exactly the same frequency add it with a different phase each
+  time: notes an octave apart, and the low note, whose octave and fifth are C3 and G3 on its first
+  root and whose root's second and fourth harmonics are C3 and C4 (`instruments.ts`, RichBass).
+  Rendered offline at the start times of those 20 builds, without a reverb, the held notes and
+  the low note vary in loudness by 0.24 LU (standard deviation; range 0.91); started at one time,
+  two renders are identical. Around E4, A4 and D5, where no other oscillator has a partial at the same frequency,
+  the level moved 0.03 dB at most. Around C3 it moved 9.9 dB and around G3 6.2 dB, both only
+  with the low note playing (`docs/measurements/scan_timing.md`).
+
+This replaces the guess written here before, that the held notes' detuned copies start at random
+phases. They do not: Tone.js starts them at 0°, 120° and 240° (`FatOscillator`), the same every time.
+
+**Not settled:**
+
+- How the spread of a whole sweep divides between the two causes. With the page's random numbers
+  fixed, the standard deviation was 0.11 LU (range 0.34) against 0.24 as the app is: a difference
+  just past chance at the 5% level (ratio of variances 4.8, where 4.0 is needed), in one run of 10
+  sweeps each.
+- What is left in one page, where the reverb and the start times stay the same: 10 sweeps played
+  one after another still have a standard deviation of 0.09 LU (range 0.29). Its cause was not
+  measured. One candidate is the low note, whose phase against the choir depends on how long it
+  has sounded since it was built.
+- Whether anyone can hear differences of this size. Nobody listened.
+
+**Decided, 15 Nov (Developer A), not built yet:** the scan is to sound the same on every page
+load. On a branch of its own, in two steps, each measured with `npm run measure` and listened to
+by Developer A before it merges: first a fixed reverb echo made from our own seeded noise, the
+seed chosen for the most even gain across the 12 held notes; then one shared start time for every
+held oscillator, with the scan's clock started at that time too.
 
 Loudness follows the level. On a test picture with levels 0.121, 0.251, 0.502 and 1 in one band
-and the chime rule switched off, that band's tone rose by 6.2, 6.0 and 5.9 dB in the first run
-and 6.5, 6.2 and 6.0 dB in the second. 20·log₁₀ of the level ratios gives 6.3, 6.0 and 6.0 dB.
+and the chime rule switched off, that band's tone rose by 6.2, 6.0 and 5.9 dB in the first run,
+6.5, 6.2 and 6.0 dB in the second, 6.1, 5.9 and 5.5 dB in the third, and 6.4, 6.2 and 6.0 dB in
+the fourth (`scan_sound.md`). 20·log₁₀ of the level ratios gives 6.3, 6.0 and 6.0 dB. The third
+run's last step was 0.4 dB short of that; why was not looked into.
 
 Checked in a recording of the map sweep:
 
 - Low note: in each of the 8 steps the expected root (C2, A1, F2, G2, twice) is the strongest
-  of the four root tones, by 41 dB or more.
-- Left and right: in the first 5 s the left channel is 9.5 dB louder than the right, they cross
-  between 15 and 20 s, and in the last 5 s the right is 9.3 dB louder.
+  of the four root tones, by 41 dB or more. This is from an earlier recording the same day;
+  `npm run measure` does not repeat it.
+- Left and right: in the first sixth of the sweep (5 s) the left channel is 8.3 dB louder than
+  the right, and in the last sixth the right is 10.2 dB louder (`scan_sound.md`, the fourth run;
+  the third gave 9.0 and 9.9). An earlier recording the same day gave 9.5 and 9.3 dB, with the
+  two channels crossing between 15 and 20 s; the tool does not measure the crossing.
 
 **Tests.** `web/src/audio/scanScore.test.ts`: 57 tests on made-up pictures (TEST INPUTS). The
 main one is a picture with three dots, which must give exactly three chimes: columns 41, 81 and
@@ -384,10 +454,11 @@ grey and grey with JPEG-sized noise are `missing` and silent. The root steps, th
 position, the note spacing and the brightness measure each have their own tests. Three more say
 exactly which notes clash (none of the held notes with each other; F under E).
 `web/src/audio/instruments.test.ts`: 3 tests solve the two bar equations again and compare the
-answers with the ratios the instruments use. `web/src/audio/scanWhy.test.ts`: 27 tests on made-up
+answers with the ratios the instruments use. `web/src/audio/scanWhy.test.ts`: 34 tests on made-up
 pictures: each dot explains itself with its place, numbers and instrument; a peak left out names
 the stronger one that took its place, for both reasons; places on a world map, another picture and
-the radar; the whole column; and the list of fixed choices. `web/e2e/scan-why.e2e.ts`: 8 browser
+the radar; the whole column; the list of fixed choices; and, for a place picked on the picture,
+the few words under it and the nearest struck note. `web/e2e/scan-why.e2e.ts`: 8 browser
 tests that do what a person does: open it by keyboard, walk to a column with the arrow keys and
 read its table, follow the line while it plays, change the scan sound while it plays, use the radar,
 and check nothing in it is announced.
@@ -396,7 +467,14 @@ the line keeps moving when another scan is chosen while one is playing (it once 
 the notes played; found by Developer A and fixed on 15 Nov). The two first chimes sound 5.000 s apart within 5 ms (10 s at half speed), over the roots
 A1 and F2; the line on screen is where the audio clock says; a chime leaves one mark, even when the
 page is busy for 0.7 s as it sounds; Esc stops the scan and clears the picture; and all five melody
-sounds let go of their notes.
+sounds let go of their notes. All three scan sounds play the same chimes, at the same times after
+the first, for 10 s (two chimes on the test picture; 15 Nov). The scan-why test that changes the
+sound while it plays waited 10 s for a text that never appears, then raced the next chime; it now
+waits only for the first chime (15 Nov).
+`web/measure/spacing.test.ts`: 14 tests check the spacing and roughness functions against their
+sources: Sethares's dips at 2:1, 3:2, 4:3, 5:4 and 5:3 for a harmonic tone, the peak of his formula,
+and the bandwidth curve's shape. `web/measure/meter.test.ts` checks the faster band meter against
+the slower one.
 
 **Tests of the scan on the globe.** `web/src/globe/geo.test.ts`: the projection against the vertex
 shader's sums and the globe's own mesh (the place faced lands in the middle, places 90° away on the
@@ -424,22 +502,29 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
 | The line runs west to east and the readout gives its longitude | Verified for the ocean | Map geometry checked by Student A, 14 Nov. The app finds a world map by the word "equirectangular" in a scene's limitations; the aerosol and rain scenes lack the word, so this must be fixed before either is played |
 | Pitch is height on the map, in 12 equal bands | Design choice | Limits in "What we do not claim" |
 | Loudness is a cell's mean colour strength | Design choice | Limits in "What we do not claim" |
-| The sound gets louder as the level rises | Verified | On a recorded test picture each doubling of the level raised that band's tone by 5.9 to 6.5 dB over two runs; 6.0 is exact |
+| The sound gets louder as the level rises | Verified | On a recorded test picture each doubling of the level raised that band's tone by 5.5 to 6.5 dB over four runs; the exact steps are 6.3, 6.0 and 6.0 |
 | Black sea and grey land are silent | Verified for the ocean | Of 746 cells that are 90% or more grey land or black sea in the uncompressed frame, none sounds. Largest cell mean 7.67/255; the floor is 12/255 |
 | A peak of colour gives one struck note | Design choice | 39% to 61% of peaks are left out |
-| Red and orange strike one instrument, the rest another | Design choice | The switch on NASA's colour bar is measured; what it means in degrees is Unverified |
+| Red and orange strike one instrument, the rest another | Design choice | The rule is ours. Where it falls was **measured** below |
+| NASA's colour bar is even, and the switch falls at about 23.6 °C on it | Verified (15 Nov) | The four printed labels lie on one straight line within 0.07 °C; the switch is at 23.64 °C by that line (`scan_pictures.md`). The figure before, 23.8 °C, assumed the coloured ends were 0 and 32: **corrected** |
+| The frame's lines use the bar's colours, so the switch means "warmer than about 23.6 °C" | Verified for the hue, which is all the rule reads (15 Nov) | 99.65% of the frame's colour (by strength) is on the same side of the switch as the bar colour of its hue. Not the bar's exact colours: the frame's are more saturated. A hue match cannot show where NASA's palette came from |
+| Warm water sounds louder than cold with the same amount of line (1.93 times) | **Corrected** (15 Nov) | That came from two end pixels of the printed bar. In the frame, the strongest warm and cold lines are equally strong (1.01 times); the palest lines are light blue (0.81 at their strongest) |
 | The held notes never clash with each other | Verified | A test, with "clash" defined as 1, 6 or 11 semitones apart |
 | The low note never clashes with the held notes | Corrected | It did claim this. F under E is a major seventh |
-| Wide spacing at the bottom is clearer than close spacing | Unverified | No source. To do: derive it from critical bandwidth, with a source someone has read |
+| Low notes a step apart are rough, because they are a fraction of a critical bandwidth apart | Verified (source read, 15 Nov) | S13, pp. 555–556. The first spacing's C3–D3 and D3–E3 were 0.18 and 0.20 of a bandwidth apart; the current lowest pairs, C3–G3 and G3–C4, are 0.72 and 0.71 (`scan_spacing.md`) |
+| The current spacing makes the choir less rough | Verified as a calculation (15 Nov) | Sethares's formula (S14) over the choir's partials, all notes at full level: current ÷ first 0.49 (every pair), 0.66 (neighbouring partials only). The model of the partials matches a recording of the real choir (`scan_spacing.md`) |
+| Wide spacing at the bottom sounds clearer | Unverified | Nobody has listened to compare, and the app cannot play the first spacing (`scan_listening_protocol.md`, task S4) |
 | The bars' tone ratios | Verified | A test solves both equations |
 | The low note's steps and the left–right position carry no data | Verified | Recordings above |
-| Every scan sound plays the same score | Verified by construction | The browser test compares the first chime only |
+| Every scan sound plays the same score | Verified (15 Nov) | The browser test compares every chime in 10 s from the first (two on the test picture); `npm run measure` compares the 21 chimes in the first 10 s of the ocean picture: same columns, bands, instruments, notes, roots, left–right places and times |
 | The globe plays the same score as the flat picture | Verified | `npm run measure`: the ocean line and both radars, every level, mean and chime equal; a recorded sweep on the globe has the same chimes at the same moments. A browser test does the same on the TEST INPUT picture |
 | The globe draws the scan where the score reads | Verified on the TEST INPUT picture | Pixels read back from the GPU match the rule's copy in TypeScript within 3 grey levels; marks sit on the dot that made them |
-| Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop |
+| Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop. Two later runs: −3.1 dBFS, and in the latest (`scan_sound.md`) −4.9 dBFS, both under full scale, with silence after Stop. The tool now fails if part of this recording is missing, since a gap there could hide the largest sample |
 | The counts in "Measured, 15 Nov" | Verified again | The tool gives the same: 60.0% and 68 chimes (53, 15); 98% and 56; 100% and 72 |
-| The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | Two more runs differ from them, and from each other, by up to 0.7 |
-| It sounds good, and a region's character can be heard | Unverified | Needs listeners. The third round has had none |
+| The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | The same map sweep recorded 10 times as the app is: standard deviation 0.24 LU, range 0.66 (`scan_repeat.md`). The table's −25.0 LUFS is inside that range (−25.19 to −24.53). The regions were recorded in four runs; they differ by up to 0.6 |
+| The same sweep varies in loudness because of the reverb and the held notes' start times, not the picture | Verified as causes (15 Nov); how a sweep's spread divides between them is not settled | Offline, each one alone changes the loudness (20 reverbs: standard deviation 0.16 LU; the start times of 20 real builds: 0.24), and without them two renders are identical (`scan_repeat.md`, `scan_timing.md`). In the app, a fixed reverb made the level around E4, A4 and D5 repeat within 0.4 dB, where it moved 2.2 to 2.9 dB |
+| It sounds good, and a region's character can be heard | Unverified | Needs listeners. The third round has had none. A protocol is drafted, not run: `docs/scan_listening_protocol.md` |
+| The scan reads a still close enough to NASA's frame | Measured; decided 15 Nov, not built yet | The JPEG the app reads puts 49 of its 68 chimes at the same place and on the same instrument as a chime of the uncompressed frame (84). A 4:4:4 JPEG at quality 90 would put 76 of 86 there; a lossless WebP is the frame itself. Developer A chose a lossless WebP read by the scan alone (15 Nov) |
 | A click on the picture explains the cell the scan read there | Verified | Unit tests (`scanPick.test.ts`), and a one-off check in the running app on the ocean still: see "Pick a place on the picture" |
 | A click makes no sound and does not move the scan | Verified | Browser tests, stopped, paused and playing. A click while playing leaves the first two notes with the same columns, instruments, 5 s spacing, low notes and left–right places that `scan.e2e.ts` checks without a click |
 | A click works by mouse, touch and pen | Verified in emulation only | Chromium touch emulation and synthetic pen events. No real phone, tablet or pen tried |
@@ -454,23 +539,58 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
   for something in the picture; the app's explanation and this page say it is not.
 - The scan reads colours in a picture. NASA's legend says the colour shows modelled sea surface
   temperature, but we do not turn colours into degrees. "Red side of yellow" is a rule about
-  pixels. On NASA's colour bar the rule switches at 74.4% of the bar's length, which is 23.8 °C
-  if the bar's scale is even between its end labels, 0 and 32. We measured the bar, not the sea.
-  **Unverified:** that the bar's scale is even (its labels were read by eye), and that the lines
-  in the frame use exactly the bar's colours.
+  pixels, and it depends on a colour's hue alone. **Measured, 15 Nov** (`docs/measurements/scan_pictures.md`):
+  - On NASA's colour bar the rule switches between x 219 and 220. The bar's four printed labels
+    (0, 10, 20, 32) lie on one straight line to within 0.62 px, which is 0.07 °C, so the bar's
+    scale is even. By that line the switch is at **23.6 °C** (23.64 by the ink centres of the
+    labels, 23.70 by their box centres). The figure written here before, 23.8 °C, assumed the
+    bar's coloured ends were 0 and 32; they sit just inside the labels.
+  - The frame's lines use the bar's hues. Every coloured pixel of the uncompressed frame 23000
+    has a hue inside the bar's range: 99% are within 0.7° of a bar hue, and 11 pixels of 768,999
+    are more than 3° from every bar hue. Weighted by colour strength, as the scan weighs them, 99.65% of
+    the frame's colour is on the same side of the switch as the bar colour of its hue.
+  - The frame does not use the bar's exact colours. At full brightness its colours are as bright
+    as the bar's (1.00 to 1.10 times) but more saturated (the middle pixel 1.07 to 1.34 times):
+    the printed bar is a paler copy of the same palette. And because the bar's hues run without a
+    gap, any hue inside their range matches some bar hue; the match shows which side of the
+    switch a colour is on, not that NASA drew it from this bar.
+
+  So "the switch is at about 23.6 °C" means that a cell strikes the warm instrument when most of
+  its colour has the hue NASA's bar gives to water warmer than 23.6 °C. We measured the bar and
+  the picture's colours, not the sea.
 - Loudness is how much of a cell is covered by drawn lines and how strongly they are coloured. It
-  is not current speed. It is not independent of temperature either: along NASA's colour bar the
-  colour strength rises from 0.47 at the cold end to 0.90 at the warm end, so warm water is
-  louder than cold water with the same amount of line (1.93 times the cell mean).
+  is not current speed. It depends a little on colour: at their strongest, the frame's lines in
+  the light-blue tenth of the bar (10% to 20% of its length) reach a colour strength of 0.81, in
+  the green to yellow-green tenths (40% to 60%) 0.89, in the turquoise tenth (20% to 30%) 0.93,
+  and in every other tenth 0.98 to 1.00. **Corrected, 15 Nov:** this page said
+  warm water is 1.93 times louder than cold water with the same amount of line. That figure came
+  from two single pixels at the ends of the printed bar, not from the frame. In the frame, the
+  strongest warm and cold lines are equally strong (1.01 times).
+- A band's loudness is not exactly its level from one page load to the next. The reverb and the
+  held notes' start times change the level around a note each time a page builds the sound: as
+  the app is, by 2.2 to 2.9 dB around E4, A4 and D5, and by 13.2 dB around C3, where the low
+  note's partials fall (`docs/measurements/scan_repeat.md`; the causes are under "Measured again"
+  above). Within one sweep the instruments do not change, and a band still gets louder as its
+  level rises.
 - The scan reads a compressed copy. `data/preview.jpg` is a JPEG of frame 23000 with halved
-  colour resolution (4:2:0, read from the file's header), which blurs thin coloured lines.
-  Against the uncompressed frame, levels differ by 0.043 on average and 0.152 at most, 1727
-  cells sound where 1816 would, and 49 of the still's 68 chimes fall on a chime of the
-  uncompressed frame (which has 84). The broad picture holds; single chimes do not.
+  colour resolution (4:2:0) at quality 82 (libjpeg's standard tables, read from the file), which
+  blurs thin coloured lines. Against the uncompressed frame, levels differ by 0.043 on average and
+  0.152 at most, 1727 cells sound where 1816 would, and 49 of the still's 68 chimes fall at the
+  same place and on the same instrument as a chime of the uncompressed frame (which has 84; 50 at
+  the same place on either instrument). On the radar, 32 of 56 chimes (Kuroshio) and 33 of 72
+  (Equatorial Pacific) do. The broad picture holds; single chimes do not.
+  **Measured, 15 Nov:** a 4:4:4 JPEG at quality 90 (1.56 MB) puts 76 of its 86 chimes at the same
+  place and on the same instrument as the uncompressed frame's, and 63 of 74 and 66 of 85 on the
+  radar. A lossless WebP (2.43 MB) is the uncompressed frame, pixel for pixel. The still is also
+  the picture on Listen, the close-ups on Compare and the globe's texture and land check, and
+  `data/README.md` asks for under about 1 MB; the Earth voice reads NASA's frames, not the still.
+  **Decided, 15 Nov (Developer A), not built yet:** the scan will read a lossless WebP of the
+  frame, a file of its own that only the scan loads; the JPEG stays for everything else. It needs
+  its own pull request, with Student A, whose folder `data/` is.
 - Bands are equal steps on the flat map (15° of latitude for the line). Along a meridian these
   are equal lengths, but a band's share of the globe's surface is (sin φ₂ − sin φ₁) ÷ 2: 12.9%
   next to the equator and 1.7% next to a pole. Weighting each pixel by cos(latitude) inside its
-  cell moves a level by at most 0.13 (in the band from 75° N to the pole) and at most 0.033
+  cell moves a level by at most 0.13 (in the band from 75° N to the pole) and at most 0.032
   elsewhere, and gives 70 chimes in place of 68. We keep the unweighted rule.
 - A circle is round on the flat map, not on the ground: Kuroshio is 0.876 times as wide
   east–west as it is tall, the Equatorial Pacific circle 1.000. So equal turns of the radar are

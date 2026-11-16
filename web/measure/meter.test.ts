@@ -1,6 +1,6 @@
 // The sound meter, checked on made-up signals whose answers are known (TEST INPUTS, not recordings).
 import { describe, expect, it } from 'vitest';
-import { bandDb, cut, integratedLoudness, kWeighting, peakDb, rmsDb, toDb, type Stereo } from './meter';
+import { bandDb, bandLevels, cut, integratedLoudness, kWeighting, peakDb, rmsDb, toDb, type Stereo } from './meter';
 
 const RATE = 48000;
 
@@ -92,5 +92,18 @@ describe('peak, level and level in a band', () => {
     const a = bandDb(sine(523, 0.1, 2).left, RATE, 480, 570);
     const b = bandDb(sine(523, 0.2, 2).left, RATE, 480, 570);
     expect(b - a).toBeCloseTo(6.02, 2);
+  });
+  it('the fast version gives the same levels as bandDb, several bands at once', () => {
+    // 1.3 s is not a power of two in samples, so the fast version pads with zeros.
+    const quiet = sine(523, 0.1, 1.3).left;
+    const loud = sine(1046, 0.5, 1.3).left;
+    const low = sine(131, 0.03, 1.3).left;
+    const mix = quiet.map((v, n) => v + loud[n] + low[n]);
+    const bands: [number, number][] = [[480, 570], [1000, 1100], [120, 140], [700, 800]];
+    const fast = bandLevels(mix, RATE, bands);
+    bands.slice(0, 3).forEach(([lo, hi], i) => expect(fast[i]).toBeCloseTo(bandDb(mix, RATE, lo, hi), 1));
+    expect(fast[0]).toBeCloseTo(toDb(0.1 / Math.SQRT2), 1);
+    expect(fast[2]).toBeCloseTo(toDb(0.03 / Math.SQRT2), 1);
+    expect(fast[3]).toBeLessThan(-80);
   });
 });

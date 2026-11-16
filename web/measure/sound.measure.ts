@@ -1,7 +1,7 @@
 // Records the running app in headless Chromium and measures the picture scan's sound.
 // Writes docs/measurements/scan_sound.*. The recording and the meter are in tap.ts and meter.ts;
 // this file presses the buttons a person would press and writes the report.
-// Run: npm run measure   (from web/). It plays in real time, so it takes about three minutes.
+// Run: npm run measure   (from web/). It plays in real time, so it takes about five minutes.
 import { expect, test, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -122,8 +122,48 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   const afterStop = await tap<Measured>(page, `measureBetween(${stopped + 0.15}, ${stopped + 2.15})`);
   const beforeStop = await tap<Measured>(page, `measureBetween(${stopped - 2}, ${stopped - 0.2})`);
   for (const key of keys) await page.keyboard.up(key);
+  await page.waitForTimeout(2500); // let the echo die away
 
-  // ---------- 4. One map sweep on the globe (Globe tab): the same score and the same player ----------
+  // ---------- 4. Every scan sound plays the same score: the first 10 s of the map sweep ----------
+  // The browser test (e2e/scan.e2e.ts) compares the sounds on the test picture, which has only two
+  // chimes in 10 s. Here the real picture: every chime in the first 10 s of the sweep, from each sound.
+  const sameScoreSeconds = 10;
+  const sounds = page.getByLabel('Scan sound');
+  const soundNames = await sounds.locator('option').allTextContents();
+  const scores: { sound: string; chimes: { column: number; band: number; warm: boolean; note: number; root: number; pan: number; at: number }[] }[] = [];
+  for (const sound of soundNames) {
+    await sounds.selectOption({ label: sound });
+    await expect(playButton(page)).toBeEnabled();
+    const before = (await scanNotes(page)).length;
+    await playButton(page).click();
+    const { columns, seconds } = await grid(page);
+    await page.waitForTimeout((sameScoreSeconds + 1) * 1000);
+    const notes = (await scanNotes(page)).slice(before) as (ScanNote & { band: number; warm: boolean; note: number; root: number; pan: number })[];
+    expect(notes.length, `${sound}: no chime was played`).toBeGreaterThan(0);
+    const began = notes[0].audioTime - (notes[0].column * seconds) / columns;
+    // The first 10 s are the columns that start before 10 s, chosen by column: a chime can start at
+    // exactly 10.000 s, and a time worked out from the audio clock can land a hair either side of it.
+    const lastColumn = Math.ceil((sameScoreSeconds * columns) / seconds) - 1;
+    scores.push({
+      sound,
+      chimes: notes
+        .filter((n) => n.column <= lastColumn)
+        .map((n) => ({ column: n.column, band: n.band, warm: n.warm, note: n.note, root: n.root, pan: n.pan, at: n.audioTime - began })),
+    });
+    await page.keyboard.press('Escape');
+    await expect(page.getByText('Scan stopped.')).toBeVisible();
+    await page.waitForTimeout(2500);
+  }
+  const without = (c: (typeof scores)[number]['chimes'][number]) => [c.column, c.band, c.warm, c.note, c.root, c.pan];
+  const sameScore = scores.map((s) => ({
+    sound: s.sound,
+    chimes: s.chimes.length,
+    same: s.chimes.length === scores[0].chimes.length && s.chimes.every((c, i) => JSON.stringify(without(c)) === JSON.stringify(without(scores[0].chimes[i]))),
+    /** Largest gap between a chime's time from the start of its sweep and the same chime's in the first sound, in seconds. */
+    largestTimeDifference: Math.max(0, ...s.chimes.map((c, i) => (scores[0].chimes[i] ? Math.abs(c.at - scores[0].chimes[i].at) : Infinity))),
+  }));
+
+  // ---------- 5. One map sweep on the globe (Globe tab): the same score and the same player ----------
   await page.goto('/#globe'); // changing view is the same as Stop
   await page.waitForFunction(() => !!(window as unknown as { __globe?: unknown }).__globe, undefined, { timeout: 15_000 });
   await expect(playButton(page)).toBeEnabled();
@@ -199,6 +239,16 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   out.push('"After Stop" is timed from the audio clock read just after the Esc key press, so the true stop is a few milliseconds earlier.');
   out.push('"Share of the time recorded": the browser hands the recorder nothing while no sound at all reaches the last point before the speakers. Under 100% there means that part was silent in that way; 100% with every sample 0 means silence was recorded.', '');
 
+  out.push('## Every scan sound plays the same score', '');
+  out.push(`Each scan sound plays the map sweep of the ocean picture; every chime in its first ${sameScoreSeconds} s (the columns that start before ${sameScoreSeconds} s) is compared with the first sound's: column, band, instrument side (warm or cool), note, root and left–right position, and its time from the start of the sweep.`, '');
+  out.push(
+    table(
+      ['Scan sound', `Chimes in the first ${sameScoreSeconds} s`, 'Same chimes as the first sound', 'Largest time difference'],
+      sameScore.map((s) => [s.sound, s.chimes, s.same ? 'yes' : 'no', Number.isFinite(s.largestTimeDifference) ? `${(1000 * s.largestTimeDifference).toFixed(1)} ms` : 'a chime is missing']),
+    ),
+    '',
+  );
+
   out.push('## One sweep on the globe (ocean picture)', '');
   out.push('The whole picture played on the Globe tab, with the line drawn round the globe while it plays.', '');
   out.push(
@@ -222,7 +272,7 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   const finite = (x: number) => (Number.isFinite(x) ? x : null); // JSON has no −Infinity
   writeFileSync(
     resolve(folder, 'scan_sound.json'),
-    JSON.stringify({ meta, steps, sweeps, keys, allVoices, beforeStop, afterStop, globe: { sweep: globeSweep, chimes: globeLine.length, sameChimes } }, (_k, v) => (typeof v === 'number' ? finite(v) : v), 1) + '\n',
+    JSON.stringify({ meta, steps, sweeps, keys, allVoices, beforeStop, afterStop, sameScore, globe: { sweep: globeSweep, chimes: globeLine.length, sameChimes } }, (_k, v) => (typeof v === 'number' ? finite(v) : v), 1) + '\n',
   );
   writeFileSync(resolve(folder, 'scan_sound.md'), out.join('\n'));
   console.log(out.join('\n'));
@@ -232,5 +282,13 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   // The claim under test: more level, more sound.
   for (let i = 1; i < steps.steps.length; i++) {
     expect(steps.steps[i].toneDb, `level ${steps.steps[i].level} must be louder than ${steps.steps[i - 1].level}`).toBeGreaterThan(steps.steps[i - 1].toneDb);
+  }
+  // Three voices are sounding, so the recording must be whole: a gap there is a dropped block, not
+  // silence, and the largest sample could be in it.
+  expect(allVoices.recorded, 'part of the recording of all three voices is missing; run again').toBeGreaterThan(0.99);
+  // And: every scan sound plays the same score.
+  for (const s of sameScore) {
+    expect(s.same, `${s.sound}: not the same chimes as ${sameScore[0].sound}`).toBe(true);
+    expect(s.largestTimeDifference, `${s.sound}: a chime at another time`).toBeLessThan(0.005);
   }
 });

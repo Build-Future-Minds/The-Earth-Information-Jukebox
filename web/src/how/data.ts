@@ -101,10 +101,18 @@ export const SCAN = scanPicturesJson as unknown as {
     regions: { id: string; name: string; radar: ScanCounts }[];
   }[];
   lossless: { quietCells: { least: number; cells: number; sounding: number; largestStrength: number }[] };
-  /** NASA's colour bar for the ocean picture: where the warm/cool switch falls, as a share of its length. */
-  bar: { switches: number[] };
+  /**
+   * NASA's colour bar for the ocean picture: where the warm/cool switch falls, as a share of its
+   * length and as the first pixel past it; and the straight line x = a + b · T through the centres of
+   * its four printed labels, with the largest distance of a label from that line in pixels.
+   */
+  bar: { switches: number[]; switchPixels: number[]; labels: { byInk: { a: number; b: number; largest: number } } };
 };
 export const OCEAN_SCAN = SCAN.pictures.find((p) => p.key === 'ocean')!;
+/** The warm/cool switch in °C on NASA's colour bar: its edge read through the labels' line (the same sum as web/measure/pictures.measure.ts). */
+export const BAR_SWITCH_C = (SCAN.bar.switchPixels[0] - 0.5 - SCAN.bar.labels.byInk.a) / SCAN.bar.labels.byInk.b;
+/** How far the bar's printed labels sit from one straight line, at most, in °C. */
+export const BAR_LABELS_OFF_C = SCAN.bar.labels.byInk.largest / SCAN.bar.labels.byInk.b;
 
 export const SOUND = scanSoundJson as unknown as {
   meta: { date: string };

@@ -1,8 +1,8 @@
 {
  "meta": {
-  "date": "2026-11-16 02:53 UTC",
+  "date": "2026-11-16 04:49 UTC",
   "browser": "Chromium 159.0.8154.6 (headless)",
-  "commit": "e9430a7",
+  "commit": "5049697",
   "dirty": "yes"
  },
  "steps": {
@@ -15,30 +15,30 @@
    {
     "target": 0.125,
     "level": 0.12121212482452393,
-    "toneDb": -44.27500164685288,
-    "levelDb": -42.63076291477474,
-    "lufs": -43.300154828731806
+    "toneDb": -45.50099826579458,
+    "levelDb": -43.599283082671654,
+    "lufs": -44.16858000800488
    },
    {
     "target": 0.25,
     "level": 0.25108224153518677,
-    "toneDb": -38.27419262745919,
-    "levelDb": -36.876564813660636,
-    "lufs": -37.14300158097388
+    "toneDb": -39.1030128899463,
+    "levelDb": -37.455576240971176,
+    "lufs": -37.71280629491096
    },
    {
     "target": 0.5,
     "level": 0.5021644830703735,
-    "toneDb": -32.58055816648883,
-    "levelDb": -31.061602617628342,
-    "lufs": -31.318698435561224
+    "toneDb": -32.88185609490834,
+    "levelDb": -31.213968783597956,
+    "lufs": -31.50139189445086
    },
    {
     "target": 1,
     "level": 1,
-    "toneDb": -27.12600879694484,
-    "levelDb": -25.138357489207067,
-    "lufs": -25.578572708179188
+    "toneDb": -26.876495952926412,
+    "levelDb": -24.96145424626888,
+    "lufs": -25.41406752648153
    }
   ]
  },
@@ -48,29 +48,29 @@
    "measured": {
     "seconds": 30,
     "sampleRate": 48000,
-    "recorded": 1.0000000000009566,
-    "lufs": -25.062532017621944,
-    "peakDb": -7.866592265300184,
-    "levelDb": -24.771453585847198,
-    "leftMinusRightDb": -0.24790578521181672
+    "recorded": 1.0000000000009441,
+    "lufs": -24.934857888008377,
+    "peakDb": -9.020834181113523,
+    "levelDb": -24.65926917169618,
+    "leftMinusRightDb": -1.2345918631191992
    },
    "firstSixth": {
     "seconds": 5,
     "sampleRate": 48000,
     "recorded": 0.9999999999998899,
-    "lufs": -23.36085830179729,
-    "peakDb": -8.635611405831924,
-    "levelDb": -23.056042661995704,
-    "leftMinusRightDb": 9.529174276245474
+    "lufs": -23.819375656379933,
+    "peakDb": -9.071466528850584,
+    "levelDb": -23.61413959006399,
+    "leftMinusRightDb": 8.27459161298125
    },
    "lastSixth": {
     "seconds": 5,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -22.798480890268984,
-    "peakDb": -7.866592265300184,
-    "levelDb": -22.709188769116256,
-    "leftMinusRightDb": -9.230856427363442
+    "lufs": -22.429745019157018,
+    "peakDb": -9.020834181113523,
+    "levelDb": -22.316413411992436,
+    "leftMinusRightDb": -10.190080408987729
    }
   },
   {
@@ -78,29 +78,29 @@
    "measured": {
     "seconds": 15,
     "sampleRate": 48000,
-    "recorded": 1.0000000000012226,
-    "lufs": -24.870477864605522,
-    "peakDb": -10.894118313994783,
-    "levelDb": -25.325802004529,
-    "leftMinusRightDb": -0.13879253872264385
+    "recorded": 1.0000000000012217,
+    "lufs": -24.17948087200097,
+    "peakDb": -9.765489371188528,
+    "levelDb": -24.655358746340656,
+    "leftMinusRightDb": -0.667224263780323
    },
    "firstSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -24.53062949947677,
-    "peakDb": -11.778368723889287,
-    "levelDb": -25.456817594740414,
-    "leftMinusRightDb": -8.227822217846182
+    "lufs": -23.3515532400062,
+    "peakDb": -12.029754382909703,
+    "levelDb": -24.20117598540321,
+    "leftMinusRightDb": -8.750648956243246
    },
    "lastSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -28.064529265870338,
-    "peakDb": -15.497090908164502,
-    "levelDb": -28.49916680076452,
-    "leftMinusRightDb": -8.541920963423898
+    "recorded": 1.0000000000012164,
+    "lufs": -28.24148311937545,
+    "peakDb": -14.984524036619922,
+    "levelDb": -28.503971902765855,
+    "leftMinusRightDb": -8.669925697986525
    }
   },
   {
@@ -109,28 +109,28 @@
     "seconds": 15,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -21.810803864424525,
-    "peakDb": -5.938721439572445,
-    "levelDb": -21.745894280161004,
-    "leftMinusRightDb": 0.19669175470052735
+    "lufs": -21.602464908540327,
+    "peakDb": -4.959949278895824,
+    "levelDb": -21.454690741785804,
+    "leftMinusRightDb": 0.05037379760815952
    },
    "firstSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
-    "recorded": 1.0000000000012164,
-    "lufs": -23.323245304888854,
-    "peakDb": -9.006533340337468,
-    "levelDb": -22.895924236194674,
-    "leftMinusRightDb": -9.199226343424861
+    "recorded": 1.0000000000012221,
+    "lufs": -22.805476794160555,
+    "peakDb": -8.535416661372055,
+    "levelDb": -22.404380395810087,
+    "leftMinusRightDb": -9.873469625953025
    },
    "lastSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
-    "recorded": 1.000000000001228,
-    "lufs": -20.627345533500115,
-    "peakDb": -8.019699454141255,
-    "levelDb": -20.94032272248954,
-    "leftMinusRightDb": -9.08782668107327
+    "recorded": 1.0000000000012221,
+    "lufs": -20.45441807945281,
+    "peakDb": -6.347309725927418,
+    "levelDb": -20.537972377927023,
+    "leftMinusRightDb": -9.310324520385585
    }
   }
  ],
@@ -141,22 +141,22 @@
   "f"
  ],
  "allVoices": {
-  "seconds": 19.565333333333335,
+  "seconds": 20,
   "sampleRate": 48000,
-  "recorded": 0.9782666666678622,
-  "lufs": -19.89190323938617,
-  "peakDb": -4.4905787042318694,
-  "levelDb": -19.35414866504083,
-  "leftMinusRightDb": 0.8762557522108594
+  "recorded": 1.0000000000012221,
+  "lufs": -20.145664450072115,
+  "peakDb": -4.932682972974341,
+  "levelDb": -19.565751249035685,
+  "leftMinusRightDb": 0.6058175014893656
  },
  "beforeStop": {
   "seconds": 1.8,
   "sampleRate": 48000,
   "recorded": 1.0000000000012237,
-  "lufs": -19.66729408744244,
-  "peakDb": -6.197828086739873,
-  "levelDb": -19.072519347594117,
-  "leftMinusRightDb": -0.993311479956251
+  "lufs": -19.618530733309207,
+  "peakDb": -5.569850007804559,
+  "levelDb": -19.156343388098307,
+  "leftMinusRightDb": -1.9148624073403049
  },
  "afterStop": {
   "seconds": 2,
@@ -167,15 +167,35 @@
   "levelDb": null,
   "leftMinusRightDb": null
  },
+ "sameScore": [
+  {
+   "sound": "Ocean choir",
+   "chimes": 21,
+   "same": true,
+   "largestTimeDifference": 0
+  },
+  {
+   "sound": "Music box",
+   "chimes": 21,
+   "same": true,
+   "largestTimeDifference": 0
+  },
+  {
+   "sound": "Plain (first instruments)",
+   "chimes": 21,
+   "same": true,
+   "largestTimeDifference": 0
+  }
+ ],
  "globe": {
   "sweep": {
    "seconds": 30,
    "sampleRate": 48000,
-   "recorded": 1.0000000000012217,
-   "lufs": -25.036054309025065,
-   "peakDb": -9.639125690922068,
-   "levelDb": -24.731565022167864,
-   "leftMinusRightDb": -0.06430466632447818
+   "recorded": 1.0000000000012221,
+   "lufs": -24.908303037324153,
+   "peakDb": -7.299322473984034,
+   "levelDb": -24.626093112332622,
+   "leftMinusRightDb": -0.8894354526270121
   },
   "chimes": 68,
   "sameChimes": true
