@@ -569,7 +569,9 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
   transition: background-color var(--snap);
 }
 .button-link:hover { background: var(--rule-2); }
-.button-link.primary { background: var(--action); border-color: var(--action); color: var(--on-action); }
+/* The same end block as button.primary (DESIGN.md: "also the primary button links"). */
+.button-link.primary { position: relative; background: var(--action); border-color: var(--action); color: var(--on-action); padding-right: calc(var(--sm) + 8px); }
+.button-link.primary::after { content: ""; position: absolute; top: -1px; right: -1px; bottom: -1px; width: 8px; background: var(--live); }
 .button-link.primary:hover { background: var(--action-hover); border-color: var(--action-hover); }
 .button-link .small { font-weight: 400; font-size: 0.85rem; opacity: 0.8; }
 
