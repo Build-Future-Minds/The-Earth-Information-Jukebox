@@ -347,6 +347,17 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 .note-bar.hit i::after { animation: note-hit-fill 0.6s ease-out; }
 @keyframes note-hit { from { background: var(--signal); box-shadow: 0 0 0 3px var(--signal); } to { background: var(--rule-2); box-shadow: 0 0 0 0 transparent; } }
 @keyframes note-hit-fill { from { background: var(--signal); } to { background: var(--ink); } }
+/* A band with no data under the line: hatched, never a level (no data is not a zero). */
+.note-bar.nodata i { background: repeating-linear-gradient(135deg, var(--ink-2) 0 2px, transparent 2px 6px); outline: 1px solid var(--rule-2); }
+.note-bar.nodata i::after { transform: scaleY(0); }
+/* Pixels the scan never reads: a black-and-white hatch over the picture. NASA's colours are not changed. */
+.scan-view .nodata-hatch { pointer-events: none; }
+.scan-view .nodata-stripe-light { fill: #fff; fill-opacity: 0.55; }
+.scan-view .nodata-stripe-dark { fill: #000; fill-opacity: 0.55; }
+/* The third mark (an asterisk), for a picture with a third instrument. */
+.scan-view .trace .chime-star { stroke: #fff; stroke-width: 3px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: 0.85; }
+.scan-view .trace .chime-star-outline { stroke: #000; stroke-width: 6px; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: 0.7; }
+.scan-nodata-note { font-size: 0.9rem; color: var(--ink-2); max-width: 70ch; }
 /* Legend: the same shapes as on the picture, each with its meaning. Shapes that sit on the image
    are shown on the image well; the bars are shown on paper, as they are on the page. */
 .scan-legend { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));

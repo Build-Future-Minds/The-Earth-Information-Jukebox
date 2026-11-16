@@ -8,14 +8,17 @@
 //   "Fixed by us"       choices the picture cannot change
 // It is not a live region: nothing here is announced while the scan plays. It follows the line
 // while the scan plays and holds still when it does not, so every column can be reached by keyboard.
+// It speaks about the picture being played only, with that picture's own numbers.
 import { useEffect, useMemo, useState } from 'react';
-import { SCAN_CHOICES, type ScanChoice } from '../audio/scanChoices';
+import type { ScanChoice } from '../audio/scanChoices';
 import { explainBand, explainRoot, placeOf, whyBand, whyColumn, type BandWhy, type ChimeWhy, type WhyContext } from '../audio/scanWhy';
 import type { Chime, ScanScore } from '../audio/scanScore';
 
 interface Props {
   score: ScanScore;
   ctx: WhyContext;
+  /** The fixed choices behind the scan of this picture (audio/scanChoices.ts, scanChoicesFor). */
+  choices: ScanChoice[];
   /** The scan is playing: the explanation follows the line. */
   playing: boolean;
   /** Which column the line is on right now, from the audio clock. */
@@ -29,10 +32,11 @@ const FOLLOW_MS = 250;
 function chimeCell(c: ChimeWhy): string {
   if (c.status === 'struck') return `${c.instrument} ${c.name}`;
   if (c.status === 'left out') return c.reason === 'spacing' ? 'peak, left out: too close to a stronger one' : 'peak, left out: a stronger peak in this column';
+  if (c.reason === 'no data') return 'none: no data';
   return c.reason === 'no colour' ? 'none: no colour' : c.reason === 'below level' ? 'none: below the peak level' : 'none: not a peak';
 }
 
-export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck }: Props) {
+export function ScanExplanation({ score, ctx, choices, playing, getColumn, lastStruck }: Props) {
   const [open, setOpen] = useState(false);
   const [column, setColumn] = useState(0);
   const [pick, setPick] = useState<number | null>(null);
@@ -64,8 +68,8 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck }: 
   const moment = placeOf(score, here.column, 0, ctx.geometry).across; // where along the sweep this column is
 
   const last = lastStruck ? whyBand(score, lastStruck.chime.column, lastStruck.chime.band, { ...ctx, names: lastStruck.names }) : null;
-  const rules = SCAN_CHOICES.filter((c) => c.kind === 'rule');
-  const decoration = SCAN_CHOICES.filter((c) => c.kind === 'decoration');
+  const rules = choices.filter((c) => c.kind === 'rule');
+  const decoration = choices.filter((c) => c.kind === 'decoration');
 
   return (
     <details className="scan-why" onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
@@ -73,9 +77,9 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck }: 
       {open && (
         <div className="scan-why-body">
           <p className="muted">
-            Pick any moment of the scan to see where on the picture it is, what was measured there, and how that became its
-            pitch, loudness and instrument. These sentences are written from the same numbers the sound is made from. Nothing
-            here is announced while the scan plays.
+            Pick any moment of the scan to see where in this picture it is, what was measured there, and how that became its
+            pitch, loudness and instrument. These sentences are written from the same numbers the sound is made from, with this
+            picture's own settings. Nothing here is announced while the scan plays.
           </p>
 
           <section aria-labelledby="why-picture">
@@ -132,17 +136,30 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck }: 
                   </tr>
                 </thead>
                 <tbody>
-                  {[...here.bands].reverse().map((b) => (
-                    <tr key={b.band}>
-                      <th scope="row">{b.band + 1}</th>
-                      <td>{b.along}</td>
-                      <td className="num">{b.reads}</td>
-                      <td className="num">{b.mean.toFixed(3)}</td>
-                      <td className="num">{b.level.toFixed(2)}</td>
-                      <td>{b.level > 0 ? `${b.held.name} at ${Math.round(100 * b.level)}%` : `${b.held.name}, silent`}</td>
-                      <td>{chimeCell(b.chime)}</td>
-                    </tr>
-                  ))}
+                  {[...here.bands].reverse().map((b) =>
+                    b.reads === 0 ? (
+                      // No data: nothing was read, so there is no mean and no level, and never a 0.
+                      <tr key={b.band} className="nodata">
+                        <th scope="row">{b.band + 1}</th>
+                        <td>{b.along}</td>
+                        <td className="num">0</td>
+                        <td className="num">—</td>
+                        <td className="num">no data</td>
+                        <td>{b.held.name}, silent: no data</td>
+                        <td>{chimeCell(b.chime)}</td>
+                      </tr>
+                    ) : (
+                      <tr key={b.band}>
+                        <th scope="row">{b.band + 1}</th>
+                        <td>{b.along}</td>
+                        <td className="num">{b.reads}</td>
+                        <td className="num">{b.mean.toFixed(3)}</td>
+                        <td className="num">{b.level.toFixed(2)}</td>
+                        <td>{b.level > 0 ? `${b.held.name} at ${Math.round(100 * b.level)}%` : `${b.held.name}, silent`}</td>
+                        <td>{chimeCell(b.chime)}</td>
+                      </tr>
+                    ),
+                  )}
                 </tbody>
               </table>
             </div>
@@ -164,10 +181,11 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck }: 
           </section>
 
           <section aria-labelledby="why-fixed">
-            <h4 id="why-fixed">Fixed by us</h4>
+            <h4 id="why-fixed">Fixed by us, for this picture</h4>
             <p className="muted">
-              Choices the picture cannot change. Each says why it was made and what supports it, tagged the way the team tags every
-              claim: <strong>Verified</strong>, <strong>Design choice</strong> or <strong>Unverified</strong>.
+              Choices the picture cannot change. Each says why it was made and what supports it, with this picture's own numbers,
+              tagged the way the team tags every claim: <strong>Verified</strong>, <strong>Design choice</strong> or{' '}
+              <strong>Unverified</strong>.
             </p>
             <ChoiceList heading="Rules for reading the picture" choices={rules} />
             <ChoiceList heading="Decoration: carries no data" choices={decoration} />

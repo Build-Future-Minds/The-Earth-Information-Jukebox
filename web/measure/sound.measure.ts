@@ -1,7 +1,10 @@
 // Records the running app in headless Chromium and measures the picture scan's sound.
 // Writes docs/measurements/scan_sound.*. The recording and the meter are in tap.ts and meter.ts;
 // this file presses the buttons a person would press and writes the report.
-// Run: npm run measure   (from web/). It plays in real time, so it takes about three minutes.
+// Run: npm run measure   (from web/). It plays in real time, so it takes several minutes.
+//
+// Each picture is recorded with its own scan rule and reported in its own section: no table holds
+// two pictures, and no number of one picture is compared with another's.
 import { expect, test, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -20,14 +23,17 @@ interface Measured {
   levelDb: number;
   leftMinusRightDb: number;
 }
-interface ScanNote {
+interface Sweep {
   audioTime: number;
-  column: number;
+  shape: string;
+  columns: number;
+  seconds: number;
 }
 
 /** Run a function of tap.ts in the page. A string, so the import runs in the page exactly as written. */
 const tap = <T>(page: Page, call: string) => page.evaluate(`import('/measure/tap.ts').then((m) => m.${call})`) as Promise<T>;
-const scanNotes = (page: Page) => page.evaluate(() => (window as unknown as { __scanNotes?: ScanNote[] }).__scanNotes ?? []);
+/** Each sweep's start on the audio clock (scanPlayer.ts, dev only): a sweep with no struck note is timed too. */
+const sweepLog = (page: Page) => page.evaluate(() => (window as unknown as { __scanSweeps?: Sweep[] }).__scanSweeps ?? []);
 const grid = (page: Page) => page.evaluate(() => (window as unknown as { __scanScore?: { grid: { columns: number; seconds: number } } }).__scanScore!.grid);
 const playButton = (page: Page) => page.getByRole('button', { name: 'Play the picture' });
 
@@ -45,42 +51,23 @@ const dbfs = (x: number) => (Number.isFinite(x) ? `${x.toFixed(1)} dBFS` : 'ever
 const row = (cells: (string | number)[]) => `| ${cells.join(' | ')} |`;
 const table = (head: string[], rows: (string | number)[][]) => [row(head), row(head.map(() => '---')), ...rows.map(row)].join('\n');
 
-test('measure the sound of the picture scan', async ({ page, browser }) => {
-  await page.goto('/#play');
-  await expect(page.getByRole('heading', { name: /Earth Sonata/ })).toBeVisible();
-  await expect(playButton(page)).toBeEnabled();
-  await expect(page.getByText('TEST INPUT — a made-up picture, not NASA data')).toHaveCount(0); // the real picture, not practice data
-  // The scan's settings are folded away by default (UI pass, 15 Nov); the sweeps below choose a scan there.
-  await page.getByText('Scan settings', { exact: true }).click();
-
-  // ---------- 1. Does the sound get louder as the level rises? ----------
-  const steps = await tap<{
-    band: number;
-    note: string;
-    hz: number;
-    secondsEach: number;
-    chimes: number;
-    steps: { target: number; level: number; toneDb: number; levelDb: number; lufs: number }[];
-  }>(page, 'levelSteps()');
-  expect(steps.chimes, 'the level picture must play no chimes').toBe(0);
-
-  // ---------- 2. One sweep of each scan of the ocean picture, at the app's own settings ----------
-  await tap(page, 'startTap()');
-  const sweeps: { name: string; measured: Measured; firstSixth: Measured; lastSixth: Measured }[] = [];
+/** Every scan of the picture now on Play along: one sweep each, measured whole and in sixths. */
+async function sweepEach(page: Page) {
+  await page.getByText('Scan settings', { exact: true }).click(); // folded away by default
   const choice = page.locator('.scan select').first();
   const names = await choice.locator('option').allTextContents();
+  const sweeps: { name: string; measured: Measured; firstSixth: Measured; lastSixth: Measured }[] = [];
   for (let index = 0; index < names.length; index++) {
     await choice.selectOption({ index });
     await expect(playButton(page)).toBeEnabled();
-    const before = (await scanNotes(page)).length;
+    const before = (await sweepLog(page)).length;
     await tap(page, 'clearTap()');
     await playButton(page).click();
-    const { columns, seconds } = await grid(page);
+    const { seconds } = await grid(page);
     await page.waitForTimeout((seconds + 1.5) * 1000);
-    const first = (await scanNotes(page))[before];
-    expect(first, `${names[index]}: no chime was played, so the sweep's start cannot be timed`).toBeTruthy();
-    // A chime in column c is played c columns after the sweep began.
-    const began = first.audioTime - (first.column * seconds) / columns;
+    const start = (await sweepLog(page))[before];
+    expect(start, `${names[index]}: the sweep's start was not logged`).toBeTruthy();
+    const began = start.audioTime;
     sweeps.push({
       name: names[index],
       measured: await tap<Measured>(page, `measureBetween(${began}, ${began + seconds})`),
@@ -91,9 +78,12 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
     await expect(page.getByText('Scan stopped.')).toBeVisible();
     await page.waitForTimeout(2500); // let the echo die away before the next one
   }
+  return sweeps;
+}
 
-  // ---------- 3. Everything at once, then Stop ----------
-  await choice.selectOption({ index: 0 });
+/** The Earth rhythm, this picture's map sweep and a held melody chord together, then Esc. */
+async function everythingThenStop(page: Page) {
+  await page.locator('.scan select').first().selectOption({ index: 0 });
   await tap(page, 'clearTap()');
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(page.getByRole('status')).toHaveText(/Playing/);
@@ -111,6 +101,43 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   const afterStop = await tap<Measured>(page, `measureBetween(${stopped + 0.15}, ${stopped + 2.15})`);
   const beforeStop = await tap<Measured>(page, `measureBetween(${stopped - 2}, ${stopped - 0.2})`);
   for (const key of keys) await page.keyboard.up(key);
+  return { keys, seconds: together.seconds, allVoices, beforeStop, afterStop };
+}
+
+test('measure the sound of the picture scan', async ({ page, browser }) => {
+  test.setTimeout(1_200_000);
+  await page.goto('/#play');
+  await expect(page.getByRole('heading', { name: /Earth Sonata/ })).toBeVisible();
+  await expect(playButton(page)).toBeEnabled();
+  await expect(page.getByText('TEST INPUT — a made-up picture, not NASA data')).toHaveCount(0); // the real picture, not practice data
+
+  // ---------- 1. Does the sound get louder as the level rises? ----------
+  const steps = await tap<{
+    band: number;
+    note: string;
+    hz: number;
+    secondsEach: number;
+    chimes: number;
+    steps: { target: number; level: number; toneDb: number; levelDb: number; lufs: number }[];
+  }>(page, 'levelSteps()');
+  expect(steps.chimes, 'the level picture must play no chimes').toBe(0);
+
+  // ---------- 2. One struck note on each instrument, alone ----------
+  const strikes = await tap<{ note: string; strikes: { sound: string; colour: string; name: string; level: number; lufs: number; peakDb: number }[] }>(page, 'strikeEach()');
+
+  // ---------- 3. Each picture: one sweep of each scan, then everything at once and Stop ----------
+  await tap(page, 'startTap()');
+  const labels = await page.locator('.source-choice .source-label').allTextContents();
+  const pictures: { label: string; sweeps: Awaited<ReturnType<typeof sweepEach>>; together: Awaited<ReturnType<typeof everythingThenStop>> }[] = [];
+  for (const label of labels.length ? labels : ['Ocean']) {
+    if (labels.length) {
+      await page.getByRole('radio', { name: label }).check();
+      await expect(page.getByText(/^Reading the /)).toContainText(label === 'Ocean' ? 'ocean' : label.toLowerCase());
+    }
+    const sweeps = await sweepEach(page);
+    const together = await everythingThenStop(page);
+    pictures.push({ label, sweeps, together });
+  }
 
   // ---------- Report ----------
   const meta = {
@@ -122,10 +149,11 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   const out: string[] = [];
   out.push('# Picture scan: measurements of the sound', '');
   out.push('Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.', '');
-  out.push(`Recorded ${meta.date} in ${meta.browser}, on commit ${meta.commit}${meta.dirty ? ' with uncommitted changes' : ''}, at ${allVoices.sampleRate} samples a second.`);
+  out.push(`Recorded ${meta.date} in ${meta.browser}, on commit ${meta.commit}${meta.dirty ? ' with uncommitted changes' : ''}.`);
   out.push('The recording is taken at the last point before the speakers, so every voice and its echo is in it.');
   out.push('Loudness is integrated loudness (ITU-R BS.1770-4) in LUFS. Peaks are the largest sample, in dBFS; 0 is full scale.');
   out.push('Nobody listened: these are measurements of a recording. Scan sound: Ocean choir. Volumes and speed: the app\'s defaults.', '');
+  out.push('**Each picture has its own section. No table holds two pictures: never compare a number in one picture\'s section with another\'s.**', '');
 
   out.push('## Does the sound get louder as the level rises?', '');
   out.push(`A made-up picture (TEST INPUT, not NASA data) holds four levels in band ${steps.band}, ${steps.secondsEach} s each, with the chime rule switched off.`);
@@ -139,40 +167,59 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
     '',
   );
 
-  out.push('## One sweep of each scan (ocean picture)', '');
+  out.push('## One struck note on each instrument, alone', '');
+  out.push(`${strikes.note} at full strength on each instrument, at the level its scan sound gives it, recorded for 2.4 s. The scan's volume, left–right position and room are the same for every instrument of a sound, so they are left out. Not a picture: the same for every picture.`, '');
   out.push(
     table(
-      ['Scan', 'Seconds', 'Loudness', 'Largest sample', 'Left minus right, first sixth', 'Left minus right, last sixth'],
-      sweeps.map((s) => [s.name, s.measured.seconds.toFixed(1), lufs(s.measured.lufs), dbfs(s.measured.peakDb), `${num(s.firstSixth.leftMinusRightDb)} dB`, `${num(s.lastSixth.leftMinusRightDb)} dB`]),
+      ['Scan sound', 'Instrument', 'Which notes', 'Level setting', 'Loudness', 'Largest sample'],
+      strikes.strikes.map((s) => [s.sound, s.name, s.colour === 'warm' ? 'warm (round mark)' : s.colour === 'cool' ? 'cool (diamond)' : 'third, blue side (asterisk)', s.level, lufs(s.lufs), dbfs(s.peakDb)]),
     ),
     '',
   );
 
-  out.push('## Everything at once, then Stop', '');
-  out.push(`The Earth rhythm, the map sweep and a melody chord of ${keys.length} keys (${keys.join(', ').toUpperCase()}) held together for ${together.seconds} s, then Esc.`, '');
-  out.push(
-    table(
-      ['', 'Loudness', 'Largest sample', 'Share of the time recorded'],
-      [
-        ['All three voices', lufs(allVoices.lufs), dbfs(allVoices.peakDb), `${num(100 * allVoices.recorded, 0)}%`],
-        ['The 2 s before Stop', lufs(beforeStop.lufs), dbfs(beforeStop.peakDb), `${num(100 * beforeStop.recorded, 0)}%`],
-        ['From 0.15 s to 2.15 s after Stop', lufs(afterStop.lufs), dbfs(afterStop.peakDb), `${num(100 * afterStop.recorded, 0)}%`],
-      ],
-    ),
-    '',
-  );
+  for (const p of pictures) {
+    out.push(`## ${p.label}`, '');
+    out.push('### One sweep of each scan', '');
+    out.push('Each sweep is timed from the audio-clock moment its first column played (the player\'s own log), so a sweep that strikes no note is measured too.', '');
+    out.push(
+      table(
+        ['Scan', 'Seconds', 'Loudness', 'Largest sample', 'Left minus right, first sixth', 'Left minus right, last sixth'],
+        p.sweeps.map((s) => [s.name, s.measured.seconds.toFixed(1), lufs(s.measured.lufs), dbfs(s.measured.peakDb), `${num(s.firstSixth.leftMinusRightDb)} dB`, `${num(s.lastSixth.leftMinusRightDb)} dB`]),
+      ),
+      '',
+    );
+    const t = p.together;
+    out.push('### Everything at once, then Stop', '');
+    out.push(`The Earth rhythm, this picture's map sweep and a melody chord of ${t.keys.length} keys (${t.keys.join(', ').toUpperCase()}) held together for ${t.seconds} s, then Esc.`, '');
+    out.push(
+      table(
+        ['', 'Loudness', 'Largest sample', 'Share of the time recorded'],
+        [
+          ['All three voices', lufs(t.allVoices.lufs), dbfs(t.allVoices.peakDb), `${num(100 * t.allVoices.recorded, 0)}%`],
+          ['The 2 s before Stop', lufs(t.beforeStop.lufs), dbfs(t.beforeStop.peakDb), `${num(100 * t.beforeStop.recorded, 0)}%`],
+          ['From 0.15 s to 2.15 s after Stop', lufs(t.afterStop.lufs), dbfs(t.afterStop.peakDb), `${num(100 * t.afterStop.recorded, 0)}%`],
+        ],
+      ),
+      '',
+    );
+  }
   out.push('"After Stop" is timed from the audio clock read just after the Esc key press, so the true stop is a few milliseconds earlier.');
   out.push('"Share of the time recorded": the browser hands the recorder nothing while no sound at all reaches the last point before the speakers. Under 100% there means that part was silent in that way; 100% with every sample 0 means silence was recorded.', '');
 
   const folder = resolve(repo, 'docs/measurements');
   mkdirSync(folder, { recursive: true });
   const finite = (x: number) => (Number.isFinite(x) ? x : null); // JSON has no −Infinity
-  writeFileSync(resolve(folder, 'scan_sound.json'), JSON.stringify({ meta, steps, sweeps, keys, allVoices, beforeStop, afterStop }, (_k, v) => (typeof v === 'number' ? finite(v) : v), 1) + '\n');
+  writeFileSync(resolve(folder, 'scan_sound.json'), JSON.stringify({ meta, steps, strikes, pictures }, (_k, v) => (typeof v === 'number' ? finite(v) : v), 1) + '\n');
   writeFileSync(resolve(folder, 'scan_sound.md'), out.join('\n'));
   console.log(out.join('\n'));
 
-  // The claim under test: more level, more sound.
+  // The claims under test: more level, more sound; nothing clips; Stop leaves silence.
   for (let i = 1; i < steps.steps.length; i++) {
     expect(steps.steps[i].toneDb, `level ${steps.steps[i].level} must be louder than ${steps.steps[i - 1].level}`).toBeGreaterThan(steps.steps[i - 1].toneDb);
+  }
+  for (const p of pictures) {
+    for (const s of p.sweeps) expect(s.measured.peakDb, `${p.label}, ${s.name}: a sample at full scale`).toBeLessThan(0);
+    expect(p.together.allVoices.peakDb, `${p.label}: all voices together reach full scale`).toBeLessThan(0);
+    expect(Number.isFinite(p.together.afterStop.peakDb) ? p.together.afterStop.peakDb : -Infinity, `${p.label}: sound after Stop`).toBeLessThan(-80);
   }
 });

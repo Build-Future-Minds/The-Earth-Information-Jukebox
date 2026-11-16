@@ -4,18 +4,27 @@
 // changes the Earth rhythm. In practice mode there is no NASA image, so it scans a labelled
 // TEST INPUT picture instead.
 //
+// Each picture is read by its own rule (data/sources.ts, `scan`): its floor, full levels, the
+// pixels it never reads, whether it is a world map, and what each instrument means in its legend.
+// The rule was measured on that picture's still; its numbers are never compared with another's.
+//
 // What you see is what you hear, drawn from the same score and the same audio clock as the sound:
 //   - the picture lights up as the line passes (the part not played yet is dimmed);
 //   - a white shape rides the line: wide where a band is loud;
-//   - every chime leaves a mark on the picture (round for warm colours, a diamond for cool ones);
+//   - every chime leaves a mark on the picture (round for warm colours, a diamond for cool ones,
+//     an asterisk for the third instrument of a picture that has one);
+//   - pixels the picture's rule never reads are hatched: no data, never a zero;
 //   - the bars beside the picture are the low note and the twelve held notes, low to high;
 //   - the legend names every one of these, with the same shapes.
 // Everything drawn over the NASA image is black or white: its colours are never changed.
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import type { Region, Scene } from '../data/types';
+import type { Region } from '../data/types';
+import type { Picture, ScanRule } from '../data/sources';
 import { DEFAULT_SCAN_SOUND, SCAN_SOUNDS, scanSound, type ScanSoundDef, type ScanSoundId } from '../audio/instruments';
 import { ScanPlayer, type ScanState } from '../audio/scanPlayer';
 import {
+  LINE_GRID,
+  RADAR_GRID,
   ROOT_NOTES,
   bandNote,
   buildScanScore,
@@ -28,10 +37,11 @@ import {
   resampleMask,
   rootNoteAt,
   type Chime,
+  type ChimeColour,
   type Pixels,
-  type ScanMeasure,
   type ScanScore,
 } from '../audio/scanScore';
+import { scanChoicesFor } from '../audio/scanChoices';
 import { regionLabel } from './ExploreControls';
 import { ScanExplanation } from './ScanExplanation';
 
@@ -40,14 +50,13 @@ export interface PictureScanHandle {
   stop: () => void;
 }
 
+/** The picture the scan plays, with its measured rule. */
+export type ScanPicture = Pick<Picture, 'key' | 'label' | 'scene' | 'imageUrl' | 'firstLetter' | 'test'> & { scan: ScanRule };
+
 interface Props {
-  scene: Scene;
-  /** The NASA still, or null in practice mode. */
-  imageUrl: string | null;
+  picture: ScanPicture;
   /** The page's speed setting: the scan follows it. */
   speed: number;
-  /** What counts as light in this picture. Colour suits the ocean picture (grey land is silent). */
-  measure?: ScanMeasure;
 }
 
 /** What the line reads: the whole picture, or one region's circle. */
@@ -66,8 +75,11 @@ interface Trace {
   id: number;
   x: number;
   y: number;
-  warm: boolean;
+  colour: ChimeColour;
 }
+
+/** The names the chosen scan sound gives its instruments, by colour. */
+const nameOf = (sound: ScanSoundDef, colour: ChimeColour) => (colour === 'warm' ? sound.warmName : colour === 'blue' ? sound.blueName : sound.coolName);
 
 declare global {
   interface Window {
@@ -91,10 +103,11 @@ const RANGE_RINGS = [3, 6, 9];
 const MAX_TRACES = 160;
 
 /** Read a picture's pixels the way the scan does. Exported for the measuring tool (web/measure),
- *  so its numbers come from the same pixels the app plays. */
-export function loadPicture(imageUrl: string | null): Promise<Loaded> {
+ *  so its numbers come from the same pixels the app plays. With no URL, it makes the TEST INPUT
+ *  picture (`make`), which is not NASA data. */
+export function loadPicture(imageUrl: string | null, make: () => Pixels = makeTestPicture): Promise<Loaded> {
   if (!imageUrl) {
-    const pixels = makeTestPicture();
+    const pixels = make();
     const canvas = document.createElement('canvas');
     canvas.width = pixels.width;
     canvas.height = pixels.height;
@@ -125,9 +138,31 @@ export async function loadMask(url: string, width: number, height: number): Prom
   return resampleMask(maskFromPixels(pixels), pixels.width, pixels.height, width, height);
 }
 
-export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, measure = 'colour' }, ref) {
+/** A black-and-white picture of a mask (white = never read), for drawing the no-data hatch. */
+function maskHref(mask: Uint8Array, width: number, height: number): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const image = new ImageData(width, height);
+  for (let p = 0; p < mask.length; p++) {
+    const v = mask[p] ? 255 : 0;
+    image.data.set([v, v, v, 255], p * 4);
+  }
+  canvas.getContext('2d')!.putImageData(image, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+
+/**
+ * Give the scan one picture (the app remounts it, with a React `key`, when the picture changes, so
+ * a new picture always starts stopped, on the whole picture, with a clean slate).
+ */
+export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ picture, speed }, ref) {
+  const { scene, imageUrl, scan: rule } = picture;
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // Pixels this picture's rule never reads, at the still's size, and a picture of them for the
+  // hatch. `undefined` while loading: the scan waits, so it never plays a picture unmasked.
+  const [mask, setMask] = useState<{ pixels: Uint8Array; href: string } | null | undefined>(undefined);
   const [target, setTarget] = useState<Target>('map');
   const [state, setState] = useState<ScanState>('stopped');
   const [volumeDb, setVolumeDb] = useState(-8);
@@ -135,7 +170,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   const [traces, setTraces] = useState<Trace[]>([]);
   // The note most recently struck, with the names the sound had when it was struck: switching the
   // scan sound afterwards must not change what the explanation says about a note already played.
-  const [lastStruck, setLastStruck] = useState<{ chime: Chime; names: { held: string; warm: string; cool: string } } | null>(null);
+  const [lastStruck, setLastStruck] = useState<{ chime: Chime; names: { held: string; warm: string; cool: string; blue: string } } | null>(null);
   const player = useRef<ScanPlayer | null>(null);
   const sweep = useRef<SVGGElement>(null);
   const profile = useRef<SVGPathElement>(null);
@@ -155,26 +190,30 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   // Circles a radar can turn in: the scene's regions, or one test circle on the TEST picture.
   const regions: Region[] = loaded?.isTest ? [TEST_CIRCLE] : scene.regions;
   const region = target === 'map' ? undefined : regions.find((r) => r.id === target);
-  // "West to east" only for a whole-world map; any other picture is read left to right.
-  const worldMap = !!loaded && !loaded.isTest && scene.source.limitations.some((l) => /equirectangular/i.test(l));
+  // "West to east" only for a whole-world map, as the picture's rule states; a made-up TEST INPUT
+  // picture is never one. Any other picture is read left to right.
+  const worldMap = !!loaded && !loaded.isTest && rule.worldMap;
   const across = worldMap ? 'west to east' : 'left to right';
+  const blueClass = !!rule.instruments.blue;
 
-  // What the line reads, and the score it makes. Same picture, same score, every time.
+  // What the line reads, and the score it makes. Same picture, same score, every time. The
+  // picture's own settings; the radar's circle cuts the mask out with the picture.
   const score = useMemo<ScanScore | null>(() => {
-    if (!loaded) return null;
-    if (!region) return buildScanScore(loaded.pixels, { kind: 'line' }, { measure });
+    if (!loaded || mask === undefined) return null;
+    const settings = { measure: rule.measure, floor: rule.floor, blueClass };
+    if (!region) return buildScanScore(loaded.pixels, { kind: 'line' }, { ...settings, grid: { ...LINE_GRID, fullStrength: rule.full.line }, mask: mask?.pixels ?? null });
     // The still may be smaller than the frames the region's pixels are counted in.
-    const { crop, shape } = regionScan(loaded.pixels, loaded.isTest ? loaded.pixels.width : scene.frames.width, region);
-    return buildScanScore(crop, shape, { measure });
-  }, [loaded, region, scene.frames.width, measure]);
+    const cut = regionScan(loaded.pixels, loaded.isTest ? loaded.pixels.width : scene.frames.width, region, mask?.pixels ?? null);
+    return buildScanScore(cut.crop, cut.shape, { ...settings, grid: { ...RADAR_GRID, fullStrength: rule.full.radar }, mask: cut.mask });
+  }, [loaded, mask, region, scene.frames.width, rule, blueClass]);
 
   const bands = score?.grid.bands ?? 12;
   const columns = score?.grid.columns ?? 1;
 
   const onChime = useCallback(
     (chime: Chime) => {
-      if (lastChime.current) lastChime.current.textContent = `${chime.warm ? sound.warmName : sound.coolName} ${noteName(chimeNote(chime))}`;
-      setLastStruck({ chime, names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } });
+      if (lastChime.current) lastChime.current.textContent = `${nameOf(sound, chime.colour)} ${noteName(chimeNote(chime))}`;
+      setLastStruck({ chime, names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName, blue: sound.blueName } });
       // The bar for this band flashes. Restarting the animation needs the class to go and come back.
       const bar = bars.current[chime.band];
       if (bar) {
@@ -184,7 +223,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
       }
       const [x, y] = chimePosition(chime, columns, bands, frame, region);
       const id = ++traceId.current;
-      setTraces((t) => [...t.slice(-(MAX_TRACES - 1)), { id, x, y, warm: chime.warm }]);
+      setTraces((t) => [...t.slice(-(MAX_TRACES - 1)), { id, x, y, colour: chime.colour }]);
     },
     [columns, bands, frame, region, sound],
   );
@@ -199,14 +238,40 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
 
   useEffect(() => {
     let live = true;
-    loadPicture(imageUrl).then(
+    loadPicture(imageUrl, picture.test?.pixels).then(
       (l) => live && setLoaded(l),
       (e: Error) => live && setLoadError(e.message),
     );
     return () => {
       live = false;
     };
-  }, [imageUrl]);
+  }, [imageUrl, picture.test]);
+
+  // The pixels this picture never reads: its mask file, fitted to the still (a TEST INPUT picture
+  // brings its own). No mask: every pixel is read.
+  useEffect(() => {
+    if (!loaded) return;
+    const { width, height } = loaded.pixels;
+    const testMask = loaded.isTest ? picture.test?.mask : undefined;
+    if (testMask) {
+      const pixels = testMask();
+      setMask({ pixels, href: maskHref(pixels, width, height) });
+      return;
+    }
+    if (loaded.isTest || !rule.mask) {
+      setMask(null);
+      return;
+    }
+    let live = true;
+    const url = rule.mask.url;
+    loadMask(url, width, height).then(
+      (pixels) => live && setMask({ pixels, href: url }),
+      () => live && setLoadError('This picture\'s mask (the pixels it never reads) did not load, so the scan will not play it.'),
+    );
+    return () => {
+      live = false;
+    };
+  }, [loaded, rule.mask, picture.test]);
 
   useEffect(() => {
     player.current?.setScore(score);
@@ -262,15 +327,24 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
       const c0 = Math.min(grid.columns - 1, Math.floor(at));
       const c1 = cyclic ? (c0 + 1) % grid.columns : Math.min(grid.columns - 1, c0 + 1);
       const mix = reducedMotion ? 0 : at - c0;
+      // The column the line is mostly in: its cells say which bands have no data right now.
+      const here = mix < 0.5 ? c0 : c1;
       let sounding = 0;
-      let mean = 0;
+      let noData = 0;
+      let sum = 0;
       for (let band = 0; band < grid.bands; band++) {
         const level = score.levels[c0 * grid.bands + band] * (1 - mix) + score.levels[c1 * grid.bands + band] * mix;
-        levels[band] = level;
-        mean += level / grid.bands;
-        if (level > 0) sounding++;
-        bars.current[band]?.style.setProperty('--level', level.toFixed(3));
+        const empty = score.reads[here * grid.bands + band] === 0;
+        levels[band] = empty ? 0 : level;
+        if (empty) noData++;
+        else sum += level;
+        if (!empty && level > 0) sounding++;
+        const bar = bars.current[band];
+        bar?.style.setProperty('--level', empty ? '0' : level.toFixed(3));
+        bar?.classList.toggle('nodata', empty);
       }
+      // The low note: the mean of the bands that read something (no data is not a zero).
+      const mean = noData < grid.bands ? sum / (grid.bands - noData) : 0;
       rootBar.current?.style.setProperty('--level', Math.min(1, mean * 2).toFixed(3));
 
       if (region) {
@@ -295,7 +369,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             : worldMap
               ? `line at about ${longitude(position)}`
               : `line ${Math.round(position * 100)}% of the way across`;
-          readout.current.textContent = `${where} · ${sounding} of ${grid.bands} bands sounding · low note ${root}`;
+          readout.current.textContent = `${where} · ${sounding} of ${grid.bands} bands sounding${noData ? ` · ${noData} with no data` : ''} · low note ${root}`;
         }
       }
     };
@@ -308,7 +382,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const labelOf = (t: Target) => (t === 'map' ? 'the whole picture' : loaded?.isTest ? 'the test circle' : regionLabel(scene.regions, t));
+  const labelOf = (t: Target) => (t === 'map' ? 'the whole picture' : loaded?.isTest ? 'the test circle' : regionLabel(scene.regions, t, picture.firstLetter));
   const status =
     state === 'playing'
       ? region
@@ -329,17 +403,29 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   const unit = view.h / 100;
   const figureClass = ['scene', 'scan-view', region ? 'radar' : 'line', state, reducedMotion ? 'still' : ''].join(' ').trim();
   const order = region ? 'the centre to the rim' : worldMap ? 'south to north' : 'bottom to top';
-  // For "Why the scan sounds like this": the words for what is sounding, and which column the line is on.
+  // For "Why the scan sounds like this": the words for what is sounding, what each instrument means
+  // in this picture, and which column the line is on.
   const why = useMemo(
-    () => ({ geometry: worldMap ? ('world' as const) : ('plain' as const), names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } }),
-    [worldMap, sound],
+    () => ({
+      geometry: worldMap ? ('world' as const) : ('plain' as const),
+      names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName, blue: sound.blueName },
+      picture: { instruments: rule.instruments, noData: rule.mask?.what },
+    }),
+    [worldMap, sound, rule],
   );
+  const choices = useMemo(() => scanChoicesFor({ label: picture.label, scan: rule }), [picture.label, rule]);
   const liveColumn = useCallback(() => Math.min(columns - 1, Math.floor((player.current?.position() ?? 0) * columns)), [columns]);
+  const nodataNote = mask ? (rule.mask?.what ?? 'the hatched part of the picture') : null;
 
   return (
     <div className="scan" role="group" aria-labelledby="scan-heading">
       <h3 id="scan-heading">Play the picture</h3>
       <p className="muted">A line sweeps the picture and plays the colours it crosses. A rule we chose; the Earth rhythm is unchanged.</p>
+      {!loaded?.isTest && (
+        <p className="muted scan-which">
+          Reading {picture.label === 'Ocean' ? 'the ocean picture' : `the ${picture.label.toLowerCase()} picture`}: {scene.source.title}, with its own settings.
+        </p>
+      )}
 
       <div className="row">
         {state === 'playing' ? (
@@ -360,7 +446,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
           <select value={target} onChange={(e) => setTarget(e.target.value)}>
             <option value="map">Whole picture: a line, {across}</option>
             {regions.map((r) => (
-              <option key={r.id} value={r.id}>{loaded?.isTest ? 'Test circle' : regionLabel(scene.regions, r.id)}: a radar turn</option>
+              <option key={r.id} value={r.id}>{loaded?.isTest ? 'Test circle' : regionLabel(scene.regions, r.id, picture.firstLetter)}: a radar turn</option>
             ))}
           </select>
         </label>
@@ -410,7 +496,9 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             role="img"
             aria-label={
               loaded?.isTest
-                ? 'Test picture for the scan: three coloured dots and a grey block on black.'
+                ? picture.test
+                  ? `Test picture for the scan (made up, not NASA data): dots in the colours of the ${picture.label.toLowerCase()} picture's legend${mask ? ', and a hatched block that is never read' : ''}.`
+                  : 'Test picture for the scan: three coloured dots and a grey block on black.'
                 : `${scene.source.title}, with the scan line${region ? ` on ${labelOf(target)}, ${region.name}` : ''}.`
             }
           >
@@ -425,6 +513,18 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                 <stop offset="0" stopColor="#fff" stopOpacity="0" />
                 <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
               </linearGradient>
+              {mask && (
+                <>
+                  {/* Black and white stripes, seen only where the mask is white: the pixels never read. */}
+                  <pattern id="scan-nodata-hatch" patternUnits="userSpaceOnUse" width={unit * 1.6} height={unit * 1.6} patternTransform="rotate(45)">
+                    <rect width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-light" />
+                    <rect x={unit * 0.8} width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-dark" />
+                  </pattern>
+                  <mask id="scan-nodata-mask" maskUnits="userSpaceOnUse" x={0} y={0} width={frame.width} height={frame.height}>
+                    <image href={mask.href} width={frame.width} height={frame.height} preserveAspectRatio="none" />
+                  </mask>
+                </>
+              )}
             </defs>
 
             {loaded ? (
@@ -432,6 +532,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             ) : (
               <rect width={frame.width} height={frame.height} className="frame-placeholder" />
             )}
+            {mask && <rect className="nodata-hatch" width={frame.width} height={frame.height} fill="url(#scan-nodata-hatch)" mask="url(#scan-nodata-mask)" />}
 
             {region && (
               <>
@@ -469,15 +570,18 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             {/* Marks left by the chimes of this sweep. */}
             <g className="traces">
               {traces.map((t) => (
-                <g key={t.id} className={t.warm ? 'trace warm' : 'trace cool'} transform={`translate(${t.x} ${t.y})`}>
+                <g key={t.id} className={`trace ${t.colour}`} transform={`translate(${t.x} ${t.y})`}>
                   <circle className="ripple" r={unit * 5.5} />
-                  {t.warm ? (
+                  {t.colour === 'warm' ? (
                     <circle className="chime-dot" r={unit * 1.15} />
+                  ) : t.colour === 'blue' ? (
+                    <path className="chime-star-outline" d={starPath(unit * 1.5)} />
                   ) : (
                     <g transform="rotate(45)">
                       <rect className="chime-dot" x={-unit * 1.1} y={-unit * 1.1} width={unit * 2.2} height={unit * 2.2} />
                     </g>
                   )}
+                  {t.colour === 'blue' && <path className="chime-star" d={starPath(unit * 1.5)} />}
                 </g>
               ))}
             </g>
@@ -514,6 +618,11 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             </g>
           </svg>
           {!loaded?.isTest && <span className="credit">Visualization: {scene.source.credit}</span>}
+          {nodataNote && (
+            <p className="scan-nodata-note">
+              The hatched part is never read: {nodataNote}. There the scan has no data, so it is silent; that is not a zero.
+            </p>
+          )}
         </div>
 
         <div className="scan-side">
@@ -539,7 +648,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
 
           <details className="scan-legend-box">
             <summary>What the marks mean</summary>
-            <Legend sound={sound} order={order} radar={!!region} />
+            <Legend sound={sound} order={order} radar={!!region} instruments={rule.instruments} third={blueClass} hatched={!!mask} />
           </details>
 
           {region && loaded && !loaded.isTest && (
@@ -562,13 +671,23 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
         <ul>
           {loaded && !loaded.isTest && (
             <li>
-              <strong>Which picture.</strong> One still: {scene.source.title}
-              {stillTime(scene.frames.timestamps?.[0])}. It is the only picture this rule has been checked on, so the scan
-              stays on it whichever picture is chosen on Listen.
+              <strong>Which picture.</strong> One still: {scene.source.title}, {rule.still.frame}
+              {stillTime(rule.still.time ?? undefined)}, {rule.still.how}. This picture has its own settings, measured on
+              this still; its numbers are never compared with another picture's.
             </li>
           )}
           <li><strong>Where.</strong> Higher on the picture is a higher note (on the radar: further from the centre). There are 12 bands, on the five notes C, D, E, G and A. Low bands are far apart and high bands close together, as a choir is spaced.</li>
-          <li><strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone. Black sea and grey land are silent. A soft held note sounds for every band the line is crossing.</li>
+          <li>
+            <strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone. In this
+            picture a cell at or below {Number((rule.floor * 255).toFixed(2))} of 255 is silent
+            {rule.floor === 12 / 255 ? ' (black sea and grey land)' : ', just above the colour drawn where there is nothing'}. A soft held note sounds for every band the line is crossing.
+          </li>
+          {rule.mask && !loaded?.isTest && (
+            <li>
+              <strong>Pixels never read.</strong> The scan never reads {rule.mask.what}. There it has no data: it is silent, it
+              strikes no note, and it does not count as a zero. They are hatched on the picture.
+            </li>
+          )}
           <li>
             <strong>Peaks of colour.</strong> When a band has more colour under the line than just before and just after, one
             note is struck, an octave above that band's held note. Peaks that follow each other too closely are left out, so
@@ -576,16 +695,23 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
           </li>
           <li>
             <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is
-            struck on one instrument. Where it is not (yellow-green, green and blue), it is struck on another.
+            struck on one instrument.{' '}
+            {blueClass
+              ? 'Where most of it has blue as its largest channel, it is struck on a third. Otherwise it is struck on the second.'
+              : 'Where it is not (yellow-green, green and blue), it is struck on another.'}
             {loaded && !loaded.isTest && (
-              <> On NASA's colour bar for this picture the switch falls at about 24 °C, if the bar's scale is even. We measured the bar, not the sea.</>
+              <>
+                {' '}In this picture the {sound.warmName} means {rule.instruments.warm}; the {sound.coolName}, {rule.instruments.cool}
+                {rule.instruments.blue ? <>; the {sound.blueName}, {rule.instruments.blue}</> : null}.
+                {rule.measured.bar0SwitchValue !== undefined && (
+                  <> On NASA's colour bar for this picture the switch falls at about {Math.round(rule.measured.bar0SwitchValue)} °C, if the bar's scale is even. We measured the bar, not the sea.</>
+                )}
+              </>
             )}
           </li>
           {loaded && !loaded.isTest && (
             <li>
-              <strong>What the scan cannot tell you.</strong> Warm colours are drawn stronger than cold ones, so warm water
-              sounds louder than cold water with the same amount of line. The still is a compressed copy of NASA's frame,
-              which blurs its finest lines.
+              <strong>What the scan cannot tell you.</strong> {rule.limits.join(' ')}
             </li>
           )}
           <li><strong>Left and right.</strong> The sound sits where the line is: it travels from the left speaker to the right with the line.</li>
@@ -600,13 +726,31 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
         </ul>
       </details>
 
-      {score && <ScanExplanation score={score} ctx={why} playing={state === 'playing'} getColumn={liveColumn} lastStruck={lastStruck} />}
+      {score && <ScanExplanation score={score} ctx={why} choices={choices} playing={state === 'playing'} getColumn={liveColumn} lastStruck={lastStruck} />}
     </div>
   );
 });
 
 /** What every mark and bar means, with the same shapes as on the picture. Real text: read by screen readers. */
-function Legend({ sound, order, radar }: { sound: ScanSoundDef; order: string; radar: boolean }) {
+function Legend({
+  sound,
+  order,
+  radar,
+  instruments,
+  third,
+  hatched,
+}: {
+  sound: ScanSoundDef;
+  order: string;
+  radar: boolean;
+  /** What each instrument means in this picture's legend. */
+  instruments: { warm: string; cool: string; blue?: string } | null;
+  /** The picture has a third instrument (blue side). */
+  third: boolean;
+  /** Some pixels are never read (hatched). */
+  hatched: boolean;
+}) {
+  const here = (meaning: string | undefined) => (instruments && meaning ? <> In this picture: {meaning}.</> : null);
   return (
     <ul className="scan-legend" aria-label="What the marks and bars mean">
       <li className="legend-group"><strong>From the picture</strong></li>
@@ -629,14 +773,34 @@ function Legend({ sound, order, radar }: { sound: ScanSoundDef; order: string; r
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <circle cx="15" cy="11" r="5" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.</span>
+        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.{here(instruments?.warm)}</span>
       </li>
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <rect x="10.5" y="6.5" width="9" height="9" transform="rotate(45 15 11)" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly yellow-green, green or blue.</span>
+        <span>
+          <strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly {third ? 'yellow-green or green' : 'yellow-green, green or blue'}.{here(instruments?.cool)}
+        </span>
       </li>
+      {third && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <path d={starPath(6, 15, 11)} stroke="#000" strokeWidth="4" strokeLinecap="round" />
+            <path d={starPath(6, 15, 11)} stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <span><strong>Asterisk: a {sound.blueName} note.</strong> The line crossed a peak of colour that is mostly blue (cyan to purple).{here(instruments?.blue)}</span>
+        </li>
+      )}
+      {hatched && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <path d="M-2 8L8 -2M-2 18L18 -2M4 24L26 2M14 24L32 6M24 24L32 16" stroke="#fff" strokeWidth="2.5" />
+            <path d="M-2 13L13 -2M-2 23L23 -2M9 24L31 2M19 24L32 11" stroke="#000" strokeWidth="2.5" />
+          </svg>
+          <span><strong>Hatched: never read.</strong> No data there: silent, never struck, not a zero.</span>
+        </li>
+      )}
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <circle cx="15" cy="11" r="8.5" fill="none" stroke="#fff" strokeWidth="1.5" strokeOpacity="0.7" />
@@ -695,6 +859,18 @@ function RadarTrail({ region }: { region: Region }) {
       })}
     </>
   );
+}
+
+/** An asterisk of three crossing strokes, radius r, centred on (cx, cy): the third instrument's mark. */
+function starPath(r: number, cx = 0, cy = 0): string {
+  return [90, 30, 150]
+    .map((deg) => {
+      const a = (deg * Math.PI) / 180;
+      const dx = r * Math.cos(a);
+      const dy = r * Math.sin(a);
+      return `M${(cx - dx).toFixed(2)} ${(cy - dy).toFixed(2)}L${(cx + dx).toFixed(2)} ${(cy + dy).toFixed(2)}`;
+    })
+    .join('');
 }
 
 /** A full circle as a path (two arcs), for cutting a hole in the dimmed surround. */

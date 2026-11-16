@@ -2,7 +2,7 @@
 
 Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.
 
-Measured 2026-11-16 02:09 UTC in Chromium 159.0.8154.6, on commit 1db3619 with uncommitted changes.
+Measured 2026-11-16 03:03 UTC in Chromium 159.0.8154.6, on commit c5520b2 with uncommitted changes.
 The rule is `web/src/audio/scanScore.ts`, run in the browser on the stills the app plays.
 
 **Each picture has its own section, its own settings and its own numbers. No table here holds two pictures. Never compare a number in one section with a number in another.**
@@ -12,6 +12,7 @@ The rule, the same for every picture (not a setting):
 - Map sweep: 240 columns × 12 bands, 30 s. Radar: 120 columns × 12 bands, 15 s, each cell read at 16 points.
 - A chime needs level 0.3, 6 columns from the next in its band, 1 per column.
 - A cell that reads nothing (masked, or outside the picture) is no data: silent, never a peak, left out of the smoothing and of the low note.
+- The instrument is chosen by the pixels above the floor only, each weighted by its colour strength: warm when red is their largest channel; for a picture with a third instrument, blue when blue is (a tie with green counts as blue); cool otherwise.
 
 Each picture's settings (`web/src/data/sources.ts`, `scan`) were chosen by this procedure, the same for every picture:
 
@@ -36,6 +37,7 @@ Measured with this picture's rule in `web/src/data/sources.ts`. The last column 
 | Full level, map sweep | 0.5 | 0.5 |
 | Full level, radar | 0.75 | 0.85 |
 | Mask (pixels never read) | none | none |
+| A third instrument for the blue side | no | (chosen from the legend, not by the procedure) |
 
 ### Which still
 
@@ -69,17 +71,17 @@ None: every pixel is read.
 
 ### The map sweep
 
-|  | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba | Bells |
+|  | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba (warm) | Bells (cool) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | colour, as measured with | 60.0% | 0 | 0.0% | 0.463 | 112 → 75 → 68 | 39% | 53 | 15 |
-| brightness, same floor and full level (for the record) | 96.8% | 0 | 0.1% | 0.507 | 271 → 174 → 126 | 54% | 63 | 63 |
+| brightness, same floor and full level (for the record) | 96.8% | 0 | 0.1% | 0.507 | 271 → 174 → 126 | 54% | 60 | 66 |
 | colour at the ocean's floor, 12/255 (for the record) | 60.0% | 0 | 0.0% | 0.463 | 112 → 75 → 68 | 39% | 53 | 15 |
 
 "Peaks → spaced → played": peaks at the chime level, then after the spacing rule, then after one per column.
 
 ### The radar, each circle
 
-| Circle | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba | Bells |
+| Circle | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba (warm) | Bells (cool) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Kuroshio eddies east of Japan | 98% | 0 | 0.0% | 0.74 | 102 → 83 → 56 | 45% | 11 | 45 |
 | Kuroshio eddies east of Japan, at the ocean's floor 12/255 (for the record) | 98% | 0 | 0.0% | 0.74 | 102 → 83 → 56 | 45% | 11 | 45 |
@@ -92,7 +94,7 @@ Each struck note is given the colour of NASA's bar that most of its cell's pixel
 
 **Map sweep**
 
-| Colour of the bar | Marimba | Bells |
+| Colour of the bar | Marimba (warm) | Bells (cool) |
 | --- | --- | --- |
 | sea surface temperature, 80–90% of the bar | 40 | 0 |
 | sea surface temperature, 90–100% of the bar | 11 | 0 |
@@ -104,7 +106,7 @@ Each struck note is given the colour of NASA's bar that most of its cell's pixel
 
 **Kuroshio eddies east of Japan**
 
-| Colour of the bar | Marimba | Bells |
+| Colour of the bar | Marimba (warm) | Bells (cool) |
 | --- | --- | --- |
 | sea surface temperature, 70–80% of the bar | 8 | 4 |
 | sea surface temperature, 80–90% of the bar | 3 | 0 |
@@ -115,7 +117,7 @@ Each struck note is given the colour of NASA's bar that most of its cell's pixel
 
 **Equatorial Pacific streaks**
 
-| Colour of the bar | Marimba | Bells |
+| Colour of the bar | Marimba (warm) | Bells (cool) |
 | --- | --- | --- |
 | sea surface temperature, 80–90% of the bar | 71 | 0 |
 | sea surface temperature, 70–80% of the bar | 1 | 0 |
@@ -198,7 +200,7 @@ GEOS Aerosols (2025). The still the app plays is 2048 × 1152; NASA's frames are
 
 ### Settings
 
-**This picture has no scan rule yet**, so it was measured with what the procedure gives. The app does not play it.
+Measured with this picture's rule in `web/src/data/sources.ts`. The last column is what the procedure gives (see the top of this page).
 
 | Setting | Measured with | The procedure gives |
 | --- | --- | --- |
@@ -207,6 +209,7 @@ GEOS Aerosols (2025). The still the app plays is 2048 × 1152; NASA's frames are
 | Full level, map sweep | 0.45 | 0.45 |
 | Full level, radar | 0.8 | 0.8 |
 | Mask (pixels never read) | none | none |
+| A third instrument for the blue side | no | (chosen from the legend, not by the procedure) |
 
 ### Which still
 
@@ -240,17 +243,17 @@ None: every pixel is read.
 
 ### The map sweep
 
-|  | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba | Bells |
+|  | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba (warm) | Bells (cool) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | colour, as measured with | 55.0% | 0 | 0.0% | 0.429 | 47 → 42 → 36 | 23% | 3 | 33 |
-| brightness, same floor and full level (for the record) | 94.8% | 0 | 4.3% | 0.775 | 191 → 151 → 110 | 42% | 6 | 104 |
+| brightness, same floor and full level (for the record) | 94.8% | 0 | 4.3% | 0.775 | 191 → 151 → 110 | 42% | 8 | 102 |
 | colour at the ocean's floor, 12/255 (for the record) | 83.8% | 0 | 0.0% | 0.429 | 62 → 55 → 49 | 21% | 3 | 46 |
 
 "Peaks → spaced → played": peaks at the chime level, then after the spacing rule, then after one per column.
 
 ### The radar, each circle
 
-| Circle | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba | Bells |
+| Circle | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba (warm) | Bells (cool) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Sulfate and sea-salt streaks near Vanuatu | 93% | 0 | 0.0% | 0.77 | 55 → 55 → 34 | 38% | 0 | 34 |
 | Sulfate and sea-salt streaks near Vanuatu, at the ocean's floor 12/255 (for the record) | 100% | 0 | 0.0% | 0.77 | 58 → 58 → 37 | 36% | 0 | 37 |
@@ -263,7 +266,7 @@ Each struck note is given the colour of NASA's bar that most of its cell's pixel
 
 **Map sweep**
 
-| Colour of the bar | Marimba | Bells |
+| Colour of the bar | Marimba (warm) | Bells (cool) |
 | --- | --- | --- |
 | black carbon | 3 | 0 |
 | sulfate | 0 | 29 |
@@ -271,7 +274,7 @@ Each struck note is given the colour of NASA's bar that most of its cell's pixel
 
 **Sulfate and sea-salt streaks near Vanuatu**
 
-| Colour of the bar | Marimba | Bells |
+| Colour of the bar | Marimba (warm) | Bells (cool) |
 | --- | --- | --- |
 | sulfate | 0 | 34 |
 
@@ -350,7 +353,7 @@ Near Real-Time Global Precipitation from the Global Precipitation Measurement Co
 
 ### Settings
 
-**This picture has no scan rule yet**, so it was measured with what the procedure gives. The app does not play it.
+Measured with this picture's rule in `web/src/data/sources.ts`. The last column is what the procedure gives (see the top of this page).
 
 | Setting | Measured with | The procedure gives |
 | --- | --- | --- |
@@ -359,6 +362,7 @@ Near Real-Time Global Precipitation from the Global Precipitation Measurement Co
 | Full level, map sweep | 0.85 | 0.85 |
 | Full level, radar | 0.95 | 0.95 |
 | Mask (pixels never read) | `data/imerg/scan_mask.png` | `data/imerg/scan_mask.png` |
+| A third instrument for the blue side | yes | (chosen from the legend, not by the procedure) |
 
 ### Which still
 
@@ -402,22 +406,22 @@ The commonest colour among the pixels the scan reads is RGB (2, 5, 20), colour s
 
 ### The map sweep
 
-|  | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba | Bells |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| colour, as measured with | 17.7% | 545 | 0.0% | 0.810 | 18 → 17 → 16 | 11% | 2 | 14 |
-| brightness, same floor and full level (for the record) | 24.4% | 545 | 0.1% | 0.883 | 26 → 24 → 22 | 15% | 3 | 19 |
-| colour at the ocean's floor, 12/255 (for the record) | 79.4% | 545 | 0.0% | 0.810 | 26 → 23 → 21 | 19% | 3 | 18 |
+|  | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba (warm) | Bells (cool) | Harp (blue) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| colour, as measured with | 17.7% | 545 | 0.0% | 0.810 | 18 → 17 → 16 | 11% | 4 | 7 | 5 |
+| brightness, same floor and full level (for the record) | 24.4% | 545 | 0.1% | 0.883 | 26 → 24 → 22 | 15% | 5 | 10 | 7 |
+| colour at the ocean's floor, 12/255 (for the record) | 79.4% | 545 | 0.0% | 0.810 | 26 → 23 → 21 | 19% | 5 | 10 | 6 |
 
 "Peaks → spaced → played": peaks at the chime level, then after the spacing rule, then after one per column.
 
 ### The radar, each circle
 
-| Circle | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba | Bells |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Long rain band in the South Pacific | 41% | 0 | 0.0% | 0.90 | 50 → 43 → 31 | 38% | 4 | 27 |
-| Long rain band in the South Pacific, at the ocean's floor 12/255 (for the record) | 99% | 0 | 0.0% | 0.90 | 58 → 49 → 37 | 36% | 4 | 33 |
-| Scattered showers on the equator in the central Pacific | 8% | 2 | 0.0% | 0.90 | 11 → 8 → 7 | 36% | 2 | 5 |
-| Scattered showers on the equator in the central Pacific, at the ocean's floor 12/255 (for the record) | 98% | 2 | 0.0% | 0.90 | 13 → 9 → 8 | 38% | 2 | 6 |
+| Circle | Cells that sound | No data | At full level | Largest cell mean | Peaks → spaced → played | Left out | Marimba (warm) | Bells (cool) | Harp (blue) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Long rain band in the South Pacific | 41% | 0 | 0.0% | 0.90 | 50 → 43 → 31 | 38% | 4 | 27 | 0 |
+| Long rain band in the South Pacific, at the ocean's floor 12/255 (for the record) | 99% | 0 | 0.0% | 0.90 | 58 → 49 → 37 | 36% | 4 | 33 | 0 |
+| Scattered showers on the equator in the central Pacific | 8% | 2 | 0.0% | 0.90 | 11 → 8 → 7 | 36% | 2 | 5 | 0 |
+| Scattered showers on the equator in the central Pacific, at the ocean's floor 12/255 (for the record) | 98% | 2 | 0.0% | 0.90 | 13 → 9 → 8 | 38% | 2 | 6 | 0 |
 
 ### What each instrument means in this picture
 
@@ -425,33 +429,33 @@ Each struck note is given the colour of NASA's bar that most of its cell's pixel
 
 **Map sweep**
 
-| Colour of the bar | Marimba | Bells |
-| --- | --- | --- |
-| rain step 6 of 10 | 2 | 0 |
-| rain step 3 of 10 | 0 | 2 |
-| snow step 6 of 10 | 0 | 3 |
-| rain step 4 of 10 | 0 | 3 |
-| rain step 2 of 10 | 0 | 4 |
-| snow step 4 of 10 | 0 | 2 |
+| Colour of the bar | Marimba (warm) | Bells (cool) | Harp (blue) |
+| --- | --- | --- | --- |
+| rain step 2 of 10 | 1 | 3 | 0 |
+| rain step 6 of 10 | 2 | 0 | 0 |
+| rain step 4 of 10 | 1 | 2 | 0 |
+| rain step 3 of 10 | 0 | 2 | 0 |
+| snow step 6 of 10 | 0 | 0 | 3 |
+| snow step 4 of 10 | 0 | 0 | 2 |
 
 **Long rain band in the South Pacific**
 
-| Colour of the bar | Marimba | Bells |
-| --- | --- | --- |
-| rain step 4 of 10 | 2 | 2 |
-| rain step 5 of 10 | 2 | 2 |
-| rain step 3 of 10 | 0 | 7 |
-| rain step 2 of 10 | 0 | 11 |
-| rain step 1 of 10 | 0 | 5 |
+| Colour of the bar | Marimba (warm) | Bells (cool) | Harp (blue) |
+| --- | --- | --- | --- |
+| rain step 4 of 10 | 2 | 2 | 0 |
+| rain step 5 of 10 | 2 | 2 | 0 |
+| rain step 3 of 10 | 0 | 7 | 0 |
+| rain step 2 of 10 | 0 | 11 | 0 |
+| rain step 1 of 10 | 0 | 5 | 0 |
 
 **Scattered showers on the equator in the central Pacific**
 
-| Colour of the bar | Marimba | Bells |
-| --- | --- | --- |
-| rain step 4 of 10 | 1 | 0 |
-| rain step 5 of 10 | 1 | 0 |
-| rain step 3 of 10 | 0 | 4 |
-| rain step 2 of 10 | 0 | 1 |
+| Colour of the bar | Marimba (warm) | Bells (cool) | Harp (blue) |
+| --- | --- | --- | --- |
+| rain step 4 of 10 | 1 | 0 | 0 |
+| rain step 5 of 10 | 1 | 0 | 0 |
+| rain step 3 of 10 | 0 | 4 | 0 |
+| rain step 2 of 10 | 0 | 1 | 0 |
 
 Pixels read above the floor, by the colour of the bar they are nearest to: rain step 1 of 10 25.1%, rain step 2 of 10 22.7%, rain step 3 of 10 12.7%, rain step 4 of 10 5.6%, rain step 5 of 10 2.8%, rain step 6 of 10 1.5%, rain step 7 of 10 0.6%, rain step 10 of 10 0.2%, snow step 1 of 10 4.2%, snow step 2 of 10 4.2%, snow step 3 of 10 4.4%, snow step 4 of 10 4.4%, snow step 5 of 10 4.9%, snow step 6 of 10 4.4%, snow step 7 of 10 1.3%, snow step 8 of 10 0.8%, snow step 9 of 10 0.1%.
 
@@ -474,21 +478,25 @@ Pixels read above the floor, by the colour of the bar they are nearest to: rain 
 | rain step 9 of 10 | 328–363 | (200, 0, 0) | 0.784 | marimba (warm) |
 | rain step 10 of 10 | 364–416 | (145, 0, 0) | 0.569 | marimba (warm) |
 
+"Blue is the largest channel" (the third instrument) is true for 0 of these 10 steps.
+
 `assets/frames/svs4285/snowbarwhite2.png` (440×90), the snow bar: read along row 36, coloured (channels spread more than 60) from x 40 to 416, 374 coloured pixels in that span.
 "Red is the largest channel" is false at the left end and false at the right end, and changes 0 times.
 
 | Step | x | RGB | Colour strength | Instrument |
 | --- | --- | --- | --- | --- |
-| snow step 1 of 10 | 40–75 | (69, 255, 255) | 0.729 | bells (cool) |
-| snow step 2 of 10 | 76–111 | (73, 221, 255) | 0.714 | bells (cool) |
-| snow step 3 of 10 | 112–147 | (77, 187, 255) | 0.698 | bells (cool) |
-| snow step 4 of 10 | 148–183 | (79, 154, 255) | 0.690 | bells (cool) |
-| snow step 5 of 10 | 184–219 | (81, 122, 255) | 0.682 | bells (cool) |
-| snow step 6 of 10 | 220–255 | (82, 93, 255) | 0.678 | bells (cool) |
-| snow step 7 of 10 | 256–291 | (83, 70, 255) | 0.725 | bells (cool) |
-| snow step 8 of 10 | 292–327 | (90, 47, 217) | 0.667 | bells (cool) |
-| snow step 9 of 10 | 328–363 | (115, 33, 187) | 0.604 | bells (cool) |
-| snow step 10 of 10 | 364–416 | (140, 20, 156) | 0.533 | bells (cool) |
+| snow step 1 of 10 | 40–75 | (69, 255, 255) | 0.729 | harp (blue) |
+| snow step 2 of 10 | 76–111 | (73, 221, 255) | 0.714 | harp (blue) |
+| snow step 3 of 10 | 112–147 | (77, 187, 255) | 0.698 | harp (blue) |
+| snow step 4 of 10 | 148–183 | (79, 154, 255) | 0.690 | harp (blue) |
+| snow step 5 of 10 | 184–219 | (81, 122, 255) | 0.682 | harp (blue) |
+| snow step 6 of 10 | 220–255 | (82, 93, 255) | 0.678 | harp (blue) |
+| snow step 7 of 10 | 256–291 | (83, 70, 255) | 0.725 | harp (blue) |
+| snow step 8 of 10 | 292–327 | (90, 47, 217) | 0.667 | harp (blue) |
+| snow step 9 of 10 | 328–363 | (115, 33, 187) | 0.604 | harp (blue) |
+| snow step 10 of 10 | 364–416 | (140, 20, 156) | 0.533 | harp (blue) |
+
+"Blue is the largest channel" (the third instrument) is true for 10 of these 10 steps.
 
 ### The still against NASA's frame
 

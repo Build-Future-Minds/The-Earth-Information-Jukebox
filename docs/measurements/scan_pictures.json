@@ -1,8 +1,8 @@
 {
  "meta": {
-  "date": "2026-11-16 02:09 UTC",
+  "date": "2026-11-16 03:03 UTC",
   "browser": "Chromium 159.0.8154.6",
-  "commit": "1db3619",
+  "commit": "c5520b2",
   "dirty": "yes"
  },
  "files": {
@@ -315,7 +315,8 @@
      "line": 0.5,
      "radar": 0.75
     },
-    "mask": null
+    "mask": null,
+    "blueClass": false
    },
    "procedure": {
     "measure": "colour",
@@ -324,7 +325,8 @@
      "line": 0.5,
      "radar": 0.85
     },
-    "mask": null
+    "mask": null,
+    "blueClass": false
    },
    "background": {
     "rgb": [
@@ -411,7 +413,8 @@
      "afterSpacing": 75,
      "chimes": 68,
      "warm": 53,
-     "cool": 15
+     "cool": 15,
+     "blue": 0
     },
     "brightness": {
      "cells": 2880,
@@ -422,8 +425,9 @@
      "peaks": 271,
      "afterSpacing": 174,
      "chimes": 126,
-     "warm": 63,
-     "cool": 63
+     "warm": 60,
+     "cool": 66,
+     "blue": 0
     },
     "atOceanFloor": {
      "cells": 2880,
@@ -435,7 +439,8 @@
      "afterSpacing": 75,
      "chimes": 68,
      "warm": 53,
-     "cool": 15
+     "cool": 15,
+     "blue": 0
     }
    },
    "lineColours": {
@@ -450,7 +455,8 @@
      "sea surface temperature, 50–60% of the bar": 3,
      "sea surface temperature, 30–40% of the bar": 2,
      "sea surface temperature, 70–80% of the bar": 2
-    }
+    },
+    "blue": {}
    },
    "pixelColours": {
     "sea surface temperature, 0–10% of the bar": 0.15151527609196797,
@@ -498,7 +504,8 @@
       "afterSpacing": 83,
       "chimes": 56,
       "warm": 11,
-      "cool": 45
+      "cool": 45,
+      "blue": 0
      },
      "radarAtOceanFloor": {
       "cells": 1440,
@@ -510,7 +517,8 @@
       "afterSpacing": 83,
       "chimes": 56,
       "warm": 11,
-      "cool": 45
+      "cool": 45,
+      "blue": 0
      },
      "colours": {
       "warm": {
@@ -523,7 +531,8 @@
        "sea surface temperature, 60–70% of the bar": 15,
        "sea surface temperature, 40–50% of the bar": 2,
        "sea surface temperature, 70–80% of the bar": 4
-      }
+      },
+      "blue": {}
      }
     },
     {
@@ -546,7 +555,8 @@
       "afterSpacing": 125,
       "chimes": 72,
       "warm": 72,
-      "cool": 0
+      "cool": 0,
+      "blue": 0
      },
      "radarAtOceanFloor": {
       "cells": 1440,
@@ -558,14 +568,16 @@
       "afterSpacing": 125,
       "chimes": 72,
       "warm": 72,
-      "cool": 0
+      "cool": 0,
+      "blue": 0
      },
      "colours": {
       "warm": {
        "sea surface temperature, 80–90% of the bar": 71,
        "sea surface temperature, 70–80% of the bar": 1
       },
-      "cool": {}
+      "cool": {},
+      "blue": {}
      }
     }
    ],
@@ -829,11 +841,16 @@
     "lineLeftOut": 44,
     "lineWarm": 53,
     "lineCool": 15,
+    "lineBlue": 0,
+    "latitudeChimesWeighted": 70,
+    "stillDifference": 6.93,
+    "stillCandidates": 1,
     "radar0Peaks": 102,
     "radar0Chimes": 56,
     "radar0LeftOut": 46,
     "radar0Warm": 11,
     "radar0Cool": 45,
+    "radar0Blue": 0,
     "radar0LargestMean": 0.74,
     "radar0SoundingPct": 98,
     "radar1Peaks": 187,
@@ -841,14 +858,20 @@
     "radar1LeftOut": 115,
     "radar1Warm": 72,
     "radar1Cool": 0,
+    "radar1Blue": 0,
     "radar1LargestMean": 0.8,
     "radar1SoundingPct": 100,
+    "legend10Cells": 2054,
+    "legend10Sounding": 1727,
+    "legend10SoundingAtOceanFloor": 1727,
     "greyLand90Cells": 518,
     "greyLand90Sounding": 0,
     "bar0Switches": 1,
     "bar0SwitchPct": 74.4,
     "bar0SwitchValue": 23.8,
     "bar0Steps": 0,
+    "bar0WarmSteps": 0,
+    "bar0BlueSteps": 0,
     "exactQuiet90Cells": 746,
     "exactQuiet90Sounding": 0,
     "exactQuiet90Largest255": 7.67
@@ -884,7 +907,7 @@
     "width": 3840,
     "height": 2160
    },
-   "hasRule": false,
+   "hasRule": true,
    "settings": {
     "measure": "colour",
     "floor": 0.0784313725490196,
@@ -892,7 +915,8 @@
      "line": 0.45,
      "radar": 0.8
     },
-    "mask": null
+    "mask": null,
+    "blueClass": false
    },
    "procedure": {
     "measure": "colour",
@@ -901,7 +925,8 @@
      "line": 0.45,
      "radar": 0.8
     },
-    "mask": null
+    "mask": null,
+    "blueClass": false
    },
    "background": {
     "rgb": [
@@ -988,7 +1013,8 @@
      "afterSpacing": 42,
      "chimes": 36,
      "warm": 3,
-     "cool": 33
+     "cool": 33,
+     "blue": 0
     },
     "brightness": {
      "cells": 2880,
@@ -999,8 +1025,9 @@
      "peaks": 191,
      "afterSpacing": 151,
      "chimes": 110,
-     "warm": 6,
-     "cool": 104
+     "warm": 8,
+     "cool": 102,
+     "blue": 0
     },
     "atOceanFloor": {
      "cells": 2880,
@@ -1012,7 +1039,8 @@
      "afterSpacing": 55,
      "chimes": 49,
      "warm": 3,
-     "cool": 46
+     "cool": 46,
+     "blue": 0
     }
    },
    "lineColours": {
@@ -1022,7 +1050,8 @@
     "cool": {
      "sulfate": 29,
      "dust": 4
-    }
+    },
+    "blue": {}
    },
    "pixelColours": {
     "black carbon": 0.033323815652974036,
@@ -1058,7 +1087,8 @@
       "afterSpacing": 55,
       "chimes": 34,
       "warm": 0,
-      "cool": 34
+      "cool": 34,
+      "blue": 0
      },
      "radarAtOceanFloor": {
       "cells": 1440,
@@ -1070,13 +1100,15 @@
       "afterSpacing": 58,
       "chimes": 37,
       "warm": 0,
-      "cool": 37
+      "cool": 37,
+      "blue": 0
      },
      "colours": {
       "warm": {},
       "cool": {
        "sulfate": 34
-      }
+      },
+      "blue": {}
      }
     },
     {
@@ -1099,7 +1131,8 @@
       "afterSpacing": 0,
       "chimes": 0,
       "warm": 0,
-      "cool": 0
+      "cool": 0,
+      "blue": 0
      },
      "radarAtOceanFloor": {
       "cells": 1440,
@@ -1111,11 +1144,13 @@
       "afterSpacing": 0,
       "chimes": 0,
       "warm": 0,
-      "cool": 0
+      "cool": 0,
+      "blue": 0
      },
      "colours": {
       "warm": {},
-      "cool": {}
+      "cool": {},
+      "blue": {}
      }
     }
    ],
@@ -1296,6 +1331,7 @@
         69
        ],
        "warm": true,
+       "blue": false,
        "strength": 0.553,
        "name": "black carbon"
       },
@@ -1308,6 +1344,7 @@
         220
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.259,
        "name": "dust"
       },
@@ -1320,6 +1357,7 @@
         169
        ],
        "warm": false,
+       "blue": false,
        "strength": 0.145,
        "name": "sea salt"
       },
@@ -1332,6 +1370,7 @@
         52
        ],
        "warm": false,
+       "blue": false,
        "strength": 0.659,
        "name": "sulfate"
       }
@@ -1398,11 +1437,16 @@
     "lineLeftOut": 11,
     "lineWarm": 3,
     "lineCool": 33,
+    "lineBlue": 0,
+    "latitudeChimesWeighted": 39,
+    "stillDifference": 2.65,
+    "stillCandidates": 1,
     "radar0Peaks": 55,
     "radar0Chimes": 34,
     "radar0LeftOut": 21,
     "radar0Warm": 0,
     "radar0Cool": 34,
+    "radar0Blue": 0,
     "radar0LargestMean": 0.77,
     "radar0SoundingPct": 93,
     "radar1Peaks": 0,
@@ -1410,14 +1454,20 @@
     "radar1LeftOut": 0,
     "radar1Warm": 0,
     "radar1Cool": 0,
+    "radar1Blue": 0,
     "radar1LargestMean": 0.15,
     "radar1SoundingPct": 79,
+    "legend10Cells": 2221,
+    "legend10Sounding": 1581,
+    "legend10SoundingAtOceanFloor": 2184,
     "greyLand90Cells": 201,
     "greyLand90Sounding": 0,
     "bar0Switches": 1,
     "bar0SwitchPct": 27.6,
     "bar0SwitchStep": 2,
-    "bar0Steps": 4
+    "bar0Steps": 4,
+    "bar0WarmSteps": 1,
+    "bar0BlueSteps": 1
    }
   },
   {
@@ -1627,7 +1677,7 @@
     "width": 3600,
     "height": 1800
    },
-   "hasRule": false,
+   "hasRule": true,
    "settings": {
     "measure": "colour",
     "floor": 0.11764705882352941,
@@ -1635,7 +1685,8 @@
      "line": 0.85,
      "radar": 0.95
     },
-    "mask": "data/imerg/scan_mask.png"
+    "mask": "data/imerg/scan_mask.png",
+    "blueClass": true
    },
    "procedure": {
     "measure": "colour",
@@ -1644,7 +1695,8 @@
      "line": 0.85,
      "radar": 0.95
     },
-    "mask": "data/imerg/scan_mask.png"
+    "mask": "data/imerg/scan_mask.png",
+    "blueClass": true
    },
    "background": {
     "rgb": [
@@ -1733,8 +1785,9 @@
      "peaks": 18,
      "afterSpacing": 17,
      "chimes": 16,
-     "warm": 2,
-     "cool": 14
+     "warm": 4,
+     "cool": 7,
+     "blue": 5
     },
     "brightness": {
      "cells": 2880,
@@ -1745,8 +1798,9 @@
      "peaks": 26,
      "afterSpacing": 24,
      "chimes": 22,
-     "warm": 3,
-     "cool": 19
+     "warm": 5,
+     "cool": 10,
+     "blue": 7
     },
     "atOceanFloor": {
      "cells": 2880,
@@ -1757,19 +1811,24 @@
      "peaks": 26,
      "afterSpacing": 23,
      "chimes": 21,
-     "warm": 3,
-     "cool": 18
+     "warm": 5,
+     "cool": 10,
+     "blue": 6
     }
    },
    "lineColours": {
     "warm": {
-     "rain step 6 of 10": 2
+     "rain step 2 of 10": 1,
+     "rain step 6 of 10": 2,
+     "rain step 4 of 10": 1
     },
     "cool": {
      "rain step 3 of 10": 2,
+     "rain step 4 of 10": 2,
+     "rain step 2 of 10": 3
+    },
+    "blue": {
      "snow step 6 of 10": 3,
-     "rain step 4 of 10": 3,
-     "rain step 2 of 10": 4,
      "snow step 4 of 10": 2
     }
    },
@@ -1835,7 +1894,8 @@
       "afterSpacing": 43,
       "chimes": 31,
       "warm": 4,
-      "cool": 27
+      "cool": 27,
+      "blue": 0
      },
      "radarAtOceanFloor": {
       "cells": 1440,
@@ -1847,7 +1907,8 @@
       "afterSpacing": 49,
       "chimes": 37,
       "warm": 4,
-      "cool": 33
+      "cool": 33,
+      "blue": 0
      },
      "colours": {
       "warm": {
@@ -1860,7 +1921,8 @@
        "rain step 1 of 10": 5,
        "rain step 4 of 10": 2,
        "rain step 5 of 10": 2
-      }
+      },
+      "blue": {}
      }
     },
     {
@@ -1883,7 +1945,8 @@
       "afterSpacing": 8,
       "chimes": 7,
       "warm": 2,
-      "cool": 5
+      "cool": 5,
+      "blue": 0
      },
      "radarAtOceanFloor": {
       "cells": 1440,
@@ -1895,7 +1958,8 @@
       "afterSpacing": 9,
       "chimes": 8,
       "warm": 2,
-      "cool": 6
+      "cool": 6,
+      "blue": 0
      },
      "colours": {
       "warm": {
@@ -1905,7 +1969,8 @@
       "cool": {
        "rain step 3 of 10": 4,
        "rain step 2 of 10": 1
-      }
+      },
+      "blue": {}
      }
     }
    ],
@@ -2086,6 +2151,7 @@
         48
        ],
        "warm": false,
+       "blue": false,
        "strength": 0.702,
        "name": "rain step 1 of 10"
       },
@@ -2098,6 +2164,7 @@
         0
        ],
        "warm": false,
+       "blue": false,
        "strength": 0.827,
        "name": "rain step 2 of 10"
       },
@@ -2110,6 +2177,7 @@
         0
        ],
        "warm": false,
+       "blue": false,
        "strength": 0.906,
        "name": "rain step 3 of 10"
       },
@@ -2122,6 +2190,7 @@
         0
        ],
        "warm": true,
+       "blue": false,
        "strength": 1,
        "name": "rain step 4 of 10"
       },
@@ -2134,6 +2203,7 @@
         0
        ],
        "warm": true,
+       "blue": false,
        "strength": 1,
        "name": "rain step 5 of 10"
       },
@@ -2146,6 +2216,7 @@
         0
        ],
        "warm": true,
+       "blue": false,
        "strength": 1,
        "name": "rain step 6 of 10"
       },
@@ -2158,6 +2229,7 @@
         0
        ],
        "warm": true,
+       "blue": false,
        "strength": 1,
        "name": "rain step 7 of 10"
       },
@@ -2170,6 +2242,7 @@
         0
        ],
        "warm": true,
+       "blue": false,
        "strength": 1,
        "name": "rain step 8 of 10"
       },
@@ -2182,6 +2255,7 @@
         0
        ],
        "warm": true,
+       "blue": false,
        "strength": 0.784,
        "name": "rain step 9 of 10"
       },
@@ -2194,6 +2268,7 @@
         0
        ],
        "warm": true,
+       "blue": false,
        "strength": 0.569,
        "name": "rain step 10 of 10"
       }
@@ -2238,6 +2313,7 @@
         255
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.729,
        "name": "snow step 1 of 10"
       },
@@ -2250,6 +2326,7 @@
         255
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.714,
        "name": "snow step 2 of 10"
       },
@@ -2262,6 +2339,7 @@
         255
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.698,
        "name": "snow step 3 of 10"
       },
@@ -2274,6 +2352,7 @@
         255
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.69,
        "name": "snow step 4 of 10"
       },
@@ -2286,6 +2365,7 @@
         255
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.682,
        "name": "snow step 5 of 10"
       },
@@ -2298,6 +2378,7 @@
         255
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.678,
        "name": "snow step 6 of 10"
       },
@@ -2310,6 +2391,7 @@
         255
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.725,
        "name": "snow step 7 of 10"
       },
@@ -2322,6 +2404,7 @@
         217
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.667,
        "name": "snow step 8 of 10"
       },
@@ -2334,6 +2417,7 @@
         187
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.604,
        "name": "snow step 9 of 10"
       },
@@ -2346,6 +2430,7 @@
         156
        ],
        "warm": false,
+       "blue": true,
        "strength": 0.533,
        "name": "snow step 10 of 10"
       }
@@ -2405,13 +2490,19 @@
     "linePeaks": 18,
     "lineChimes": 16,
     "lineLeftOut": 2,
-    "lineWarm": 2,
-    "lineCool": 14,
+    "lineWarm": 4,
+    "lineCool": 7,
+    "lineBlue": 5,
+    "latitudeChimesWeighted": 17,
+    "stillDifference": 4.48,
+    "stillRunnerUpDifference": 7.84,
+    "stillCandidates": 30,
     "radar0Peaks": 50,
     "radar0Chimes": 31,
     "radar0LeftOut": 19,
     "radar0Warm": 4,
     "radar0Cool": 27,
+    "radar0Blue": 0,
     "radar0LargestMean": 0.9,
     "radar0SoundingPct": 41,
     "radar1Peaks": 11,
@@ -2419,15 +2510,23 @@
     "radar1LeftOut": 4,
     "radar1Warm": 2,
     "radar1Cool": 5,
+    "radar1Blue": 0,
     "radar1LargestMean": 0.9,
     "radar1SoundingPct": 8,
     "maskPct": 40.21,
+    "legend10Cells": 742,
+    "legend10Sounding": 510,
+    "legend10SoundingAtOceanFloor": 742,
     "bar0Switches": 1,
     "bar0SwitchPct": 28.7,
     "bar0SwitchStep": 4,
     "bar0Steps": 10,
+    "bar0WarmSteps": 7,
+    "bar0BlueSteps": 0,
     "bar1Switches": 0,
-    "bar1Steps": 10
+    "bar1Steps": 10,
+    "bar1WarmSteps": 0,
+    "bar1BlueSteps": 10
    }
   }
  ]

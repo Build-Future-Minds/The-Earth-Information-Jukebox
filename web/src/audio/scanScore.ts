@@ -92,6 +92,27 @@ export function isWarm(r: number, g: number, b: number): boolean {
   return r >= g && r >= b;
 }
 
+/** Blue side: blue is the largest channel (a tie with green counts as blue) and red is not. Used
+ *  only by a picture whose own legend gives blue colours their own meaning (the rain picture: snow,
+ *  drawn cyan to purple). Design choice; where it falls on NASA's bars is measured
+ *  (docs/measurements/scan_pictures.md). */
+export function isBlue(r: number, g: number, b: number): boolean {
+  return !isWarm(r, g, b) && b >= g;
+}
+
+/** Which instrument strikes a note: `warm` (red side of yellow), `cool` (the rest) and, for a
+ *  picture with a third class, `blue`. */
+export type ChimeColour = 'warm' | 'cool' | 'blue';
+
+/** The instrument for a cell, from the shares of its drawn colour. Two classes: warm when half or
+ *  more of the colour is warm. Three classes: the largest share wins; a tie goes to warm, then cool. */
+export function chimeColour(warmShare: number, blueShare: number | null): ChimeColour {
+  if (blueShare === null) return warmShare >= 0.5 ? 'warm' : 'cool';
+  const coolShare = 1 - warmShare - blueShare;
+  if (warmShare >= coolShare && warmShare >= blueShare) return 'warm';
+  return blueShare > coolShare ? 'blue' : 'cool';
+}
+
 /** A cell's mean colour strength at or below this plays nothing. 12 grey levels: the tolerance the
  *  team's land rule already allows for JPEG noise on grey land. Design choice. It is the ocean
  *  picture's floor and the default; another picture sets its own (data/sources.ts, `scan.floor`). */
@@ -127,8 +148,10 @@ export interface Chime {
   band: number;
   /** 0–1, the smoothed level at the peak: sets how hard the note is struck. */
   level: number;
-  /** true: marimba (red side of yellow). false: bells (yellow-green, green, blue). */
+  /** true: the warm instrument (red side of yellow). Always `colour === 'warm'`. */
   warm: boolean;
+  /** Which instrument strikes it (see chimeColour). */
+  colour: ChimeColour;
 }
 
 export interface ScanOptions {
@@ -139,6 +162,8 @@ export interface ScanOptions {
   floor?: number;
   /** Pixels never read, the picture's size (see ScanMask). Default: every pixel is read. */
   mask?: ScanMask | null;
+  /** A third instrument for colours on the blue side (isBlue). Default: two classes, warm and cool. */
+  blueClass?: boolean;
 }
 
 /** A peak the chime rule found and left out, with the reason and the chime that took its place. */
@@ -168,8 +193,13 @@ export interface ScanScore {
   reads: Uint32Array;
   /** `levels[column * bands + band]`, 0–1: how loud that band's held note is in that column. */
   levels: Float32Array;
-  /** `warmShare[column * bands + band]`, 0–1: share of the cell's colour that is on the red side of yellow. */
+  /** `warmShare[column * bands + band]`, 0–1: share of the cell's drawn colour (pixels above the
+   *  floor, weighted by colour strength) that is on the red side of yellow. */
   warmShare: Float32Array;
+  /** Whether the blue side has its own instrument in this score. */
+  blueClass: boolean;
+  /** The same share for the blue side (isBlue); all 0 when `blueClass` is false. */
+  blueShare: Float32Array;
   /** Sorted by column, then band. */
   chimes: Chime[];
   /** Peaks the chime rule found and left out, sorted by column, then band. */
@@ -226,8 +256,10 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
   const { columns, bands } = grid;
   const cells = columns * bands;
   const light = new Float64Array(cells); // what sets the level: colour strength or brightness
-  const colour = new Float64Array(cells); // colour strength, for the warm share
+  const colour = new Float64Array(cells); // drawn colour strength, for the instrument's shares
   const warmColour = new Float64Array(cells);
+  const blueColour = new Float64Array(cells);
+  const blueClass = options.blueClass ?? false;
   const count = new Uint32Array(cells);
   const { data, width, height } = pixels;
   if (mask && mask.length !== width * height) {
@@ -240,8 +272,13 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
     const s = colourStrength(data[i], data[i + 1], data[i + 2]);
     count[cell]++;
     light[cell] += measure === 'colour' ? s : brightness(data[i], data[i + 1], data[i + 2]);
+    // The instrument is chosen by what is drawn: only pixels above the floor vote, weighted by
+    // their colour strength. A background with a colour of its own (the rain picture's navy sea)
+    // never chooses the instrument.
+    if (s <= floor) return;
     colour[cell] += s;
     if (isWarm(data[i], data[i + 1], data[i + 2])) warmColour[cell] += s;
+    else if (blueClass && isBlue(data[i], data[i + 1], data[i + 2])) blueColour[cell] += s;
   };
   if (shape.kind === 'line') {
     // Every pixel is counted once, in the cell it falls in. The bottom row is band 0.
@@ -269,6 +306,7 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
 
   const levels = new Float32Array(cells);
   const warmShare = new Float32Array(cells);
+  const blueShare = new Float32Array(cells);
   const means = new Float32Array(cells);
   let sounding = 0;
   let withData = 0;
@@ -277,12 +315,17 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
     withData++;
     means[c] = light[c] / count[c];
     levels[c] = levelOf(light[c] / count[c], grid.fullStrength, floor);
-    // A cell with no colour at all (grey or white light) has no warm share: it rings bells.
+    // A cell with nothing drawn above the floor (or only grey or white light) has no warm share:
+    // it rings the cool instrument. It is silent anyway unless measured by brightness.
     warmShare[c] = colour[c] > 0 ? warmColour[c] / colour[c] : 0;
+    blueShare[c] = colour[c] > 0 ? blueColour[c] / colour[c] : 0;
     if (levels[c] > 0) sounding++;
   }
 
-  const found = sounding > 0 ? findChimesDetailed(levels, warmShare, grid, shape.kind === 'radar', rule, count) : { chimes: [], dropped: [] };
+  const found =
+    sounding > 0
+      ? findChimesDetailed(levels, warmShare, grid, shape.kind === 'radar', rule, count, blueClass ? blueShare : undefined)
+      : { chimes: [], dropped: [] };
   return {
     shape: shape.kind,
     grid,
@@ -292,6 +335,8 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
     reads: count,
     levels,
     warmShare,
+    blueClass,
+    blueShare,
     chimes: found.chimes,
     dropped: found.dropped,
     status: sounding > 0 ? 'ok' : 'missing',
@@ -364,8 +409,9 @@ export function findChimes(
   cyclic: boolean,
   rule: ChimeRule = CHIME_RULE,
   reads?: ArrayLike<number>,
+  blueShare?: ArrayLike<number>,
 ): Chime[] {
-  return findChimesDetailed(levels, warmShare, grid, cyclic, rule, reads).chimes;
+  return findChimesDetailed(levels, warmShare, grid, cyclic, rule, reads, blueShare).chimes;
 }
 
 /** The same rule as `findChimes`, and also the peaks it left out, each with its reason and winner.
@@ -377,6 +423,8 @@ export function findChimesDetailed(
   cyclic: boolean,
   rule: ChimeRule = CHIME_RULE,
   reads?: ArrayLike<number>,
+  /** Shares of the blue side, for a picture with a third instrument; omitted, two classes. */
+  blueShare?: ArrayLike<number>,
 ): { chimes: Chime[]; dropped: DroppedPeak[] } {
   const { columns, bands } = grid;
   const smooth = (column: number, band: number) => smoothedLevel(levels, grid, cyclic, column, band, reads);
@@ -399,7 +447,9 @@ export function findChimesDetailed(
       const aboveBefore = noData(column - 1, band) || here > smooth(column - 1, band);
       const notBelowAfter = noData(column + 1, band) || here >= smooth(column + 1, band);
       if (aboveBefore && notBelowAfter) {
-        peaks.push({ column, band, level: here, warm: warmShare[column * bands + band] >= 0.5 });
+        const cell = column * bands + band;
+        const colour = chimeColour(warmShare[cell], blueShare ? blueShare[cell] : null);
+        peaks.push({ column, band, level: here, warm: colour === 'warm', colour });
       }
     }
     // Strongest first; an earlier column wins a tie, so the result never depends on sort order.

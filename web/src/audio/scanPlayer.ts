@@ -31,6 +31,8 @@ export interface ScanLogEntry {
   column: number;
   band: number;
   warm: boolean;
+  /** Which instrument struck it: warm, cool or (a picture with a third class) blue. */
+  colour: Chime['colour'];
   note: number;
   /** The root note sounding under this chime (decoration: scanScore.ts, rootNoteAt). */
   root: number;
@@ -74,6 +76,7 @@ interface Rig {
   bass: ScanBass;
   warm: BarInstrument;
   cool: BarInstrument;
+  blue: BarInstrument;
 }
 
 export class ScanPlayer {
@@ -172,6 +175,7 @@ export class ScanPlayer {
     old.bass.silence();
     old.warm.damp();
     old.cool.damp();
+    old.blue.damp();
     setTimeout(() => disposeRig(old), 400);
   }
 
@@ -205,8 +209,9 @@ export class ScanPlayer {
     const bass = createScanBass(def);
     const warm = new BarInstrument(def.warm, def.warmLevel);
     const cool = new BarInstrument(def.cool, def.coolLevel);
-    for (const source of [choir, bass, warm, cool]) source.output.connect(volume);
-    return { def, room, panner, volume, choir, bass, warm, cool };
+    const blue = new BarInstrument(def.blue, def.blueLevel);
+    for (const source of [choir, bass, warm, cool, blue]) source.output.connect(volume);
+    return { def, room, panner, volume, choir, bass, warm, cool, blue };
   }
 
   /** One column of the score, at exact audio time `time`. */
@@ -236,8 +241,8 @@ export class ScanPlayer {
 
     for (const chime of this.chimesByColumn.get(column) ?? []) {
       const note = chimeNote(chime);
-      (chime.warm ? rig.warm : rig.cool).strike(note, time, chimeVelocity(chime.level));
-      window.__scanNotes?.push({ audioTime: time, column, band: chime.band, warm: chime.warm, note, root, pan, sound: rig.def.id });
+      rig[chime.colour].strike(note, time, chimeVelocity(chime.level));
+      window.__scanNotes?.push({ audioTime: time, column, band: chime.band, warm: chime.warm, colour: chime.colour, note, root, pan, sound: rig.def.id });
       const generation = this.generation;
       Tone.getDraw().schedule(() => {
         if (generation === this.generation) this.listener.onChime?.(chime);
@@ -258,6 +263,7 @@ export class ScanPlayer {
       this.rig.bass.silence();
       this.rig.warm.damp();
       this.rig.cool.damp();
+      this.rig.blue.damp();
       this.rig.room.close();
     }
     this.setState(next);
@@ -275,6 +281,7 @@ function disposeRig(rig: Rig): void {
   rig.bass.dispose();
   rig.warm.dispose();
   rig.cool.dispose();
+  rig.blue.dispose();
   rig.volume.dispose();
   rig.panner.dispose();
   rig.room.dispose();

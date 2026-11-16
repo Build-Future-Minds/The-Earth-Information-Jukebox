@@ -26,10 +26,12 @@ import {
   buildScanScore,
   colourStrength,
   findChimes,
+  isBlue,
   isWarm,
   levelOf,
   radarPoint,
   regionScan,
+  type ChimeColour,
   type Pixels,
   type RadarShape,
   type ScanGrid,
@@ -84,6 +86,8 @@ export interface Settings {
   full: { line: number; radar: number };
   /** The mask's file, or null. */
   mask: string | null;
+  /** A third instrument for colours on the blue side (the rule's `instruments.blue`). */
+  blueClass: boolean;
 }
 
 /** What one scan of one picture gives. */
@@ -105,6 +109,8 @@ export interface ScanSummary {
   chimes: number;
   warm: number;
   cool: number;
+  /** Struck on the third instrument (only for a picture with a blue class). */
+  blue: number;
 }
 
 const ceil20 = (x: number) => Math.ceil(x * 20 - 1e-9) / 20;
@@ -127,8 +133,9 @@ function summarise(score: ScanScore): ScanSummary {
     largest = Math.max(largest, score.means[c]);
   }
   // The chime rule with its two "leave out" steps switched off, one at a time.
-  const peaks = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, minGap: 0, perColumn: Infinity }, score.reads);
-  const spaced = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, perColumn: Infinity }, score.reads);
+  const blue = score.blueClass ? score.blueShare : undefined;
+  const peaks = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, minGap: 0, perColumn: Infinity }, score.reads, blue);
+  const spaced = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, perColumn: Infinity }, score.reads, blue);
   return {
     cells: score.levels.length,
     sounding,
@@ -138,8 +145,9 @@ function summarise(score: ScanScore): ScanSummary {
     peaks: peaks.length,
     afterSpacing: spaced.length,
     chimes: score.chimes.length,
-    warm: score.chimes.filter((c) => c.warm).length,
-    cool: score.chimes.filter((c) => !c.warm).length,
+    warm: score.chimes.filter((c) => c.colour === 'warm').length,
+    cool: score.chimes.filter((c) => c.colour === 'cool').length,
+    blue: score.chimes.filter((c) => c.colour === 'blue').length,
   };
 }
 
@@ -153,12 +161,14 @@ function lineCell(x: number, y: number, width: number, height: number, grid: Sca
  * The map sweep's cells, measured by colour strength, with two extras the rule does not have:
  * a weight for each row, and a mask of pixels to leave out. `selfCheck` proves the copy agrees.
  */
-function lineCells(pixels: Pixels, grid: ScanGrid, floor: number, weightOfRow?: (y: number) => number, skip?: Uint8Array | null) {
+function lineCells(pixels: Pixels, grid: ScanGrid, floor: number, blueClass: boolean, weightOfRow?: (y: number) => number, skip?: Uint8Array | null) {
   const { columns, bands } = grid;
   const { data, width, height } = pixels;
   const n = columns * bands;
   const sum = new Float64Array(n);
+  const drawn = new Float64Array(n); // colour above the floor: what votes for the instrument
   const warm = new Float64Array(n);
+  const blue = new Float64Array(n);
   const read = new Float64Array(n);
   for (let y = 0; y < height; y++) {
     const w = weightOfRow ? weightOfRow(y) : 1;
@@ -169,19 +179,24 @@ function lineCells(pixels: Pixels, grid: ScanGrid, floor: number, weightOfRow?: 
       const s = colourStrength(data[i], data[i + 1], data[i + 2]);
       read[cell] += w;
       sum[cell] += w * s;
+      if (s <= floor) continue;
+      drawn[cell] += w * s;
       if (isWarm(data[i], data[i + 1], data[i + 2])) warm[cell] += w * s;
+      else if (blueClass && isBlue(data[i], data[i + 1], data[i + 2])) blue[cell] += w * s;
     }
   }
   const mean = new Float64Array(n);
   const levels = new Float32Array(n);
   const warmShare = new Float32Array(n);
+  const blueShare = new Float32Array(n);
   for (let c = 0; c < n; c++) {
     if (read[c] === 0) continue;
     mean[c] = sum[c] / read[c];
     levels[c] = levelOf(mean[c], grid.fullStrength, floor);
-    warmShare[c] = sum[c] > 0 ? warm[c] / sum[c] : 0;
+    warmShare[c] = drawn[c] > 0 ? warm[c] / drawn[c] : 0;
+    blueShare[c] = drawn[c] > 0 ? blue[c] / drawn[c] : 0;
   }
-  return { mean, levels, warmShare, read };
+  return { mean, levels, warmShare, blueShare, read };
 }
 
 /** For each map-sweep cell: the share of the pixels it reads that `flag` marks (NaN: reads none). */
@@ -275,6 +290,8 @@ interface BarStep {
   to: number;
   rgb: [number, number, number];
   warm: boolean;
+  /** On the blue side (isBlue): only matters for a picture with a blue class. */
+  blue: boolean;
   strength: number;
   name: string;
 }
@@ -310,7 +327,7 @@ function measureBar(bar: Pixels, file: BarFile) {
     const close = () => {
       if (run.length >= 4) {
         const rgb = sum.map((s) => round(s / run.length, 1)) as [number, number, number];
-        steps.push({ from: run[0], to: run[run.length - 1], rgb, warm: isWarm(...rgb), strength: round(colourStrength(...rgb), 3), name: '' });
+        steps.push({ from: run[0], to: run[run.length - 1], rgb, warm: isWarm(...rgb), blue: isBlue(...rgb), strength: round(colourStrength(...rgb), 3), name: '' });
       }
       run = [];
       sum = [0, 0, 0];
@@ -412,14 +429,13 @@ function classify(classes: ColourClass[], r: number, g: number, b: number): numb
 }
 /** A struck note's colour: the class with the most votes in its cell. Each pixel read above the
  *  floor votes for its class (or "no colour of the bar"), weighted by its colour strength. */
-function tally(classes: ColourClass[], chimes: { warm: boolean; votes: Float64Array }[]) {
-  const out = { warm: {} as Record<string, number>, cool: {} as Record<string, number> };
+function tally(classes: ColourClass[], chimes: { colour: ChimeColour; votes: Float64Array }[]) {
+  const out: Record<ChimeColour, Record<string, number>> = { warm: {}, cool: {}, blue: {} };
   for (const c of chimes) {
     let best = -1;
     for (let k = 0; k <= classes.length; k++) if (c.votes[k] > 0 && (best < 0 || c.votes[k] > c.votes[best])) best = k;
     const name = best < 0 ? 'nothing above the floor' : best === classes.length ? 'no colour of the bar' : classes[best].name;
-    const side = c.warm ? out.warm : out.cool;
-    side[name] = (side[name] ?? 0) + 1;
+    out[c.colour][name] = (out[c.colour][name] ?? 0) + 1;
   }
   return out;
 }
@@ -475,21 +491,24 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
   const crops = p.scene.regions.map((r) => ({ region: r, ...regionScan(pixels, frameWidth, r, mask) }));
   const largestLine = largestOf(buildScanScore(pixels, { kind: 'line' }, { mask }));
   const largestRadar = Math.max(...crops.map((c) => largestOf(buildScanScore(c.crop, c.shape, { mask: c.mask }))));
+  const blueClass = !!rule?.instruments.blue;
   const procedure: Settings = {
     measure: 'colour',
     floor: (Math.round(background.spread) + 12) / 255,
     full: { line: ceil20(largestLine), radar: ceil20(largestRadar) },
     mask: maskFile,
+    blueClass,
   };
-  const settings: Settings = rule ? { measure: rule.measure, floor: rule.floor, full: rule.full, mask: maskFile } : procedure;
+  const settings: Settings = rule ? { measure: rule.measure, floor: rule.floor, full: rule.full, mask: maskFile, blueClass } : procedure;
   const lineGrid: ScanGrid = { ...LINE_GRID, fullStrength: settings.full.line };
   const radarGrid: ScanGrid = { ...RADAR_GRID, fullStrength: settings.full.radar };
+  const as = { floor: settings.floor, measure: settings.measure, blueClass: settings.blueClass };
 
   // ---- The map sweep ----
-  const line = buildScanScore(pixels, { kind: 'line' }, { grid: lineGrid, floor: settings.floor, mask, measure: settings.measure });
-  const lineBrightness = buildScanScore(pixels, { kind: 'line' }, { grid: lineGrid, floor: settings.floor, mask, measure: 'brightness' });
-  const atOceanFloor = buildScanScore(pixels, { kind: 'line' }, { grid: lineGrid, floor: STRENGTH_FLOOR, mask, measure: settings.measure });
-  const cells = lineCells(pixels, lineGrid, settings.floor, undefined, mask);
+  const line = buildScanScore(pixels, { kind: 'line' }, { ...as, grid: lineGrid, mask });
+  const lineBrightness = buildScanScore(pixels, { kind: 'line' }, { ...as, grid: lineGrid, mask, measure: 'brightness' });
+  const atOceanFloor = buildScanScore(pixels, { kind: 'line' }, { ...as, grid: lineGrid, mask, floor: STRENGTH_FLOOR });
+  const cells = lineCells(pixels, lineGrid, settings.floor, settings.blueClass, undefined, mask);
   let selfCheck = 0;
   for (let c = 0; c < cells.levels.length; c++) selfCheck = Math.max(selfCheck, Math.abs(cells.levels[c] - line.levels[c]));
 
@@ -542,7 +561,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
       if (votes) votes[classOfPixel[q]] += colourStrength(pixels.data[q * 4], pixels.data[q * 4 + 1], pixels.data[q * 4 + 2]);
     }
   }
-  const lineColours = tally(classes, line.chimes.map((c) => ({ warm: c.warm, votes: lineVotes.get(c.column * lineGrid.bands + c.band)! })));
+  const lineColours = tally(classes, line.chimes.map((c) => ({ colour: c.colour, votes: lineVotes.get(c.column * lineGrid.bands + c.band)! })));
   // What the floor costs: cells where some pixels are drawn in a colour of NASA's bar (above the
   // floor), and how many of them sound at this floor and at the ocean's.
   const legendPixel = new Uint8Array(width * height);
@@ -570,7 +589,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
 
   // ---- The radar, each circle ----
   const regions = crops.map(({ region: r, crop, shape, mask: cropMask }) => {
-    const score = buildScanScore(crop, shape, { grid: radarGrid, floor: settings.floor, mask: cropMask, measure: settings.measure });
+    const score = buildScanScore(crop, shape, { ...as, grid: radarGrid, mask: cropMask });
     const votes = score.chimes.map((c) => {
       const v = new Float64Array(classes.length + 1);
       for (let i = 0; i < RADAR_SAMPLES; i++) {
@@ -586,7 +605,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
           v[cls < 0 ? classes.length : cls] += s;
         }
       }
-      return { warm: c.warm, votes: v };
+      return { colour: c.colour, votes: v };
     });
     // Where the circle is and how wide it is on the ground. The frame is a whole-globe map with
     // x = (lon + 180) · width ÷ 360 and y = (90 − lat) · height ÷ 180 (assets/source_manifest.json).
@@ -603,14 +622,14 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
       groundRatio: (eastWest * Math.cos((lat * Math.PI) / 180)) / northSouth,
       radar: summarise(score),
       /** The same circle at the ocean's floor, 12/255, for the record. */
-      radarAtOceanFloor: summarise(buildScanScore(crop, shape, { grid: radarGrid, floor: STRENGTH_FLOOR, mask: cropMask, measure: settings.measure })),
+      radarAtOceanFloor: summarise(buildScanScore(crop, shape, { ...as, grid: radarGrid, mask: cropMask, floor: STRENGTH_FLOOR })),
       colours: tally(classes, votes),
     };
   });
 
   // ---- Equal latitude bands on a stretched map ----
   const { columns, bands } = LINE_GRID;
-  const weighted = lineCells(pixels, lineGrid, settings.floor, (y) => Math.cos(((90 - ((y + 0.5) * 180) / height) * Math.PI) / 180), mask);
+  const weighted = lineCells(pixels, lineGrid, settings.floor, settings.blueClass, (y) => Math.cos(((90 - ((y + 0.5) * 180) / height) * Math.PI) / 180), mask);
   const latitude = {
     bands: Array.from({ length: bands }, (_, band) => {
       const south = -90 + (180 * band) / bands;
@@ -641,7 +660,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
       };
     }),
     chimes: line.chimes.length,
-    chimesWeighted: findChimes(weighted.levels, weighted.warmShare, lineGrid, false, CHIME_RULE, weighted.read).length,
+    chimesWeighted: findChimes(weighted.levels, weighted.warmShare, lineGrid, false, CHIME_RULE, weighted.read, settings.blueClass ? weighted.blueShare : undefined).length,
   };
 
   // ---- Which of NASA's frames the still is, and the still against that frame ----
@@ -692,17 +711,31 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
     lineLeftOut: summaryLine.peaks - summaryLine.chimes,
     lineWarm: summaryLine.warm,
     lineCool: summaryLine.cool,
+    lineBlue: summaryLine.blue,
+    latitudeChimesWeighted: latitude.chimesWeighted,
   };
+  if (still) {
+    quoted.stillDifference = round(still.best.meanDifference, 2);
+    if (still.runnerUp) quoted.stillRunnerUpDifference = round(still.runnerUp.meanDifference, 2);
+    quoted.stillCandidates = still.candidates.length;
+  }
   regions.forEach((r, i) => {
     quoted[`radar${i}Peaks`] = r.radar.peaks;
     quoted[`radar${i}Chimes`] = r.radar.chimes;
     quoted[`radar${i}LeftOut`] = r.radar.peaks - r.radar.chimes;
     quoted[`radar${i}Warm`] = r.radar.warm;
     quoted[`radar${i}Cool`] = r.radar.cool;
+    quoted[`radar${i}Blue`] = r.radar.blue;
     quoted[`radar${i}LargestMean`] = round(r.radar.largestCellMean, 2);
     quoted[`radar${i}SoundingPct`] = round((100 * r.radar.sounding) / r.radar.cells, 0);
   });
   if (mask) quoted.maskPct = round((100 * masked) / (width * height), 2);
+  if (legendDrawn) {
+    // Cells where 10% or more of the pixels are drawn in a colour of NASA's bar: how many sound.
+    quoted.legend10Cells = legendDrawn[1].cells;
+    quoted.legend10Sounding = legendDrawn[1].sounding;
+    quoted.legend10SoundingAtOceanFloor = legendDrawn[1].soundingAtOceanFloor;
+  }
   if (greyLand) {
     quoted.greyLand90Cells = greyLand.cells;
     quoted.greyLand90Sounding = greyLand.sounding;
@@ -714,6 +747,8 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
     const first = b.steps.findIndex((s, k) => k > 0 && s.warm !== b.steps[k - 1].warm);
     if (first > 0) quoted[`bar${i}SwitchStep`] = first + 1; // the first step on the other side, counted from 1
     quoted[`bar${i}Steps`] = b.steps.length;
+    quoted[`bar${i}WarmSteps`] = b.steps.filter((s) => s.warm).length;
+    quoted[`bar${i}BlueSteps`] = b.steps.filter((s) => s.blue).length;
   });
   if (frame && typeof frame.exactQuiet90Cells === 'number') {
     quoted.exactQuiet90Cells = frame.exactQuiet90Cells as number;
@@ -772,7 +807,8 @@ async function compareWithFrame(
     return { error: (e as Error).message };
   }
   const mask = maskUrl ? await loadMask(maskUrl, exact.width, exact.height) : null;
-  const b = buildScanScore(exact, { kind: 'line' }, { grid: lineGrid, floor: settings.floor, mask, measure: settings.measure });
+  const as = { floor: settings.floor, measure: settings.measure, blueClass: settings.blueClass };
+  const b = buildScanScore(exact, { kind: 'line' }, { ...as, grid: lineGrid, mask });
   let sum = 0;
   let top = 0;
   let both = 0;
@@ -783,7 +819,7 @@ async function compareWithFrame(
     top = Math.max(top, d);
     both++;
   }
-  const key = (c: { column: number; band: number; warm: boolean }) => `${c.column}:${c.band}:${c.warm}`;
+  const key = (c: { column: number; band: number; colour: ChimeColour }) => `${c.column}:${c.band}:${c.colour}`;
   const exactChimes = new Set(b.chimes.map(key));
   const sounding = (s: ScanScore) => s.levels.filter((l) => l > 0).length;
   const out: Record<string, unknown> = {
@@ -797,8 +833,8 @@ async function compareWithFrame(
     regions: p.scene.regions.map((r) => {
       const s = regionScan(still, p.scene.frames.width, r, stillMask);
       const e = regionScan(exact, p.scene.frames.width, r, mask);
-      const sa = buildScanScore(s.crop, s.shape, { grid: radarGrid, floor: settings.floor, mask: s.mask, measure: settings.measure });
-      const ea = buildScanScore(e.crop, e.shape, { grid: radarGrid, floor: settings.floor, mask: e.mask, measure: settings.measure });
+      const sa = buildScanScore(s.crop, s.shape, { ...as, grid: radarGrid, mask: s.mask });
+      const ea = buildScanScore(e.crop, e.shape, { ...as, grid: radarGrid, mask: e.mask });
       const ek = new Set(ea.chimes.map(key));
       return { id: r.id, still: sa.chimes.length, frame: ea.chimes.length, samePlaceAndInstrument: sa.chimes.filter((c) => ek.has(key(c))).length };
     }),

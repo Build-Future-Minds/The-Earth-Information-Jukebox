@@ -95,8 +95,12 @@ const g255 = (x: number) => `${(x * 255).toFixed(2).replace(/\.00$/, '')}/255`;
 const rgb = (c: number[]) => `(${c.map((v) => Math.round(v)).join(', ')})`;
 const NAMES: Record<string, string> = { ocean: 'Ocean', aerosols: 'Aerosols', imerg: 'Rain' };
 
-function scanRow(name: string, s: ScanSummary): (string | number)[] {
-  return [name, pct(s.sounding, s.cells), s.noData, pct(s.atFull, s.cells), s.largestCellMean.toFixed(3), funnel(s), leftOut(s), s.warm, s.cool];
+/** Instrument columns, named as in the default scan sound (Ocean choir). */
+const instrumentHeads = (blue: boolean) => ['Marimba (warm)', 'Bells (cool)', ...(blue ? ['Harp (blue)'] : [])];
+const instrumentCells = (s: ScanSummary, blue: boolean) => [s.warm, s.cool, ...(blue ? [s.blue] : [])];
+
+function scanRow(name: string, s: ScanSummary, blue: boolean): (string | number)[] {
+  return [name, pct(s.sounding, s.cells), s.noData, pct(s.atFull, s.cells), s.largestCellMean.toFixed(3), funnel(s), leftOut(s), ...instrumentCells(s, blue)];
 }
 
 function section(p: PictureAudit, a: Audit): string[] {
@@ -121,6 +125,7 @@ function section(p: PictureAudit, a: Audit): string[] {
         ['Full level, map sweep', set.full.line, p.procedure.full.line],
         ['Full level, radar', set.full.radar, p.procedure.full.radar],
         ['Mask (pixels never read)', set.mask ? `\`${set.mask}\`` : 'none', p.procedure.mask ? `\`${p.procedure.mask}\`` : 'none'],
+        ['A third instrument for the blue side', set.blueClass ? 'yes' : 'no', '(chosen from the legend, not by the procedure)'],
       ],
     ),
     '',
@@ -182,11 +187,11 @@ function section(p: PictureAudit, a: Audit): string[] {
   out.push('### The map sweep', '');
   out.push(
     table(
-      ['', 'Cells that sound', 'No data', 'At full level', 'Largest cell mean', 'Peaks → spaced → played', 'Left out', 'Marimba', 'Bells'],
+      ['', 'Cells that sound', 'No data', 'At full level', 'Largest cell mean', 'Peaks → spaced → played', 'Left out', ...instrumentHeads(set.blueClass)],
       [
-        scanRow(`${set.measure}, as measured with`, p.line.colour),
-        scanRow('brightness, same floor and full level (for the record)', p.line.brightness),
-        scanRow('colour at the ocean\'s floor, 12/255 (for the record)', p.line.atOceanFloor),
+        scanRow(`${set.measure}, as measured with`, p.line.colour, set.blueClass),
+        scanRow('brightness, same floor and full level (for the record)', p.line.brightness, set.blueClass),
+        scanRow('colour at the ocean\'s floor, 12/255 (for the record)', p.line.atOceanFloor, set.blueClass),
       ],
     ),
     '',
@@ -196,14 +201,14 @@ function section(p: PictureAudit, a: Audit): string[] {
   out.push('### The radar, each circle', '');
   out.push(
     table(
-      ['Circle', 'Cells that sound', 'No data', 'At full level', 'Largest cell mean', 'Peaks → spaced → played', 'Left out', 'Marimba', 'Bells'],
+      ['Circle', 'Cells that sound', 'No data', 'At full level', 'Largest cell mean', 'Peaks → spaced → played', 'Left out', ...instrumentHeads(set.blueClass)],
       p.regions.flatMap((r) =>
         [
           [r.name, r.radar],
           [`${r.name}, at the ocean's floor 12/255 (for the record)`, r.radarAtOceanFloor],
         ].map(([name, s]) => {
           const x = s as ScanSummary;
-          return [name as string, pct(x.sounding, x.cells, 0), x.noData, pct(x.atFull, x.cells), x.largestCellMean.toFixed(2), funnel(x), leftOut(x), x.warm, x.cool];
+          return [name as string, pct(x.sounding, x.cells, 0), x.noData, pct(x.atFull, x.cells), x.largestCellMean.toFixed(2), funnel(x), leftOut(x), ...instrumentCells(x, set.blueClass)];
         }),
       ),
     ),
@@ -217,9 +222,14 @@ function section(p: PictureAudit, a: Audit): string[] {
     out.push(`Each struck note is given the colour of NASA's bar that most of its cell's pixels are nearest to. "Nearest" compares the direction of a colour only (the colour minus its smallest channel), so a colour faded into black or grey keeps its direction. A pixel within about 26° of a bar colour (cos ${a.matchCos}) votes for it, weighted by its colour strength; pixels at or below the floor do not vote.`, '');
     const scans = [{ name: 'Map sweep', colours: p.lineColours }, ...p.regions.map((r) => ({ name: r.name, colours: r.colours }))];
     for (const s of scans) {
-      const names = [...new Set([...Object.keys(s.colours.warm), ...Object.keys(s.colours.cool)])];
+      const names = [...new Set([...Object.keys(s.colours.warm), ...Object.keys(s.colours.cool), ...Object.keys(s.colours.blue)])];
       out.push(`**${s.name}**`, '');
-      out.push(names.length ? table(['Colour of the bar', 'Marimba', 'Bells'], names.map((n) => [n, s.colours.warm[n] ?? 0, s.colours.cool[n] ?? 0])) : 'No struck notes.', '');
+      out.push(
+        names.length
+          ? table(['Colour of the bar', ...instrumentHeads(set.blueClass)], names.map((n) => [n, s.colours.warm[n] ?? 0, s.colours.cool[n] ?? 0, ...(set.blueClass ? [s.colours.blue[n] ?? 0] : [])]))
+          : 'No struck notes.',
+        '',
+      );
     }
     out.push(`Pixels read above the floor, by the colour of the bar they are nearest to: ${Object.entries(p.pixelColours).map(([n, share]) => `${n} ${pct(share, 1)}`).join(', ')}.`, '');
   }
@@ -235,7 +245,9 @@ function section(p: PictureAudit, a: Audit): string[] {
     }
     out.push('');
     if (b.steps.length) {
-      out.push(table(['Step', 'x', 'RGB', 'Colour strength', 'Instrument'], b.steps.map((s) => [s.name, `${s.from}–${s.to}`, rgb(s.rgb), s.strength.toFixed(3), s.warm ? 'marimba (warm)' : 'bells (cool)'])), '');
+      const instrument = (s: { warm: boolean; blue: boolean }) => (s.warm ? 'marimba (warm)' : set.blueClass && s.blue ? 'harp (blue)' : 'bells (cool)');
+      out.push(table(['Step', 'x', 'RGB', 'Colour strength', 'Instrument'], b.steps.map((s) => [s.name, `${s.from}–${s.to}`, rgb(s.rgb), s.strength.toFixed(3), instrument(s)])), '');
+      if (set.blueClass) out.push(`"Blue is the largest channel" (the third instrument) is true for ${b.steps.filter((s) => s.blue).length} of these ${b.steps.length} steps.`, '');
       if (b.names) out.push('The step names were read by eye from the labels on the bar.', '');
     } else {
       out.push(`Colour strength along the bar, every tenth, left end first: ${b.strength.map((s) => s.toFixed(2)).join(', ')}.`);
@@ -332,7 +344,8 @@ function report(a: Audit, meta: Record<string, string>): string {
   out.push('The rule, the same for every picture (not a setting):', '');
   out.push(`- Map sweep: ${a.lineGrid.columns} columns × ${a.lineGrid.bands} bands, ${a.lineGrid.seconds} s. Radar: ${a.radarGrid.columns} columns × ${a.radarGrid.bands} bands, ${a.radarGrid.seconds} s, each cell read at ${a.radarSamples * a.radarSamples} points.`);
   out.push(`- A chime needs level ${a.chimeRule.minLevel}, ${a.chimeRule.minGap} columns from the next in its band, ${a.chimeRule.perColumn} per column.`);
-  out.push('- A cell that reads nothing (masked, or outside the picture) is no data: silent, never a peak, left out of the smoothing and of the low note.', '');
+  out.push('- A cell that reads nothing (masked, or outside the picture) is no data: silent, never a peak, left out of the smoothing and of the low note.');
+  out.push('- The instrument is chosen by the pixels above the floor only, each weighted by its colour strength: warm when red is their largest channel; for a picture with a third instrument, blue when blue is (a tie with green counts as blue); cool otherwise.', '');
   out.push('Each picture\'s settings (`web/src/data/sources.ts`, `scan`) were chosen by this procedure, the same for every picture:', '');
   out.push('- **Floor:** the colour strength of the commonest colour among the pixels read, plus 12 grey levels (the tolerance for JPEG noise).');
   out.push('- **Full level:** the largest cell mean on that scan (the radar: the larger of the two circles), rounded up to 0.05, so no cell is clipped.');
