@@ -140,7 +140,11 @@ export function HomeView({ source, pictures, headingRef }: Props) {
           {STEPS.map((s, i) => (
             <li key={s.text}>
               <a href={s.href}>
-                <span className="home-step-n"><span className="sr-only">Step </span>{i + 1}<span className="sr-only">:</span></span>
+                {/* A catalogue index numeral (01 to 05) for the eye; "Step 1:" for screen readers. */}
+                <span className="home-step-n">
+                  <span aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="sr-only">Step {i + 1}:</span>
+                </span>
                 <span className="home-step-text">{s.text}</span>
                 <span className="home-step-page">
                   <s.Icon />
