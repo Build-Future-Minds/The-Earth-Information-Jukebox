@@ -2,7 +2,7 @@
 
 Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.
 
-Measured 2026-11-16 03:03 UTC in Chromium 159.0.8154.6, on commit c5520b2 with uncommitted changes.
+Measured 2026-11-16 03:42 UTC in Chromium 159.0.8154.6, on commit facd88d with uncommitted changes.
 The rule is `web/src/audio/scanScore.ts`, run in the browser on the stills the app plays.
 
 **Each picture has its own section, its own settings and its own numbers. No table here holds two pictures. Never compare a number in one section with a number in another.**

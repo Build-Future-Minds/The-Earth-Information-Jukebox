@@ -19,7 +19,20 @@ import {
 } from './scanScore';
 import { CHOICE_TAGS, scanChoicesFor, type ChoicePicture } from './scanChoices';
 import { AEROSOLS_SCAN, IMERG_SCAN, OCEAN_SCAN, PRACTICE_SCAN } from '../data/sources';
-import { explainBand, explainChime, explainRoot, placeOf, whyBand, whyColumn, type WhyContext } from './scanWhy';
+import {
+  chimeSummary,
+  chosenBand,
+  explainBand,
+  explainChime,
+  explainPick,
+  explainRoot,
+  heldSummary,
+  nearestStruck,
+  placeOf,
+  whyBand,
+  whyColumn,
+  type WhyContext,
+} from './scanWhy';
 
 const names = { held: 'choir', warm: 'marimba', cool: 'bells' };
 const plain: WhyContext = { geometry: 'plain', names };
@@ -376,5 +389,65 @@ describe('a cell with no data explains itself, and is never called a zero (TEST 
   it('the floor in a sentence is the picture\'s own floor', () => {
     const navy = buildScanScore(makeTestPicture(), { kind: 'line' }, { floor: 48 / 255 });
     expect(explainBand(whyBand(navy, 120, 5, plain))).toContain(`− ${(48 / 255).toFixed(3)})`);
+  });
+});
+
+describe('a place picked on the picture, in a few words', () => {
+  const score = buildScanScore(makeTestPicture(), { kind: 'line' });
+
+  it("the table's words for the held and struck note", () => {
+    expect(heldSummary(whyBand(score, 41, 1, plain))).toBe('G3 at 100%');
+    expect(chimeSummary(whyBand(score, 41, 1, plain).chime)).toBe('marimba G4');
+    expect(heldSummary(whyBand(score, 120, 5, plain))).toBe('A4, silent');
+    expect(chimeSummary(whyBand(score, 120, 5, plain).chime)).toBe('none: no colour');
+    expect(chimeSummary(whyBand(score, 44, 1, plain).chime)).toBe('none: not a peak');
+  });
+
+  it('the band explained: the one picked, else the loudest struck note, else the loudest, else the lowest', () => {
+    const red = whyColumn(score, 41, plain).bands;
+    expect(chosenBand(red, null).band).toBe(1); // the red dot's struck note
+    expect(chosenBand(red, 7).band).toBe(7); // picked
+    expect(chosenBand(whyColumn(score, 44, plain).bands, null).band).toBe(1); // loud, nothing struck
+    expect(chosenBand(whyColumn(score, 0, plain).bands, null).band).toBe(0); // all silent
+  });
+
+  it('a struck note is named as it is', () => {
+    expect(explainPick(whyBand(score, 41, 1, plain), score, plain)).toBe('Column 42 of 240, band 2. Held note: G3 at 100%. Struck note: marimba G4.');
+  });
+
+  it('the middle of the red dot names the note the dot made, 3 columns earlier', () => {
+    expect(nearestStruck(score, 44, 1)).toEqual({ chime: score.chimes.find((c) => c.column === 41)!, offset: -3 });
+    expect(explainPick(whyBand(score, 44, 1, plain), score, plain)).toBe(
+      'Column 45 of 240, band 2. Held note: G3 at 100%. Struck note: none: not a peak. ' +
+        'Nearest struck note in this band: column 42, 3 columns earlier (0.4 s at normal speed): marimba G4.',
+    );
+  });
+
+  it('a band with no struck note says so', () => {
+    expect(nearestStruck(score, 0, 11)).toBeNull();
+    expect(explainPick(whyBand(score, 0, 11, plain), score, plain)).toBe(
+      'Column 1 of 240, band 12. Held note: C6, silent. Struck note: none: no colour. No note is struck in this band in this sweep.',
+    );
+  });
+
+  it('a peak left out names the note that took its place', () => {
+    const p = black();
+    paint(p, 100, 50, 1, 10, [128, 0, 0]);
+    paint(p, 103, 50, 1, 10, [90, 0, 0]);
+    const s = buildScanScore(p, { kind: 'line' });
+    expect(explainPick(whyBand(s, 103, 6, plain), s, plain)).toBe(
+      'Column 104 of 240, band 7. Held note: C5 at 68%. Struck note: peak, left out: too close to a stronger one. ' +
+        'Nearest struck note in this band: column 101, 3 columns earlier (0.4 s at normal speed): marimba C6.',
+    );
+  });
+
+  it('on the radar the nearest note is found round the circle, across the seam', () => {
+    const { crop, shape } = regionScan(makeTestPicture(), 240, TEST_CIRCLE);
+    const radar = buildScanScore(crop, shape);
+    const green = radar.chimes.find((c) => c.column === 48 && c.band === 9)!;
+    expect(green).toBeDefined();
+    expect(nearestStruck(radar, 40, 9)).toEqual({ chime: green, offset: 8 });
+    expect(nearestStruck(radar, 110, 9)).toEqual({ chime: green, offset: 58 }); // 58 later round the seam, not 62 earlier
+    expect(nearestStruck(radar, 100, 9)).toEqual({ chime: green, offset: -52 });
   });
 });

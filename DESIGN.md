@@ -264,7 +264,7 @@ The app has five views, one per tab, plus the Game tab, which opens the listenin
 - **Listen (home):** the picture and region choices in one row (step marks 1 Picture, 2 Region, 3 Play), the picture in its chart frame with the credit under it, the player bar (with the beat timeline), and the Explain picture when opened. Fits one desktop screen.
 - **Compare:** for the chosen picture only, its two regions side by side: close-up with ticks, the giant numeral, the value, a Play/Stop toggle and the region's rhythm row; then the tide table and curves.
 - **How it's made:** the three-picture strip (picture, ticks, pulses), the rule in one line, the three honesty lines, and a credit block for each picture.
-- **Play along:** Play the picture (the scan, its settings and legend folded away), one panel with the Earth rhythm's Play and Stop, a now chip and the melody keys, and a one-line game card.
+- **Play along:** Play the picture (the scan, its settings and legend folded away; click or tap the picture to explain a place, which is outlined in black and white with four ticks and named in a line under the picture), one panel with the Earth rhythm's Play and Stop, a now chip and the melody keys, and a one-line game card.
 - **Globe:** the chosen picture on a large globe, with a Play/Stop toggle per region.
 
 State is shown, not narrated: a now chip (region badge plus Ready, Playing or Paused) in the player; the status sentence is for screen readers only. The missing-information message sits at the top of the main column on every view.
