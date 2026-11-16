@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
 import { DEFAULT_MELODY_INSTRUMENT, DEFAULT_SCAN_SOUND, type MelodyInstrumentId, type ScanSoundId } from './audio/instruments';
-import { regionLabel, regionStyle } from './components/ExploreControls';
+import { regionColour, regionLabel, regionStyle } from './components/ExploreControls';
 import { PageLinks } from './components/PageLinks';
 import { ThemeSwitch } from './components/ThemeSwitch';
 import { SourceChoice } from './components/SourceChoice';
@@ -165,6 +165,12 @@ export function App() {
           ? `${label}: missing information. The Earth voice is quiet.`
           : `Playing ${label}.`;
 
+  // The playing side's colour (DESIGN.md "Live"): the end block on the current tab and on Play, and
+  // Listen's needle. Pictures with neutral regions (aerosols, rain) use ink, and so does Listen while
+  // it plays the whole picture: no side is playing then.
+  const side = view === 'listen' ? (target === 'map' ? null : target) : regionId;
+  const live = { ['--live' as string]: look.neutral || !side ? 'var(--ink)' : regionColour(scene.regions, side) } as CSSProperties;
+
   return (
     <>
       {isPractice(ACTIVE) && (
@@ -174,7 +180,7 @@ export function App() {
       )}
       {/* Layout (Dev B, after seeing it live): a sticky top bar with the title, the tabs and the
           theme switch (on phones the tabs move to a fixed bottom bar), then one main column. */}
-      <header className="topbar" ref={topbarRef}>
+      <header className="topbar" ref={topbarRef} style={live}>
         <div className="brand">
           <h1>Earth Sonata</h1>
           <p className="lede">Choose a NASA picture, then hear it.</p>
@@ -183,7 +189,7 @@ export function App() {
         <ThemeSwitch />
       </header>
 
-      <main className={view === 'listen' ? 'stage listen-stage' : 'stage'}>
+      <main className={view === 'listen' ? 'stage listen-stage' : 'stage'} style={live}>
         {/* Focus target on a view change, announced by screen readers; the tab already shows it. */}
         <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
 

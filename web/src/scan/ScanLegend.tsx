@@ -68,7 +68,7 @@ export function ScanLegend({ sound, order, radar, bars = 'below' }: { sound: Sca
         <span>
           <strong>Bars: the 12 held notes ({sound.heldName}),</strong>{' '}
           {bars === 'beside' ? `beside the picture, one beside each band it reads, from ${order}, low to high.` : `from ${order}, low to high.`} The filled
-          part is how loud each is now. A bar flashes orange when a note is struck in its band.
+          part is how loud each is now. A bar flashes when a note is struck in its band.
         </span>
       </li>
       {bars === 'beside' && (
@@ -80,7 +80,7 @@ export function ScanLegend({ sound, order, radar, bars = 'below' }: { sound: Sca
             <line x1="21" y1="2" x2="21" y2="18" className="g-signal-line" />
           </svg>
           <span>
-            <strong>The sound line, under the picture.</strong> Every struck note of the scan, by time and pitch, with the same shapes. The orange line is
+            <strong>The sound line, under the picture.</strong> Every struck note of the scan, by time and pitch, with the same shapes. The upright line, in the playing region's colour (ink for the whole picture), is
             where the sound is now.
           </span>
         </li>

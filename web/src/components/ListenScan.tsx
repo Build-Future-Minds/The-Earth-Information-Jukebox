@@ -264,9 +264,11 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
               <span className="sl-time" ref={timeText}>0:00 / {clock(seconds / p.speed)}</span>
             </div>
             <div className={state === 'stopped' ? 'sl-lane idle' : 'sl-lane'} ref={lane}>
+              {/* Pulse's needle in the side's colour (--live), and the part already played washed in it. */}
+              <span className="sl-wash" />
               <SoundMarks score={score} />
               <SoundMarks score={score} played />
-              <span className="sl-playhead" />
+              <span className="sl-needle" />
             </div>
             <div className="sl-axis">
               {axis.map((t, i) => (
