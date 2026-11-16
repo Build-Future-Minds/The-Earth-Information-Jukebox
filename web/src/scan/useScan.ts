@@ -15,13 +15,10 @@ import type { Picture, ScanRule } from '../data/sources';
 import { DEFAULT_SCAN_SOUND, scanSound, type ScanSoundDef, type ScanSoundId } from '../audio/instruments';
 import { ScanPlayer, type ScanState } from '../audio/scanPlayer';
 import {
-  LINE_GRID,
-  RADAR_GRID,
   TEST_CIRCLE,
-  buildScanScore,
   chimeNote,
   noteName,
-  regionScan,
+  pictureScore,
   type Chime,
   type ChimeColour,
   type ScanScore,
@@ -123,7 +120,8 @@ export function useScan({ picture, speed }: ScanOptions) {
   const sound = scanSound(soundId);
 
   // The picture's size on screen, in the units the scene uses (frame pixels).
-  const frame = loaded?.isTest ? { width: loaded.pixels.width, height: loaded.pixels.height } : scene.frames;
+  // Memoised: Listen's drawing effects depend on it, and a new object each render would restart them.
+  const frame = useMemo(() => (loaded?.isTest ? { width: loaded.pixels.width, height: loaded.pixels.height } : scene.frames), [loaded, scene.frames]);
   // Circles a radar can turn in: the scene's regions, or one test circle on the TEST picture.
   const regions: Region[] = loaded?.isTest ? [TEST_CIRCLE] : scene.regions;
   const region = target === 'map' ? undefined : regions.find((r) => r.id === target);
@@ -134,15 +132,15 @@ export function useScan({ picture, speed }: ScanOptions) {
   const blueClass = !!rule.instruments.blue;
 
   // What the line reads, and the score it makes. Same picture, same score, every time. The
-  // picture's own settings; the radar's circle cuts the mask out with the picture.
+  // picture's own settings; the radar's circle cuts the mask out with the picture. One recipe
+  // (audio/scanScore.ts, pictureScore), so the app plays what `npm run measure` measured.
   const score = useMemo<ScanScore | null>(() => {
     if (!loaded || mask === undefined) return null;
-    const settings = { measure: rule.measure, floor: rule.floor, blueClass };
-    if (!region) return buildScanScore(loaded.pixels, { kind: 'line' }, { ...settings, grid: { ...LINE_GRID, fullStrength: rule.full.line }, mask: mask?.pixels ?? null });
+    const pixels = mask?.pixels ?? null;
+    if (!region) return pictureScore(loaded.pixels, rule, pixels, { kind: 'line' });
     // The still may be smaller than the frames the region's pixels are counted in.
-    const cut = regionScan(loaded.pixels, loaded.isTest ? loaded.pixels.width : scene.frames.width, region, mask?.pixels ?? null);
-    return buildScanScore(cut.crop, cut.shape, { ...settings, grid: { ...RADAR_GRID, fullStrength: rule.full.radar }, mask: cut.mask });
-  }, [loaded, mask, region, scene.frames.width, rule, blueClass]);
+    return pictureScore(loaded.pixels, rule, pixels, { kind: 'radar', frameWidth: loaded.isTest ? loaded.pixels.width : scene.frames.width, region });
+  }, [loaded, mask, region, scene.frames.width, rule]);
 
   const bands = score?.grid.bands ?? 12;
   const columns = score?.grid.columns ?? 1;

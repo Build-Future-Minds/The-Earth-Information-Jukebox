@@ -157,6 +157,7 @@ The scan of the paper is not needed to run anything.
 | --- | --- |
 | `audit.ts` | Runs in the browser: loads the pictures as the app does and measures them, one at a time: the scan, the colour bars and, for the ocean, the stills |
 | `pictures.measure.ts` | Starts that run, says where NASA's files are, makes the extra stills, and writes its report |
+| `choose.ts` | Lists the pictures on Listen (step 1) and chooses one there; every view plays the picture chosen on Listen, and the choice is kept when the view changes. The picture and sound scripts use it |
 | `tap.ts` | Runs in the browser: records what the app sends to the speakers, and the choir alone |
 | `meter.ts` | Loudness (ITU-R BS.1770-4), largest sample, level in a band of frequencies (one at a time, or many at once by a Fourier transform) |
 | `meter.test.ts` | The meter on signals with known answers, including three EBU Tech 3341 cases. Runs with `npm test` |

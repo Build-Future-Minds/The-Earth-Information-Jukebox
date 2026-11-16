@@ -143,7 +143,7 @@ browser.** Test on the demo machine before relying on it.
 **Design choice**, after **Verified** NASA examples. Owner: Dev A, 15 Nov. Code:
 `web/src/audio/scanScore.ts`, `scanPlayer.ts`, `instruments.ts`, `components/PictureScan.tsx`, and
 `web/src/scan/` (what every view of the scan shares: picture, score, player, drawing loop, controls, legend).
-Rule, settings, measurements and limits: `mapping_spec.md`, "Play along: the picture scan".
+Rule, settings, measurements and limits: `mapping_spec.md`, "The picture scan: what Listen plays".
 
 **What:** the "Play along" section has two extras. "Play the picture" sweeps a line over the
 NASA image (west to east over the whole picture, or a radar turn inside a region's circle) and
@@ -326,8 +326,10 @@ Rule and limits: `mapping_spec.md`, "The Earth voice as music". Measured: `docs/
 
 **What:** the Earth voice used to be a short drum hit on E4, dry. It is now, by default, a soft
 piano note on E4 with a quiet bell on the same note, in a small room, over a band that plays the
-listening game's chords (C, Am7, F, Gsus, home to C, two beats each). "Earth sound" on Listen also
-offers the piano alone and the first version's plain pulse.
+listening game's chords (C, Am7, F, Gsus, home to C, two beats each). "Earth sound" on Play along
+(next to the Earth rhythm's own Play and Stop) also offers the piano alone and the first version's
+plain pulse; the choice applies wherever the Earth voice plays (Compare, Globe). Listen plays the
+picture scan since D1, and the picker moves there if P4 brings the Earth voice back to Listen.
 
 **Why:** the picture scan, the melody keys and the listening game all sounded like music, and the
 Earth voice, the part the project is about, sounded like a test tone. D4 says tempo, pitch and

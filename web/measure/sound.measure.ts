@@ -10,6 +10,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { choosePicture, pictureChoices } from './choose';
 
 const repo = fileURLToPath(new URL('../..', import.meta.url));
 
@@ -245,7 +246,7 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
 
   // ---------- 3. Each picture: one sweep of each scan, everything at once and Stop, then the globe ----------
   await tap(page, 'startTap()');
-  const labels = await page.locator('.source-choice .source-label').allTextContents();
+  const choices = await pictureChoices(page);
   const pictures: {
     label: string;
     sweeps: Awaited<ReturnType<typeof sweepEach>>['sweeps'];
@@ -254,12 +255,10 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
     sameScore: SameScore[] | null;
     globe: Awaited<ReturnType<typeof globeSweep>>;
   }[] = [];
-  for (const label of labels.length ? labels : ['Ocean']) {
-    await page.goto('/#play'); // the picture is chosen here, and kept when the view changes to Globe and back
-    if (labels.length) {
-      await page.getByRole('radio', { name: label }).check();
-      await expect(page.getByText(/^Reading the /)).toContainText(label === 'Ocean' ? 'ocean' : label.toLowerCase());
-    }
+  for (const picture of choices) {
+    const { label } = picture;
+    await choosePicture(page, picture, 'play'); // chosen on Listen (step 1), and kept when the view changes to Play along, to Globe and back
+    await expect(page.getByText(/^Reading the /)).toContainText(label === 'Ocean' ? 'ocean' : label.toLowerCase());
     const { sweeps, wholePicture } = await sweepEach(page);
     // A gap in this recording is a dropped block, not silence, and the largest sample could hide in
     // it (a picture with a big still keeps the page busy). Record this take again, up to three more times.

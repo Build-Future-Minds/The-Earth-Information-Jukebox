@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { IconButton } from './IconButton';
 import { ExplainIcon, PauseIcon, PlayIcon, ReplayIcon, SoundIcon, StopIcon } from './icons';
 // Owner: Student B (v1 by Dev B — refine wording, order and labels; review together).
@@ -6,7 +6,6 @@ import { ExplainIcon, PauseIcon, PlayIcon, ReplayIcon, SoundIcon, StopIcon } fro
 import { thumbCss } from '../data/selection';
 import type { Region } from '../data/types';
 import type { PlayState } from '../audio/transport';
-import { EARTH_SOUNDS, type EarthSoundId } from '../audio/earthSound';
 
 
 export const SPEEDS = [0.5, 0.75, 1, 1.25];
@@ -49,34 +48,45 @@ interface PlayerProps {
   onStart: () => void;
   onPause: () => void;
   onStop: () => void;
-  onReplay: () => void;
+  /** Without it there is no Replay button (Listen's scan: Stop then Play does the same). */
+  onReplay?: () => void;
   onExplain: () => void;
   onSpeed: (speed: number) => void;
   onVolume: (db: number) => void;
-  /** What the Earth voice sounds like. Only the sound changes, never the notes or their times. */
-  earthSound: EarthSoundId;
-  onEarthSound: (id: EarthSoundId) => void;
-  /** The beat timeline, shown inside the bar like a music player's progress line. */
+  /** The timeline, shown inside the bar like a music player's progress line. */
   children?: ReactNode;
   /** Step number for Play on Listen; decoration, hidden from screen readers. */
   step?: number;
+  /** The bar's name for screen readers. */
+  label?: string;
+  /** Extra classes: 'axis' lines the timeline up under the picture (Listen). */
+  className?: string;
+  /** Nothing to play yet: Play is disabled. */
+  canPlay?: boolean;
+  /** More settings under Speed and Volume (Listen: the scan's instruments). */
+  settings?: ReactNode;
 }
 
 /** One framed bar under the picture: Play, Stop, Replay, the timeline, Explain and Sound. */
 export function PlayerBar(p: PlayerProps) {
   const playing = p.playState === 'playing';
   const [soundOpen, setSoundOpen] = useState(false);
+  // The settings open under the bar: bring them into view, which may be below the fold.
+  const settingsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (soundOpen) settingsRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [soundOpen]);
   return (
-    <section className="player" aria-label="Playback controls">
+    <section className={p.className ? `player ${p.className}` : 'player'} aria-label={p.label ?? 'Playback controls'}>
       <div className="player-row">
         <div className="player-buttons">
           {playing ? (
             <IconButton icon={PauseIcon} label="Pause" onClick={p.onPause} primary />
           ) : (
-            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary step={p.step} />
+            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary step={p.step} disabled={p.canPlay === false} />
           )}
           <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" hint="Esc" />
-          <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />
+          {p.onReplay && <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />}
         </div>
         <div className="player-track">{p.children}</div>
         <div className="player-buttons">
@@ -84,7 +94,8 @@ export function PlayerBar(p: PlayerProps) {
           <IconButton icon={SoundIcon} label="Sound" onClick={() => setSoundOpen((o) => !o)} expanded={soundOpen} controls="sound-settings" />
         </div>
       </div>
-      <div id="sound-settings" className="sound-settings" hidden={!soundOpen}>
+      <div id="sound-settings" className="sound-settings" hidden={!soundOpen} ref={settingsRef}>
+        {p.settings}
         <div className="row" role="group" aria-label="Speed">
           {SPEEDS.map((v) => (
             <button key={v} type="button" className="speed" aria-pressed={p.speed === v} onClick={() => p.onSpeed(v)}>
@@ -105,14 +116,6 @@ export function PlayerBar(p: PlayerProps) {
             onChange={(e) => p.onVolume(Number(e.target.value))}
             aria-valuetext={volumeText(p.volumeDb)}
           />
-        </label>
-        <label>
-          Earth sound{' '}
-          <select value={p.earthSound} onChange={(e) => p.onEarthSound(e.target.value as EarthSoundId)}>
-            {EARTH_SOUNDS.map((s) => (
-              <option key={s.id} value={s.id}>{s.label}</option>
-            ))}
-          </select>
         </label>
       </div>
     </section>

@@ -3,8 +3,8 @@
 import { defineConfig, devices } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 
-/** 5175 unless MEASURE_PORT says otherwise: two copies of the repo can then measure at once. */
-const port = Number(process.env.MEASURE_PORT ?? 5175);
+/** 5175, or MEASURE_PORT when several copies of the repo measure at once on one machine. */
+const PORT = Number(process.env.MEASURE_PORT ?? 5175);
 
 export default defineConfig({
   testDir: '.',
@@ -15,16 +15,16 @@ export default defineConfig({
   reporter: 'list',
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: `http://localhost:${port}`,
+    baseURL: `http://localhost:${PORT}`,
     // Lets the level test start its own player without a click. The other measurements press the
     // app's buttons, as a person would.
     launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] },
   },
   webServer: {
     // No VITE_DATASET here: the app shows the real pictures in data/.
-    command: `npx vite --port ${port} --strictPort`,
+    command: `npx vite --port ${PORT} --strictPort`,
     cwd: fileURLToPath(new URL('..', import.meta.url)),
-    url: `http://localhost:${port}`,
+    url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
   },
 });

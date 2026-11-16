@@ -1,6 +1,6 @@
 // Picture scan ("Play the picture"): turns the pixels under a moving line into sound events.
 // Pure functions only (no audio, no DOM), so the same picture always gives the same score and
-// every number can be tested. The rule is in docs/mapping_spec.md, "Play along: the picture scan".
+// every number can be tested. The rule is in docs/mapping_spec.md, "The picture scan: what Listen plays".
 //
 // This is a play-along extra. It is separate from the Earth rhythm (the tested rule) and never
 // changes an Earth note.
@@ -644,6 +644,36 @@ export function regionScan(
   return { crop, shape: { kind: 'radar', cx: crop.width / 2, cy: crop.height / 2, r: region.radius_px * k }, mask: cropMask };
 }
 
+/** One picture's own settings for the scan (data/sources.ts, `ScanRule`): what counts as light, its
+ *  floor, and its full level for the map sweep and for the radar. */
+export interface PictureSettings {
+  measure: ScanMeasure;
+  floor: number;
+  full: { line: number; radar: number };
+  /** The picture's legend: a `blue` entry gives colours on the blue side their own (third) instrument. */
+  instruments?: { blue?: string };
+}
+
+/**
+ * The score for one picture with that picture's own settings: the whole picture (the map sweep) or
+ * one region's circle (the radar). The same recipe as the measuring tool (web/measure/audit.ts), so
+ * the app plays exactly what was measured. `mask` is the picture's size, or null.
+ */
+export function pictureScore(
+  pixels: Pixels,
+  settings: PictureSettings,
+  mask: ScanMask | null,
+  target: { kind: 'line' } | { kind: 'radar'; frameWidth: number; region: { box_px: [number, number, number, number]; radius_px: number } },
+): ScanScore {
+  const { measure, floor } = settings;
+  const blueClass = !!settings.instruments?.blue;
+  if (target.kind === 'line') {
+    return buildScanScore(pixels, { kind: 'line' }, { grid: { ...LINE_GRID, fullStrength: settings.full.line }, floor, mask, measure, blueClass });
+  }
+  const { crop, shape, mask: cropMask } = regionScan(pixels, target.frameWidth, target.region, mask);
+  return buildScanScore(crop, shape, { grid: { ...RADAR_GRID, fullStrength: settings.full.radar }, floor, mask: cropMask, measure, blueClass });
+}
+
 // ---------- TEST INPUT picture (not NASA data) ----------
 
 /**
@@ -667,9 +697,11 @@ export const TEST_CIRCLE = {
   description: 'A circle 110 pixels across on the made-up test picture.',
 };
 
+/** The TEST INPUT picture's size, so a page can lay it out before it is made. */
+export const TEST_PICTURE_SIZE = { width: 240, height: 120 };
+
 export function makeTestPicture(): Pixels {
-  const width = 240;
-  const height = 120;
+  const { width, height } = TEST_PICTURE_SIZE;
   const data = new Uint8ClampedArray(width * height * 4);
   const fill = (x0: number, y0: number, w: number, h: number, rgb: [number, number, number]) => {
     for (let y = y0; y < y0 + h; y++) {

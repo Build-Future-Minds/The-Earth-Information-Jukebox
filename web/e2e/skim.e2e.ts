@@ -5,11 +5,11 @@ import { openApp, startWithKeyboard } from './helpers';
 test('the status sentence is for screen readers; the player shows state as a chip', async ({ page }) => {
   await openApp(page);
   const status = page.getByRole('status');
-  await expect(status).toHaveText(/Stopped\. Region A selected\./);
+  await expect(status).toHaveText(/Stopped\. The whole picture selected\./);
   const box = await status.boundingBox();
   expect(box!.width).toBeLessThanOrEqual(1); // visually hidden, still read aloud
   const chip = page.locator('.player .now-chip');
-  await expect(chip).toContainText('A');
+  await expect(chip).toContainText('Whole picture');
   await expect(chip).toContainText('Ready');
   await startWithKeyboard(page);
   await expect(chip).toContainText('Playing');
@@ -35,18 +35,23 @@ test('How it\'s made opens on its title, the honesty lines and the two pipelines
   await expect(page.locator('#how-sources')).toContainText('NASA/Goddard Space Flight Center Scientific Visualization Studio');
 });
 
-test('Listen numbers the steps: region, then Play (practice data has one picture)', async ({ page }) => {
+test('Listen numbers the steps: picture, what to hear, then Play, and screen readers hear "Step n of 3"', async ({ page }) => {
   await openApp(page);
   const steps = page.locator('.step-mark');
-  await expect(steps).toHaveText(['1', '2']);
-  await expect(page.locator('.region-group .step-mark')).toHaveText('1');
-  await expect(page.locator('.player .step-mark')).toHaveText('2');
-  // Marks are decoration: names stay exact.
+  await expect(steps).toHaveText(['1', '2', '3']);
+  await expect(page.locator('.step-pictures .step-mark')).toHaveText('1');
+  await expect(page.locator('.step-hear .step-mark')).toHaveText('2');
+  await expect(page.locator('.player .step-mark')).toHaveText('3');
+  // Marks are decoration: names stay exact, and each step's name says where it is.
+  await expect(page.getByRole('group', { name: 'Step 1 of 3: Choose a NASA picture' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Step 2 of 3: Choose what to hear' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Step 3 of 3: play' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Region' })).toBeVisible();
 });
 
-test('Explain shows the picture: both regions, crop then beat, and one sentence', async ({ page }) => {
+// "Explain" on Listen explained the Earth rhythm as a picture; since P1 it explains the scan. The
+// rhythm's picture comes back with P4's "Add the Earth rhythm" switch. Kept, not deleted.
+test.fixme('Explain shows the picture: both regions, crop then beat, and one sentence (returns with P4)', async ({ page }) => {
   await openApp(page);
   await startWithKeyboard(page);
   await page.getByRole('button', { name: 'Explain', exact: true }).click();
@@ -105,11 +110,12 @@ for (const [w, h] of [[1024, 768], [920, 700], [768, 1024]] as const) {
   });
 }
 
-test('Explain before Play says Press Play and shows no "no data" (nothing is missing)', async ({ page }) => {
+test('Explain before Play says no note has been struck yet and shows no "no data" (nothing is missing)', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'Explain', exact: true }).click();
-  await expect(page.locator('.explain-line')).toHaveText(/Press Play/);
-  await expect(page.locator('.explanation')).not.toContainText('no data');
+  await page.locator('.explain-scan').getByText('Why the scan sounds like this', { exact: true }).click();
+  await expect(page.locator('.explain-scan .why-last')).toHaveText('No note has been struck in this sweep yet.');
+  await expect(page.locator('.explain-scan .why-last')).not.toContainText('no data');
 });
 
 test('Compare says the ticks are drawn in the browser to show what is measured', async ({ page }) => {

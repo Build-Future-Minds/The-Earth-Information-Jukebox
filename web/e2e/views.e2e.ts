@@ -1,7 +1,7 @@
 // The four views (Listen, Compare, How it's made, Play along): page links, the URL, and the rule that
 // changing view is the same as pressing Stop. Practice data.
 import { expect, test, type Page } from '@playwright/test';
-import { earthPeakAhead, melodyVoices, notesAfter, openApp, startWithKeyboard } from './helpers';
+import { earthPeakAhead, melodyVoices, notesAfter, openApp, scanNoteCount, scanNotesAfter, startWithKeyboard } from './helpers';
 
 const pages = (page: Page) => page.getByRole('navigation', { name: 'Pages' });
 /** Voices fade out over 0.4 s after release. */
@@ -44,19 +44,29 @@ test('back button changes view and stops', async ({ page }) => {
   expect(await earthPeakAhead(page)).toBeLessThan(0.05);
 });
 
-for (const view of ['listen', 'play'] as const) {
-  test(`Esc stops on ${view}`, async ({ page }) => {
-    await openApp(page, view);
-    await startWithKeyboard(page);
-    await notesAfter(page, 0, 2);
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('status')).toHaveText(/Stopped/);
-    await settle(page);
-    expect(await earthPeakAhead(page)).toBeLessThan(0.05);
-  });
-}
+test('Esc stops on play', async ({ page }) => {
+  await openApp(page, 'play');
+  await startWithKeyboard(page);
+  await notesAfter(page, 0, 2);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('status')).toHaveText(/Stopped/);
+  await settle(page);
+  expect(await earthPeakAhead(page)).toBeLessThan(0.05);
+});
 
-test('Tab order on Listen follows the screen: tabs, theme, region, then Play; Enter starts', async ({ page }) => {
+// Listen plays the picture scan (P1): Esc silences it, and nothing more is struck.
+test('Esc stops on listen', async ({ page }) => {
+  await openApp(page);
+  await startWithKeyboard(page);
+  await scanNotesAfter(page, 0, 1);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('status')).toHaveText(/Stopped/);
+  const mark = await scanNoteCount(page);
+  await page.waitForTimeout(1500);
+  expect(await scanNoteCount(page)).toBe(mark);
+});
+
+test('Tab order on Listen follows the screen: tabs, theme, step 1, step 2, then Play; Enter starts', async ({ page }) => {
   await openApp(page);
   for (const name of ['Home', 'Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'Game']) {
     await page.keyboard.press('Tab');
@@ -66,13 +76,18 @@ test('Tab order on Listen follows the screen: tabs, theme, region, then Play; En
     await page.keyboard.press('Tab');
     await expect(page.getByRole('button', { name, exact: true })).toBeFocused();
   }
-  await page.keyboard.press('Tab'); // the region radio group is one Tab stop
-  await expect(page.getByRole('radio', { name: /Region A/ })).toBeFocused();
+  // Step 1: the picture radio group is one Tab stop (practice data: one picture, no NASA link).
+  await page.keyboard.press('Tab');
+  const picture = page.getByRole('group', { name: 'Step 1 of 3: Choose a NASA picture' }).getByRole('radio');
+  await expect(picture).toBeFocused();
+  // Step 2: one Tab stop, on the chosen option.
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('group', { name: 'Step 2 of 3: Choose what to hear' }).getByRole('radio', { name: /^Whole picture/ })).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('status')).toHaveText(/Playing/);
-  await notesAfter(page, 0, 2);
+  await expect(page.getByRole('status')).toHaveText(/Playing the whole picture/);
+  await scanNotesAfter(page, 0, 1);
 });
 
 test('status line on every view', async ({ page }) => {

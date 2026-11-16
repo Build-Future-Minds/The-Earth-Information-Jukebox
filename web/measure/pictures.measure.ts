@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Audit, BarFile, FrameFile, PictureAudit, PictureFiles, ScanSummary } from './audit';
+import { choosePicture, pictureChoices } from './choose';
 
 const repo = fileURLToPath(new URL('../..', import.meta.url));
 const have = (file: string) => existsSync(resolve(repo, file));
@@ -626,15 +627,12 @@ test('measure the picture scan on the NASA pictures', async ({ page, browser }) 
     }
     return scores;
   };
-  const labels = await page.locator('.source-choice .source-label').allTextContents();
   let renderer = '';
   const globePictures: GlobeChecks['pictures'] = [];
-  for (const label of labels.length ? labels : ['Ocean']) {
-    await page.goto('/#play'); // the picture is chosen here, and kept when the view changes to Globe and back
-    if (labels.length) {
-      await page.getByRole('radio', { name: label }).check();
-      await expect(page.getByText(/^Reading the /)).toContainText(label === 'Ocean' ? 'ocean' : label.toLowerCase());
-    }
+  for (const picture of await pictureChoices(page)) {
+    const { label } = picture;
+    await choosePicture(page, picture, 'play'); // chosen on Listen (step 1), and kept when the view changes to Play along, to Globe and back
+    await expect(page.getByText(/^Reading the /)).toContainText(label === 'Ocean' ? 'ocean' : label.toLowerCase());
     const flat = await readAll();
     await page.goto('/#globe');
     await page.waitForFunction(() => !!(window as unknown as { __globe?: unknown }).__globe, undefined, { timeout: 15_000 });

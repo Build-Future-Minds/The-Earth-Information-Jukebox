@@ -5,6 +5,8 @@
 import type { CSSProperties, Ref } from 'react';
 import { NowChip } from '../components/NowChip';
 import type { MelodyInstrumentId } from '../audio/instruments';
+import type { EarthSoundId } from '../audio/earthSound';
+import { EarthSoundChoice } from '../components/EarthSoundChoice';
 import type { PlayState } from '../audio/transport';
 import type { InputSource } from '../audio/userVoice';
 import { PictureScan, type PictureScanHandle, type ScanPicture } from '../components/PictureScan';
@@ -29,6 +31,9 @@ interface Props {
   onStart: () => void;
   onPause: () => void;
   onStop: () => void;
+  /** What the Earth voice sounds like (also on Compare and Globe). Only the sound changes, never the notes. */
+  earthSound: EarthSoundId;
+  onEarthSound: (id: EarthSoundId) => void;
   heldNotes: ReadonlySet<number>;
   melodyDb: number;
   melodyInstrument: MelodyInstrumentId;
@@ -62,6 +67,9 @@ export function PlayView(p: Props) {
           )}
           <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" hint="Esc" />
           <NowChip letter={p.regionLetter} playState={p.playState} />
+        </div>
+        <div className="row">
+          <EarthSoundChoice value={p.earthSound} onChange={p.onEarthSound} />
         </div>
         <MelodyPad
           heldNotes={p.heldNotes}

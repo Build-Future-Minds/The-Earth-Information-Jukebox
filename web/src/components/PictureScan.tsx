@@ -1,7 +1,8 @@
 // "Play the picture": a line sweeps the NASA image and plays what it crosses, after NASA's own
-// image sonifications (docs/mapping_spec.md, "Play along: the picture scan").
-// A play-along extra: it has its own player, clock and volume (audio/scanPlayer.ts) and never
-// changes the Earth rhythm. In practice mode there is no NASA image, so it scans a labelled
+// image sonifications (docs/mapping_spec.md, "The picture scan: what Listen plays"). Listen plays the
+// same scan with the page's player bar (components/ListenScan.tsx); this one, on Play along, has its
+// own buttons. It has its own player, clock and volume (audio/scanPlayer.ts) and never changes the
+// Earth rhythm. It reads the picture chosen on Listen, with that picture's own settings. In practice mode there is no NASA image, so it scans a labelled
 // TEST INPUT picture instead.
 //
 // This is the flat view of the scan. The picture, the score, the player, the controls, the bars
@@ -21,11 +22,11 @@
 //   - the legend names every one of these, with the same shapes.
 // Everything drawn over the NASA image is black or white: its colours are never changed.
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import type { Region } from '../data/types';
 import { cellAt, cellOutline, cellTicks, type ScanPlacement } from '../audio/scanPick';
 import { chosenBand, explainPick, whyColumn } from '../audio/scanWhy';
 import { ScanButtons, ScanSettings, ScanStatus } from '../scan/ScanControls';
-import { starPath } from '../scan/ScanLegend';
+import { ScanHow } from '../scan/ScanLegend';
+import { ScanOverlay, drawSweep, viewOf } from '../scan/ScanOverlay';
 import { ScanSide } from '../scan/ScanSide';
 import { groundNote } from '../scan/groundNote';
 import { useScan, type ScanHandle, type ScanPicture } from '../scan/useScan';
@@ -45,29 +46,19 @@ interface Props {
   onSpeed?: (speed: number) => void;
 }
 
-/** Widest the shape riding the line gets (each side), as a share of the picture's width or the circle's radius. */
-const PROFILE_LINE = 0.034;
-const PROFILE_RADAR = 0.2;
-/** How far behind the line its glow reaches: a share of the width, or degrees of turn (many thin
- *  wedges on top of each other, so the glow fades evenly). */
-const TRAIL_LINE = 0.05;
-const TRAIL_RADAR_DEGREES = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
-/** Compass letters around the radar on a world map: letter, then the direction as (east, north). */
-const COMPASS: [string, number, number][] = [['E', 1, 0], ['N', 0, 1], ['W', -1, 0], ['S', 0, -1]];
-/** Thin rings on the radar: every third band. */
-const RANGE_RINGS = [3, 6, 9];
 /** A press that moves further than this (CSS pixels) before it lets go is a drag, not a tap: it picks nothing. */
 const TAP_SLOP = 10;
 
 export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ picture, speed, onSpeed }, ref) {
   const scan = useScan({ picture, speed });
-  const { scene, rule, mask, blueClass, choices, sound } = scan;
+  const { scene, rule, mask, choices, sound } = scan;
   const { loaded, target, state, traces, frame, region, worldMap, score, bands, labelOf, why, liveColumn, lastStruck, reducedMotion } = scan;
   const nodataNote = mask ? (rule.mask?.what ?? 'the hatched part of the picture') : null;
   const sweep = useRef<SVGGElement>(null);
   const profile = useRef<SVGPathElement>(null);
   const unplayed = useRef<SVGPathElement>(null);
   const played = useRef<SVGPathElement>(null);
+  const sweepRefs = useMemo(() => ({ sweep, profile, unplayed, played }), []);
   const svg = useRef<SVGSVGElement>(null);
   /** The pointer pressed on the picture and where, until it lets go. */
   const press = useRef<{ id: number; x: number; y: number } | null>(null);
@@ -126,27 +117,11 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   useImperativeHandle(ref, () => ({ stop: scan.stop }), []);
 
   // The line on the flat picture, moved every frame by the shared loop.
-  useScanFrame(scan, ({ position, levels, grid, region: r, frame: f }) => {
-    if (r) {
-      const [cx, cy] = r.center_px;
-      sweep.current?.setAttribute('transform', `rotate(${-position * 360} ${cx} ${cy})`);
-      profile.current?.setAttribute('d', profilePath(levels, (b) => cx + ((b + 0.5) * r.radius_px) / grid.bands, cy, r.radius_px * PROFILE_RADAR, cx, cx + r.radius_px, true));
-      unplayed.current?.setAttribute('d', sectorPath(cx, cy, r.radius_px * 1.02, position));
-      played.current?.setAttribute('d', arcPath(cx, cy, r.radius_px, position));
-    } else {
-      sweep.current?.setAttribute('transform', `translate(${position * f.width} 0)`);
-      profile.current?.setAttribute('d', profilePath(levels, (b) => f.height - ((b + 0.5) * f.height) / grid.bands, 0, f.width * PROFILE_LINE, f.height, 0, false));
-    }
-  });
+  useScanFrame(scan, ({ position, levels, region: r, frame: f }) => drawSweep(sweepRefs, f, r, position, levels));
 
-  // Radar view: zoom to the circle with a small margin.
-  const margin = region ? region.radius_px * 0.16 : 0;
-  const view = region
-    ? { x: region.center_px[0] - region.radius_px - margin, y: region.center_px[1] - region.radius_px - margin, w: 2 * (region.radius_px + margin), h: 2 * (region.radius_px + margin) }
-    : { x: 0, y: 0, w: frame.width, h: frame.height };
-  // Sizes of things drawn on the picture, as shares of what is in view, so they look the same on
-  // the map and on the zoomed circle.
-  const unit = view.h / 100;
+  // Radar view: zoom to the circle with a small margin. Sizes drawn on the picture are shares of
+  // what is in view, so they look the same on the map and on the zoomed circle.
+  const { view, unit } = viewOf(frame, region);
   const figureClass = ['scene', 'scan-view', region ? 'radar' : 'line', state, reducedMotion ? 'still' : ''].join(' ').trim();
 
   return (
@@ -182,120 +157,12 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             onPointerUp={onPressEnd}
             onPointerCancel={() => (press.current = null)}
           >
-            <defs>
-              {/* Soft edge of the dimmed, not-yet-played part, and the glow behind the line. */}
-              <linearGradient id="scan-ahead" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0" stopColor="#000" stopOpacity="0" />
-                <stop offset="0.02" stopColor="#000" stopOpacity="0.42" />
-                <stop offset="1" stopColor="#000" stopOpacity="0.42" />
-              </linearGradient>
-              <linearGradient id="scan-trail" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0" stopColor="#fff" stopOpacity="0" />
-                <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
-              </linearGradient>
-              {mask && (
-                <>
-                  {/* Black and white stripes, seen only where the mask is white: the pixels never read. */}
-                  <pattern id="scan-nodata-hatch" patternUnits="userSpaceOnUse" width={unit * 1.6} height={unit * 1.6} patternTransform="rotate(45)">
-                    <rect width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-light" />
-                    <rect x={unit * 0.8} width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-dark" />
-                  </pattern>
-                  <mask id="scan-nodata-mask" maskUnits="userSpaceOnUse" x={0} y={0} width={frame.width} height={frame.height}>
-                    <image href={mask.href} width={frame.width} height={frame.height} preserveAspectRatio="none" />
-                  </mask>
-                </>
-              )}
-            </defs>
-
             {loaded ? (
               <image href={loaded.href} width={frame.width} height={frame.height} preserveAspectRatio="none" />
             ) : (
               <rect width={frame.width} height={frame.height} className="frame-placeholder" />
             )}
-            {mask && <rect className="nodata-hatch" width={frame.width} height={frame.height} fill="url(#scan-nodata-hatch)" mask="url(#scan-nodata-mask)" />}
-
-            {region && (
-              <>
-                {/* Outside the circle is never read, and the part of the circle not played yet waits in the dark. */}
-                <path
-                  className="veil"
-                  fillRule="evenodd"
-                  d={`M${view.x} ${view.y}h${view.w}v${view.h}h${-view.w}Z ${circlePath(region.center_px[0], region.center_px[1], region.radius_px)}`}
-                />
-                <path ref={unplayed} className="veil" />
-                {/* Thin rings every third band: how far out a note is. */}
-                <g className="range-rings">
-                  {RANGE_RINGS.map((band) => (
-                    <circle key={band} cx={region.center_px[0]} cy={region.center_px[1]} r={(region.radius_px * band) / bands} />
-                  ))}
-                </g>
-                <g className="box active">
-                  <circle className="ring-outline" cx={region.center_px[0]} cy={region.center_px[1]} r={region.radius_px} />
-                  <circle className="ring" cx={region.center_px[0]} cy={region.center_px[1]} r={region.radius_px} />
-                </g>
-                {/* The part of the rim the line has passed: how far round this turn is. */}
-                <path ref={played} className="played-arc" />
-                {worldMap && (
-                  <g className="compass" fontSize={unit * 4.2}>
-                    {COMPASS.map(([letter, dx, dy]) => (
-                      <text key={letter} x={region.center_px[0] + dx * (region.radius_px + margin * 0.55)} y={region.center_px[1] - dy * (region.radius_px + margin * 0.55)}>
-                        {letter}
-                      </text>
-                    ))}
-                  </g>
-                )}
-              </>
-            )}
-
-            {/* Marks left by the chimes of this sweep. */}
-            <g className="traces">
-              {traces.map((t) => (
-                <g key={t.id} className={`trace ${t.colour}`} transform={`translate(${t.x} ${t.y})`}>
-                  <circle className="ripple" r={unit * 5.5} />
-                  {t.colour === 'warm' ? (
-                    <circle className="chime-dot" r={unit * 1.15} />
-                  ) : t.colour === 'blue' ? (
-                    <path className="chime-star-outline" d={starPath(unit * 1.5)} />
-                  ) : (
-                    <g transform="rotate(45)">
-                      <rect className="chime-dot" x={-unit * 1.1} y={-unit * 1.1} width={unit * 2.2} height={unit * 2.2} />
-                    </g>
-                  )}
-                  {t.colour === 'blue' && <path className="chime-star" d={starPath(unit * 1.5)} />}
-                </g>
-              ))}
-            </g>
-
-            {/* Everything that moves with the line. */}
-            <g ref={sweep} className="sweep">
-              {region ? (
-                <RadarTrail region={region} />
-              ) : (
-                <>
-                  <rect className="ahead" x={0} y={0} width={frame.width} height={frame.height} fill="url(#scan-ahead)" />
-                  <rect className="trail" x={-frame.width * TRAIL_LINE} y={0} width={frame.width * TRAIL_LINE} height={frame.height} fill="url(#scan-trail)" />
-                </>
-              )}
-              <path ref={profile} className="profile" />
-              {region ? (
-                <>
-                  <line className="sweep-outline" x1={region.center_px[0]} y1={region.center_px[1]} x2={region.center_px[0] + region.radius_px} y2={region.center_px[1]} />
-                  <line className="sweep-halo" x1={region.center_px[0]} y1={region.center_px[1]} x2={region.center_px[0] + region.radius_px} y2={region.center_px[1]} />
-                  <line className="sweep-line" x1={region.center_px[0]} y1={region.center_px[1]} x2={region.center_px[0] + region.radius_px} y2={region.center_px[1]} />
-                  <circle className="needle-end" cx={region.center_px[0]} cy={region.center_px[1]} r={unit * 1.3} />
-                  <circle className="needle-end" cx={region.center_px[0] + region.radius_px} cy={region.center_px[1]} r={unit * 1.7} />
-                </>
-              ) : (
-                <>
-                  <line className="sweep-outline" x1={0} y1={0} x2={0} y2={frame.height} />
-                  <line className="sweep-halo" x1={0} y1={0} x2={0} y2={frame.height} />
-                  <line className="sweep-line" x1={0} y1={0} x2={0} y2={frame.height} />
-                  {/* Small arrowheads where the line meets the top and bottom edges. */}
-                  <path className="needle-end" d={`M${-unit * 1.8} 0H${unit * 1.8}L0 ${unit * 3}Z`} />
-                  <path className="needle-end" d={`M${-unit * 1.8} ${frame.height}H${unit * 1.8}L0 ${frame.height - unit * 3}Z`} />
-                </>
-              )}
-            </g>
+            <ScanOverlay frame={frame} region={region} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} mask={mask} />
 
             {/* The place explained in "Why the scan sounds like this": the cell's own outline and four
                 ticks pointing at it, black under white. It never moves. */}
@@ -350,62 +217,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
 
       <details className="scan-how">
         <summary>How the picture becomes sound</summary>
-        <ul>
-          {loaded && !loaded.isTest && (
-            <li>
-              <strong>Which picture.</strong> One still: {scene.source.title}, {rule.still.frame}
-              {stillTime(rule.still.time ?? undefined)}, {rule.still.how}. This picture has its own settings, measured on
-              this still; its numbers are never compared with another picture's.
-            </li>
-          )}
-          <li><strong>Where.</strong> Higher on the picture is a higher note (on the radar: further from the centre). There are 12 bands, on the five notes C, D, E, G and A. Low bands are far apart and high bands close together, as a choir is spaced.</li>
-          <li>
-            <strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone. In this
-            picture a cell at or below {Number((rule.floor * 255).toFixed(2))} of 255 is silent
-            {rule.floor === 12 / 255 ? ' (black sea and grey land)' : ', just above the colour drawn where there is nothing'}. A soft held note sounds for every band the line is crossing.
-          </li>
-          {rule.mask && !loaded?.isTest && (
-            <li>
-              <strong>Pixels never read.</strong> The scan never reads {rule.mask.what}. There it has no data: it is silent, it
-              strikes no note, and it does not count as a zero. They are hatched on the picture.
-            </li>
-          )}
-          <li>
-            <strong>Peaks of colour.</strong> When a band has more colour under the line than just before and just after, one
-            note is struck, an octave above that band's held note. Peaks that follow each other too closely are left out, so
-            each struck note can be heard.
-          </li>
-          <li>
-            <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is
-            struck on one instrument.{' '}
-            {blueClass
-              ? 'Where most of it has blue as its largest channel, it is struck on a third. Otherwise it is struck on the second.'
-              : 'Where it is not (yellow-green, green and blue), it is struck on another.'}
-            {loaded && !loaded.isTest && (
-              <>
-                {' '}In this picture the {sound.warmName} means {rule.instruments.warm}; the {sound.coolName}, {rule.instruments.cool}
-                {rule.instruments.blue ? <>; the {sound.blueName}, {rule.instruments.blue}</> : null}.
-                {rule.measured.bar0SwitchValue !== undefined && (
-                  <> On NASA's colour bar for this picture the switch falls at about {rule.measured.bar0SwitchValue.toFixed(1)} °C, and the picture's lines use the bar's hues. We measured the bar and the picture's colours, not the sea.</>
-                )}
-              </>
-            )}
-          </li>
-          {loaded && !loaded.isTest && (
-            <li>
-              <strong>What the scan cannot tell you.</strong> {rule.limits.join(' ')}
-            </li>
-          )}
-          <li><strong>Left and right.</strong> The sound sits where the line is: it travels from the left speaker to the right with the line.</li>
-          <li>
-            <strong>Decoration, not data.</strong> The scale is fixed. The low note steps through C, A, F and G on a fixed
-            timetable, so the same held notes sound like four chords. The picture sets only how loud that low note is.
-          </li>
-          <li>
-            <strong>Scan sound.</strong> Every choice plays the same notes at the same times. Only the instruments change, and
-            all of them are made by this page's own code.
-          </li>
-        </ul>
+        <ScanHow scene={scene} rule={rule} isTest={!!loaded?.isTest} sound={sound} />
       </details>
 
       {score && (
@@ -424,83 +236,3 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
     </div>
   );
 });
-
-/** The glow behind the radar line. Drawn with the line pointing east; the group it sits in is turned. */
-function RadarTrail({ region }: { region: Region }) {
-  const [cx, cy] = region.center_px;
-  const r = region.radius_px;
-  return (
-    <>
-      {TRAIL_RADAR_DEGREES.map((degrees) => {
-        // Behind an anticlockwise line is the clockwise side: below it on screen when it points east.
-        const a = (degrees * Math.PI) / 180;
-        return <path key={degrees} className="trail" d={`M${cx} ${cy}L${cx + r} ${cy}A${r} ${r} 0 0 1 ${cx + r * Math.cos(a)} ${cy + r * Math.sin(a)}Z`} />;
-      })}
-    </>
-  );
-}
-
-/** A full circle as a path (two arcs), for cutting a hole in the dimmed surround. */
-function circlePath(cx: number, cy: number, r: number): string {
-  return `M${cx + r} ${cy}A${r} ${r} 0 1 0 ${cx - r} ${cy}A${r} ${r} 0 1 0 ${cx + r} ${cy}Z`;
-}
-
-/** The part of the rim the line has already passed: an arc from 3 o'clock, anticlockwise, to the line. */
-function arcPath(cx: number, cy: number, r: number, position: number): string {
-  if (position <= 0.0005) return '';
-  const p = Math.min(position, 0.9995);
-  const angle = 2 * Math.PI * p;
-  return `M${cx + r} ${cy}A${r} ${r} 0 ${p > 0.5 ? 1 : 0} 0 ${cx + r * Math.cos(angle)} ${cy - r * Math.sin(angle)}`;
-}
-
-/** The part of the circle the radar has not reached yet: from the line round (anticlockwise) to
- *  3 o'clock. `position` is how far round the line is, 0 to 1. */
-function sectorPath(cx: number, cy: number, r: number, position: number): string {
-  if (position <= 0.0005) return circlePath(cx, cy, r);
-  if (position >= 0.9995) return '';
-  const angle = 2 * Math.PI * position;
-  const x = cx + r * Math.cos(angle);
-  const y = cy - r * Math.sin(angle);
-  const large = position < 0.5 ? 1 : 0;
-  // Sweep flag 0 is anticlockwise on screen.
-  return `M${cx} ${cy}L${x} ${y}A${r} ${r} 0 ${large} 0 ${cx + r} ${cy}Z`;
-}
-
-/**
- * The shape that rides the line: a closed, smooth outline, wide where a band is loud.
- * `along(band)` is the band's place along the line; `across0` is the line's own coordinate;
- * `half` is the widest half-width; `start` and `end` are the line's two ends.
- * For the radar the line runs along x (`alongX`), for the map sweep along y.
- */
-function profilePath(
-  levels: ArrayLike<number>,
-  along: (band: number) => number,
-  across0: number,
-  half: number,
-  start: number,
-  end: number,
-  alongX: boolean,
-): string {
-  const points: [number, number][] = [[start, 0]];
-  for (let band = 0; band < levels.length; band++) points.push([along(band), levels[band] * half]);
-  points.push([end, 0]);
-  const xy = (a: number, w: number) => (alongX ? `${a.toFixed(1)} ${(across0 + w).toFixed(1)}` : `${(across0 + w).toFixed(1)} ${a.toFixed(1)}`);
-  // One side out, the mirror side back. Each step is a curve with level control points, so the
-  // outline has no corners and never overshoots a band's width.
-  const side = (sign: 1 | -1, list: [number, number][]) => {
-    let d = '';
-    for (let i = 1; i < list.length; i++) {
-      const [a0, w0] = list[i - 1];
-      const [a1, w1] = list[i];
-      const mid = (a0 + a1) / 2;
-      d += `C${xy(mid, sign * w0)} ${xy(mid, sign * w1)} ${xy(a1, sign * w1)}`;
-    }
-    return d;
-  };
-  return `M${xy(start, 0)}${side(1, points)}${side(-1, [...points].reverse())}Z`;
-}
-
-/** ", 2007-03-25 12:00 UTC" for "2007-03-25T12:00Z": the time of the still's frame, as the scene file gives it. */
-function stillTime(iso?: string): string {
-  return iso ? `, ${iso.replace('T', ' ').replace('Z', ' UTC')}` : '';
-}

@@ -27,12 +27,13 @@ function noteFor(key: string, times: string[]): string {
     return `GEOS-FP model output, one still (${times[0] ?? 'time unknown'}). Measured at its own settings: don't compare its numbers with the ocean's.`;
   if (key === 'imerg')
     return `GPM IMERG satellite rain estimates, first of ${times.length} hourly frames (${times[0] ?? '?'} to ${times[times.length - 1] ?? '?'}). Don't compare its numbers with other sources.`;
-  return `ECCO2 model output, first frame of the run (${times[0] ?? 'model time unknown'}).`;
+  if (key === 'ocean' || key === 'practice') return `ECCO2 model output, first frame of the run (${times[0] ?? 'model time unknown'}).`;
+  return `First frame (${times[0] ?? 'time unknown'}). Measured at its own settings: don't compare its numbers with other sources.`;
 }
 
 export const GLOBE_SOURCES: GlobeSource[] = PICTURES.map((p) => ({
   key: p.key,
-  label: LABEL[p.key],
+  label: LABEL[p.key] ?? p.label,
   scene: p.scene,
   features: p.features,
   imageUrl: p.imageUrl,

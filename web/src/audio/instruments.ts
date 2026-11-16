@@ -2,7 +2,7 @@
 // Every sound here is synthesised by this code in the browser (no samples, no recordings), and
 // none of it touches the Earth voice, which keeps its own synth and its own path to the speakers.
 //
-// Why these sounds (docs/mapping_spec.md, "Play along: the picture scan"):
+// Why these sounds (docs/mapping_spec.md, "The picture scan: what Listen plays"):
 // - Struck bars. A marimba, glockenspiel or music-box note is a few pure tones that fade at
 //   different speeds. Where the tones lie comes from how the bar is held:
 //     free at both ends (glockenspiel): frequencies in the ratio (x_n / x_1)^2 with

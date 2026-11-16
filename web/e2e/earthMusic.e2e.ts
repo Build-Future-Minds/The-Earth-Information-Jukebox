@@ -12,7 +12,7 @@ interface BandBeat {
 const bandLog = (page: Page) => page.evaluate(() => (window as unknown as { __earthBand: BandBeat[] }).__earthBand);
 
 test('the band strikes only on beat starts, where the first pulse is, never near a second pulse', async ({ page }) => {
-  await openApp(page);
+  await openApp(page, 'play'); // Listen plays the picture scan (D1); the Earth rhythm is on Play along and Compare
   await startWithKeyboard(page); // Region A: no missing steps
   const notes = await notesAfter(page, 0, 24);
   const band = (await bandLog(page)).filter((b) => b.audioTime <= notes[notes.length - 1].audioTime);
@@ -42,8 +42,7 @@ test('the band steps aside while the picture scan plays; the Earth rhythm goes o
 });
 
 test('Earth sound: choosing the plain pulse changes the sound, not the notes', async ({ page }) => {
-  await openApp(page);
-  await page.getByRole('button', { name: 'Sound', exact: true }).click();
+  await openApp(page, 'play');
   const choice = page.getByRole('combobox', { name: 'Earth sound' });
   await expect(choice).toHaveValue('band');
   await startWithKeyboard(page);

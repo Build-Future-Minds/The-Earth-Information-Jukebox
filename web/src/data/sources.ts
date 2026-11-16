@@ -3,21 +3,24 @@
 //   ocean     SVS 3912, data/           30 frames, regions A and B (EIC visualization, model output)
 //   aerosols  SVS 5669, data/aerosols/  one still, regions C and D (a challenge resource, not EIC)
 //   imerg     SVS 4285, data/imerg/     30 hourly frames, regions E and F (EIC, satellite observations)
+//   <folder>  data/<folder>/            any other picture: it appears by itself (P1, Listen step 1)
 //   practice  fixtures/mock/            test input only, regions A and B
 //
-// PICTURES is every picture with a scene (the globe shows them all). SOURCES is the pictures that
-// have measurements (features.json), which the app can play.
+// A picture is found by its files: data/scene.json for the ocean (the ACTIVE dataset), and every
+// data/<folder>/scene.json. PICTURES is every picture with a scene (the globe shows them all).
+// SOURCES is the pictures that also have measurements (features.json): the app plays those.
 //
 // Never compare numbers between pictures (Dev A, 15 Nov): each is drawn and measured with its own
 // settings. Every comparison helper here takes ONE source, so two pictures can never meet.
 import type { EarthTrack } from '../audio/earthVoice';
-import { LINE_GRID, RADAR_GRID, STRENGTH_FLOOR, type Pixels, type ScanMeasure } from '../audio/scanScore';
+import { LINE_GRID, RADAR_GRID, STRENGTH_FLOOR, TEST_CIRCLE, type Pixels, type ScanMeasure } from '../audio/scanScore';
 import { OCEAN_LAND, type LandRule } from '../globe/geo';
 import { ACTIVE, type Dataset } from './dataset';
 import { makeAerosolTestPicture, makeRainTestMask, makeRainTestPicture } from './testPictures';
 import type { Features, Region, Scene } from './types';
 
-export type SourceKey = 'ocean' | 'aerosols' | 'imerg' | 'practice';
+/** 'ocean', 'practice', or the picture's folder in data/ ('aerosols', 'imerg', ...). */
+export type SourceKey = string;
 
 /**
  * How the picture scan ("Play along") reads one picture. Every picture has its own: the settings
@@ -57,13 +60,18 @@ export interface Picture extends Omit<Dataset, 'features'> {
   key: SourceKey;
   /** One word for the picture button: "Ocean", "Aerosols", "Rain", "Practice". */
   label: string;
+  /** The short name on Listen's picture list ("Sea surface currents and temperature"). NASA's own
+   *  title is `scene.source.title`, never typed here. */
+  short: string;
+  /** What kind of data it is, in a few words ("Model output (ECCO2)"). */
+  kind: string;
   /** null until Dev A has measured the picture. */
   features: Features | null;
   /** Letter of the picture's first region; the next region gets the next letter. */
-  firstLetter: 'A' | 'C' | 'E';
+  firstLetter: string;
   /** 'hue': violet and rose (DESIGN.md). 'neutral': ink and white, for pictures that use those hues. */
   regionStyle: 'hue' | 'neutral';
-  resource: 'eic' | 'challenge' | 'practice';
+  resource: 'eic' | 'challenge' | 'practice' | 'unknown';
   /** What flat land looks like (globe land check); null when the land is a photo. */
   landRule: LandRule | null;
   /** How the picture scan reads this picture; null until it has been measured (the scan does not
@@ -79,26 +87,38 @@ export interface Source extends Picture {
   features: Features;
 }
 
-function fromData(folder: 'aerosols' | 'imerg', json: Record<string, { default: unknown }>, images: Record<string, string>) {
-  const scene = json[`../../../data/${folder}/scene.json`]?.default as Scene | undefined;
-  const features = (json[`../../../data/${folder}/features.json`]?.default as Features | undefined) ?? null;
-  return scene ? { scene, features, imageUrl: Object.values(images)[0] ?? null, origin: 'data/' as const } : null;
+// ---------- Finding the pictures: every data/<folder>/scene.json ----------
+
+// Written by analysis/prepare_scene.py --source svs5669 / svs4285 (and any later source).
+const SCENES = import.meta.glob<{ default: unknown }>('../../../data/*/scene.json', { eager: true });
+const FEATURES = import.meta.glob<{ default: unknown }>('../../../data/*/features.json', { eager: true });
+const PREVIEWS = import.meta.glob<string>('../../../data/*/preview.{jpg,jpeg,png,webp}', { eager: true, query: '?url', import: 'default' });
+/** Each picture's scan mask, if it has one (analysis/scan_mask.py): white = never read. */
+const MASKS = import.meta.glob<string>('../../../data/*/scan_mask.png', { eager: true, query: '?url', import: 'default' });
+
+const folderOf = (path: string) => /\/data\/([^/]+)\//.exec(path)![1];
+
+/** The folders in data/ that hold a scene.json, in name order. */
+export const SCENE_FOLDERS: string[] = Object.keys(SCENES).map(folderOf).sort();
+
+function fromFolder(folder: string) {
+  const scene = SCENES[`../../../data/${folder}/scene.json`]?.default as Scene | undefined;
+  if (!scene) return null;
+  const features = (FEATURES[`../../../data/${folder}/features.json`]?.default as Features | undefined) ?? null;
+  const preview = Object.entries(PREVIEWS).find(([path]) => folderOf(path) === folder)?.[1] ?? null;
+  return { scene, features, imageUrl: preview, origin: 'data/' as const };
 }
 
-// Written by analysis/prepare_scene.py --source svs5669 / svs4285.
-const aerosols = fromData(
-  'aerosols',
-  import.meta.glob<{ default: unknown }>('../../../data/aerosols/{scene,features}.json', { eager: true }),
-  import.meta.glob<string>('../../../data/aerosols/preview.{jpg,jpeg,png,webp}', { eager: true, query: '?url', import: 'default' }),
-);
-const imerg = fromData(
-  'imerg',
-  import.meta.glob<{ default: unknown }>('../../../data/imerg/{scene,features}.json', { eager: true }),
-  import.meta.glob<string>('../../../data/imerg/preview.{jpg,jpeg,png,webp}', { eager: true, query: '?url', import: 'default' }),
-);
+/** "Model output" for a picture we have no words for yet, from its scene.json. */
+const KIND_WORDS: Record<Scene['source']['data_kind'], string> = {
+  model_output: 'Model output',
+  observation: 'Observations',
+  artistic_rendering: 'Artistic rendering',
+  synthetic_test_input: 'Test input, not NASA data',
+};
+
 /** The rain picture's scan mask (analysis/scan_mask.py): its land, a photo, is never read. */
-const imergMask: string | null =
-  Object.values(import.meta.glob<string>('../../../data/imerg/scan_mask.png', { eager: true, query: '?url', import: 'default' }))[0] ?? null;
+const imergMask: string | null = MASKS['../../../data/imerg/scan_mask.png'] ?? null;
 
 // ---------- The picture scan's rule for each picture ----------
 
@@ -278,6 +298,8 @@ function practicePictures(practice: Picture): Picture[] {
     ...practice,
     key: 'aerosols',
     label: 'Aerosols',
+    short: 'Aerosols',
+    kind: 'Test input, not NASA data',
     firstLetter: 'C',
     regionStyle: 'neutral',
     scan: testRule(AEROSOLS_SCAN, null),
@@ -288,6 +310,8 @@ function practicePictures(practice: Picture): Picture[] {
       ...practice,
       key: 'imerg',
       label: 'Rain',
+      short: 'Rain',
+      kind: 'Test input, not NASA data',
       firstLetter: 'E',
       regionStyle: 'neutral',
       scan: testRule(IMERG_SCAN, 'the block that stands for land'),
@@ -297,16 +321,65 @@ function practicePictures(practice: Picture): Picture[] {
   return list;
 }
 
+/** What the app knows about each picture beyond its scene.json: the words on screen, the region
+ *  look, and its scan rule. A folder not listed here still appears, with neutral regions, its
+ *  NASA title as its name, and no scan until it has been measured. */
+const KNOWN: Record<string, Pick<Picture, 'label' | 'short' | 'kind' | 'firstLetter' | 'regionStyle' | 'resource' | 'landRule' | 'scan'>> = {
+  // Aerosol land is dull grey-green (same rule as prepare_scene.py).
+  aerosols: { label: 'Aerosols', short: 'Aerosols', kind: 'Model output (GEOS-FP)', firstLetter: 'C', regionStyle: 'neutral', resource: 'challenge', landRule: [30, 95, 12], scan: AEROSOLS_SCAN },
+  // Rain: the land is a satellite photo, so no colour rule finds it (prepare_scene.py uses the ocean outline).
+  imerg: { label: 'Rain', short: 'Precipitation (GPM IMERG)', kind: 'Satellite estimates', firstLetter: 'E', regionStyle: 'neutral', resource: 'eic', landRule: null, scan: IMERG_SCAN },
+};
+/** The known pictures come first, in this order; any other folder follows, by name. */
+const ORDER = ['aerosols', 'imerg'];
+
 function pickPictures(): Picture[] {
   if (ACTIVE.origin === 'fixtures/mock/') {
-    const practice: Picture = { ...ACTIVE, key: 'practice', label: 'Practice', firstLetter: 'A', regionStyle: 'hue', resource: 'practice', landRule: OCEAN_LAND, scan: PRACTICE_SCAN };
+    const practice: Picture = {
+      ...ACTIVE,
+      key: 'practice',
+      label: 'Practice',
+      short: 'Practice picture',
+      kind: 'Test input, not NASA data',
+      firstLetter: 'A',
+      regionStyle: 'hue',
+      resource: 'practice',
+      landRule: OCEAN_LAND,
+      scan: PRACTICE_SCAN,
+    };
     return import.meta.env.VITE_DATASET === 'practice-pictures' ? practicePictures(practice) : [practice];
   }
-  const list: Picture[] = [{ ...ACTIVE, key: 'ocean', label: 'Ocean', firstLetter: 'A', regionStyle: 'hue', resource: 'eic', landRule: OCEAN_LAND, scan: OCEAN_SCAN }];
-  // Aerosol land is dull grey-green (same rule as prepare_scene.py).
-  if (aerosols) list.push({ ...aerosols, key: 'aerosols', label: 'Aerosols', firstLetter: 'C', regionStyle: 'neutral', resource: 'challenge', landRule: [30, 95, 12], scan: AEROSOLS_SCAN });
-  // Rain: the land is a satellite photo, so no colour rule finds it (prepare_scene.py uses the ocean outline).
-  if (imerg) list.push({ ...imerg, key: 'imerg', label: 'Rain', firstLetter: 'E', regionStyle: 'neutral', resource: 'eic', landRule: null, scan: IMERG_SCAN });
+  const list: Picture[] = [
+    { ...ACTIVE, key: 'ocean', label: 'Ocean', short: 'Sea surface currents and temperature', kind: 'Model output (ECCO2)', firstLetter: 'A', regionStyle: 'hue', resource: 'eic', landRule: OCEAN_LAND, scan: OCEAN_SCAN },
+  ];
+  const folders = [...ORDER.filter((f) => SCENE_FOLDERS.includes(f)), ...SCENE_FOLDERS.filter((f) => !ORDER.includes(f))];
+  const used = new Set(['A', 'C', 'E']);
+  for (const folder of folders) {
+    const data = fromFolder(folder);
+    if (!data) continue;
+    const known = KNOWN[folder];
+    if (known) {
+      list.push({ ...data, key: folder, ...known });
+      continue;
+    }
+    // A picture nobody has described yet: the next free pair of letters, neutral regions (they may
+    // share hues with its data), and no scan until `npm run measure` has measured it.
+    let letter = 'G';
+    while (used.has(letter)) letter = String.fromCharCode(letter.charCodeAt(0) + 2);
+    used.add(letter);
+    list.push({
+      ...data,
+      key: folder,
+      label: folder,
+      short: data.scene.source.title,
+      kind: KIND_WORDS[data.scene.source.data_kind] ?? data.scene.source.data_kind,
+      firstLetter: letter,
+      regionStyle: 'neutral',
+      resource: 'unknown',
+      landRule: null,
+      scan: null,
+    });
+  }
   return list;
 }
 
@@ -381,5 +454,35 @@ export function natureLine(p: { scene: Scene }): string {
 export function describesLine(picture: { key: SourceKey }): string {
   if (picture.key === 'aerosols') return 'It describes the picture, not air quality or amounts.';
   if (picture.key === 'imerg') return 'It describes the picture, not rainfall amounts.';
-  return 'It describes the picture, not water speed or ocean health.';
+  if (picture.key === 'ocean' || picture.key === 'practice') return 'It describes the picture, not water speed or ocean health.';
+  return 'It describes the picture, not the amounts it shows.';
+}
+
+// ---------- What the picture scan can play on a picture ----------
+
+/** What the scan reads: the whole picture ('map', the map sweep) or one circle (its id, the radar). */
+export type ScanTarget = 'map' | string;
+
+/** The circles the radar can turn in: the picture's regions, or the one test circle on the TEST
+ *  INPUT picture that stands in for a NASA picture in practice mode. */
+export function scanRegions(p: Picture): Region[] {
+  return p.imageUrl ? p.scene.regions : [TEST_CIRCLE];
+}
+
+/** "Region C" (the picture's own letters), or "Test circle" on the TEST picture. */
+export function targetName(p: Picture, target: ScanTarget): string {
+  if (target === 'map') return 'Whole picture';
+  if (!p.imageUrl) return 'Test circle';
+  return `Region ${regionLetter(p, target)}`;
+}
+
+/** "30 hourly frames", "30 frames", "1 still": how many frames NASA's picture has, from its scene. */
+export function framesText(scene: Scene): { count: number; words: string } {
+  const count = scene.frames.count;
+  if (count <= 1) return { count: 1, words: 'still' };
+  const times = (scene.frames.timestamps ?? []).map((t) => Date.parse(t));
+  const steps = times.slice(1).map((t, i) => t - times[i]);
+  const even = steps.length > 0 && steps.every((s) => Number.isFinite(s) && s === steps[0]);
+  const every = even ? ({ 3_600_000: 'hourly ', 86_400_000: 'daily ' } as Record<number, string>)[steps[0]] ?? '' : '';
+  return { count, words: `${every}frames` };
 }
