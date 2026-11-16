@@ -19,6 +19,7 @@ import {
   type ScanMeasure,
   type ScanScore,
 } from '../audio/scanScore';
+import { cellCentre } from '../audio/scanPick';
 import type { WhyContext } from '../audio/scanWhy';
 import { regionLabel } from '../components/ExploreControls';
 import { loadPicture, type LoadedPicture } from './loadPicture';
@@ -224,7 +225,8 @@ export function useScan({ scene, imageUrl, speed, measure }: ScanOptions) {
   };
 }
 
-/** Centre of a chime's cell on the picture, in frame pixels. */
+/** Centre of a chime's cell on the picture, in frame pixels. The same formula a click on the picture
+ *  is inverted from (audio/scanPick.ts, tested there), so a mark and a click on it name the same cell. */
 export function chimePosition(
   chime: Chime,
   columns: number,
@@ -232,12 +234,11 @@ export function chimePosition(
   frame: { width: number; height: number },
   region?: { center_px: [number, number]; radius_px: number },
 ): [number, number] {
-  if (!region) {
-    return [((chime.column + 0.5) / columns) * frame.width, frame.height - ((chime.band + 0.5) / bands) * frame.height];
-  }
-  const angle = (2 * Math.PI * (chime.column + 0.5)) / columns;
-  const radius = (region.radius_px * (chime.band + 0.5)) / bands;
-  return [region.center_px[0] + radius * Math.cos(angle), region.center_px[1] - radius * Math.sin(angle)];
+  return cellCentre(
+    chime,
+    { columns, bands },
+    region ? { kind: 'radar', frame, center: region.center_px, radius: region.radius_px } : { kind: 'line', frame, pixels: frame },
+  );
 }
 
 /** "143° W": where the line is on the map. The NASA frame runs from 180° W at the left edge to 180° E. */

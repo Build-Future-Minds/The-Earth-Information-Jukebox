@@ -218,6 +218,62 @@ export function explainBand(why: BandWhy): string {
   return [sentence1, sentence2, sentence3, explainChime(why)].join(' ');
 }
 
+/** A cell's struck note in a few words, as the table's "Struck note" column gives it. */
+export function chimeSummary(c: ChimeWhy): string {
+  if (c.status === 'struck') return `${c.instrument} ${c.name}`;
+  if (c.status === 'left out') return c.reason === 'spacing' ? 'peak, left out: too close to a stronger one' : 'peak, left out: a stronger peak in this column';
+  return c.reason === 'no colour' ? 'none: no colour' : c.reason === 'below level' ? 'none: below the peak level' : 'none: not a peak';
+}
+
+/** A cell's held note in a few words, as the table's "Held note" column gives it. */
+export function heldSummary(why: BandWhy): string {
+  return why.level > 0 ? `${why.held.name} at ${Math.round(100 * why.level)}%` : `${why.held.name}, silent`;
+}
+
+/** Which band of a column is explained in full: the one the listener picked (with the list, or by
+ *  clicking the picture), else the loudest struck note, else the loudest held note, else the lowest band. */
+export function chosenBand(list: BandWhy[], pick: number | null): BandWhy {
+  if (pick !== null && list[pick]) return list[pick];
+  const struck = list.filter((b) => b.chime.status === 'struck').sort((a, b) => b.level - a.level)[0];
+  return struck ?? [...list].sort((a, b) => b.level - a.level)[0] ?? list[0];
+}
+
+/** The struck note nearest a cell in the same band, and how many columns away it is (negative is
+ *  earlier). On the radar the distance is taken round the circle, so the ends of the turn are
+ *  neighbours. Of two equally near, the earlier wins. Null when the band has no struck note. */
+export function nearestStruck(score: ScanScore, column: number, band: number): { chime: Chime; offset: number } | null {
+  const { columns } = score.grid;
+  let best: { chime: Chime; offset: number } | null = null;
+  for (const chime of score.chimes) {
+    if (chime.band !== band) continue;
+    let offset = chime.column - column;
+    if (score.shape === 'radar') {
+      offset = ((offset % columns) + columns) % columns; // 0 to columns − 1 later
+      if (offset > columns / 2) offset -= columns; // or that many earlier, whichever is nearer
+    }
+    const nearer = !best || Math.abs(offset) < Math.abs(best.offset) || (Math.abs(offset) === Math.abs(best.offset) && offset < best.offset);
+    if (nearer) best = { chime, offset };
+  }
+  return best;
+}
+
+/**
+ * The line under the picture about the place being explained: which cell, its held note and its
+ * struck note in the table's words. Where no note is struck, the nearest struck note in the same band,
+ * so a click on the middle of a spot of colour can find the note that spot made.
+ */
+export function explainPick(why: BandWhy, score: ScanScore, ctx: WhyContext): string {
+  const { columns, seconds } = score.grid;
+  const head = `Column ${why.column + 1} of ${columns}, band ${why.band + 1}. Held note: ${heldSummary(why)}. Struck note: ${chimeSummary(why.chime)}.`;
+  if (why.chime.status === 'struck') return head;
+  const near = nearestStruck(score, why.column, why.band);
+  if (!near) return `${head} No note is struck in this band in this sweep.`;
+  const steps = Math.abs(near.offset);
+  const when = `${steps} column${steps === 1 ? '' : 's'} ${near.offset < 0 ? 'earlier' : 'later'} (${trim((steps * seconds) / columns)} s at normal speed)`;
+  const name = `${near.chime.warm ? ctx.names.warm : ctx.names.cool} ${noteName(chimeNote(near.chime))}`;
+  return `${head} Nearest struck note in this band: column ${near.chime.column + 1}, ${when}: ${name}.`;
+}
+
 /** The low note: which one, why, and what the picture sets about it. */
 export function explainRoot(root: { name: string; loudness: number }, seconds: number, bands: number): string {
   return (

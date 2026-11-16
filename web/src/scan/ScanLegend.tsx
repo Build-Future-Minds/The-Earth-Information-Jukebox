@@ -41,6 +41,22 @@ export function ScanLegend({ sound, order, radar }: { sound: ScanSoundDef; order
         </svg>
         <span><strong>Ring.</strong> Spreads from a mark at the moment its note sounds. The mark stays until the sweep ends.</span>
       </li>
+      <li>
+        <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+          <g fill="none" strokeLinecap="round" stroke="#000" strokeWidth="3.5">
+            <rect x="13" y="6" width="4" height="10" />
+            <path d="M15 1V3.5M15 18.5V21M5 11H10M20 11H25" />
+          </g>
+          <g fill="none" strokeLinecap="round" stroke="#fff" strokeWidth="1.5">
+            <rect x="13" y="6" width="4" height="10" />
+            <path d="M15 1V3.5M15 18.5V21M5 11H10M20 11H25" />
+          </g>
+        </svg>
+        <span>
+          <strong>Outlined cell with four ticks.</strong> The place explained in “Why the scan sounds like this”, chosen with its
+          column slider or by clicking the picture.
+        </span>
+      </li>
       {radar && (
         <li>
           <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
