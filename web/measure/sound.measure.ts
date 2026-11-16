@@ -1,7 +1,7 @@
 // Records the running app in headless Chromium and measures the picture scan's sound.
 // Writes docs/measurements/scan_sound.*. The recording and the meter are in tap.ts and meter.ts;
 // this file presses the buttons a person would press and writes the report.
-// Run: npm run measure   (from web/). It plays in real time, so it takes several minutes.
+// Run: npm run measure   (from web/). It plays in real time, so it takes several minutes (about ten).
 //
 // Each picture is recorded with its own scan rule and reported in its own section: no table holds
 // two pictures, and no number of one picture is compared with another's.
@@ -36,6 +36,8 @@ interface ScanNote {
   band: number;
   colour: string;
   note: number;
+  root: number;
+  pan: number;
 }
 /** The chimes of one sweep, timed from its start (seconds). */
 interface SweepChime {
@@ -76,9 +78,15 @@ const sweepNotes = (notes: ScanNote[], began: number, seconds: number): SweepChi
 const sameChimes = (a: SweepChime[], b: SweepChime[]) =>
   a.length === b.length && a.every((n, i) => n.column === b[i].column && n.band === b[i].band && n.colour === b[i].colour && n.note === b[i].note && Math.abs(n.at - b[i].at) < 0.001);
 
+/** Open "Scan settings" if it is folded away (it is, by default). */
+async function openSettings(page: Page) {
+  const open = await page.locator('details.scan-settings').evaluate((d) => (d as HTMLDetailsElement).open);
+  if (!open) await page.getByText('Scan settings', { exact: true }).click();
+}
+
 /** Every scan of the picture now on Play along: one sweep each, measured whole and in sixths. */
 async function sweepEach(page: Page) {
-  await page.getByText('Scan settings', { exact: true }).click(); // folded away by default
+  await openSettings(page);
   const choice = page.locator('.scan select').first();
   const names = await choice.locator('option').allTextContents();
   const sweeps: { name: string; measured: Measured; firstSixth: Measured; lastSixth: Measured }[] = [];
@@ -130,7 +138,64 @@ async function everythingThenStop(page: Page) {
   const afterStop = await tap<Measured>(page, `measureBetween(${stopped + 0.15}, ${stopped + 2.15})`);
   const beforeStop = await tap<Measured>(page, `measureBetween(${stopped - 2}, ${stopped - 0.2})`);
   for (const key of keys) await page.keyboard.up(key);
+  await page.waitForTimeout(2500); // let the echo die away
   return { keys, seconds: together.seconds, allVoices, beforeStop, afterStop };
+}
+
+const SAME_SCORE_SECONDS = 10;
+interface SameScore {
+  sound: string;
+  chimes: number;
+  same: boolean;
+  /** Largest gap between a chime's time from the start of its sweep and the same chime's in the first sound, in seconds. */
+  largestTimeDifference: number;
+}
+
+/**
+ * Every scan sound plays the same score: the first 10 s of the map sweep of the picture now on
+ * Play along, once with each scan sound. The browser test (e2e/scan.e2e.ts) compares the sounds on
+ * the test picture, which has only two chimes in 10 s; here, the real picture. Run for the ocean
+ * picture only: the sounds differ only in instruments, not in what a picture says.
+ */
+async function sameScoreEachSound(page: Page): Promise<SameScore[]> {
+  await openSettings(page);
+  await page.locator('.scan select').first().selectOption({ index: 0 }); // the whole picture
+  const sounds = page.getByLabel('Scan sound');
+  const soundNames = await sounds.locator('option').allTextContents();
+  const scores: { sound: string; chimes: { column: number; band: number; colour: string; note: number; root: number; pan: number; at: number }[] }[] = [];
+  for (const sound of soundNames) {
+    await sounds.selectOption({ label: sound });
+    await expect(playButton(page)).toBeEnabled();
+    const before = (await scanNotes(page)).length;
+    const sweepsBefore = (await sweepLog(page)).length;
+    await playButton(page).click();
+    const { columns, seconds } = await grid(page);
+    await page.waitForTimeout((SAME_SCORE_SECONDS + 1) * 1000);
+    const start = (await sweepLog(page))[sweepsBefore];
+    expect(start, `${sound}: the sweep's start was not logged`).toBeTruthy();
+    const notes = (await scanNotes(page)).slice(before);
+    expect(notes.length, `${sound}: no chime was played`).toBeGreaterThan(0);
+    const began = start.audioTime;
+    // The first 10 s are the columns that start before 10 s, chosen by column: a chime can start at
+    // exactly 10.000 s, and a time worked out from the audio clock can land a hair either side of it.
+    const lastColumn = Math.ceil((SAME_SCORE_SECONDS * columns) / seconds) - 1;
+    scores.push({
+      sound,
+      chimes: notes
+        .filter((n) => n.column <= lastColumn)
+        .map((n) => ({ column: n.column, band: n.band, colour: n.colour, note: n.note, root: n.root, pan: n.pan, at: n.audioTime - began })),
+    });
+    await page.keyboard.press('Escape');
+    await expect(page.getByText('Scan stopped.')).toBeVisible();
+    await page.waitForTimeout(2500);
+  }
+  const without = (c: (typeof scores)[number]['chimes'][number]) => [c.column, c.band, c.colour, c.note, c.root, c.pan];
+  return scores.map((s) => ({
+    sound: s.sound,
+    chimes: s.chimes.length,
+    same: s.chimes.length === scores[0].chimes.length && s.chimes.every((c, i) => JSON.stringify(without(c)) === JSON.stringify(without(scores[0].chimes[i]))),
+    largestTimeDifference: Math.max(0, ...s.chimes.map((c, i) => (scores[0].chimes[i] ? Math.abs(c.at - scores[0].chimes[i].at) : Infinity))),
+  }));
 }
 
 /**
@@ -184,7 +249,9 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   const pictures: {
     label: string;
     sweeps: Awaited<ReturnType<typeof sweepEach>>['sweeps'];
-    together: Awaited<ReturnType<typeof everythingThenStop>>;
+    together: Awaited<ReturnType<typeof everythingThenStop>> & { attempts: number };
+    /** Every scan sound plays the same score: the ocean picture only, else null. */
+    sameScore: SameScore[] | null;
     globe: Awaited<ReturnType<typeof globeSweep>>;
   }[] = [];
   for (const label of labels.length ? labels : ['Ocean']) {
@@ -194,9 +261,17 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
       await expect(page.getByText(/^Reading the /)).toContainText(label === 'Ocean' ? 'ocean' : label.toLowerCase());
     }
     const { sweeps, wholePicture } = await sweepEach(page);
-    const together = await everythingThenStop(page);
+    // A gap in this recording is a dropped block, not silence, and the largest sample could hide in
+    // it (a picture with a big still keeps the page busy). Record this take again, up to three more times.
+    let together = await everythingThenStop(page);
+    let attempts = 1;
+    while (together.allVoices.recorded <= 0.99 && attempts < 4) {
+      together = await everythingThenStop(page);
+      attempts++;
+    }
+    const sameScore = label === 'Ocean' ? await sameScoreEachSound(page) : null;
     const globe = await globeSweep(page, wholePicture);
-    pictures.push({ label, sweeps, together, globe });
+    pictures.push({ label, sweeps, together: { ...together, attempts }, sameScore, globe });
   }
 
   // ---------- Report ----------
@@ -251,6 +326,7 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
     const t = p.together;
     out.push('### Everything at once, then Stop', '');
     out.push(`The Earth rhythm, this picture's map sweep and a melody chord of ${t.keys.length} keys (${t.keys.join(', ').toUpperCase()}) held together for ${t.seconds} s, then Esc.`, '');
+    if (t.attempts > 1) out.push(`This take was recorded ${t.attempts} times: the browser dropped audio blocks from the first ${t.attempts - 1}, and a gap could hide the largest sample, so only a whole recording (more than 99% of the time) is reported.`, '');
     out.push(
       table(
         ['', 'Loudness', 'Largest sample', 'Share of the time recorded'],
@@ -262,6 +338,20 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
       ),
       '',
     );
+    if (p.sameScore) {
+      out.push('### Every scan sound plays the same score', '');
+      out.push(
+        `Each scan sound plays the map sweep of the ${p.label.toLowerCase()} picture; every chime in its first ${SAME_SCORE_SECONDS} s (the columns that start before ${SAME_SCORE_SECONDS} s) is compared with the first sound's: column, band, instrument (warm, cool or blue), note, root and left–right position, and its time from the start of the sweep.`,
+        '',
+      );
+      out.push(
+        table(
+          ['Scan sound', `Chimes in the first ${SAME_SCORE_SECONDS} s`, 'Same chimes as the first sound', 'Largest time difference'],
+          p.sameScore.map((s) => [s.sound, s.chimes, s.same ? 'yes' : 'no', Number.isFinite(s.largestTimeDifference) ? `${(1000 * s.largestTimeDifference).toFixed(1)} ms` : 'a chime is missing']),
+        ),
+        '',
+      );
+    }
     const g = p.globe;
     out.push('### One sweep on the globe', '');
     out.push('The whole picture played on the Globe tab, with the line drawn round the globe while it plays.', '');
@@ -291,14 +381,22 @@ test('measure the sound of the picture scan', async ({ page, browser }) => {
   writeFileSync(resolve(folder, 'scan_sound.md'), out.join('\n'));
   console.log(out.join('\n'));
 
-  // The claims under test: more level, more sound; nothing clips; Stop leaves silence; the globe plays what Play along plays.
+  // The claims under test: more level, more sound; nothing clips; Stop leaves silence; every scan
+  // sound plays the same score; the globe plays what Play along plays.
   for (let i = 1; i < steps.steps.length; i++) {
     expect(steps.steps[i].toneDb, `level ${steps.steps[i].level} must be louder than ${steps.steps[i - 1].level}`).toBeGreaterThan(steps.steps[i - 1].toneDb);
   }
   for (const p of pictures) {
     for (const s of p.sweeps) expect(s.measured.peakDb, `${p.label}, ${s.name}: a sample at full scale`).toBeLessThan(0);
+    // Three voices are sounding, so the recording must be whole: a gap there is a dropped block, not
+    // silence, and the largest sample could be in it.
+    expect(p.together.allVoices.recorded, `${p.label}: part of the recording of all three voices is missing; run again`).toBeGreaterThan(0.99);
     expect(p.together.allVoices.peakDb, `${p.label}: all voices together reach full scale`).toBeLessThan(0);
     expect(Number.isFinite(p.together.afterStop.peakDb) ? p.together.afterStop.peakDb : -Infinity, `${p.label}: sound after Stop`).toBeLessThan(-80);
+    for (const s of p.sameScore ?? []) {
+      expect(s.same, `${p.label}, ${s.sound}: not the same chimes as ${p.sameScore![0].sound}`).toBe(true);
+      expect(s.largestTimeDifference, `${p.label}, ${s.sound}: a chime at another time`).toBeLessThan(0.005);
+    }
     expect(p.globe.same, `${p.label}: the globe sweep has ${p.globe.chimes} chimes, Play along ${p.globe.flatChimes}`).toBe(true);
   }
 });

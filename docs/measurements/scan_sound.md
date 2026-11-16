@@ -2,7 +2,7 @@
 
 Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.
 
-Recorded 2026-11-16 05:13 UTC in Chromium 159.0.8154.6 (headless), on commit 9e282f1 with uncommitted changes.
+Recorded 2026-11-16 06:01 UTC in Chromium 159.0.8154.6 (headless), on commit c88871c with uncommitted changes.
 The recording is taken at the last point before the speakers, so every voice and its echo is in it.
 Loudness is integrated loudness (ITU-R BS.1770-4) in LUFS. Peaks are the largest sample, in dBFS; 0 is full scale.
 Nobody listened: these are measurements of a recording. Scan sound: Ocean choir. Volumes and speed: the app's defaults.
@@ -17,10 +17,10 @@ If loudness followed the level exactly, each doubling would add 6.02 dB to the t
 
 | Level in the score | Tone | Step up from the row above | Whole sound | Loudness |
 | --- | --- | --- | --- | --- |
-| 0.121 | -44.6 dB |  | -43.0 dB | -43.6 LUFS |
-| 0.251 | -38.5 dB | 6.20 dB | -36.9 dB | -37.2 LUFS |
-| 0.502 | -32.6 dB | 5.82 dB | -30.9 dB | -31.2 LUFS |
-| 1.000 | -26.7 dB | 5.92 dB | -24.8 dB | -25.3 LUFS |
+| 0.121 | -43.5 dB |  | -42.4 dB | -43.1 LUFS |
+| 0.251 | -37.3 dB | 6.27 dB | -36.4 dB | -36.7 LUFS |
+| 0.502 | -31.2 dB | 6.05 dB | -30.3 dB | -30.6 LUFS |
+| 1.000 | -25.3 dB | 5.90 dB | -24.1 dB | -24.7 LUFS |
 
 ## One struck note on each instrument, alone
 
@@ -28,13 +28,13 @@ C6 at full strength on each instrument, at the level its scan sound gives it, re
 
 | Scan sound | Instrument | Which notes | Level setting | Loudness | Largest sample |
 | --- | --- | --- | --- | --- | --- |
-| Ocean choir | marimba | warm (round mark) | 0.5 | -18.3 LUFS | -3.7 dBFS |
+| Ocean choir | marimba | warm (round mark) | 0.5 | -18.2 LUFS | -3.6 dBFS |
 | Ocean choir | bells | cool (diamond) | 0.3 | -19.5 LUFS | -5.5 dBFS |
 | Ocean choir | harp | third, blue side (asterisk) | 0.32 | -19.4 LUFS | -6.8 dBFS |
-| Music box | kalimba | warm (round mark) | 0.42 | -20.5 LUFS | -6.6 dBFS |
-| Music box | music box | cool (diamond) | 0.26 | -21.6 LUFS | -10.3 dBFS |
-| Music box | harp | third, blue side (asterisk) | 0.25 | -21.6 LUFS | -9.1 dBFS |
-| Plain (first instruments) | marimba | warm (round mark) | 0.5 | -18.2 LUFS | -3.6 dBFS |
+| Music box | kalimba | warm (round mark) | 0.42 | -20.5 LUFS | -6.5 dBFS |
+| Music box | music box | cool (diamond) | 0.26 | -21.6 LUFS | -10.2 dBFS |
+| Music box | harp | third, blue side (asterisk) | 0.25 | -21.5 LUFS | -9.0 dBFS |
+| Plain (first instruments) | marimba | warm (round mark) | 0.5 | -18.3 LUFS | -3.7 dBFS |
 | Plain (first instruments) | bells | cool (diamond) | 0.3 | -19.6 LUFS | -7.5 dBFS |
 | Plain (first instruments) | harp | third, blue side (asterisk) | 0.31 | -19.6 LUFS | -7.1 dBFS |
 
@@ -46,9 +46,9 @@ Each sweep is timed from the audio-clock moment its first column played (the pla
 
 | Scan | Seconds | Loudness | Largest sample | Left minus right, first sixth | Left minus right, last sixth |
 | --- | --- | --- | --- | --- | --- |
-| Whole picture: a line, west to east | 30.0 | -24.7 LUFS | -8.8 dBFS | 10.2 dB | -8.7 dB |
-| Region A: a radar turn | 15.0 | -24.6 LUFS | -11.1 dBFS | -7.6 dB | -7.2 dB |
-| Region B: a radar turn | 15.0 | -21.7 LUFS | -5.7 dBFS | -8.7 dB | -8.1 dB |
+| Whole picture: a line, west to east | 30.0 | -24.8 LUFS | -6.6 dBFS | 9.3 dB | -9.8 dB |
+| Region A: a radar turn | 15.0 | -24.7 LUFS | -10.9 dBFS | -8.8 dB | -8.5 dB |
+| Region B: a radar turn | 15.0 | -21.8 LUFS | -6.7 dBFS | -9.0 dB | -9.0 dB |
 
 ### Everything at once, then Stop
 
@@ -56,9 +56,19 @@ The Earth rhythm, this picture's map sweep and a melody chord of 4 keys (A, S, D
 
 |  | Loudness | Largest sample | Share of the time recorded |
 | --- | --- | --- | --- |
-| All three voices | -20.0 LUFS | -3.8 dBFS | 100% |
-| The 2 s before Stop | -20.5 LUFS | -6.5 dBFS | 100% |
+| All three voices | -20.5 LUFS | -3.7 dBFS | 100% |
+| The 2 s before Stop | -20.5 LUFS | -6.4 dBFS | 100% |
 | From 0.15 s to 2.15 s after Stop | silent | every sample is 0 | 100% |
+
+### Every scan sound plays the same score
+
+Each scan sound plays the map sweep of the ocean picture; every chime in its first 10 s (the columns that start before 10 s) is compared with the first sound's: column, band, instrument (warm, cool or blue), note, root and left–right position, and its time from the start of the sweep.
+
+| Scan sound | Chimes in the first 10 s | Same chimes as the first sound | Largest time difference |
+| --- | --- | --- | --- |
+| Ocean choir | 21 | yes | 0.0 ms |
+| Music box | 21 | yes | 0.0 ms |
+| Plain (first instruments) | 21 | yes | 0.0 ms |
 
 ### One sweep on the globe
 
@@ -66,7 +76,7 @@ The whole picture played on the Globe tab, with the line drawn round the globe w
 
 | Scan | Seconds | Loudness | Largest sample | Chimes | Same chimes as the Play along sweep |
 | --- | --- | --- | --- | --- | --- |
-| Globe: whole picture, a line | 30.0 | -25.2 LUFS | -8.9 dBFS | 68 | yes: column, band, instrument and note, at the same moment within 1 ms |
+| Globe: whole picture, a line | 30.0 | -24.8 LUFS | -8.0 dBFS | 68 | yes: column, band, instrument and note, at the same moment within 1 ms |
 
 The two sweeps are separate recordings, so their loudness differs by as much as any two runs of one sweep do; the chimes are the check.
 
@@ -78,9 +88,9 @@ Each sweep is timed from the audio-clock moment its first column played (the pla
 
 | Scan | Seconds | Loudness | Largest sample | Left minus right, first sixth | Left minus right, last sixth |
 | --- | --- | --- | --- | --- | --- |
-| Whole picture: a line, west to east | 30.0 | -27.1 LUFS | -10.9 dBFS | 10.3 dB | -9.2 dB |
-| Region C: a radar turn | 15.0 | -21.6 LUFS | -5.3 dBFS | -8.7 dB | -9.9 dB |
-| Region D: a radar turn | 15.0 | -53.6 LUFS | -36.4 dBFS | -8.2 dB | -8.4 dB |
+| Whole picture: a line, west to east | 30.0 | -27.5 LUFS | -12.1 dBFS | 9.9 dB | -9.8 dB |
+| Region C: a radar turn | 15.0 | -22.0 LUFS | -6.1 dBFS | -8.7 dB | -10.3 dB |
+| Region D: a radar turn | 15.0 | -54.0 LUFS | -37.7 dBFS | -8.5 dB | -8.5 dB |
 
 ### Everything at once, then Stop
 
@@ -88,8 +98,8 @@ The Earth rhythm, this picture's map sweep and a melody chord of 4 keys (A, S, D
 
 |  | Loudness | Largest sample | Share of the time recorded |
 | --- | --- | --- | --- |
-| All three voices | -20.8 LUFS | -3.9 dBFS | 100% |
-| The 2 s before Stop | -20.8 LUFS | -6.8 dBFS | 100% |
+| All three voices | -21.5 LUFS | -4.3 dBFS | 100% |
+| The 2 s before Stop | -21.6 LUFS | -7.2 dBFS | 100% |
 | From 0.15 s to 2.15 s after Stop | silent | every sample is 0 | 100% |
 
 ### One sweep on the globe
@@ -98,7 +108,7 @@ The whole picture played on the Globe tab, with the line drawn round the globe w
 
 | Scan | Seconds | Loudness | Largest sample | Chimes | Same chimes as the Play along sweep |
 | --- | --- | --- | --- | --- | --- |
-| Globe: whole picture, a line | 30.0 | -26.9 LUFS | -10.5 dBFS | 36 | yes: column, band, instrument and note, at the same moment within 1 ms |
+| Globe: whole picture, a line | 30.0 | -27.4 LUFS | -12.3 dBFS | 36 | yes: column, band, instrument and note, at the same moment within 1 ms |
 
 The two sweeps are separate recordings, so their loudness differs by as much as any two runs of one sweep do; the chimes are the check.
 
@@ -110,9 +120,9 @@ Each sweep is timed from the audio-clock moment its first column played (the pla
 
 | Scan | Seconds | Loudness | Largest sample | Left minus right, first sixth | Left minus right, last sixth |
 | --- | --- | --- | --- | --- | --- |
-| Whole picture: a line, west to east | 30.0 | -32.4 LUFS | -14.9 dBFS | 7.8 dB | -9.2 dB |
-| Region E: a radar turn | 15.0 | -24.5 LUFS | -8.0 dBFS | -9.4 dB | -10.7 dB |
-| Region F: a radar turn | 15.0 | -25.9 LUFS | -10.6 dBFS | -9.8 dB | -11.8 dB |
+| Whole picture: a line, west to east | 30.0 | -32.7 LUFS | -14.4 dBFS | 8.5 dB | -9.1 dB |
+| Region E: a radar turn | 15.0 | -23.8 LUFS | -7.8 dBFS | -10.5 dB | -12.3 dB |
+| Region F: a radar turn | 15.0 | -25.3 LUFS | -8.7 dBFS | -9.2 dB | -10.3 dB |
 
 ### Everything at once, then Stop
 
@@ -120,8 +130,8 @@ The Earth rhythm, this picture's map sweep and a melody chord of 4 keys (A, S, D
 
 |  | Loudness | Largest sample | Share of the time recorded |
 | --- | --- | --- | --- |
-| All three voices | -21.1 LUFS | -4.8 dBFS | 98% |
-| The 2 s before Stop | -20.8 LUFS | -6.0 dBFS | 100% |
+| All three voices | -21.9 LUFS | -5.3 dBFS | 100% |
+| The 2 s before Stop | -22.5 LUFS | -7.4 dBFS | 100% |
 | From 0.15 s to 2.15 s after Stop | silent | every sample is 0 | 100% |
 
 ### One sweep on the globe
@@ -130,7 +140,7 @@ The whole picture played on the Globe tab, with the line drawn round the globe w
 
 | Scan | Seconds | Loudness | Largest sample | Chimes | Same chimes as the Play along sweep |
 | --- | --- | --- | --- | --- | --- |
-| Globe: whole picture, a line | 30.0 | -32.0 LUFS | -14.9 dBFS | 16 | yes: column, band, instrument and note, at the same moment within 1 ms |
+| Globe: whole picture, a line | 30.0 | -31.8 LUFS | -14.4 dBFS | 16 | yes: column, band, instrument and note, at the same moment within 1 ms |
 
 The two sweeps are separate recordings, so their loudness differs by as much as any two runs of one sweep do; the chimes are the check.
 

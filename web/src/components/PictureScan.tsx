@@ -386,7 +386,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                 {' '}In this picture the {sound.warmName} means {rule.instruments.warm}; the {sound.coolName}, {rule.instruments.cool}
                 {rule.instruments.blue ? <>; the {sound.blueName}, {rule.instruments.blue}</> : null}.
                 {rule.measured.bar0SwitchValue !== undefined && (
-                  <> On NASA's colour bar for this picture the switch falls at about {Math.round(rule.measured.bar0SwitchValue)} °C, if the bar's scale is even. We measured the bar, not the sea.</>
+                  <> On NASA's colour bar for this picture the switch falls at about {rule.measured.bar0SwitchValue.toFixed(1)} °C, and the picture's lines use the bar's hues. We measured the bar and the picture's colours, not the sea.</>
                 )}
               </>
             )}

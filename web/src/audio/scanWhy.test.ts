@@ -285,10 +285,10 @@ describe('the fixed choices, for each picture', () => {
         expect(decoration).toEqual(expect.arrayContaining(['scale', 'bar-tones', 'low-note', 'pan', 'scan-sound']));
       });
 
-      it('an unverified choice says what is missing', () => {
-        const unverified = choices.filter((c) => c.tag === 'Unverified');
-        expect(unverified.length).toBeGreaterThan(0);
-        for (const c of unverified) expect(c.evidence.toLowerCase()).toMatch(/unverified|no source|not been/);
+      it('what is not known is said: an unverified choice says what is missing, and the spacing says nobody has listened', () => {
+        for (const c of choices.filter((c) => c.tag === 'Unverified')) expect(c.evidence.toLowerCase()).toMatch(/unverified|no source|not been/);
+        // The spacing's reason has a source now (S13), but nobody has listened to hear whether it is clearer.
+        expect(choices.find((c) => c.id === 'pitch-spacing')!.evidence).toContain('Unverified: that the new spacing sounds clearer');
       });
 
       it("the numbers in a choice are this picture's own: its rule's settings", () => {
@@ -324,7 +324,8 @@ describe('the fixed choices, for each picture', () => {
     expect(text('full-level').what).toContain(String(LINE_GRID.fullStrength));
     expect(text('full-level').what).toContain(String(RADAR_GRID.fullStrength));
     expect(text('chime-rule').evidence).toContain('44 of 112');
-    expect(text('instrument-switch').evidence).toContain('74.4%');
+    expect(text('instrument-switch').evidence).toContain('switches at 23.6 °C');
+    expect(text('instrument-switch').evidence).toContain('within 0.07 °C');
   });
 
   it('only the rain picture has a mask entry and the third instrument\'s tones', () => {

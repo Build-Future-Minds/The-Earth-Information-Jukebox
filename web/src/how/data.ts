@@ -106,6 +106,10 @@ export const SCAN = scanPicturesJson as unknown as {
   }[];
 };
 export const OCEAN_SCAN = SCAN.pictures.find((p) => p.key === 'ocean')!;
+/** The warm/cool switch in °C on NASA's colour bar: its edge read through the line the bar's four printed labels lie on (web/measure/audit.ts). */
+export const BAR_SWITCH_C = OCEAN_SCAN.quoted.bar0SwitchValue;
+/** How far the bar's printed labels sit from that straight line, at most, in °C. */
+export const BAR_LABELS_OFF_C = OCEAN_SCAN.quoted.bar0LabelsOffC;
 
 /** The ocean's grey land and black sea, measured on NASA's uncompressed frame: the cells that are 90% or more of either. */
 export const EXACT_QUIET = {

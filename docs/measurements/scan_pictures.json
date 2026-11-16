@@ -1,10 +1,16 @@
 {
  "meta": {
-  "date": "2026-11-16 05:06 UTC",
+  "date": "2026-11-16 05:35 UTC",
   "browser": "Chromium 159.0.8154.6",
-  "commit": "9e282f1",
+  "commit": "c88871c",
   "dirty": "yes"
  },
+ "barLabelsC": [
+  0,
+  10,
+  20,
+  32
+ ],
  "files": {
   "ocean": {
    "frames": [
@@ -26,7 +32,23 @@
       32
      ],
      "unit": "°C",
+     "labels": [
+      0,
+      10,
+      20,
+      32
+     ],
      "url": "/assets/frames/svs3912/sst_ecco2_cbar.png"
+    }
+   ],
+   "stills": [
+    {
+     "name": "q90_444",
+     "url": "/assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.q90_444.jpg"
+    },
+    {
+     "name": "webp",
+     "url": "/assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.lossless.webp"
     }
    ]
   },
@@ -254,6 +276,40 @@
      "url": "/assets/frames/svs4285/snowbarwhite2.png"
     }
    ]
+  }
+ },
+ "stillFiles": {
+  "jpeg": {
+   "pillow": "12.3.0",
+   "libjpeg": "3.1.4.1",
+   "files": [
+    {
+     "sampling": "4:2:0",
+     "quality": 82
+    },
+    {
+     "sampling": "4:4:4",
+     "quality": 90
+    }
+   ]
+  },
+  "stills": {
+   "app": {
+    "label": "The app's still (`data/preview.jpg`)",
+    "describe": "0.68 MB, JPEG 4:2:0, quality 82 (libjpeg's standard tables)"
+   },
+   "q90_444": {
+    "label": "JPEG 4:4:4, quality 90",
+    "describe": "1.56 MB, JPEG 4:4:4, quality 90 (libjpeg's standard tables)"
+   },
+   "webp": {
+    "label": "WebP, lossless",
+    "describe": "2.43 MB, WebP lossless (method 6)"
+   },
+   "uncompressed": {
+    "label": "Uncompressed frame",
+    "describe": "3.34 MB, PNG from the TIF (6.30 MB)"
+   }
   }
  },
  "lineGrid": {
@@ -714,6 +770,11 @@
      "width": 310,
      "height": 95,
      "row": 28,
+     "rows": [
+      28,
+      67
+     ],
+     "rowDifference": 0,
      "from": 14,
      "to": 291,
      "colouredThreshold": 100,
@@ -735,6 +796,9 @@
        ]
       }
      ],
+     "switchPixels": [
+      220
+     ],
      "strength": [
       0.4666666666666667,
       0.6431372549019608,
@@ -748,13 +812,74 @@
       0.8666666666666667,
       0.9019607843137255
      ],
+     "colours": "278 colours, x 14 to 291",
      "steps": [],
      "names": null,
      "ends": [
       0,
       32
      ],
-     "unit": "°C"
+     "unit": "°C",
+     "decodeDifference": 0,
+     "labels": {
+      "translucent": true,
+      "rows": [
+       73,
+       85
+      ],
+      "labels": [
+       {
+        "value": 0,
+        "from": 9,
+        "to": 16,
+        "centre": 12.66294097100943,
+        "boxCentre": 12.5
+       },
+       {
+        "value": 10,
+        "from": 93,
+        "to": 108,
+        "centre": 101.04010856453561,
+        "boxCentre": 100.5
+       },
+       {
+        "value": 20,
+        "from": 180,
+        "to": 195,
+        "centre": 187.78401618614058,
+        "boxCentre": 187.5
+       },
+       {
+        "value": 32,
+        "from": 284,
+        "to": 299,
+        "centre": 292.2660593871998,
+        "boxCentre": 291.5
+       }
+      ],
+      "byInk": {
+       "a": 13.111391412482476,
+       "b": 8.730767088047669,
+       "residuals": [
+        -0.4484504414730459,
+        0.6210462715764464,
+        0.057283012704715475,
+        -0.22987884280809112
+       ],
+       "largest": 0.6210462715764464
+      },
+      "byBox": {
+       "a": 12.90497335701599,
+       "b": 8.715808170515098,
+       "residuals": [
+        -0.40497335701599013,
+        0.436944937833033,
+        0.27886323268205615,
+        -0.31083481349912745
+       ],
+       "largest": 0.436944937833033
+      }
+     }
     }
    ],
    "barsMissing": [],
@@ -823,6 +948,510 @@
     "exactQuiet90Sounding": 0,
     "exactQuiet90Largest255": 7.67
    },
+   "palette": {
+    "toleranceDegrees": 3,
+    "colours": 87796,
+    "largestHueStep": 2.4446839999269514,
+    "strengthByTenth": [
+     {
+      "pixels": 88028,
+      "bar": 0.7060275962236745,
+      "frameLargest": 0.9882352941176471,
+      "frame99": 0.8196078431372549,
+      "brightestAgainstBar": 1.1004366812227073,
+      "saturationRatio": 1.28
+     },
+     {
+      "pixels": 87420,
+      "bar": 0.5759103641456581,
+      "frameLargest": 0.8117647058823529,
+      "frame99": 0.6352941176470588,
+      "brightestAgainstBar": 1.0098522167487685,
+      "saturationRatio": 1.34
+     },
+     {
+      "pixels": 70457,
+      "bar": 0.60266106442577,
+      "frameLargest": 0.9254901960784314,
+      "frame99": 0.7490196078431373,
+      "brightestAgainstBar": 1.0585585585585586,
+      "saturationRatio": 1.34
+     },
+     {
+      "pixels": 43563,
+      "bar": 0.728011204481793,
+      "frameLargest": 0.9921568627450981,
+      "frame99": 0.8431372549019608,
+      "brightestAgainstBar": 1.0675105485232068,
+      "saturationRatio": 1.31
+     },
+     {
+      "pixels": 23027,
+      "bar": 0.7445378151260508,
+      "frameLargest": 0.8901960784313725,
+      "frame99": 0.7372549019607844,
+      "brightestAgainstBar": 1,
+      "saturationRatio": 1.11
+     },
+     {
+      "pixels": 43631,
+      "bar": 0.7822803195352219,
+      "frameLargest": 0.8901960784313725,
+      "frame99": 0.8156862745098039,
+      "brightestAgainstBar": 1,
+      "saturationRatio": 1.07
+     },
+     {
+      "pixels": 58373,
+      "bar": 0.8574229691876754,
+      "frameLargest": 0.984313725490196,
+      "frame99": 0.9098039215686274,
+      "brightestAgainstBar": 1,
+      "saturationRatio": 1.11
+     },
+     {
+      "pixels": 66185,
+      "bar": 0.8626050420168071,
+      "frameLargest": 1,
+      "frame99": 0.9137254901960784,
+      "brightestAgainstBar": 1.02,
+      "saturationRatio": 1.15
+     },
+     {
+      "pixels": 223536,
+      "bar": 0.8652661064425774,
+      "frameLargest": 1,
+      "frame99": 0.9764705882352941,
+      "brightestAgainstBar": 1.0323886639676114,
+      "saturationRatio": 1.12
+     },
+     {
+      "pixels": 64779,
+      "bar": 0.9025210084033616,
+      "frameLargest": 1,
+      "frame99": 0.9490196078431372,
+      "brightestAgainstBar": 1.0323886639676114,
+      "saturationRatio": 1.11
+     }
+    ],
+    "bar": {
+     "hueAtColdEnd": 227.89915966386553,
+     "hueAtWarmEnd": 354.2608695652174,
+     "stepsUp": 1,
+     "stepsDown": 266,
+     "reversals": [
+      1
+     ]
+    },
+    "all": {
+     "pixels": 768999,
+     "mass": 254583.29803920997,
+     "outside": 11,
+     "outsideAdaptive": 10,
+     "within": 0.9999856956901114,
+     "withinByMass": 0.9999935765852267,
+     "adaptive": 0.9999869960819194,
+     "adaptiveByMass": 0.9999939924897804,
+     "angleWithin": 0.013036427875718954,
+     "agree": 0.9941742446999281,
+     "agreeByMass": 0.996549994707999,
+     "p50": 0.25,
+     "p90": 0.5,
+     "p99": 0.7000000000000001
+    },
+    "groups": [
+     {
+      "range": [
+       13,
+       31
+      ],
+      "pixels": 149612,
+      "mass": 12568.152941176844,
+      "outside": 7,
+      "outsideAdaptive": 6,
+      "within": 0.9999532123091731,
+      "withinByMass": 0.9999528843366627,
+      "adaptive": 0.9999598962650055,
+      "adaptiveByMass": 0.9999613089916967,
+      "angleWithin": 0.012278426864155282,
+      "agree": 0.9863045744993717,
+      "agreeByMass": 0.9872310311871366,
+      "p50": 0.25,
+      "p90": 0.5,
+      "p99": 0.7000000000000001
+     },
+     {
+      "range": [
+       32,
+       63
+      ],
+      "pixels": 187631,
+      "mass": 34445.16078431434,
+      "outside": 1,
+      "outsideAdaptive": 1,
+      "within": 0.9999946703902873,
+      "withinByMass": 0.9999941936691412,
+      "adaptive": 0.9999946703902873,
+      "adaptiveByMass": 0.9999941936691412,
+      "angleWithin": 0.012060906779796515,
+      "agree": 0.9936364460030592,
+      "agreeByMass": 0.9939240732298995,
+      "p50": 0.25,
+      "p90": 0.5,
+      "p99": 0.75
+     },
+     {
+      "range": [
+       64,
+       127
+      ],
+      "pixels": 265701,
+      "mass": 96408.98823529523,
+      "outside": 3,
+      "outsideAdaptive": 3,
+      "within": 0.999988709112875,
+      "withinByMass": 0.99999125457833,
+      "adaptive": 0.999988709112875,
+      "adaptiveByMass": 0.99999125457833,
+      "angleWithin": 0.01301462922608496,
+      "agree": 0.9964057342652078,
+      "agreeByMass": 0.996539090895927,
+      "p50": 0.25,
+      "p90": 0.5,
+      "p99": 0.7000000000000001
+     },
+     {
+      "range": [
+       128,
+       255
+      ],
+      "pixels": 166055,
+      "mass": 111160.996078425,
+      "outside": 0,
+      "outsideAdaptive": 0,
+      "within": 1,
+      "withinByMass": 1,
+      "adaptive": 1,
+      "adaptiveByMass": 1,
+      "angleWithin": 0.014856523441028575,
+      "agree": 0.9983017674866761,
+      "agreeByMass": 0.998426765150451,
+      "p50": 0.25,
+      "p90": 0.5,
+      "p99": 0.65
+     }
+    ],
+    "warmShare": 0.5313048661864918,
+    "pastSwitchShare": 0.5278548608944909,
+    "disagreeAt": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0.003450005292000426,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "offBar": [
+     {
+      "hue": 240,
+      "share": 0.00000147877174635907,
+      "ofOffBar": 0.24615384615384608,
+      "pixels": 2,
+      "example": [
+       7,
+       7,
+       20
+      ]
+     },
+     {
+      "hue": 330,
+      "share": 0.000001447964001643256,
+      "ofOffBar": 0.24102564102564097,
+      "pixels": 2,
+      "example": [
+       94,
+       30,
+       57
+      ]
+     },
+     {
+      "hue": 230,
+      "share": 0.0000010782710650534885,
+      "ofOffBar": 0.17948717948717946,
+      "pixels": 2,
+      "example": [
+       38,
+       43,
+       89
+      ]
+     },
+     {
+      "hue": 340,
+      "share": 0.0000010474633203376746,
+      "ofOffBar": 0.17435897435897432,
+      "pixels": 1,
+      "example": [
+       79,
+       11,
+       29
+      ]
+     },
+     {
+      "hue": 310,
+      "share": 4.1590455366348844e-7,
+      "ofOffBar": 0.06923076923076922,
+      "pixels": 1,
+      "example": [
+       41,
+       14,
+       36
+      ]
+     },
+     {
+      "hue": 270,
+      "share": 3.2348131951604657e-7,
+      "ofOffBar": 0.053846153846153835,
+      "pixels": 1,
+      "example": [
+       26,
+       13,
+       34
+      ]
+     }
+    ]
+   },
+   "stills": [
+    {
+     "name": "app",
+     "url": "/@fs/C:/dev/The-Earth-Information-Jukebox-scan-pictures/data/preview.jpg",
+     "size": {
+      "width": 2048,
+      "height": 1024
+     },
+     "largestPixelDifference": 168,
+     "line": {
+      "sounding": 1727,
+      "cells": 2880,
+      "chimes": 68,
+      "warm": 53,
+      "cool": 15,
+      "samePlaceAndInstrument": 49,
+      "samePlace": 50,
+      "meanLevelChange": 0.0431629963650999,
+      "largestLevelChange": 0.1520688533782959
+     },
+     "regions": [
+      {
+       "id": "kuroshio_eddies",
+       "name": "Kuroshio eddies east of Japan",
+       "radar": {
+        "sounding": 1416,
+        "cells": 1440,
+        "chimes": 56,
+        "warm": 11,
+        "cool": 45,
+        "samePlaceAndInstrument": 32,
+        "samePlace": 32,
+        "meanLevelChange": 0.08234881103890075,
+        "largestLevelChange": 0.6485355794429779
+       },
+       "land": 0.0013697457409468368
+      },
+      {
+       "id": "equator_pacific",
+       "name": "Equatorial Pacific streaks",
+       "radar": {
+        "sounding": 1438,
+        "cells": 1440,
+        "chimes": 72,
+        "warm": 72,
+        "cool": 0,
+        "samePlaceAndInstrument": 33,
+        "samePlace": 33,
+        "meanLevelChange": 0.08031995852862665,
+        "largestLevelChange": 0.3783124089241028
+       },
+       "land": 0.00042804554404588647
+      }
+     ]
+    },
+    {
+     "name": "q90_444",
+     "url": "/assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.q90_444.jpg",
+     "size": {
+      "width": 2048,
+      "height": 1024
+     },
+     "largestPixelDifference": 69,
+     "line": {
+      "sounding": 1901,
+      "cells": 2880,
+      "chimes": 86,
+      "warm": 57,
+      "cool": 29,
+      "samePlaceAndInstrument": 77,
+      "samePlace": 77,
+      "meanLevelChange": 0.007973043949164094,
+      "largestLevelChange": 0.037744391709566116
+     },
+     "regions": [
+      {
+       "id": "kuroshio_eddies",
+       "name": "Kuroshio eddies east of Japan",
+       "radar": {
+        "sounding": 1414,
+        "cells": 1440,
+        "chimes": 74,
+        "warm": 15,
+        "cool": 59,
+        "samePlaceAndInstrument": 63,
+        "samePlace": 63,
+        "meanLevelChange": 0.013746271080041577,
+        "largestLevelChange": 0.06276151537895203
+       },
+       "land": 0.0003424364352367092
+      },
+      {
+       "id": "equator_pacific",
+       "name": "Equatorial Pacific streaks",
+       "radar": {
+        "sounding": 1439,
+        "cells": 1440,
+        "chimes": 85,
+        "warm": 85,
+        "cool": 0,
+        "samePlaceAndInstrument": 66,
+        "samePlace": 66,
+        "meanLevelChange": 0.018247811043854905,
+        "largestLevelChange": 0.07949793338775635
+       },
+       "land": 0.0000856091088091773
+      }
+     ]
+    },
+    {
+     "name": "webp",
+     "url": "/assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.lossless.webp",
+     "size": {
+      "width": 2048,
+      "height": 1024
+     },
+     "largestPixelDifference": 0,
+     "line": {
+      "sounding": 1816,
+      "cells": 2880,
+      "chimes": 84,
+      "warm": 57,
+      "cool": 27,
+      "samePlaceAndInstrument": 84,
+      "samePlace": 84,
+      "meanLevelChange": 0,
+      "largestLevelChange": 0
+     },
+     "regions": [
+      {
+       "id": "kuroshio_eddies",
+       "name": "Kuroshio eddies east of Japan",
+       "radar": {
+        "sounding": 1396,
+        "cells": 1440,
+        "chimes": 75,
+        "warm": 16,
+        "cool": 59,
+        "samePlaceAndInstrument": 75,
+        "samePlace": 75,
+        "meanLevelChange": 0,
+        "largestLevelChange": 0
+       },
+       "land": 0
+      },
+      {
+       "id": "equator_pacific",
+       "name": "Equatorial Pacific streaks",
+       "radar": {
+        "sounding": 1436,
+        "cells": 1440,
+        "chimes": 81,
+        "warm": 81,
+        "cool": 0,
+        "samePlaceAndInstrument": 81,
+        "samePlace": 81,
+        "meanLevelChange": 0,
+        "largestLevelChange": 0
+       },
+       "land": 0
+      }
+     ]
+    },
+    {
+     "name": "uncompressed",
+     "url": "/assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.png",
+     "size": {
+      "width": 2048,
+      "height": 1024
+     },
+     "largestPixelDifference": 0,
+     "line": {
+      "sounding": 1816,
+      "cells": 2880,
+      "chimes": 84,
+      "warm": 57,
+      "cool": 27,
+      "samePlaceAndInstrument": 84,
+      "samePlace": 84,
+      "meanLevelChange": 0,
+      "largestLevelChange": 0
+     },
+     "regions": [
+      {
+       "id": "kuroshio_eddies",
+       "name": "Kuroshio eddies east of Japan",
+       "radar": {
+        "sounding": 1396,
+        "cells": 1440,
+        "chimes": 75,
+        "warm": 16,
+        "cool": 59,
+        "samePlaceAndInstrument": 75,
+        "samePlace": 75,
+        "meanLevelChange": 0,
+        "largestLevelChange": 0
+       },
+       "land": 0
+      },
+      {
+       "id": "equator_pacific",
+       "name": "Equatorial Pacific streaks",
+       "radar": {
+        "sounding": 1436,
+        "cells": 1440,
+        "chimes": 81,
+        "warm": 81,
+        "cool": 0,
+        "samePlaceAndInstrument": 81,
+        "samePlace": 81,
+        "meanLevelChange": 0,
+        "largestLevelChange": 0
+       },
+       "land": 0
+      }
+     ]
+    }
+   ],
    "quoted": {
     "floor255": 12,
     "backgroundSpread": 0,
@@ -868,10 +1497,12 @@
     "greyLand90Sounding": 0,
     "bar0Switches": 1,
     "bar0SwitchPct": 74.4,
-    "bar0SwitchValue": 23.8,
+    "bar0SwitchValue": 23.6,
+    "bar0LabelsOffC": 0.07,
     "bar0Steps": 0,
     "bar0WarmSteps": 0,
     "bar0BlueSteps": 0,
+    "bar0HueSamePct": 99.65,
     "exactQuiet90Cells": 746,
     "exactQuiet90Sounding": 0,
     "exactQuiet90Largest255": 7.67
@@ -1287,6 +1918,11 @@
      "width": 1500,
      "height": 300,
      "row": 162,
+     "rows": [
+      155,
+      220
+     ],
+     "rowDifference": 202,
      "from": 212,
      "to": 1282,
      "colouredThreshold": 20,
@@ -1308,6 +1944,9 @@
        ]
       }
      ],
+     "switchPixels": [
+      507
+     ],
      "strength": [
       0.4117647058823529,
       0.5529411764705883,
@@ -1321,6 +1960,7 @@
       0.6588235294117647,
       0.12156862745098039
      ],
+     "colours": null,
      "steps": [
       {
        "from": 213,
@@ -1382,7 +2022,9 @@
       "sulfate"
      ],
      "ends": null,
-     "unit": null
+     "unit": null,
+     "decodeDifference": null,
+     "labels": null
     }
    ],
    "barsMissing": [],
@@ -1419,6 +2061,8 @@
      }
     ]
    },
+   "palette": null,
+   "stills": null,
    "quoted": {
     "floor255": 20,
     "backgroundSpread": 8,
@@ -2107,6 +2751,11 @@
      "width": 440,
      "height": 90,
      "row": 36,
+     "rows": [
+      29,
+      44
+     ],
+     "rowDifference": 255,
      "from": 40,
      "to": 416,
      "colouredThreshold": 60,
@@ -2128,6 +2777,9 @@
        ]
       }
      ],
+     "switchPixels": [
+      148
+     ],
      "strength": [
       0.7019607843137254,
       0.8274509803921568,
@@ -2141,6 +2793,7 @@
       0.5686274509803921,
       0.5686274509803921
      ],
+     "colours": null,
      "steps": [
       {
        "from": 40,
@@ -2275,7 +2928,9 @@
      ],
      "names": null,
      "ends": null,
-     "unit": null
+     "unit": null,
+     "decodeDifference": null,
+     "labels": null
     },
     {
      "file": "assets/frames/svs4285/snowbarwhite2.png",
@@ -2283,6 +2938,11 @@
      "width": 440,
      "height": 90,
      "row": 36,
+     "rows": [
+      29,
+      44
+     ],
+     "rowDifference": 235,
      "from": 40,
      "to": 416,
      "colouredThreshold": 60,
@@ -2290,6 +2950,7 @@
      "warmAtStart": false,
      "warmAtEnd": false,
      "switches": [],
+     "switchPixels": [],
      "strength": [
       0.7294117647058823,
       0.7137254901960784,
@@ -2303,6 +2964,7 @@
       0.5333333333333333,
       0.5333333333333333
      ],
+     "colours": null,
      "steps": [
       {
        "from": 40,
@@ -2437,7 +3099,9 @@
      ],
      "names": null,
      "ends": null,
-     "unit": null
+     "unit": null,
+     "decodeDifference": null,
+     "labels": null
     }
    ],
    "barsMissing": [],
@@ -2474,6 +3138,8 @@
      }
     ]
    },
+   "palette": null,
+   "stills": null,
    "quoted": {
     "floor255": 30,
     "backgroundSpread": 18.2,

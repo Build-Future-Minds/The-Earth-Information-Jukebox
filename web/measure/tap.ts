@@ -2,10 +2,10 @@
 // the app sends to the speakers, and measures it with meter.ts. The dev server serves this file;
 // it is never part of the built app. Nothing here changes what the app plays.
 import * as Tone from 'tone';
-import { BarInstrument, SCAN_SOUNDS } from '../src/audio/instruments';
+import { BarInstrument, SCAN_SOUNDS, ScanChoir, scanSound, type ScanSoundId } from '../src/audio/instruments';
 import { ScanPlayer } from '../src/audio/scanPlayer';
 import { CHIME_RULE, LINE_GRID, STRENGTH_FLOOR, bandNote, buildScanScore, type Pixels } from '../src/audio/scanScore';
-import { bandDb, cut, integratedLoudness, peakDb, rmsDb, type Stereo } from './meter';
+import { bandDb, bandLevels, cut, integratedLoudness, peakDb, rmsDb, type Stereo } from './meter';
 
 // A small audio processor that passes nothing on and posts every block it is given, with the audio
 // clock's time at the start of the block.
@@ -51,6 +51,9 @@ export function clearTap(): void {
 
 /** The audio clock now (no look-ahead): the same clock as the times in the app's note logs. */
 export const audioNow = (): number => Tone.immediate();
+
+/** Whether the audio is running, and the audio clock: for a test to say why something did not sound. */
+export const contextState = () => ({ state: Tone.getContext().state, time: Tone.immediate(), sampleRate: Tone.getContext().sampleRate });
 
 /** Everything recorded so far as one recording beginning at audio time `start`. A gap is silence. */
 function recording(): Stereo & { start: number } {
@@ -102,6 +105,50 @@ export function measureBetween(from: number, to: number) {
     levelDb: both(rmsDb(part.left), rmsDb(part.right)),
     leftMinusRightDb: rmsDb(part.left) - rmsDb(part.right),
   };
+}
+
+/**
+ * The level around each band's held note (within 3% of its frequency, both channels' power added)
+ * between two audio-clock times. Other tones fall in these bands too (the octaves and the fifth
+ * harmonic of lower notes, the low note's octave, the chimes), so this is a fingerprint of a
+ * recording, not the level of one note. Two recordings of the same sound give the same fingerprint.
+ */
+export function measureHeldTones(from: number, to: number, bands = LINE_GRID.bands) {
+  const part = between(from, to);
+  const hz = Array.from({ length: bands }, (_, band) => Tone.Frequency(bandNote(band), 'midi').toFrequency());
+  const ranges = hz.map((f) => [f * 0.97, f * 1.03] as [number, number]);
+  const left = bandLevels(part.left, part.sampleRate, ranges);
+  const right = bandLevels(part.right, part.sampleRate, ranges);
+  return hz.map((f, band) => ({ band, note: Tone.Frequency(bandNote(band), 'midi').toNote(), hz: f, db: both(left[band], right[band]) }));
+}
+
+/**
+ * Record the scan's own choir (instruments.ts, ScanChoir) holding one band's note at full level with
+ * its tone fully open, dry: straight to the speakers, without the room. Returns the level of each
+ * harmonic of that note (within 1.5% of k times its frequency, both channels), so a model of the
+ * choir's partials (spacing.ts) can be checked against the real thing. Plays for `seconds` + 1.5 s.
+ */
+export async function recordChoirNote(band: number, seconds = 8, sound: ScanSoundId = 'ocean', topHz = 6000) {
+  await startTap();
+  await Tone.start();
+  const notes = Array.from({ length: LINE_GRID.bands }, (_, b) => bandNote(b));
+  const choir = new ScanChoir(notes, scanSound(sound).choir);
+  choir.output.connect(Tone.getDestination());
+  const start = Tone.immediate() + 0.05;
+  choir.setLevels(notes.map((_, b) => (b === band ? 1 : 0)), 1, start, 0.01);
+  clearTap();
+  await new Promise((done) => setTimeout(done, (seconds + 1.5) * 1000));
+  const part = between(start + 1, start + 1 + seconds); // from 1 s on: the level and the tone have settled
+  choir.silence();
+  await new Promise((done) => setTimeout(done, 300));
+  choir.dispose();
+  const f0 = Tone.Frequency(bandNote(band), 'midi').toFrequency();
+  // Harmonics up to topHz, and only while the ±1.5% windows of neighbours do not overlap.
+  const ks = Array.from({ length: Math.floor(Math.min(topHz / f0, 33)) }, (_, i) => i + 1);
+  const ranges = ks.map((k) => [k * f0 * 0.985, k * f0 * 1.015] as [number, number]);
+  const left = bandLevels(part.left, part.sampleRate, ranges);
+  const right = bandLevels(part.right, part.sampleRate, ranges);
+  return { band, note: Tone.Frequency(bandNote(band), 'midi').toNote(), hz: f0, sampleRate: part.sampleRate, harmonics: ks.map((k, i) => ({ k, hz: k * f0, db: both(left[i], right[i]) })) };
 }
 
 /**

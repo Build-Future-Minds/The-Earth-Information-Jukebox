@@ -130,11 +130,13 @@ export const OCEAN_SCAN: ScanRule = {
     radar1Peaks: 187,
     radar1LeftOut: 115,
     bar0SwitchPct: 74.4,
-    bar0SwitchValue: 23.8,
+    bar0SwitchValue: 23.6,
+    bar0LabelsOffC: 0.07,
+    bar0HueSamePct: 99.65,
     stillDifference: 6.93,
   },
   limits: [
-    'Warm colours are drawn stronger than cold ones, so warm water sounds louder than cold water with the same amount of line.',
+    'Lines of some colours are drawn paler than others (light blue the most), so the same amount of line sounds a little quieter in those colours.',
     'The still is a compressed copy of NASA\'s frame, which blurs its finest lines.',
   ],
 };

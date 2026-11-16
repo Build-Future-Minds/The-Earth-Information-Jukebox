@@ -175,7 +175,10 @@ function instrumentSwitch(p: ChoicePicture): ScanChoice {
   if (isTest(p)) {
     evidence = 'A unit test checks each dot of the TEST INPUT picture strikes the instrument its colour says.';
   } else if (p.scan.measured.bar0SwitchValue !== undefined) {
-    evidence = `On NASA's colour bar for this picture the rule switches at ${m(p, 'bar0SwitchPct')}% of the bar's length, which is ${m(p, 'bar0SwitchValue')} °C if the bar's scale is even (${MEASURED}). Unverified: that the bar's scale is even, and that the lines in the frame use the bar's colours.`;
+    evidence =
+      `Measured (${MEASURED}): on NASA's colour bar for the ocean picture the rule switches at ${m(p, 'bar0SwitchValue')} °C; the bar's four printed labels lie on one straight line within ${m(p, 'bar0LabelsOffC')} °C. ` +
+      `The picture's lines use the bar's hues: ${m(p, 'bar0HueSamePct')}% of their colour is on the same side of the switch as the bar colour of the same hue. ` +
+      'They are not the bar\'s exact colours (they are more saturated), and we measured colours, not the sea.';
   } else if (blue) {
     evidence =
       `Measured on NASA's two bars (${MEASURED}): ${m(p, 'bar0WarmSteps')} of the rain bar's ${m(p, 'bar0Steps')} steps are on the warm side, from step ${m(p, 'bar0SwitchStep')} on; ` +
@@ -204,10 +207,10 @@ export function scanChoicesFor(p: ChoicePicture): ScanChoice[] {
       kind: 'rule',
       name: 'Which note a band plays',
       what: `The ${BAND_NOTE_NAMES.length} held notes are ${BAND_NOTE_NAMES.join(' ')}: far apart at the bottom (a fifth, then a fourth) and close together at the top.`,
-      why: 'Notes a step apart sound muddy when they are low, and on the radar every band sounds at once. The first version climbed the scale one step at a time from C3 and its three lowest notes blurred together.',
+      why: 'Notes a step apart sound rough when they are low, and on the radar every band sounds at once. The first version climbed the scale one step at a time from C3 and its three lowest notes blurred together.',
       evidence:
-        'Developer A heard the blur in the first listening round, which is one opinion, not a test. No source has been read for the general claim that low notes blur, so the claim is unverified.',
-      tag: 'Unverified',
+        'Plomp and Levelt (1965, source S13) found two tones roughest when they are a quarter of a critical bandwidth apart, and that intervals grow more dissonant below about 500 Hz, which "reflects the musical practice to avoid thirds at low frequencies". Measured on 15 Nov (docs/measurements/scan_spacing.md): the first version\'s lowest neighbours were 0.18 and 0.20 of a critical bandwidth apart, the current ones (C3–G3, G3–C4) 0.72 and 0.71; a roughness model of the choir with all notes at full level gives the current spacing 0.49 of the first\'s. Developer A heard the blur in the first listening round: one opinion, not a test. Unverified: that the new spacing sounds clearer. Nobody has listened to compare.',
+      tag: 'Design choice',
     },
     floorChoice(p),
     fullLevelChoice(p),
@@ -289,7 +292,9 @@ export function scanChoicesFor(p: ChoicePicture): ScanChoice[] {
       name: 'Scan sound',
       what: 'Ocean choir, Music box and Plain play the same score: the same notes at the same times. Only the instruments change.',
       why: 'A listener can compare the instruments without the notes changing.',
-      evidence: 'A browser test compares the first chime of the three sounds. It does not yet compare a longer stretch.',
+      evidence:
+        'Every chime in 10 s is compared across the three sounds: where, which instrument, which note, over which root, left or right, and when. A browser test does it on the test picture (two chimes)' +
+        (isOcean(p) ? '; npm run measure does it on this picture, 21 chimes in the first 10 s of the map sweep, all the same (docs/measurements/scan_sound.md).' : '. For this picture it has not been compared on a real still.'),
       tag: 'Design choice',
     },
   ];
