@@ -20,6 +20,9 @@
   --region-b: oklch(0.52 0.17 5);
   --on-region: oklch(0.99 0 0);
   --well: oklch(0.20 0.03 262);
+  /* Secondary marks drawn on the well (beat drawings). The well is dark in both themes, so this is
+     not overridden in dark: --rule there is almost the well's own colour (about 1.7:1). */
+  --on-well-2: oklch(0.78 0.025 250);
   --white: #ffffff;
   --black: #000000;
 
@@ -57,7 +60,10 @@
 }
 
 * { box-sizing: border-box; }
-html { background: var(--paper); }
+/* Keep a focused control clear of the sticky top bar (and, below 1024px, the fixed tab bar) when the
+   browser scrolls it into view (WCAG 2.2 SC 2.4.11). */
+html { background: var(--paper); scroll-padding-top: 80px; }
+@media (max-width: 1023px) { html { scroll-padding-bottom: 88px; } }
 ::selection { background: var(--signal); color: var(--on-signal); }
 
 body {
@@ -645,6 +651,12 @@ figure.scene figcaption { font-size: 0.85rem; }
 .key-hint { font: 600 0.65rem/1 var(--mono); color: inherit; opacity: 0.75; border: 0; padding: 0; background: none; }
 
 @media (max-width: 1560px) { .brand .lede { display: none; } }
+/* Seven tabs (Home added, P0) need tighter cells just above the bottom-bar width, or the top bar
+   scrolls sideways at 1024px. */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .topbar { gap: var(--sm); }
+  .page-links a { padding-inline: 8px; gap: 5px; }
+}
 @media (max-width: 900px) {
   .page-links a { padding: 10px 12px; }
 }
@@ -653,7 +665,7 @@ figure.scene figcaption { font-size: 0.85rem; }
   .topbar { padding: 8px 16px; }
   .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
     border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(6, 1fr); }
+  .page-links ul { border: 0; border-radius: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
   .page-links li + li { border-left: 1px solid var(--rule); }
   .page-links a { flex-direction: column; gap: 2px; padding: 8px 1px; font-size: 0.66rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
   body { padding-bottom: 72px; }
@@ -732,11 +744,11 @@ figure.scene figcaption { font-size: 0.85rem; }
 .how-beats { flex-direction: column; gap: 6px; }
 .how-beats .beat-picture { width: 150px; }
 .beat-row { display: flex; align-items: center; gap: 10px; color: var(--white); font-size: 0.85rem; }
-.beat-picture .bp-base, .beat-picture .bp-edge { stroke: var(--rule); stroke-width: 1; }
-.beat-picture .bp-mid { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 3 3; }
+.beat-picture .bp-base, .beat-picture .bp-edge { stroke: var(--on-well-2); stroke-width: 1; }
+.beat-picture .bp-mid { stroke: var(--on-well-2); stroke-width: 1; stroke-dasharray: 3 3; }
 .beat-picture .bp-lo { fill: var(--region, var(--white)); }
-.beat-picture .bp-hi { fill: var(--rule); }
-.beat-picture .bp-label { fill: var(--rule); font: 400 9px var(--mono); }
+.beat-picture .bp-hi { fill: var(--on-well-2); }
+.beat-picture .bp-label { fill: var(--on-well-2); font: 400 9px var(--mono); }
 .how-rule { margin: var(--sm) 0 0; font-size: 1.05rem; }
 .how-honest { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .how-honest li::before { content: "—"; margin-right: 8px; color: var(--ink-2); }
@@ -789,9 +801,136 @@ figure.scene figcaption { font-size: 0.85rem; }
 @media (max-width: 1023px) {
   .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
     border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(6, 1fr); }
+  .page-links ul { border: 0; border-radius: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
   .page-links li + li { border-left: 1px solid var(--rule); }
   .page-links a { flex-direction: column; gap: 2px; padding: 8px 1px; font-size: 0.72rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
   body { padding-bottom: 72px; }
   .player { position: sticky; bottom: 72px; z-index: 15; }
+}
+
+/* ---- Home, the landing page (P0): the opening sheet, then ruled sections. Same world as the app
+   (DESIGN.md): hairline rules, no boxes or shadows, tide blue for the one primary action. ---- */
+.home { display: grid; gap: var(--xl); padding-block: var(--sm) var(--xl); }
+.home h2, .home h3 { margin: 0; }
+.home h3 { font-size: 1.15rem; font-weight: 700; line-height: 1.3; }
+.home-strip p, .home-facts p, .home-quiet, .home-step-text { text-wrap: pretty; }
+
+/* Opening: the problem as the title, the idea, Start listening; the picture beside it. */
+.home-open { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--xl); align-items: center; }
+.home-pitch { display: grid; gap: var(--md); justify-items: start; }
+.home-open h2 { font-size: clamp(1.9rem, 1.05rem + 1.45vw, 2.4rem); font-weight: 750; line-height: 1.12;
+  letter-spacing: -0.015em; text-wrap: balance; max-width: 21ch; }
+.home-open h2:focus-visible { outline-offset: 8px; }
+.home-lead { display: block; font-weight: 500; color: var(--ink-2); margin-bottom: 0.15em; }
+.home-idea-line { font-size: 1.35rem; font-weight: 650; line-height: 1.3; max-width: 30ch; text-wrap: pretty; }
+.home-start { min-height: 56px; padding: 0 22px; font-size: 1.1rem; }
+.home-start svg { flex: none; }
+.home-quiet { color: var(--ink-2); font-size: 0.95rem; }
+.home-pitch .home-quiet { margin-top: calc(-1 * var(--xs)); }
+.home-open figure.scene { max-width: none; }
+.home-open figcaption { padding-left: 44px; max-width: none; gap: 6px; }
+.home-open .box[data-region] { cursor: default; }
+/* No region is "chosen" on Home, so both circles are drawn at the weight Listen gives the chosen one. */
+.home-open .box .ring-outline { stroke-width: 16; }
+.home-open .box .ring { stroke-width: 9; }
+.home-key { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px var(--md);
+  color: var(--ink); font-size: 0.95rem; font-weight: 600; }
+.home-key li { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Sections: a hairline on top, more space above the heading than below it. */
+.home-section { display: grid; gap: var(--sm); border-top: 1px solid var(--rule); padding-top: var(--md); }
+.home-section > h2 { font-size: 1.65rem; font-weight: 750; line-height: 1.2; letter-spacing: -0.01em; }
+@media (max-width: 640px) { .home-section > h2 { font-size: 1.4rem; } }
+
+/* The idea in three pictures: the How it's made drawings on one continuous well, read left to right,
+   each step's words under its drawing. */
+.home-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-strip li { position: relative; display: grid; gap: 6px; align-content: start; padding-inline-end: var(--xl); }
+.home-strip li:last-child { padding-inline-end: 0; }
+.home-strip p { color: var(--ink-2); }
+.home-art { height: 160px; display: flex; align-items: center; justify-content: center; gap: var(--sm); background: var(--well);
+  padding: var(--sm); margin-bottom: 6px; color: var(--white); }
+.home-strip li:not(:last-child) .home-art { margin-inline-end: calc(-1 * var(--xl)); }
+.home-strip li:not(:first-child) .home-art { border-inline-start: 1px solid oklch(1 0 0 / 0.16); }
+.home-strip li:first-child .home-art { border-start-start-radius: var(--r); border-end-start-radius: var(--r); }
+.home-strip li:last-child .home-art { border-start-end-radius: var(--r); border-end-end-radius: var(--r); }
+.home-thumb { position: relative; display: block; width: min(100%, calc(128px * var(--a, 2))); aspect-ratio: var(--a, 2);
+  background: var(--well) center / 100% 100% no-repeat; }
+/* The circle as the opening picture draws it: the region's colour inside a black outline, letter above. */
+.home-thumb i { position: absolute; transform: translate(-50%, -50%); aspect-ratio: 1; min-width: 16px; border-radius: 50%;
+  border: 3px solid var(--region, var(--white)); box-shadow: 0 0 0 2px var(--black); }
+.home-thumb i .region-badge { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%);
+  box-shadow: 0 0 0 2px var(--black); font-style: normal; }
+.home-ticks figure { margin: 0; display: grid; justify-items: center; gap: 4px; font-size: 0.85rem; }
+.home-art figcaption { color: var(--white); }
+.home-ticks svg { width: 120px; }
+.home-beats { flex-direction: column; gap: 6px; }
+.home-beats .beat-picture { width: 140px; }
+.home-arrow { position: absolute; z-index: 1; left: 0; top: 80px; transform: translate(-50%, -50%); display: flex; padding: 3px;
+  color: var(--white); background: var(--well); border: 1px solid oklch(1 0 0 / 0.16); border-radius: 50%; }
+.home-rule { font-size: 1.05rem; }
+.home-rule .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* How to use it, and Quick links: ruled rows, like a tide table; each whole row is the link. */
+.home-steps, .home-nasa-links, .home-app-links { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+.home-steps li, .home-nasa-links li, .home-app-links li { border-bottom: 1px solid var(--rule); }
+.home-steps a, .home-nasa-links a, .home-app-links a { display: grid; align-items: center; gap: var(--sm); min-height: 56px; padding: 8px 6px;
+  color: var(--ink); text-decoration: none; transition: background-color var(--snap); }
+.home-steps a { grid-template-columns: 2rem minmax(0, 1fr) auto; }
+.home-steps a:hover, .home-nasa-links a:hover, .home-app-links a:hover { background: var(--rule-2); }
+.home-steps a:focus-visible, .home-nasa-links a:focus-visible, .home-app-links a:focus-visible { outline-offset: -3px; }
+.home-step-n { display: inline-grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  background: var(--ink); color: var(--paper); font: 700 0.85rem/1 var(--font); }
+.home-step-text { font-size: 1.1rem; font-weight: 600; }
+.home-step-page { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.95rem; color: var(--ink-2); }
+.home-steps a:hover .home-step-page { color: var(--ink); }
+.home-keys { color: var(--ink-2); font-size: 0.95rem; }
+.home-keys kbd { color: var(--ink); }
+
+/* Quick links: the app's pages and the NASA pages, side by side, as the same ruled rows. */
+.home-links { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: var(--xl); align-items: start; }
+.home-links h3 { margin-bottom: var(--xs); }
+.home-app-links a { grid-template-columns: auto minmax(0, 1fr) auto; min-height: 48px; }
+.home-app-name { font-weight: 700; }
+.home-app-links a > svg:last-child { color: var(--ink-2); }
+.home-nasa-links a { grid-template-columns: 5.5rem minmax(0, 1fr) auto; min-height: 48px; }
+.home-svs { font: 600 0.95rem/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+.home-nasa-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.home-nasa-links a:hover .home-nasa-title { text-decoration-color: var(--signal); }
+.home-nasa-links svg { color: var(--ink-2); }
+
+/* What it is and is not: one ruled row per picture. The sentences say what they are, so the
+   column labels are for the eye only. */
+.home-choice { font-size: 1.15rem; font-weight: 650; }
+.home-facts-head, .home-facts li { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--md); }
+.home-facts-head { font-size: 0.85rem; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--ink); padding-bottom: 6px; margin-top: var(--xs); }
+.home-facts { list-style: none; margin: 0; padding: 0; }
+.home-facts li { border-bottom: 1px solid var(--rule); padding: 12px 0; align-items: baseline; }
+.home-credit { font-size: 0.9rem; color: var(--ink-2); }
+
+@media (max-width: 900px) {
+  .home-open { grid-template-columns: minmax(0, 1fr); gap: var(--lg); }
+  .home-links { grid-template-columns: minmax(0, 1fr); gap: var(--lg); }
+}
+@media (max-width: 760px) {
+  /* One column: each drawing on its own well, joined by a downward arrow. */
+  .home-strip { grid-template-columns: minmax(0, 1fr); gap: var(--sm); }
+  .home-strip li, .home-strip li:last-child { padding-inline-end: 0; }
+  .home-strip li .home-art { border-radius: var(--r); }
+  .home-strip li:not(:last-child) .home-art { margin-inline-end: 0; }
+  .home-strip li:not(:first-child) .home-art { border-inline-start: 0; }
+  .home-arrow { position: static; transform: rotate(90deg); justify-self: center; margin-bottom: 2px; color: var(--ink-2);
+    background: none; border: 0; }
+  .home-facts-head { display: none; }
+  .home-facts li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}
+@media (max-width: 640px) {
+  .home { gap: var(--lg); }
+  .home-open figcaption { padding-left: 34px; }
+  .home-steps a { grid-template-columns: 1.75rem minmax(0, 1fr); row-gap: 2px; }
+  .home-step-page { grid-column: 2; }
+  .home-nasa-links a { grid-template-columns: minmax(0, 1fr) auto; row-gap: 0; }
+  .home-svs { grid-column: 1; }
+  .home-nasa-title { grid-column: 1; }
+  .home-nasa-links svg { grid-column: 2; grid-row: 1 / span 2; }
 }

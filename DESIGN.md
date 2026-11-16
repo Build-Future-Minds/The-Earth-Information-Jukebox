@@ -16,6 +16,7 @@ colors:
   region-b: "oklch(0.52 0.17 5)"
   on-region: "oklch(0.99 0 0)"
   well: "oklch(0.20 0.03 262)"
+  on-well-2: "oklch(0.78 0.025 250)"
 typography:
   numeral:
     fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
@@ -123,7 +124,7 @@ Earth Sonata reads like a tide table printed on a sea chart. The NASA picture si
 
 Two editions of one print. Light is almanac white with navy ink and tide-blue actions. Dark is the night edition: deep navy ground with the same inks lifted. The theme follows the saved choice, else the system setting, and is set before first paint so there is no flash. One red-orange, the signal, is the only loud colour and it means live, chosen or focused, nothing else.
 
-The system is keyboard-first. The Tab order follows the screen: the six tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.
+The system is keyboard-first. The Tab order follows the screen: the tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.
 
 **Key Characteristics:**
 - One face, Atkinson Hyperlegible Next. Atkinson Hyperlegible Mono only for numbers, coordinates and readouts.
@@ -152,6 +153,7 @@ A two-ink print: navy ink on cool almanac white, one blue for actions, one red-o
 - **Almanac White** (`paper`): the ground.
 - **Hairline** (`rule`) and **Faint Hairline** (`rule-2`): section rules, table rules, tide gridlines; rule-2 is also the button hover fill and the missing-frame fill.
 - **Chart Well** (`well`): the dark panel behind the NASA picture, close-up canvases and legend swatches. Deep navy in both themes (darker still in night).
+- **On-Well Slate** (`on-well-2`): secondary marks drawn on the well (the beat drawing's second pulse and rules). The same in both themes, because the well is dark in both; `rule` is nearly the well's colour in night.
 
 Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the sidecar carries them.
 
@@ -171,6 +173,7 @@ Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the side
 - **Numeral** (500 default, 200 to 800 driven, clamp(4.5rem, 10vw, 9rem), 0.78): the giant alignment number under each region's patch, in the region colour with a paper-coloured stroke behind it.
 - **Value** (500, 2.6rem, 1): the live alignment readout; its weight follows alignment (200 = every which way, 800 = all one way). Mobile 1.9rem.
 - **Headline** (750, 1.9rem, 1.1): page title; 1.6rem on mobile.
+- **Home title** (750, clamp 1.9rem to 2.4rem, 1.12, max 21ch): the problem sentence that opens Home, its first sentence at 500 in slate ink. Home's section headings are 750, 1.65rem (1.4rem on phones).
 - **Title** (700, 1.05rem, 1.3): section headings.
 - **Status** (650, 1.35rem, 1.3, max 46ch): the sentence about what is playing.
 - **Body** (400, 18px, 1.5): prose capped at 65 to 70ch.
@@ -183,7 +186,7 @@ Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the side
 
 ## Layout
 
-A sticky top bar (10px 24px padding, 1px rule under it) holds the title on the left (the title line shows from 1560px up), the six tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding). On Listen, the picture choice and region choice sit in one row above the picture; the picture is capped to the screen height so the whole view fits a 1440 x 900 screen; the player bar sits right under the picture. Below 900px the title line hides. Below 1024px the tabs move to a fixed bottom bar (six equal cells, icon over word), the player bar sticks just above it, and the chart margin tightens.
+A sticky top bar (10px 24px padding, 1px rule under it) holds the title on the left (the title line shows from 1560px up), the tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding). On Listen, the picture choice and region choice sit in one row above the picture; the picture is capped to the screen height so the whole view fits a 1440 x 900 screen; the player bar sits right under the picture. Below 900px the title line hides. Between 1024 and 1199px the tab cells tighten so seven tabs fit. Below 1024px the tabs move to a fixed bottom bar (one equal cell per tab, icon over word), the player bar sticks just above it, and the chart margin tightens. The page keeps a focused control clear of both bars (`scroll-padding`).
 
 Spacing scale: 10, 16, 22, 28, 40px. Sections are separated by a 1px top rule with 16px padding, not by gaps alone. The NASA picture sits in a chart frame (1px ink neatline, margin 22px top and 44px left) with ticks every 10 degrees, labelled every 30, and the credit directly under it.
 
@@ -218,7 +221,7 @@ A line icon over a one-word label. Team rule (15 Nov): more buttons, less text.
 - **Stop** carries `aria-keyshortcuts="Escape"`; Esc stops from anywhere.
 
 ### Page links (tabs)
-Six tabs in the top bar: Listen, Compare, How it's made, Play along, Globe (five views) and Game (opens the listening game page, which links back), each a 20px line icon and a word. They are one joined strip with a 2px ink frame and 2px ink dividers, 8px corners; the current tab is filled in ink with paper text and carries `aria-current="page"`; hover fills with the faint hairline. On phones the strip becomes a fixed bottom bar of four equal cells, icon over word.
+Seven tabs in the top bar: Home, Listen, Compare, How it's made, Play along, Globe (six views) and Game (opens the listening game page, which links back), each a 20px line icon and a word. They are one joined strip with a 2px ink frame and 2px ink dividers, 8px corners; the current tab is filled in ink with paper text and carries `aria-current="page"`; hover fills with the faint hairline. On phones and tablets the strip becomes a fixed bottom bar, one equal cell per tab, icon over word.
 
 ### Player bar
 One framed strip under the picture, like a music player: 2px ink frame, 10px corners, 8px 10px padding. Left: Play (tide blue) / Pause, Stop with a small visible "Esc" hint (hidden from screen readers; `aria-keyshortcuts` says it), Replay. Middle: the beat timeline, taking the free width. Right: Explain and Sound. On phones it sticks above the tabs and the timeline takes its own row.
@@ -260,8 +263,9 @@ A picture with a single frame (aerosols) has one value per region. Its tide curv
 
 ## Views
 
-The app has five views, one per tab, plus the Game tab, which opens the listening game page. Changing view stops all sound, moves focus to the view's heading, and changes the tab title to "<view> · Earth Sonata".
-- **Listen (home):** the picture and region choices in one row (step marks 1 Picture, 2 Region, 3 Play), the picture in its chart frame with the credit under it, the player bar (with the beat timeline), and the Explain picture when opened. Fits one desktop screen.
+The app has six views, one per tab, plus the Game tab, which opens the listening game page. An empty or unknown address shows Home. Changing view stops all sound, moves focus to the view's heading, and changes the tab title to "<view> · Earth Sonata".
+- **Home:** the landing page, with no sound and no player. The opening: the problem as the title, the idea, one tide-blue "Start listening" link to Listen, and the ocean picture in its chart frame with both circles at full weight, the credit and a lettered key; it fits 1440 x 900. Then, each under a hairline: the idea in three pictures (one continuous well: circle, line ticks, beat drawings, joined by arrows), how to use it (five ruled rows, each row a link), quick links (app pages and NASA pages as ruled rows, NASA pages read from each `scene.json`), and what it is and is not (one ruled row per picture: what it is, what the sound describes, credit).
+- **Listen:** the picture and region choices in one row (step marks 1 Picture, 2 Region, 3 Play), the picture in its chart frame with the credit under it, the player bar (with the beat timeline), and the Explain picture when opened. Fits one desktop screen.
 - **Compare:** for the chosen picture only, its two regions side by side: close-up with ticks, the giant numeral, the value, a Play/Stop toggle and the region's rhythm row; then the tide table and curves.
 - **How it's made:** the three-picture strip (picture, ticks, pulses), the rule in one line, the three honesty lines, and a credit block for each picture.
 - **Play along:** Play the picture (the scan, its settings and legend folded away; click or tap the picture to explain a place, which is outlined in black and white with four ticks and named in a line under the picture), one panel with the Earth rhythm's Play and Stop, a now chip and the melody keys, and a one-line game card.
