@@ -15,6 +15,7 @@ import { selectSource } from './data/selection';
 import { otherRegionOf, PICTURES, sourceByKey, SOURCES, type SourceKey } from './data/sources';
 import { useView, VIEWS } from './views';
 import { CompareView } from './views/CompareView';
+import { HomeView } from './views/HomeView';
 import { HowView } from './views/HowView';
 import { ListenView } from './views/ListenView';
 import { PlayView } from './views/PlayView';
@@ -167,8 +168,10 @@ export function App() {
           : `Playing ${label}.`;
 
   // The playing side's colour (DESIGN.md "Live"): the end block on the current tab and on Play.
-  // Pictures with neutral regions (aerosols, rain) use ink.
-  const live = { ['--live' as string]: look.neutral ? 'var(--ink)' : regionColour(scene.regions, regionId) } as CSSProperties;
+  // Pictures with neutral regions (aerosols, rain) use ink, and so does Home, where no side is chosen.
+  const live = {
+    ['--live' as string]: look.neutral || view === 'home' ? 'var(--ink)' : regionColour(scene.regions, regionId),
+  } as CSSProperties;
 
   return (
     <>
@@ -191,8 +194,9 @@ export function App() {
       </header>
 
       <main className="stage" style={live}>
-        {/* Focus target on a view change, announced by screen readers; the tab already shows it. */}
-        <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
+        {/* Focus target on a view change, announced by screen readers; the tab already shows it.
+            Home has its own visible heading (the problem sentence), which takes this role there. */}
+        {view !== 'home' && <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>}
 
         {(view === 'listen' || view === 'compare' || view === 'globe') && (
           <div className="pickers">
@@ -211,13 +215,18 @@ export function App() {
           </div>
         )}
 
-        {/* In the shell, on every view: sound can start on Listen, Compare and Play along. */}
-        <p className="status sr-only" role="status">{status}</p>
+        {/* In the shell, on every view that has sound (not Home, which has none): sound can start on
+            Listen, Compare and Play along. */}
+        {view !== 'home' && <p className="status sr-only" role="status">{status}</p>}
         {missing && playState !== 'stopped' && (
           <p className="missing" role="alert">
             Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
           </p>
         )}
+
+        {/* Home shows the ocean picture whichever picture is chosen elsewhere: it is the one the opening
+            sentences and the three pictures describe (the practice frame when practice data is on). */}
+        {view === 'home' && <HomeView source={sourceByKey('ocean')} pictures={PICTURES} headingRef={headingRef} />}
 
         {view === 'listen' && (
           <ListenView
