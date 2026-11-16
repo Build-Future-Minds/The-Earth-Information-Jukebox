@@ -112,8 +112,8 @@ were missed by the first round of browser tests:
 
 ## Not tested yet
 
-- **Whether people can hear the difference.** The quiz player and pass mark (9 of 10) are ready
-  (`docs/ACCESSIBILITY_LOG.md`), but there are no sessions yet
+- **Whether people can hear the difference.** The listening game (Musical sound off, Rhythm only on)
+  and pass mark (9 of 10) are ready (`docs/ACCESSIBILITY_LOG.md`), but there are no sessions yet
 - Screen readers, including the new beat lane (a slider) and the close-ups (canvases): Student B's log
 - The demo laptop: speakers, a Wi-Fi-off run of `npm run preview`
 - Safari and Firefox; touch dragging on the beat lane

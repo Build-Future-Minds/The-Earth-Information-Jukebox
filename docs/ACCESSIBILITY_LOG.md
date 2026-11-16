@@ -53,8 +53,15 @@ The pass mark comes from Dev A's plan.
   question, about 150 ms in where the second pulse lands at a 1-second beat. The 30 questions are
   the same two regions at 30 moments, with the order shuffled, so they test one pair, not ocean
   regions in general.
-- **Player:** `tools/listening_quiz_player.html`, not the game. The game's pitch and note length
-  follow alignment, which gives the answer away, and the game is not the app's sound.
+- **Player (changed 15 Nov, team decision, before anyone listened):** the quiz player is removed.
+  The test now runs on the listening game, `tools/listening_game.html`, with **Musical sound off**
+  and **Rhythm only on**, so pitch and music give nothing away. Be honest about what changed:
+  - Rhythm only is close to, not the same as, the app's rule: each note is held for half its gap,
+    so note length still follows the spacing.
+  - The game asks "which of two patches made this rhythm?", with patches from across the picture,
+    not the 30 prepared questions on the real pair below.
+  - **Student B to confirm before the first session** how game rounds are counted against the
+    10-question, 9-correct pass mark, and write it here.
 - **Question:** "Which one has the more even pulse, the first or the second?" Guessing gets 50%.
 - **Each listener answers 10 questions.** **9 or more correct counts as hearing the difference.**
   Guessing reaches 9 or more about 1 time in 100 (11 in 1024, 1.1%).

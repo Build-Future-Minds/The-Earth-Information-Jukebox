@@ -18,7 +18,7 @@ tests and 73 app unit tests pass, and CI (unit, build, browser tests) is green.
 
 **Critical path for Sunday**
 
-1. **Student B: run the listening test** on the real pair with the quiz player and log the counts.
+1. **Student B: run the listening test** with the listening game (Musical sound off, Rhythm only on) and log the counts. The quiz player was removed on 15 Nov; see `docs/ACCESSIBILITY_LOG.md`.
    No one has listened yet. Slide 6, the testing paragraph and "What we tested" all wait on it.
 2. **Reviews of work merged without one:** Dev B's #13 (restyle), #17 (beat lane, time line,
    close-ups) and #19 (game launch). Student B checks the design in the running app; Dev A checks
@@ -112,7 +112,7 @@ One approved NASA sample moves through preparation, measurement, sound and expla
 ## Sunday morning (10:00 AM)
 
 - [x] **B** Speed and volume controls; setup instructions; Student A tries them from a clean copy — *Student A: npm ci, test, build, dev and preview all worked from a clean clone*
-- [ ] **SB** Listening test on the real pair with the quiz player; counts in `docs/ACCESSIBILITY_LOG.md` — *top priority: no one has listened yet*
+- [ ] **SB** Listening test with the listening game (Musical sound off, Rhythm only on; the quiz player was removed 15 Nov); counts in `docs/ACCESSIBILITY_LOG.md` — *top priority: no one has listened yet*
 - [ ] **SB** Keyboard and screen-reader checks logged in `docs/ACCESSIBILITY_LOG.md` — *nothing logged yet; include the beat lane, close-ups and time line from #17*
 - [ ] **SB + A** Review Dev B's #13, #17 and #19, merged without a teammate review — *Student B: the design in the running app; Dev A: the wording*
 - [ ] **SA** 7-slide backup deck drafted from `docs/submission/slides_7.md` — *slides 1, 2, 3 and 7 drafted outside the repo (`slides_7.md` is still the template). Slide 5 screenshot: `docs/submission/stills/app_live_real_data.png` (#26). Dev A gives the team name and slide 4 wording; slide 6 waits on listening counts*
