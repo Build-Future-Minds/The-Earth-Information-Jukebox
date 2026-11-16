@@ -22,6 +22,10 @@ interface Props {
   getColumn: () => number;
   /** The note most recently struck in this sweep, with the instrument names it had when it sounded, or null. */
   lastStruck: { chime: Chime; names: WhyContext['names'] } | null;
+  /** The fixed choices, with this picture's own floor, full level and switch (scanChoicesFor). */
+  choices?: ScanChoice[];
+  /** Open from the start (Listen's Explain panel, which is already a choice to read it). */
+  startOpen?: boolean;
 }
 
 const FOLLOW_MS = 250;
@@ -32,8 +36,8 @@ function chimeCell(c: ChimeWhy): string {
   return c.reason === 'no colour' ? 'none: no colour' : c.reason === 'below level' ? 'none: below the peak level' : 'none: not a peak';
 }
 
-export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck }: Props) {
-  const [open, setOpen] = useState(false);
+export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, choices = SCAN_CHOICES, startOpen = false }: Props) {
+  const [open, setOpen] = useState(startOpen);
   const [column, setColumn] = useState(0);
   const [pick, setPick] = useState<number | null>(null);
   const { columns, bands } = score.grid;
@@ -64,11 +68,11 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck }: 
   const moment = placeOf(score, here.column, 0, ctx.geometry).across; // where along the sweep this column is
 
   const last = lastStruck ? whyBand(score, lastStruck.chime.column, lastStruck.chime.band, { ...ctx, names: lastStruck.names }) : null;
-  const rules = SCAN_CHOICES.filter((c) => c.kind === 'rule');
-  const decoration = SCAN_CHOICES.filter((c) => c.kind === 'decoration');
+  const rules = choices.filter((c) => c.kind === 'rule');
+  const decoration = choices.filter((c) => c.kind === 'decoration');
 
   return (
-    <details className="scan-why" onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
+    <details className="scan-why" open={open} onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
       <summary>Why the scan sounds like this</summary>
       {open && (
         <div className="scan-why-body">

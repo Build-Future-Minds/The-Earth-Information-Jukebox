@@ -25,7 +25,7 @@ and writes
 Check: inside each rain circle the scan mask must mark exactly the pixels the region's own mask
 leaves out. Any difference stops the run with a message, and nothing is written.
 
-Owner: Developer A. A design choice (docs/mapping_spec.md, "Play along: the picture scan").
+Owner: Developer A. A design choice (docs/mapping_spec.md, "The picture scan: what Listen plays").
 """
 
 from __future__ import annotations

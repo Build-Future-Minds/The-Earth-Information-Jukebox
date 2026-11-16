@@ -1,10 +1,11 @@
 // The sources the app can play (ocean currents, aerosols, or practice) and the rules that keep
 // them apart: letters come from the source, aerosols are neutral, and no comparison crosses sources.
 import { describe, expect, it } from 'vitest';
+import measured from '../../../docs/measurements/scan_pictures.json';
 import { buildEarthTrack } from '../audio/earthVoice';
 import { regionLabel } from '../components/ExploreControls';
 import { stepAtSameMoment } from '../components/RhythmExplanation';
-import { dayLabels, otherRegionOf, PICTURES, regionLetter, sourceByKey, SOURCES, timeWord, describesLine } from './sources';
+import { dayLabels, framesText, otherRegionOf, PICTURES, regionLetter, SCENE_FOLDERS, sourceByKey, SOURCES, timeWord, describesLine } from './sources';
 
 describe('sources', () => {
   it('lists every picture: ocean, aerosols, rain', () =>
@@ -83,6 +84,67 @@ describe('timeWord', () => {
     expect(timeWord(sourceByKey('ocean'))).toBe('model time');
     expect(timeWord(sourceByKey('aerosols'))).toBe('model time');
     expect(timeWord(sourceByKey('imerg'))).toBe('time');
+  });
+});
+
+// ---------- Listen, step 1: the picture list (P1) ----------
+
+/** Every file one folder down in data/, listed here, apart from the app's own lists: the folders
+ *  that hold `file`. (Lazy: nothing is loaded, only the names are read.) */
+const FILES_ON_DISK = Object.keys(import.meta.glob('../../../data/*/*'));
+const foldersOnDisk = (file: string) =>
+  FILES_ON_DISK.filter((p) => p.endsWith(`/${file}`))
+    .map((p) => p.split('/').slice(-2)[0])
+    .sort();
+
+describe('the picture list (Listen, step 1)', () => {
+  it('has one row per data/<folder>/scene.json with its features.json, after the ocean picture at data/', () => {
+    const playable = foldersOnDisk('scene.json').filter((f) => foldersOnDisk('features.json').includes(f));
+    expect(SOURCES.map((s) => s.key)).toEqual(['ocean', ...playable]);
+    expect(SCENE_FOLDERS).toEqual(foldersOnDisk('scene.json'));
+  });
+
+  it('every row has a short name, a kind, and NASA\'s own title from its scene.json', () => {
+    expect(SOURCES.map((s) => s.short)).toEqual(['Sea surface currents and temperature', 'Aerosols', 'Precipitation (GPM IMERG)']);
+    for (const s of SOURCES) {
+      expect(s.kind.length).toBeGreaterThan(0);
+      expect(s.scene.source.title.length).toBeGreaterThan(0);
+      expect(s.scene.source.url).toMatch(/^https:\/\/svs\.gsfc\.nasa\.gov\/\d+/);
+    }
+  });
+
+  it('frames: 30 frames, one still, 30 hourly frames', () => {
+    expect(framesText(sourceByKey('ocean').scene).count).toBe(30);
+    expect(framesText(sourceByKey('aerosols').scene)).toEqual({ count: 1, words: 'still' });
+    expect(framesText(sourceByKey('imerg').scene)).toEqual({ count: 30, words: 'hourly frames' });
+  });
+});
+
+describe('each picture\'s own scan settings', () => {
+  // docs/measurements/scan_pictures.json is written by `npm run measure`. A picture's settings in
+  // the app must be the ones that were measured; a change to either shows up here.
+  it('are exactly what the measurements say for that picture (floor, full levels, mask, measure)', () => {
+    for (const s of SOURCES) {
+      const m = measured.pictures.find((p) => p.key === s.key);
+      expect(m, `${s.key} is measured`).toBeDefined();
+      expect(s.scan, `${s.key} has a scan rule`).not.toBeNull();
+      const { floor, full, measure, mask } = m!.settings;
+      expect([s.scan!.measure, s.scan!.floor, s.scan!.full]).toEqual([measure, floor, full]);
+      expect(s.scan!.mask ? `data/${s.key}/scan_mask.png` : null).toBe(mask);
+    }
+  });
+
+  it('the rain picture never reads its land, which is a photo; the others read every pixel', () => {
+    expect(sourceByKey('imerg').scan!.mask?.what).toMatch(/land/);
+    expect(sourceByKey('ocean').scan!.mask).toBeNull();
+    expect(sourceByKey('aerosols').scan!.mask).toBeNull();
+  });
+
+  it('each says what its instruments mean and what the scan cannot tell you, in its own words', () => {
+    for (const s of SOURCES) {
+      expect(s.scan!.instruments.warm).not.toBe(s.scan!.instruments.cool);
+      expect(s.scan!.limits.length).toBeGreaterThan(0);
+    }
   });
 });
 

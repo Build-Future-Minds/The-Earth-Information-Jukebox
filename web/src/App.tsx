@@ -1,18 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
-import { DEFAULT_MELODY_INSTRUMENT, type MelodyInstrumentId } from './audio/instruments';
-import type { PictureScanHandle } from './components/PictureScan';
-import { BeatTrack } from './components/BeatTrack';
-import { PlayerBar, RegionChoice, regionLabel, regionStyle } from './components/ExploreControls';
+import { DEFAULT_MELODY_INSTRUMENT, DEFAULT_SCAN_SOUND, type MelodyInstrumentId, type ScanSoundId } from './audio/instruments';
+import { regionLabel, regionStyle } from './components/ExploreControls';
 import { PageLinks } from './components/PageLinks';
 import { ThemeSwitch } from './components/ThemeSwitch';
-import { stepAtSameMoment } from './components/RhythmExplanation';
 import { SourceChoice } from './components/SourceChoice';
 import { selectSource } from './data/selection';
-import { otherRegionOf, PICTURES, sourceByKey, SOURCES, type SourceKey } from './data/sources';
+import { PICTURES, sourceByKey, SOURCES, type ScanTarget, type SourceKey } from './data/sources';
 import { useView, VIEWS } from './views';
 import { CompareView } from './views/CompareView';
 import { HowView } from './views/HowView';
@@ -20,31 +17,36 @@ import { ListenView } from './views/ListenView';
 import { PlayView } from './views/PlayView';
 import { GlobeTab } from './views/GlobeView';
 
+/** Anything that plays the picture scan: Listen's scan or Play along's. Stop and Esc silence it. */
+interface Stoppable {
+  stop: () => void;
+}
 
 export function App() {
   // The picture being played (the jukebox) and its region. Every comparison uses this one source.
+  // The picture scan plays this same picture, with its own settings (P1: the ocean-only lock is gone).
   const [sourceKey, setSourceKey] = useState<SourceKey>(SOURCES[0].key);
   const source = sourceByKey(sourceKey);
-  const { scene, features, imageUrl } = source;
+  const { scene, features } = source;
   const look = { firstLetter: source.firstLetter, neutral: source.regionStyle === 'neutral' };
-  // The picture scan (Play along) always plays the ocean picture, whichever picture is chosen on
-  // Listen: its colour rule was built and checked on the ocean's temperature colours only, and the
-  // ocean's regions are A and B, as the scan labels them (Dev B's review of #45).
-  const scanPicture = sourceByKey('ocean');
   const [regionId, setRegionId] = useState(SOURCES[0].scene.regions[0].id);
+  // What Listen's scan reads: the whole picture, or one region's circle.
+  const [target, setTarget] = useState<ScanTarget>('map');
   const [playState, setPlayState] = useState<PlayState>('stopped');
   const [sounding, setSounding] = useState<TrackStep | null>(null);
   const [explaining, setExplaining] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [volumeDb, setVolumeDb] = useState(-6);
+  const [scanDb, setScanDb] = useState(-8);
+  const [scanSoundId, setScanSoundId] = useState<ScanSoundId>(DEFAULT_SCAN_SOUND);
   const [melodyDb, setMelodyDb] = useState(-10);
   const [melodyInstrument, setMelodyInstrument] = useState<MelodyInstrumentId>(DEFAULT_MELODY_INSTRUMENT);
   const [heldNotes, setHeldNotes] = useState<ReadonlySet<number>>(new Set());
   const transport = useRef<Transport | null>(null);
   const melody = useRef<UserVoice | null>(null);
-  const scan = useRef<PictureScanHandle>(null);
+  const scan = useRef<Stoppable>(null);
   const explanationRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const topbarRef = useRef<HTMLElement>(null);
   const view = useView();
   const viewLabel = VIEWS.find((v) => v.key === view)!.label;
 
@@ -66,6 +68,18 @@ export function App() {
     setSounding(null);
   }, [track]);
 
+  // Listen fits the screen under the top bar: where the bar ends (with the practice banner above it,
+  // when there is one), for the CSS (styles.css, ".listen-area").
+  useLayoutEffect(() => {
+    const bar = topbarRef.current;
+    if (!bar) return;
+    const set = () => document.documentElement.style.setProperty('--chrome', `${bar.offsetTop + bar.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(bar);
+    return () => ro.disconnect();
+  }, []);
+
   const start = useCallback(() => void transport.current?.start(), []);
   const pause = useCallback(() => transport.current?.pause(), []);
   const stop = useCallback(() => {
@@ -74,7 +88,6 @@ export function App() {
     scan.current?.stop(); // and the picture scan
     setSounding(null);
   }, []);
-  const replay = useCallback(() => void transport.current?.replay(), []);
   // Melody inputs (keyboard, on-screen keys, later MIDI) all send MIDI note numbers.
   const onMelodyNoteOn = useCallback(
     (note: number, source: InputSource) => void melody.current?.noteOn(note, 0.7, source),
@@ -82,44 +95,43 @@ export function App() {
   );
   const onMelodyNoteOff = useCallback((note: number, source: InputSource) => melody.current?.noteOff(note, source), []);
   const onMelodyAllOff = useCallback(() => melody.current?.allOff(), []);
-  // Beat visualizer (Student B's lane): read the audio clock, and jump within the loop.
+  // Beat visualizer: read the audio clock.
   const getPosition = useCallback(() => transport.current?.loopPosition() ?? 0, []);
-  const seek = useCallback((t: number) => transport.current?.seek(t), []);
   // "Listen to Region A/B" in the close-ups: choose the region, and start if nothing is playing.
   const listenTo = useCallback((id: string) => {
     setRegionId(id);
     if (transport.current?.getState() !== 'playing') void transport.current?.start();
   }, []);
 
-  // Keyboard shortcuts on top of the normal Tab / Enter / Space controls.
+  // Esc stops everything, from anywhere (DESIGN.md "Stop"). Listen's step 2 has its own number keys.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.key === 'Escape') return stop();
-      // 1/2 work only while focus is on the Region choice, the control they operate, so number keys
-      // elsewhere stay free for speech input and other tools (WCAG 2.2 SC 2.1.4; docs/DECISIONS.md D8).
-      if (!(e.target instanceof Element) || !e.target.closest('.region-group')) return;
-      const n = Number(e.key);
-      if (Number.isInteger(n) && n >= 1 && n <= scene.regions.length) {
-        const id = scene.regions[n - 1].id;
-        setRegionId(id);
-        // Move focus with the selection, as arrow keys do, so the next arrow press starts from here.
-        document.querySelector<HTMLInputElement>(`input[name="region"][value="${id}"]`)?.focus();
-      }
+      if (e.key === 'Escape') stop();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [stop, scene]);
+  }, [stop]);
 
-  // Choosing another picture is like Stop, then its first region is selected.
+  // Choosing another picture is like Stop, then the whole picture and its first region are selected.
   const chooseSource = useCallback(
     (key: SourceKey) => {
       stop();
       const next = selectSource(key);
       setSourceKey(next.sourceKey);
       setRegionId(next.regionId);
+      setTarget('map');
     },
     [stop],
+  );
+
+  // Choosing what to hear on Listen. A region also becomes the region Compare and Globe show.
+  const chooseTarget = useCallback(
+    (next: ScanTarget) => {
+      setTarget(next);
+      if (next !== 'map' && scene.regions.some((r) => r.id === next)) setRegionId(next);
+    },
+    [scene],
   );
 
   // Changing view is the same as pressing Stop. Then go to the top and move focus to the view's
@@ -141,15 +153,8 @@ export function App() {
   }, [explaining]);
 
   const label = regionLabel(scene.regions, regionId, look.firstLetter);
-  // For the comparison line: the other region's measurement at the same source moment (two regions only).
-  const otherRegion = otherRegionOf(source, regionId);
-  const other = otherRegion
-    ? {
-        label: regionLabel(scene.regions, otherRegion.id, look.firstLetter),
-        step: sounding ? stepAtSameMoment(features.steps, sounding.step, otherRegion.id) : null,
-      }
-    : null;
   const missing = sounding?.step.status === 'missing' ? sounding.step.reason : null;
+  // The Earth rhythm's sentence, for the views that play it. Listen has the scan's own (ListenScan).
   // Changes only on real transitions, so the live region does not chatter every beat.
   const status =
     playState === 'stopped'
@@ -167,43 +172,29 @@ export function App() {
           PRACTICE DATA — test input, not NASA data
         </div>
       )}
-      {/* Layout (Dev B, after seeing it live): a sticky top bar with the title, four tabs and the
+      {/* Layout (Dev B, after seeing it live): a sticky top bar with the title, the tabs and the
           theme switch (on phones the tabs move to a fixed bottom bar), then one main column. */}
-      <header className="topbar">
+      <header className="topbar" ref={topbarRef}>
         <div className="brand">
           <h1>Earth Sonata</h1>
-          {/* Student B's title line (docs/design/student_b_pictures.html), made picture-neutral
-              now that the app plays three pictures. */}
-          <p className="lede">Hear two regions. Lined-up streaks play an even pulse.</p>
+          <p className="lede">Choose a NASA picture, then hear it.</p>
         </div>
         <PageLinks current={view} />
         <ThemeSwitch />
       </header>
 
-      <main className="stage">
+      <main className={view === 'listen' ? 'stage listen-stage' : 'stage'}>
         {/* Focus target on a view change, announced by screen readers; the tab already shows it. */}
         <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
 
-        {(view === 'listen' || view === 'compare' || view === 'globe') && (
+        {(view === 'compare' || view === 'globe') && (
           <div className="pickers">
             <SourceChoice sources={SOURCES} current={sourceKey} onChoose={chooseSource} />
-            {view === 'listen' && (
-              <RegionChoice
-                step={SOURCES.length > 1 ? 2 : 1}
-                regions={scene.regions}
-                regionId={regionId}
-                onRegion={setRegionId}
-                look={look}
-                imageUrl={imageUrl}
-                frame={scene.frames}
-              />
-            )}
           </div>
         )}
 
-        {/* In the shell, on every view: sound can start on Listen, Compare and Play along. */}
-        <p className="status sr-only" role="status">{status}</p>
-        {missing && playState !== 'stopped' && (
+        {view !== 'listen' && <p className="status sr-only" role="status">{status}</p>}
+        {view !== 'listen' && missing && playState !== 'stopped' && (
           <p className="missing" role="alert">
             Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
           </p>
@@ -211,100 +202,71 @@ export function App() {
 
         {view === 'listen' && (
           <ListenView
-            scene={scene}
-            imageUrl={imageUrl}
-            regionId={regionId}
-            label={label}
+            pictures={SOURCES}
+            picture={source}
+            onPicture={chooseSource}
+            target={target}
+            onTarget={chooseTarget}
             look={look}
-            onSelect={setRegionId}
-            sounding={sounding}
+            scanRef={scan}
+            speed={speed}
+            onSpeed={(s) => {
+              setSpeed(s);
+              transport.current?.setSpeed(s);
+            }}
+            volumeDb={scanDb}
+            onVolume={setScanDb}
+            soundId={scanSoundId}
+            onSound={setScanSoundId}
             explaining={explaining}
+            onExplain={() => setExplaining((x) => !x)}
             explanationRef={explanationRef}
-            other={other}
-            explainRows={[
-              { region: scene.regions.find((r) => r.id === regionId)!, step: sounding?.step ?? null, playing: true },
-              ...(otherRegion ? [{ region: otherRegion, step: other?.step ?? null, playing: false }] : []),
-            ].map((row) => {
-              const l = regionLabel(scene.regions, row.region.id, look.firstLetter);
-              return { ...row, label: l, letter: l.replace('Region ', ''), colour: regionStyle(scene.regions, row.region.id, look) };
-            })}
-            player={
-              <PlayerBar
-                step={SOURCES.length > 1 ? 3 : 2}
-                playState={playState}
-                explaining={explaining}
-                speed={speed}
-                volumeDb={volumeDb}
-                onStart={start}
-                onPause={pause}
-                onStop={stop}
-                onReplay={replay}
-                onExplain={() => setExplaining((x) => !x)}
-                onSpeed={(s) => {
-                  setSpeed(s);
-                  transport.current?.setSpeed(s);
-                }}
-                onVolume={(db) => {
-                  setVolumeDb(db);
-                  transport.current?.setVolume(db);
-                }}
-              >
-                <BeatTrack
-                  track={track}
-                  colour={regionStyle(scene.regions, regionId, look)}
-                  regionLabel={label}
-                  playState={playState}
-                  speed={speed}
-                  getPosition={getPosition}
-                  onSeek={seek}
-                />
-              </PlayerBar>
-            }
           />
         )}
-          {view === 'compare' && (
-            <CompareView
-              scene={scene}
-              features={features}
-              imageUrl={imageUrl}
-              regionId={regionId}
-              playState={playState}
-              getPosition={getPosition}
-              onListen={listenTo}
-              onStop={stop}
-              look={look}
-            />
-          )}
-          {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop} />}
-          {view === 'how' && <HowView source={source} pictures={PICTURES} />}
-          {view === 'play' && (
-            <PlayView
-              scene={scanPicture.scene}
-              imageUrl={scanPicture.imageUrl}
-              speed={speed}
-              scanRef={scan}
-              playState={playState}
-              onStart={start}
-              onPause={pause}
-              onStop={stop}
-              heldNotes={heldNotes}
-              melodyDb={melodyDb}
-              melodyInstrument={melodyInstrument}
-              onMelodyInstrument={(id) => {
-                setMelodyInstrument(id);
-                melody.current?.setInstrument(id);
-              }}
-              onNoteOn={onMelodyNoteOn}
-              onNoteOff={onMelodyNoteOff}
-              onAllOff={onMelodyAllOff}
-              onMelodyVolume={(db) => {
-                setMelodyDb(db);
-                melody.current?.setVolume(db);
-              }}
-              regionLetter={label.replace('Region ', '')}
-              colour={regionStyle(scene.regions, regionId, look)}
-            />
-          )}
+        {view === 'compare' && (
+          <CompareView
+            scene={scene}
+            features={features}
+            imageUrl={source.imageUrl}
+            regionId={regionId}
+            playState={playState}
+            getPosition={getPosition}
+            onListen={listenTo}
+            onStop={stop}
+            look={look}
+          />
+        )}
+        {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop} />}
+        {view === 'how' && <HowView source={source} pictures={PICTURES} />}
+        {view === 'play' && (
+          <PlayView
+            scene={scene}
+            imageUrl={source.imageUrl}
+            rule={source.scan}
+            speed={speed}
+            scanRef={scan}
+            playState={playState}
+            onStart={start}
+            onPause={pause}
+            onStop={stop}
+            heldNotes={heldNotes}
+            melodyDb={melodyDb}
+            melodyInstrument={melodyInstrument}
+            onMelodyInstrument={(id) => {
+              setMelodyInstrument(id);
+              melody.current?.setInstrument(id);
+            }}
+            onNoteOn={onMelodyNoteOn}
+            onNoteOff={onMelodyNoteOff}
+            onAllOff={onMelodyAllOff}
+            onMelodyVolume={(db) => {
+              setMelodyDb(db);
+              melody.current?.setVolume(db);
+            }}
+            regionLetter={label.replace('Region ', '')}
+            colour={regionStyle(scene.regions, regionId, look)}
+          />
+        )}
       </main>
     </>
   );

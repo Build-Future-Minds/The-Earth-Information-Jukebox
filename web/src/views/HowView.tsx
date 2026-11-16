@@ -3,16 +3,7 @@
 import { RULE_TEXT } from '../audio/earthVoice';
 import { BeatPicture } from '../components/BeatPicture';
 import { agree, Key, scatter } from '../components/LookingAt';
-import { describesLine, type Picture, type Source } from '../data/sources';
-
-/** "A computer model (ECCO2), not a photo." / satellite estimates / test input, per picture. */
-function natureLine(p: Picture): string {
-  const s = p.scene.source;
-  const what = s.model_or_instrument && s.model_or_instrument !== 'none' ? ` (${s.model_or_instrument})` : '';
-  if (s.data_kind === 'model_output') return `A computer model${what}, not a photo.`;
-  if (s.data_kind === 'observation') return `Satellite estimates${what}, drawn as a picture.`;
-  return 'Test input made by the team, not NASA data.';
-}
+import { describesLine, natureLine, type Picture, type Source } from '../data/sources';
 
 export function HowView({ source, pictures }: { source: Source; pictures: Picture[] }) {
   const r = source.scene.regions[0];
@@ -56,7 +47,7 @@ export function HowView({ source, pictures }: { source: Source; pictures: Pictur
 
       <ul className="how-honest" aria-label="What the sound does not tell you">
         <li>{natureLine(source)}</li>
-        <li>The rhythm rule is a choice we made.</li>
+        <li>Both sound rules are choices we made: the picture scan on Listen, the rhythm on Compare and in the game.</li>
         <li>{describesLine(source)}</li>
       </ul>
 

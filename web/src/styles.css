@@ -239,6 +239,10 @@ button {
 button:hover { background: var(--rule-2); }
 button.primary { background: var(--action); border-color: var(--action); color: var(--on-action); }
 button.primary:hover { background: var(--action-hover); border-color: var(--action-hover); }
+/* Nothing to do yet (the picture is loading, or not measured): faded, and hover does nothing. */
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button:disabled:hover { background: transparent; }
+button.primary:disabled:hover { background: var(--action); border-color: var(--action); }
 button[aria-expanded='true'] { background: var(--ink); color: var(--paper); }
 
 /* Key caps take their button's text colour, so they invert on filled buttons. */
@@ -353,8 +357,8 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
                gap: 8px var(--md); font-size: 0.9rem; line-height: 1.4; color: var(--ink-2); }
 .scan-legend li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; }
 .scan-legend strong { color: var(--ink); font-weight: 650; }
-.scan-view .scan-legend .glyph { width: 30px; height: 22px; margin-top: 1px; background: var(--well); border-radius: var(--r-key); }
-.scan-view .scan-legend .glyph.light { background: var(--paper); outline: 1px solid var(--rule); }
+.scan-legend .glyph { width: 30px; height: 22px; margin-top: 1px; background: var(--well); border-radius: var(--r-key); }
+.scan-legend .glyph.light { background: var(--paper); outline: 1px solid var(--rule); }
 .glyph .g-track { fill: var(--rule-2); }
 .glyph .g-ink { fill: var(--ink); }
 .glyph .g-signal { fill: var(--signal); }
@@ -773,4 +777,188 @@ figure.scene figcaption { font-size: 0.85rem; }
   .page-links a { flex-direction: column; gap: 2px; padding: 8px 1px; font-size: 0.72rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
   body { padding-bottom: 72px; }
   .player { position: sticky; bottom: 72px; z-index: 15; }
+}
+
+/* ---------- Listen (P1): three numbered steps, the picture between its two sound axes ----------
+   Steps 1 and 2 sit side by side, as ruled lists (the tide table's rows). Under them the picture
+   takes the rest of the screen: .listen-area is a size container whose height is the screen minus
+   the top bar and the steps (both measured: --chrome in App.tsx, --steps-h in ListenView.tsx).
+   Inside it --pic-w is the picture's width; the player bar uses the same columns, so its sound line
+   runs exactly under the picture, and the twelve held notes stand beside the twelve bands. */
+.listen { display: grid; gap: 12px; min-width: 0; }
+.steps { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 14px 40px; align-items: start; }
+fieldset.step { border: 0; margin: 0; padding: 0; min-width: 0; }
+.step legend { display: flex; align-items: center; gap: 8px; width: 100%; padding: 0; margin-bottom: 4px; font-size: 1.05rem; font-weight: 700; }
+.step legend .step-mark { margin: 0; }
+.step-hint { margin-left: auto; font-size: 0.8rem; font-weight: 400; color: var(--ink-2); }
+.step-rows { border-top: 1px solid var(--ink); }
+
+/* Step 1: one row per picture. The label holds the radio, thumbnail, name and kind; NASA's title is
+   a link of its own on the second line. */
+.pic-row { display: grid; grid-template-columns: 22px 64px minmax(0, 1fr) auto; grid-template-areas: "radio thumb name kind" "radio thumb title kind";
+  column-gap: 12px; row-gap: 1px; align-items: center; padding: 6px 4px 6px 0; border-bottom: 1px solid var(--rule); }
+.pic-row:hover { background: var(--rule-2); }
+.pic-pick { display: contents; cursor: pointer; font-weight: 400; }
+.pic-pick input { grid-area: radio; }
+.pic-thumb { grid-area: thumb; width: 64px; height: 32px; border-radius: var(--r-key); border: 1px solid var(--ink); background: var(--well) center / cover no-repeat; }
+.pic-name { grid-area: name; align-self: end; justify-self: start; font-size: 1rem; font-weight: 700; line-height: 1.25; }
+.pic-title { grid-area: title; align-self: start; justify-self: start; font-size: 0.82rem; line-height: 1.3; color: var(--ink-2); text-decoration-thickness: 1px; }
+a.pic-title:hover { color: var(--ink); }
+.pic-kind { grid-area: kind; display: grid; gap: 1px; justify-items: end; font-size: 0.82rem; line-height: 1.3; color: var(--ink-2); white-space: nowrap; }
+.pic-kind .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pic-note { font-weight: 650; color: var(--ink); }
+/* The chosen picture and the chosen thing to hear: the signal underline (DESIGN.md: signal = chosen). */
+.pic-row.on .pic-name, .hear-row.on .hear-name b { font-weight: 800; text-decoration: underline 3px var(--signal); text-underline-offset: 5px; text-decoration-skip-ink: none; }
+
+/* Step 2: the whole picture, then each region with its round crop and letter. */
+.hear-row { display: grid; grid-template-columns: 22px 40px minmax(0, 1fr) auto; column-gap: 12px; align-items: center; min-height: 52px;
+  padding: 6px 4px 6px 0; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.hear-row:hover { background: var(--rule-2); }
+.hear-icon { width: 40px; height: 40px; display: grid; place-items: center; }
+.hear-icon .region-thumb { width: 40px; height: 40px; }
+.hear-name { display: grid; gap: 1px; min-width: 0; }
+.hear-name b { display: block; font-size: 1rem; font-weight: 700; line-height: 1.3; }
+.hear-name b .region-badge { margin-right: 6px; vertical-align: 1px; }
+.hear-name small { font-size: 0.82rem; font-weight: 400; line-height: 1.3; color: var(--ink-2); }
+.hear-row kbd { color: var(--ink-2); }
+.hear-chosen { display: none; }
+/* Small drawings: the map sweep (a picture with a line across it) and the radar (a circle). */
+.sweep-icon { display: block; position: relative; width: 36px; height: 20px; border: 2px solid var(--ink); border-radius: var(--r-key); background: var(--well); }
+.sweep-icon::after { content: ""; position: absolute; top: -5px; bottom: -5px; left: 40%; width: 2px; background: var(--ink); }
+.sweep-icon.small { width: 20px; height: 12px; }
+.sweep-icon.small::after { top: -3px; bottom: -3px; }
+.circle-icon { display: block; width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--ink); }
+.circle-icon.small { width: 16px; height: 16px; border-width: 2px; }
+
+/* The picture and its axes. Without room to fit the screen (phones, tablets, short windows) the
+   page scrolls and the picture takes the column's width. */
+.listen-scan { --side: 44px; display: grid; gap: 12px; min-width: 0; }
+.listen-area { display: grid; gap: 12px; min-width: 0; align-content: start; }
+.listen-axes { display: grid; grid-template-columns: var(--side) minmax(0, 1fr) 112px; align-items: start; min-width: 0; }
+.listen-figure { grid-column: 2; grid-row: 1; margin: 0; min-width: 0; justify-items: stretch; } /* .scan-view sets start, for Play along */
+.listen-figure .chart { margin: 22px 0 0 0; }
+.listen-figure svg { display: block; width: 100%; height: auto; background: var(--well); }
+.listen-figure .box .ring-outline { stroke-width: 6px; vector-effect: non-scaling-stroke; }
+.listen-figure .box .ring { stroke-width: 3px; vector-effect: non-scaling-stroke; }
+.map-tag.below { transform: translate(-50%, 6px); }
+.listen-under { grid-column: 2 / -1; grid-row: 2; display: grid; gap: 6px; padding-top: 6px; min-width: 0; }
+.listen-notes:empty { display: none; }
+.band-meter { grid-column: 3; grid-row: 1; display: grid; grid-template-rows: repeat(12, minmax(0, 1fr)); margin: 22px 0 0 16px; }
+.band { display: grid; grid-template-columns: 26px minmax(0, 1fr); align-items: center; gap: 6px; min-height: 0; }
+.band b { font: 400 0.66rem/1 var(--mono); color: var(--ink-2); }
+.band i { display: block; position: relative; height: 6px; overflow: hidden; background: var(--rule-2); border-radius: 2px; }
+.band i::after { content: ""; position: absolute; inset: 0; background: var(--ink); transform-origin: left; transform: scaleX(var(--level, 0)); }
+.band.hit i { animation: band-hit 0.6s ease-out; }
+.band.hit i::after { animation: note-hit-fill 0.6s ease-out; }
+@keyframes band-hit { from { background: var(--signal); } to { background: var(--rule-2); } }
+/* The radar: the zoomed circle, and beside it where it is and what it is. */
+.listen-scan.radar .listen-figure { grid-column: auto; grid-row: auto; }
+.listen-radar { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: 22px; align-items: start; min-width: 0; }
+.listen-radar .zoom { border: 1px solid var(--ink); }
+.listen-scan.radar .band-meter { margin-top: 0; }
+.listen-where { display: grid; gap: 8px; align-content: start; min-width: 0; font-size: 0.9rem; color: var(--ink-2); }
+.where-name { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700; color: var(--ink); }
+.where-desc { max-width: 46ch; }
+.where-map { display: block; width: 100%; max-width: 320px; height: auto; border: 1px solid var(--ink); background: var(--well); }
+.where-map .box.active .ring-outline { fill: none; stroke: #000; stroke-width: 5px; vector-effect: non-scaling-stroke; }
+.where-map .box.active .ring { fill: none; stroke: #fff; stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+
+/* Step 3's sound line: every struck note by time and pitch, the played part in ink, the playhead
+   in signal. Shapes match the marks on the picture: round = warm instrument, diamond = cool. */
+.player.axis .player-track { min-width: 0; }
+.sound-line { display: grid; gap: 2px; min-width: 0; }
+.sl-head { display: flex; align-items: center; gap: 12px; min-height: 20px; font-size: 0.82rem; }
+.sl-head .now-chip .region-badge { background: var(--region, var(--ink)); }
+.sl-where, .sl-time { font: 400 0.75rem/1 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sl-time { margin-left: auto; }
+.sl-lane { --pos: 0; position: relative; height: 46px; margin-top: 6px; border-bottom: 1px solid var(--ink-2); }
+.sl-marks { position: absolute; inset: 4px 0; }
+.sl-marks i { position: absolute; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: var(--ink-2); opacity: 0.35; }
+.sl-marks i.cool { width: 4.4px; height: 4.4px; margin: -2.2px 0 0 -2.2px; border-radius: 1px; transform: rotate(45deg); }
+.sl-marks.played { clip-path: inset(0 calc(100% - var(--pos) * 100%) 0 0); }
+.sl-marks.played i { background: var(--ink); opacity: 1; }
+.sl-playhead { position: absolute; top: -8px; bottom: 0; left: calc(var(--pos) * 100%); width: 2px; margin-left: -1px; background: var(--signal); }
+.sl-playhead::before { content: ""; position: absolute; top: -4px; left: 50%; width: 12px; height: 12px; transform: translateX(-50%); border-radius: var(--r-key); background: var(--signal); }
+.sl-lane.idle .sl-marks.played, .sl-lane.idle .sl-playhead { display: none; }
+.sl-axis { position: relative; height: 14px; font: 400 0.66rem/1 var(--mono); color: var(--ink-2); }
+.sl-axis span { position: absolute; top: 3px; transform: translateX(-50%); white-space: nowrap; }
+.sl-axis span:first-child { transform: none; }
+.sl-axis span:last-child { transform: translateX(-100%); }
+.scan-sound select { margin-left: 6px; }
+
+/* Explain: a hairline section under the player, opened by the Explain button. */
+.explain-scan { display: grid; gap: var(--sm); border-top: 1px solid var(--rule); padding-top: var(--sm); }
+.explain-scan:focus-visible { outline-offset: 6px; }
+.explain-scan h3 { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.explain-scan .scan-why { margin-top: 0; }
+.explain-scan .scan-legend-box summary, .explain-scan .scan-how summary { cursor: pointer; font-weight: 600; }
+.glyph .g-axis { stroke: var(--ink-2); stroke-width: 1; }
+.glyph .g-ink-fill { fill: var(--ink); }
+.glyph .g-signal-line { stroke: var(--signal); stroke-width: 2; }
+
+/* Room to fit one screen: the picture takes what the steps leave, and the axes line up. */
+@media (min-width: 1024px) and (min-height: 640px) {
+  .listen-scan { --side: 156px; }
+  .listen-area {
+    container-type: size;
+    height: max(420px, calc(100svh - var(--chrome, 70px) - var(--steps-h, 200px) - 52px));
+  }
+  .listen-axes, .listen-area .player {
+    /* Height left for the picture: the area minus the longitude labels (22), the credit (28),
+       the gap (12) and the player bar (110), and 4 for the picture's own frame. */
+    --pic-h: calc(100cqh - 176px);
+    --pic-w: min(calc(var(--pic-h) * var(--aspect, 2)), calc(100cqw - 2 * var(--side)));
+    --sq: min(var(--pic-h), calc(var(--pic-w) * 0.56));
+  }
+  .listen-axes { grid-template-columns: minmax(var(--side), 1fr) var(--pic-w) minmax(var(--side), 1fr); }
+  .band-meter { max-width: 112px; height: calc(var(--pic-w) / var(--aspect, 2)); }
+  .listen-scan.radar .listen-radar { grid-template-columns: var(--sq) minmax(0, 1fr); }
+  .listen-scan.radar .band-meter { height: var(--sq); }
+  .player.axis { padding: 8px 0; }
+  .player.axis .player-row { display: grid; grid-template-columns: minmax(calc(var(--side) - 2px), 1fr) var(--pic-w) minmax(calc(var(--side) - 2px), 1fr); gap: 0; }
+  .player.axis .player-row > .player-buttons:first-child { justify-content: flex-end; padding-right: 14px; }
+  .player.axis .player-row > .player-buttons:last-child { padding-left: 14px; }
+}
+/* Not fitting the screen: the band meter is as tall as the picture it sits beside. */
+@media not ((min-width: 1024px) and (min-height: 640px)) {
+  .band-meter { align-self: stretch; }
+}
+@media (max-width: 1023px) {
+  .steps { grid-template-columns: minmax(0, 1fr); }
+}
+/* Phones: the steps stack; step 2 becomes chips with the chosen one's full name under them; the
+   picture keeps a 34px gutter for its latitude labels; the meter gives its room to the picture;
+   the player sticks above the tabs, its sound line under the picture's edges. */
+@media (max-width: 640px) {
+  .listen-scan { --side: 34px; }
+  .listen-axes { grid-template-columns: 34px minmax(0, 1fr); }
+  .band-meter { display: none; }
+  .listen-scan.radar .listen-radar { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr); }
+  .step-hint { display: none; }
+  .pic-row { grid-template-columns: 22px 56px minmax(0, 1fr); grid-template-areas: "radio thumb name" "radio thumb title" "radio thumb kind"; }
+  .pic-thumb { width: 56px; height: 28px; }
+  .pic-kind { display: flex; flex-wrap: wrap; gap: 0 6px; white-space: normal; }
+  .pic-kind > span + span::before { content: "· "; }
+  .hear-rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 6px; padding-top: 8px; }
+  .hear-row { position: relative; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 4px; min-height: 0; padding: 6px 2px;
+    border: 2px solid var(--ink); border-radius: var(--r); text-align: center; }
+  .hear-row input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .hear-row:has(input:focus-visible) { outline: 3px solid var(--signal); outline-offset: 3px; }
+  .hear-row.on { background: var(--ink); color: var(--paper); }
+  .hear-row.on:hover { background: var(--ink); }
+  .hear-row.on .hear-name b { text-decoration: none; }
+  .hear-row.on .region-thumb { outline-color: var(--paper); }
+  .hear-row.on .region-badge { background: var(--paper); color: var(--region, var(--ink)); }
+  .hear-row.on .sweep-icon, .hear-row.on .circle-icon { border-color: var(--paper); }
+  .hear-row.on .sweep-icon::after { background: var(--paper); }
+  .hear-row .sweep-icon { margin: 9px 0; }
+  .hear-name b { font-size: 0.85rem; }
+  .hear-name small, .hear-row kbd { display: none; }
+  .hear-full { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .hear-chosen { display: block; margin-top: 6px; font-size: 0.85rem; color: var(--ink-2); }
+  .hear-chosen b { color: var(--ink); }
+  .player.axis .player-row { grid-template-columns: repeat(4, 1fr); }
+  .player.axis .player-track { padding-left: 22px; }
+  .sl-where { display: none; }
+  .sl-lane { height: 34px; }
 }

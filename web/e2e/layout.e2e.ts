@@ -1,5 +1,6 @@
 // Layout after Dev B saw it live (15 Nov): real tabs, a player bar, and less scrolling.
-// Practice data: the picture is drawn as a 2:1 placeholder, the same shape as the ocean map.
+// Listen since P1: three steps, the picture, and the player bar with the scan's sound line.
+// Practice data: the scan reads the TEST INPUT picture.
 import { expect, test, type Page } from '@playwright/test';
 import { openApp, startWithKeyboard } from './helpers';
 
@@ -24,19 +25,27 @@ test('on a phone the tabs sit at the bottom and the picture starts on the first 
   await openApp(page);
   const nav = await tabs(page).boundingBox();
   expect(nav!.y + nav!.height).toBeGreaterThanOrEqual(840);
-  const picture = await page.locator('figure.scene').boundingBox();
+  const picture = await page.locator('.listen-figure').boundingBox();
   expect(picture!.y).toBeLessThan(500);
 });
 
-test('the player bar holds the controls and the timeline', async ({ page }) => {
+test('the player bar holds the controls and the sound line, which runs under the picture', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await openApp(page);
-  const bar = page.getByRole('region', { name: 'Playback controls' });
+  const bar = page.getByRole('region', { name: 'Step 3 of 3: play' });
   await expect(bar.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
-  await expect(bar.getByRole('slider', { name: /Rhythm timeline/ })).toBeVisible();
+  await expect(bar.locator('.sound-line')).toBeVisible();
   await expect(bar.getByRole('button', { name: 'Stop', exact: true })).toContainText('Esc');
+  // The sound line is the picture's own x axis: same left edge, same width.
+  const lane = (await bar.locator('.sl-lane').boundingBox())!;
+  const picture = (await page.locator('.listen-figure .chart svg').boundingBox())!;
+  expect(Math.abs(lane.x - picture.x)).toBeLessThanOrEqual(2);
+  expect(Math.abs(lane.width - picture.width)).toBeLessThanOrEqual(2);
 });
 
-test('the timeline has a two-mark legend, and the keys are described for screen readers', async ({ page }) => {
+// The Earth rhythm's beat lane and its legend left Listen in P1 (decision D1); they come back with
+// P4's "Add the Earth rhythm" switch. Kept, not deleted, so P4 turns it back on.
+test.fixme('the timeline has a two-mark legend, and the keys are described for screen readers (returns with P4)', async ({ page }) => {
   await openApp(page);
   const legend = page.locator('.track-legend');
   await expect(legend).toContainText('First pulse');

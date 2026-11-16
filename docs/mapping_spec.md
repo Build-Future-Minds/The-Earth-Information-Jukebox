@@ -1,5 +1,8 @@
 # Mapping spec: one rhythm rule
 
+> Listen plays the picture scan (section "The picture scan: what Listen plays", decision D1).
+> The rhythm rule below is the sound of Compare and the listening game.
+
 Owner: Developer A. This follows the Team Briefing. Everything here is a **sound rule we choose**.
 It describes the rendered image. It does not measure water speed, turbulence or ocean health.
 
@@ -107,11 +110,17 @@ Equatorial Pacific and Kuroshio, and the files the app plays: section 10.
 A second feature (for example on-screen motion between frames, or legend colour band) may
 control a second sound property. It needs its own tests and its own honest wording first.
 
-## Play along: the picture scan (an extra, not part of the rule)
+## The picture scan: what Listen plays
 
-Added 15 Nov by Developer A, in the app's "Play along" section. It is a second way to listen and
-it is **not** the rhythm rule above: the Earth voice, its tests and the listening check do not
-change. A browser test proves the Earth notes keep their schedule while the scan plays.
+Added 15 Nov by Developer A on "Play along". Since 16 Nov it is **Listen's sound** (decision D1 in
+`docs/page_plan.md`; **Design choice**): Listen's three steps choose a NASA picture, then the whole
+picture or one region, then play the scan. It is a second rule beside the rhythm rule above, not
+a change to it: the rhythm rule stays the rule the listening game tests and the sound of Compare,
+and its tests do not change. A browser test proves the Earth notes keep their schedule while the
+scan plays (Play along). The rhythm comes back to Listen as a switch in P4.
+
+Each picture is read with **its own settings**, measured on its own still (decision D2; see "Each
+picture's own settings" below). The rule is the same for every picture.
 
 **Where the idea comes from. Verified** (read on NASA's pages, 15 Nov; sources S9 to S11 in
 `DECISIONS.md`). NASA's image sonifications, made by SYSTEM Sounds (M. Russo, A. Santaguida),
@@ -146,8 +155,44 @@ team's land rule uses. A cell's mean strength `s` becomes a level
 | Columns × bands | 240 × 12 | 120 × 12 |
 | One sweep at speed 1 | 30 s, the Earth loop's length | 15 s |
 | How a cell is read | Every pixel once | 16 points, 4 along the radius × 4 along the arc |
-| Floor | 12 ÷ 255 | 12 ÷ 255 |
-| Full level | 0.5 | 0.75 |
+| Floor | the picture's own (below) | the picture's own |
+| Full level | the picture's own (below) | the picture's own |
+
+### Each picture's own settings
+
+The floor, the full levels and the pixels never read are set per picture, measured on that
+picture's own still by `npm run measure` (`docs/measurements/scan_pictures.md`, one section per
+picture). **Never compare these numbers between pictures**: each picture is drawn differently, so
+a floor or a full level means something only for its own picture. The app reads them from
+`web/src/data/sources.ts` (`scan`), and a unit test fails if they differ from what was measured.
+
+| Picture | Floor | Full level: map sweep | Full level: radar | Never read | Tag |
+| --- | --- | --- | --- | --- | --- |
+| Sea surface currents and temperature (SVS 3912) | 12 ÷ 255 | 0.5 | 0.75 | nothing | **Design choice**, measured 15 Nov |
+| Aerosols (SVS 5669) | 20 ÷ 255 | 0.45 | 0.8 | nothing | **Design choice**, by the procedure, measured 16 Nov |
+| Precipitation, GPM IMERG (SVS 4285) | 30 ÷ 255 | 0.85 | 0.95 | land and ice (`data/imerg/scan_mask.png`) | floor and full levels **Design choice**, by the procedure; the mask **Verified** (below) |
+
+The procedure, the same for every picture since 16 Nov (**Design choice**):
+
+- **Floor:** the colour strength of the commonest colour among the pixels read (what the picture
+  draws as "nothing"), plus 12 grey levels for JPEG noise.
+- **Full level:** the largest cell mean on that scan (the radar: the larger of the two circles),
+  rounded up to 0.05, so no cell is clipped.
+- **Never read:** the picture's `scan_mask.png`, if it has one. The rain picture's land and ice are
+  a satellite photo, not rain data, and the colour rule would make a desert sound like rain. Its
+  mask is the land `analysis/prepare_scene.py` already uses for its regions (the SVS 3912 ocean
+  outline plus pixels that never change across the 30 frames). **Verified**: inside each rain
+  circle it marks exactly the pixels the region's own mask leaves out (`analysis/scan_mask.py`
+  stops on any difference). A cell that reads nothing is no data: silent, never a peak, and not
+  counted as a zero.
+
+The ocean picture keeps the settings it was built with on 15 Nov; the procedure would give its
+radar 0.85 instead of 0.75 (`scan_pictures.md`, "Ocean").
+
+**Measured, 16 Nov: the app plays what was measured.** On Listen, the score the app builds for
+each picture and each scan has the same struck notes as the measuring tool counted: ocean 68 (map
+sweep), 56 and 72 (regions A and B); aerosols 36, 34 and 0 (Region D's strongest cell is 0.15,
+under the chime level); rain 16, 31 and 7. Read from the running app on real data, not heard.
 
 A chime needs a level of 0.3 or more at its peak, after smoothing over three columns with
 weights 1, 2, 1. Two chimes in one band are at least 6 columns (0.75 s) apart, and one column
@@ -181,7 +226,7 @@ Note names, the scale and the chord steps are written with Tonal, a music-theory
 so the code says "C major pentatonic" and "I, VIm, IV, V" and a test checks the note names.
 
 **Explaining a note.** The app can say why any note sounds, the way "Explain this rhythm" does for
-the Earth voice. The fold-out "Why the scan sounds like this" (Play along) has four parts:
+the Earth voice. "Why the scan sounds like this" (opened by Explain on Listen, and a fold-out on Play along) has four parts:
 
 - *Last struck note.* The place on the picture, what was measured there, and how that became the
   held note's loudness and the struck note's pitch, instrument and strength.

@@ -48,14 +48,23 @@ interface PlayerProps {
   onStart: () => void;
   onPause: () => void;
   onStop: () => void;
-  onReplay: () => void;
+  /** Without it there is no Replay button (Listen's scan: Stop then Play does the same). */
+  onReplay?: () => void;
   onExplain: () => void;
   onSpeed: (speed: number) => void;
   onVolume: (db: number) => void;
-  /** The beat timeline, shown inside the bar like a music player's progress line. */
+  /** The timeline, shown inside the bar like a music player's progress line. */
   children?: ReactNode;
   /** Step number for Play on Listen; decoration, hidden from screen readers. */
   step?: number;
+  /** The bar's name for screen readers. */
+  label?: string;
+  /** Extra classes: 'axis' lines the timeline up under the picture (Listen). */
+  className?: string;
+  /** Nothing to play yet: Play is disabled. */
+  canPlay?: boolean;
+  /** More settings under Speed and Volume (Listen: the scan's instruments). */
+  settings?: ReactNode;
 }
 
 /** One framed bar under the picture: Play, Stop, Replay, the timeline, Explain and Sound. */
@@ -63,16 +72,16 @@ export function PlayerBar(p: PlayerProps) {
   const playing = p.playState === 'playing';
   const [soundOpen, setSoundOpen] = useState(false);
   return (
-    <section className="player" aria-label="Playback controls">
+    <section className={p.className ? `player ${p.className}` : 'player'} aria-label={p.label ?? 'Playback controls'}>
       <div className="player-row">
         <div className="player-buttons">
           {playing ? (
             <IconButton icon={PauseIcon} label="Pause" onClick={p.onPause} primary />
           ) : (
-            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary step={p.step} />
+            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary step={p.step} disabled={p.canPlay === false} />
           )}
           <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" hint="Esc" />
-          <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />
+          {p.onReplay && <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />}
         </div>
         <div className="player-track">{p.children}</div>
         <div className="player-buttons">
@@ -81,6 +90,7 @@ export function PlayerBar(p: PlayerProps) {
         </div>
       </div>
       <div id="sound-settings" className="sound-settings" hidden={!soundOpen}>
+        {p.settings}
         <div className="row" role="group" aria-label="Speed">
           {SPEEDS.map((v) => (
             <button key={v} type="button" className="speed" aria-pressed={p.speed === v} onClick={() => p.onSpeed(v)}>

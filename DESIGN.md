@@ -123,7 +123,7 @@ Earth Sonata reads like a tide table printed on a sea chart. The NASA picture si
 
 Two editions of one print. Light is almanac white with navy ink and tide-blue actions. Dark is the night edition: deep navy ground with the same inks lifted. The theme follows the saved choice, else the system setting, and is set before first paint so there is no flash. One red-orange, the signal, is the only loud colour and it means live, chosen or focused, nothing else.
 
-The system is keyboard-first. The Tab order follows the screen: the six tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.
+The system is keyboard-first. The Tab order follows the screen: the six tabs, the theme switch, then on Listen step 1 (the picture list, then its NASA title links), step 2 (what to hear), then Play. Colour is never the only cue: every region mark carries its letter.
 
 **Key Characteristics:**
 - One face, Atkinson Hyperlegible Next. Atkinson Hyperlegible Mono only for numbers, coordinates and readouts.
@@ -183,7 +183,7 @@ Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the side
 
 ## Layout
 
-A sticky top bar (10px 24px padding, 1px rule under it) holds the title on the left (the title line shows from 1560px up), the six tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding). On Listen, the picture choice and region choice sit in one row above the picture; the picture is capped to the screen height so the whole view fits a 1440 x 900 screen; the player bar sits right under the picture. Below 900px the title line hides. Below 1024px the tabs move to a fixed bottom bar (six equal cells, icon over word), the player bar sticks just above it, and the chart margin tightens.
+A sticky top bar (10px 24px padding, 1px rule under it) holds the title on the left (the title line shows from 1560px up), the six tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding). On Listen, steps 1 and 2 sit side by side as two ruled lists above the picture; the picture takes the rest of the screen (a size container: the screen minus the top bar and the steps) so the whole view fits a 1440 x 900 screen; the player bar sits right under the picture, its sound line in the same column as the picture, and the twelve held-note bars stand in the right gutter beside the bands they read. Below 1024px wide or 640px tall the page scrolls and the picture takes the column's width. Below 900px the title line hides. Below 1024px the tabs move to a fixed bottom bar (six equal cells, icon over word), the player bar sticks just above it, and the chart margin tightens.
 
 Spacing scale: 10, 16, 22, 28, 40px. Sections are separated by a 1px top rule with 16px padding, not by gaps alone. The NASA picture sits in a chart frame (1px ink neatline, margin 22px top and 44px left) with ticks every 10 degrees, labelled every 30, and the credit directly under it.
 
@@ -221,7 +221,19 @@ A line icon over a one-word label. Team rule (15 Nov): more buttons, less text.
 Six tabs in the top bar: Listen, Compare, How it's made, Play along, Globe (five views) and Game (opens the listening game page, which links back), each a 20px line icon and a word. They are one joined strip with a 2px ink frame and 2px ink dividers, 8px corners; the current tab is filled in ink with paper text and carries `aria-current="page"`; hover fills with the faint hairline. On phones the strip becomes a fixed bottom bar of four equal cells, icon over word.
 
 ### Player bar
-One framed strip under the picture, like a music player: 2px ink frame, 10px corners, 8px 10px padding. Left: Play (tide blue) / Pause, Stop with a small visible "Esc" hint (hidden from screen readers; `aria-keyshortcuts` says it), Replay. Middle: the beat timeline, taking the free width. Right: Explain and Sound. On phones it sticks above the tabs and the timeline takes its own row.
+One framed strip under the picture, like a music player: 2px ink frame, 10px corners, 8px 10px padding. Left: Play (tide blue) / Pause, Stop with a small visible "Esc" hint (hidden from screen readers; `aria-keyshortcuts` says it), and Replay where it exists (not on Listen's scan: Stop then Play does the same). Middle: the timeline, taking the free width. Right: Explain and Sound. On Listen the bar's middle column is the picture's own column, so the sound line runs exactly under the picture, and its name for screen readers is "Step 3 of 3: play". On phones it sticks above the tabs and the timeline takes its own row.
+
+### Picture list (Listen, step 1)
+One ruled row per picture (ink rule on top, hairlines between): radio, a 64 x 32 thumbnail with an ink hairline, the team's short name (700), NASA's own title under it as a link to NASA's page (0.82rem slate), and on the right the kind of data and the frame count (the number in mono). The chosen row's name gets the 3px signal underline. A picture whose scan has not been measured says so in its row.
+
+### What to hear (Listen, step 2)
+The same ruled rows: "Whole picture" with a small sweep drawing (a framed well with a line across it), then each region with its round crop, letter badge and name, and one line on what you will hear ("A line crosses it west to east in 30 s" / "A radar line turns once around the circle in 15 s", following the speed). Number keys 1, 2, 3 work while the group has focus. On phones the rows become chips (icon and short name, the chosen one filled in ink) with the chosen option's full name spelled out under them.
+
+### Sound line (signature)
+The scan's timeline in the player bar: every struck note of the score as a 5px mark, x by time (on the map sweep the picture's own x, so the playhead stands under the scan line; on the radar the turn, 0 to 360 from east), y by pitch, round for the warm instrument and a diamond for the cool one, the same shapes as on the picture. Notes still to come are slate at 35%; played notes are ink (a clip at the playhead); the playhead is the 2px signal line with a square cap. Mono axis labels: longitudes, or E N W S. Above it, the now chip and the mono time (0:13 / 0:30).
+
+### Held-note bars
+Twelve thin bars in the right gutter, highest note at the top, each beside the band of the picture it reads (on the radar, beside the zoomed circle, centre low and rim high). The ink fill is how loud that held note is now; a bar flashes signal when a note is struck in its band. Empty while stopped. Hidden on phones; the sound line carries the notes there.
 
 ### Sound settings
 One Sound icon button shows and hides the speed buttons (½× ¾× 1× 1¼×, mono, the chosen one pressed in ink) and a Volume slider. No decibel numbers on screen; screen readers hear a percentage.
@@ -261,7 +273,7 @@ A picture with a single frame (aerosols) has one value per region. Its tide curv
 ## Views
 
 The app has five views, one per tab, plus the Game tab, which opens the listening game page. Changing view stops all sound, moves focus to the view's heading, and changes the tab title to "<view> · Earth Sonata".
-- **Listen (home):** the picture and region choices in one row (step marks 1 Picture, 2 Region, 3 Play), the picture in its chart frame with the credit under it, the player bar (with the beat timeline), and the Explain picture when opened. Fits one desktop screen.
+- **Listen (home):** three numbered steps (P1): 1 Choose a NASA picture and 2 Choose what to hear side by side, then the picture in its chart frame (or, for a region, the zoomed circle with a locator map and the region's description beside it) with the credit under it, the held-note bars beside it, and the player bar with the sound line (3 Play). It plays the picture scan (decision D1). Explain opens a hairline section under the player: the three honesty lines for the picture, "Why the scan sounds like this", what the marks mean and how the picture becomes sound. Fits one desktop screen.
 - **Compare:** for the chosen picture only, its two regions side by side: close-up with ticks, the giant numeral, the value, a Play/Stop toggle and the region's rhythm row; then the tide table and curves.
 - **How it's made:** the three-picture strip (picture, ticks, pulses), the rule in one line, the three honesty lines, and a credit block for each picture.
 - **Play along:** Play the picture (the scan, its settings and legend folded away), one panel with the Earth rhythm's Play and Stop, a now chip and the melody keys, and a one-line game card.
@@ -279,7 +291,7 @@ State is shown, not narrated: a now chip (region badge plus Ready, Playing or Pa
 - **Do** let font weight (200 to 800) carry alignment on the numeral and live value.
 - **Do** draw a missing frame as a break or hatched gap.
 - **Do** give both themes the same structure; only the inks lift.
-- **Do** keep the Tab order the same as the screen order: tabs, theme, picture, region, then Play.
+- **Do** keep the Tab order the same as the screen order: tabs, theme, step 1, step 2, then Play.
 
 ### Don't:
 - **Don't** put content in boxes, cards or floating panels, or add side stripes.
