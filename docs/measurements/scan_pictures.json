@@ -1,8 +1,8 @@
 {
  "meta": {
-  "date": "2026-11-16 03:57 UTC",
+  "date": "2026-11-16 05:06 UTC",
   "browser": "Chromium 159.0.8154.6",
-  "commit": "7d8dfc6",
+  "commit": "9e282f1",
   "dirty": "yes"
  },
  "files": {
@@ -2529,5 +2529,79 @@
     "bar1BlueSteps": 10
    }
   }
- ]
+ ],
+ "globe": {
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "pictures": [
+   {
+    "label": "Ocean",
+    "checks": [
+     {
+      "scan": "Whole picture: a line, west to east",
+      "cells": 2880,
+      "chimes": 68,
+      "same": true
+     },
+     {
+      "scan": "Region A: a radar turn",
+      "cells": 1440,
+      "chimes": 56,
+      "same": true
+     },
+     {
+      "scan": "Region B: a radar turn",
+      "cells": 1440,
+      "chimes": 72,
+      "same": true
+     }
+    ]
+   },
+   {
+    "label": "Aerosols",
+    "checks": [
+     {
+      "scan": "Whole picture: a line, west to east",
+      "cells": 2880,
+      "chimes": 36,
+      "same": true
+     },
+     {
+      "scan": "Region C: a radar turn",
+      "cells": 1440,
+      "chimes": 34,
+      "same": true
+     },
+     {
+      "scan": "Region D: a radar turn",
+      "cells": 1440,
+      "chimes": 0,
+      "same": true
+     }
+    ]
+   },
+   {
+    "label": "Rain",
+    "checks": [
+     {
+      "scan": "Whole picture: a line, west to east",
+      "cells": 2880,
+      "chimes": 16,
+      "same": true
+     },
+     {
+      "scan": "Region E: a radar turn",
+      "cells": 1440,
+      "chimes": 31,
+      "same": true
+     },
+     {
+      "scan": "Region F: a radar turn",
+      "cells": 1440,
+      "chimes": 7,
+      "same": true
+     }
+    ]
+   }
+  ]
+ }
 }

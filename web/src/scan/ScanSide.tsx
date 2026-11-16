@@ -6,7 +6,8 @@ import { ROOT_NOTES, bandNote, noteName } from '../audio/scanScore';
 import { ScanLegend } from './ScanLegend';
 import type { Scan } from './useScan';
 
-export function ScanSide({ scan, children }: { scan: Scan; children?: ReactNode }) {
+/** `hatchDrawn`: this view hatches the pixels the picture never reads (Play along does; the globe does not). */
+export function ScanSide({ scan, children, hatchDrawn = true }: { scan: Scan; children?: ReactNode; hatchDrawn?: boolean }) {
   const { side, bands, sound, order, region, rule, blueClass, mask } = scan;
   return (
     <div className="scan-side">
@@ -32,7 +33,7 @@ export function ScanSide({ scan, children }: { scan: Scan; children?: ReactNode 
 
       <details className="scan-legend-box">
         <summary>What the marks mean</summary>
-        <ScanLegend sound={sound} order={order} radar={!!region} instruments={rule.instruments} third={blueClass} hatched={!!mask} />
+        <ScanLegend sound={sound} order={order} radar={!!region} instruments={rule.instruments} third={blueClass} hatched={!!mask} hatchDrawn={hatchDrawn} />
       </details>
 
       {children}

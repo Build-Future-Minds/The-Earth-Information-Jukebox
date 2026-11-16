@@ -1,8 +1,8 @@
 {
  "meta": {
-  "date": "2026-11-16 03:47 UTC",
+  "date": "2026-11-16 05:13 UTC",
   "browser": "Chromium 159.0.8154.6 (headless)",
-  "commit": "facd88d",
+  "commit": "9e282f1",
   "dirty": "yes"
  },
  "steps": {
@@ -15,30 +15,30 @@
    {
     "target": 0.125,
     "level": 0.12121212482452393,
-    "toneDb": -43.39369465523197,
-    "levelDb": -41.98232313346766,
-    "lufs": -42.68817780653472
+    "toneDb": -44.647772601150805,
+    "levelDb": -42.98039019932931,
+    "lufs": -43.55752252655026
    },
    {
     "target": 0.25,
     "level": 0.25108224153518677,
-    "toneDb": -37.329081595716,
-    "levelDb": -36.31063828867701,
-    "lufs": -36.59181884296565
+    "toneDb": -38.45187733911899,
+    "levelDb": -36.94657695658618,
+    "lufs": -37.180380990663224
    },
    {
     "target": 0.5,
     "level": 0.5021644830703735,
-    "toneDb": -31.763937750056446,
-    "levelDb": -30.516496009156274,
-    "lufs": -30.77287993349784
+    "toneDb": -32.63111149525287,
+    "levelDb": -30.9488452831919,
+    "lufs": -31.20529791762715
    },
    {
     "target": 1,
     "level": 1,
-    "toneDb": -26.290987474188967,
-    "levelDb": -24.548845982268418,
-    "lufs": -25.094513202311983
+    "toneDb": -26.711634532932926,
+    "levelDb": -24.775678102337523,
+    "lufs": -25.2534692964395
    }
   ]
  },
@@ -50,15 +50,15 @@
     "colour": "warm",
     "name": "marimba",
     "level": 0.5,
-    "lufs": -18.26753553611258,
-    "peakDb": -3.574312189979436
+    "lufs": -18.290285962225408,
+    "peakDb": -3.669714354079405
    },
    {
     "sound": "Ocean choir",
     "colour": "cool",
     "name": "bells",
     "level": 0.3,
-    "lufs": -19.52181715472915,
+    "lufs": -19.518755854096092,
     "peakDb": -5.533309377530871
    },
    {
@@ -66,32 +66,32 @@
     "colour": "blue",
     "name": "harp",
     "level": 0.32,
-    "lufs": -19.359616786627825,
-    "peakDb": -6.833859880951807
+    "lufs": -19.359617660746178,
+    "peakDb": -6.834468234990922
    },
    {
     "sound": "Music box",
     "colour": "warm",
     "name": "kalimba",
     "level": 0.42,
-    "lufs": -20.438074957081668,
-    "peakDb": -6.476784210652534
+    "lufs": -20.497857953403102,
+    "peakDb": -6.600379658535191
    },
    {
     "sound": "Music box",
     "colour": "cool",
     "name": "music box",
     "level": 0.26,
-    "lufs": -21.58048513670131,
-    "peakDb": -10.212450414952537
+    "lufs": -21.640828897408692,
+    "peakDb": -10.272978698031851
    },
    {
     "sound": "Music box",
     "colour": "blue",
     "name": "harp",
     "level": 0.25,
-    "lufs": -21.503864613133768,
-    "peakDb": -8.973756164164563
+    "lufs": -21.570582212283902,
+    "peakDb": -9.060618156539796
    },
    {
     "sound": "Plain (first instruments)",
@@ -106,7 +106,7 @@
     "colour": "cool",
     "name": "bells",
     "level": 0.3,
-    "lufs": -19.61696800111694,
+    "lufs": -19.62289818556486,
     "peakDb": -7.5443081820866
    },
    {
@@ -114,8 +114,8 @@
     "colour": "blue",
     "name": "harp",
     "level": 0.31,
-    "lufs": -19.6375824198975,
-    "peakDb": -7.125354595292757
+    "lufs": -19.642374018656746,
+    "peakDb": -7.125354007353945
    }
   ]
  },
@@ -128,29 +128,29 @@
      "measured": {
       "seconds": 30,
       "sampleRate": 48000,
-      "recorded": 1.0000000000012221,
-      "lufs": -24.807643854573072,
-      "peakDb": -8.05401542210282,
-      "levelDb": -24.45658642755559,
-      "leftMinusRightDb": -0.3998060927444058
+      "recorded": 1.0000000000012224,
+      "lufs": -24.656603128274753,
+      "peakDb": -8.753899230155895,
+      "levelDb": -24.371220982462162,
+      "leftMinusRightDb": 0.2533714489100696
      },
      "firstSixth": {
       "seconds": 5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -23.70607847085379,
-      "peakDb": -8.103379708342057,
-      "levelDb": -23.371625658995793,
-      "leftMinusRightDb": 9.743958299788627
+      "lufs": -23.18500187897209,
+      "peakDb": -8.906961534277919,
+      "levelDb": -22.91112359224439,
+      "leftMinusRightDb": 10.16764463206928
      },
      "lastSixth": {
       "seconds": 5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -22.22304758259543,
-      "peakDb": -8.05401542210282,
-      "levelDb": -22.04087961827401,
-      "leftMinusRightDb": -9.237621007781499
+      "lufs": -22.6202939808208,
+      "peakDb": -8.753899230155895,
+      "levelDb": -22.540778372038144,
+      "leftMinusRightDb": -8.708118387071156
      }
     },
     {
@@ -159,28 +159,28 @@
       "seconds": 15,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -24.68682526040664,
-      "peakDb": -10.447981343401027,
-      "levelDb": -25.04106705988491,
-      "leftMinusRightDb": 0.08895314338674254
+      "lufs": -24.621964226949345,
+      "peakDb": -11.05498129220373,
+      "levelDb": -25.136282741756855,
+      "leftMinusRightDb": 0.8779200904499724
      },
      "firstSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -24.25329622227877,
-      "peakDb": -10.667964745511272,
-      "levelDb": -25.095088462240724,
-      "leftMinusRightDb": -8.445750021644795
+      "lufs": -24.7353184787711,
+      "peakDb": -11.410150669246091,
+      "levelDb": -25.67452477148979,
+      "leftMinusRightDb": -7.622672162543605
      },
      "lastSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -28.022442354698207,
-      "peakDb": -14.28044612558564,
-      "levelDb": -28.131158897278972,
-      "leftMinusRightDb": -7.919238389105317
+      "lufs": -28.590193049631996,
+      "peakDb": -15.114328252433342,
+      "levelDb": -28.943569078515793,
+      "leftMinusRightDb": -7.217849833597107
      }
     },
     {
@@ -189,28 +189,28 @@
       "seconds": 15,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -21.443998088069833,
-      "peakDb": -6.544727308905181,
-      "levelDb": -21.217532995721324,
-      "leftMinusRightDb": 0.9261474176724391
+      "lufs": -21.65619595987324,
+      "peakDb": -5.683404850610119,
+      "levelDb": -21.58901669381673,
+      "leftMinusRightDb": 1.1536049875800884
      },
      "firstSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -23.58414528174316,
-      "peakDb": -8.03405397759166,
-      "levelDb": -23.13853181421003,
-      "leftMinusRightDb": -8.662180042188126
+      "lufs": -23.28527847539344,
+      "peakDb": -9.249673804039627,
+      "levelDb": -23.007994719252792,
+      "leftMinusRightDb": -8.723872595617681
      },
      "lastSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -20.201509390037813,
-      "peakDb": -6.544727308905181,
-      "levelDb": -20.095963697311056,
-      "leftMinusRightDb": -8.352682435166411
+      "lufs": -20.743231456018496,
+      "peakDb": -8.108150942994165,
+      "levelDb": -20.998676641235782,
+      "leftMinusRightDb": -8.125563803761011
      }
     }
    ],
@@ -225,20 +225,20 @@
     "allVoices": {
      "seconds": 20,
      "sampleRate": 48000,
-     "recorded": 1.0000000000012228,
-     "lufs": -20.30416853180297,
-     "peakDb": -5.612842906809735,
-     "levelDb": -19.705909943413495,
-     "leftMinusRightDb": 1.318172731186408
+     "recorded": 1.0000000000012221,
+     "lufs": -19.977977187639826,
+     "peakDb": -3.781471697437413,
+     "levelDb": -19.392629332354076,
+     "leftMinusRightDb": 1.437229406228294
     },
     "beforeStop": {
      "seconds": 1.8,
      "sampleRate": 48000,
-     "recorded": 1.0000000000012317,
-     "lufs": -20.504449930769017,
-     "peakDb": -7.226465430206005,
-     "levelDb": -19.936034910380794,
-     "leftMinusRightDb": -0.5440057313458482
+     "recorded": 1.000000000001216,
+     "lufs": -20.473176702134495,
+     "peakDb": -6.546767757700216,
+     "levelDb": -19.806928904020427,
+     "leftMinusRightDb": -0.2476264154675647
     },
     "afterStop": {
      "seconds": 2,
@@ -249,6 +249,20 @@
      "levelDb": null,
      "leftMinusRightDb": null
     }
+   },
+   "globe": {
+    "sweep": {
+     "seconds": 30,
+     "sampleRate": 48000,
+     "recorded": 1.0000000000012221,
+     "lufs": -25.171517663618925,
+     "peakDb": -8.929269732746977,
+     "levelDb": -24.856006701870378,
+     "leftMinusRightDb": -0.3436673346020349
+    },
+    "chimes": 68,
+    "flatChimes": 68,
+    "same": true
    }
   },
   {
@@ -260,28 +274,28 @@
       "seconds": 30,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -27.487697319699038,
-      "peakDb": -12.387099266272187,
-      "levelDb": -27.69479504971317,
-      "leftMinusRightDb": -1.366065042654867
+      "lufs": -27.0539476134166,
+      "peakDb": -10.933209999308442,
+      "levelDb": -27.372548761161944,
+      "leftMinusRightDb": -1.5897191521643492
      },
      "firstSixth": {
       "seconds": 5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -28.144631268943165,
-      "peakDb": -15.676416904891928,
-      "levelDb": -29.065654572512805,
-      "leftMinusRightDb": 10.092284996439123
+      "lufs": -27.838178633390253,
+      "peakDb": -14.118801299986991,
+      "levelDb": -28.69213803086253,
+      "leftMinusRightDb": 10.314354726942199
      },
      "lastSixth": {
       "seconds": 5,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -26.44395193583543,
-      "peakDb": -12.387099266272187,
-      "levelDb": -26.211771384762788,
-      "leftMinusRightDb": -9.141943211045952
+      "lufs": -25.36126292057047,
+      "peakDb": -10.933209999308442,
+      "levelDb": -25.397670289647024,
+      "leftMinusRightDb": -9.191156291929623
      }
     },
     {
@@ -290,28 +304,28 @@
       "seconds": 15,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -21.600083558675657,
-      "peakDb": -6.244700066937843,
-      "levelDb": -21.975855768818814,
-      "leftMinusRightDb": 1.1939444889553457
+      "lufs": -21.64326815467031,
+      "peakDb": -5.32534695582001,
+      "levelDb": -22.414774060758162,
+      "leftMinusRightDb": 2.681925942155992
      },
      "firstSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
-      "recorded": 1.0000000000012164,
-      "lufs": -27.698060591515226,
-      "peakDb": -13.147585604031292,
-      "levelDb": -27.184583522957496,
-      "leftMinusRightDb": -8.896058994304756
+      "recorded": 1.000000000001228,
+      "lufs": -28.001448766113583,
+      "peakDb": -12.238087902610456,
+      "levelDb": -27.593861975960913,
+      "leftMinusRightDb": -8.742320606230258
      },
      "lastSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
-      "recorded": 1.000000000001228,
-      "lufs": -20.148951864748554,
-      "peakDb": -6.244700066937843,
-      "levelDb": -19.728067086161747,
-      "leftMinusRightDb": -10.481097584452506
+      "recorded": 1.0000000000012164,
+      "lufs": -21.70873731019529,
+      "peakDb": -5.32534695582001,
+      "levelDb": -21.408706779411265,
+      "leftMinusRightDb": -9.879844843917574
      }
     },
     {
@@ -320,28 +334,28 @@
       "seconds": 15,
       "sampleRate": 48000,
       "recorded": 1.0000000000012221,
-      "lufs": -53.18699014445423,
-      "peakDb": -37.96032053060027,
-      "levelDb": -52.51668401608394,
-      "leftMinusRightDb": -1.7246213003699964
+      "lufs": -53.575636751653114,
+      "peakDb": -36.408488232722895,
+      "levelDb": -52.98421629864616,
+      "leftMinusRightDb": -1.1799608974169615
      },
      "firstSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
-      "recorded": 1.000000000001228,
-      "lufs": -51.878758040650695,
-      "peakDb": -39.383430410344374,
-      "levelDb": -51.171011893604124,
-      "leftMinusRightDb": -9.645820226749315
+      "recorded": 1.0000000000012164,
+      "lufs": -52.50277211026526,
+      "peakDb": -40.28728249024698,
+      "levelDb": -51.79397732583312,
+      "leftMinusRightDb": -8.242635982328864
      },
      "lastSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
-      "recorded": 1.0000000000012164,
-      "lufs": -54.030569054636516,
-      "peakDb": -40.4293245451586,
-      "levelDb": -53.40992074688536,
-      "leftMinusRightDb": -9.368777281438696
+      "recorded": 1.000000000001228,
+      "lufs": -55.25575884432304,
+      "peakDb": -42.00340359502456,
+      "levelDb": -54.79781547101233,
+      "leftMinusRightDb": -8.382485841207924
      }
     }
    ],
@@ -356,30 +370,44 @@
     "allVoices": {
      "seconds": 20,
      "sampleRate": 48000,
-     "recorded": 1.0000000000012221,
-     "lufs": -21.007825041411163,
-     "peakDb": -5.131135237702194,
-     "levelDb": -20.41624112903312,
-     "leftMinusRightDb": 0.7845069390158947
+     "recorded": 0.9999999999913541,
+     "lufs": -20.823669799908036,
+     "peakDb": -3.8738561728991234,
+     "levelDb": -20.214017958092256,
+     "leftMinusRightDb": 0.6147212072554957
     },
     "beforeStop": {
      "seconds": 1.8,
      "sampleRate": 48000,
-     "recorded": 1.0000000000012317,
-     "lufs": -21.10781538328097,
-     "peakDb": -6.400182201490586,
-     "levelDb": -20.65421847093857,
-     "leftMinusRightDb": 0.06575066812640529
+     "recorded": 0.9999999999905893,
+     "lufs": -20.798930592204496,
+     "peakDb": -6.806419140609088,
+     "levelDb": -20.140332040138,
+     "leftMinusRightDb": 0.1163005928919425
     },
     "afterStop": {
      "seconds": 2,
      "sampleRate": 48000,
-     "recorded": 1.0000000000012221,
+     "recorded": 0.999999999990564,
      "lufs": null,
      "peakDb": null,
      "levelDb": null,
      "leftMinusRightDb": null
     }
+   },
+   "globe": {
+    "sweep": {
+     "seconds": 30,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": -26.90382114665948,
+     "peakDb": -10.54359973435514,
+     "levelDb": -27.222271762612728,
+     "leftMinusRightDb": -2.7410881063721426
+    },
+    "chimes": 36,
+    "flatChimes": 36,
+    "same": true
    }
   },
   {
@@ -390,29 +418,29 @@
      "measured": {
       "seconds": 30,
       "sampleRate": 48000,
-      "recorded": 0.999999999994309,
-      "lufs": -32.10054204783838,
-      "peakDb": -14.720797242544174,
-      "levelDb": -33.07229699135762,
-      "leftMinusRightDb": 0.43408676847106165
+      "recorded": 0.999999999990564,
+      "lufs": -32.440325014294096,
+      "peakDb": -14.94327319722428,
+      "levelDb": -33.472824444530424,
+      "leftMinusRightDb": -0.16632398141275218
      },
      "firstSixth": {
       "seconds": 5,
       "sampleRate": 48000,
-      "recorded": 1.0000000000012221,
-      "lufs": -33.96212216230196,
-      "peakDb": -16.72174959079665,
-      "levelDb": -33.65120400565357,
-      "leftMinusRightDb": 8.577333372084198
+      "recorded": 0.999999999990564,
+      "lufs": -34.50094949629292,
+      "peakDb": -16.867439496459934,
+      "levelDb": -33.93339523069548,
+      "leftMinusRightDb": 7.844661297625294
      },
      "lastSixth": {
       "seconds": 5,
       "sampleRate": 48000,
       "recorded": 0.999999999990564,
-      "lufs": -34.17083192721851,
-      "peakDb": -18.932147044791293,
-      "levelDb": -35.67244927698511,
-      "leftMinusRightDb": -9.379642450184917
+      "lufs": -34.578229009762794,
+      "peakDb": -19.711855841589873,
+      "levelDb": -36.11254181738079,
+      "leftMinusRightDb": -9.18084892178259
      }
     },
     {
@@ -421,28 +449,28 @@
       "seconds": 15,
       "sampleRate": 48000,
       "recorded": 0.999999999990564,
-      "lufs": -23.854514410417753,
-      "peakDb": -7.3832873774162735,
-      "levelDb": -25.1840435168631,
-      "leftMinusRightDb": -0.28258623782251746
+      "lufs": -24.47277724570595,
+      "peakDb": -8.027466005564996,
+      "levelDb": -25.738085933136368,
+      "leftMinusRightDb": -0.5833016082776865
      },
      "firstSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
-      "recorded": 0.9999999999905412,
-      "lufs": -22.71582610985826,
-      "peakDb": -8.200721201617842,
-      "levelDb": -22.51804636121259,
-      "leftMinusRightDb": -8.925461553388484
+      "recorded": 0.999999999990564,
+      "lufs": -22.867887392673026,
+      "peakDb": -10.131597366537093,
+      "levelDb": -22.806143449721944,
+      "leftMinusRightDb": -9.431943444663617
      },
      "lastSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
-      "recorded": 0.9999999999905868,
-      "lufs": -25.17939749031132,
-      "peakDb": -8.969754398179617,
-      "levelDb": -26.653707887956585,
-      "leftMinusRightDb": -11.764485257721518
+      "recorded": 0.999999999990564,
+      "lufs": -25.62539403248377,
+      "peakDb": -10.255615926422582,
+      "levelDb": -27.198470000179746,
+      "leftMinusRightDb": -10.652114979726942
      }
     },
     {
@@ -451,28 +479,28 @@
       "seconds": 15,
       "sampleRate": 48000,
       "recorded": 0.999999999990564,
-      "lufs": -25.048493456751263,
-      "peakDb": -9.439892602361184,
-      "levelDb": -33.471103641021905,
-      "leftMinusRightDb": 4.570929213676827
+      "lufs": -25.875683206840222,
+      "peakDb": -10.635187932732755,
+      "levelDb": -34.25031917845967,
+      "leftMinusRightDb": 3.6822850554353295
      },
      "firstSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
       "recorded": 0.999999999990564,
-      "lufs": -50.83760450441417,
-      "peakDb": -38.366396686661616,
-      "levelDb": -57.027894195023016,
-      "leftMinusRightDb": -9.147321211922012
+      "lufs": -55.17531050771811,
+      "peakDb": -42.199658661677184,
+      "levelDb": -60.5919139192637,
+      "leftMinusRightDb": -9.760703996250783
      },
      "lastSixth": {
       "seconds": 2.5,
       "sampleRate": 48000,
       "recorded": 0.999999999990564,
-      "lufs": -28.203145122690472,
-      "peakDb": -17.417557603038944,
-      "levelDb": -34.204187809450275,
-      "leftMinusRightDb": -10.837667344752298
+      "lufs": -28.61008460707694,
+      "peakDb": -17.622008206201286,
+      "levelDb": -34.64746633788994,
+      "leftMinusRightDb": -11.76419592386111
      }
     }
    ],
@@ -485,22 +513,22 @@
     ],
     "seconds": 20,
     "allVoices": {
-     "seconds": 18.78933333333333,
+     "seconds": 19.525333333333332,
      "sampleRate": 48000,
-     "recorded": 0.9394666666578019,
-     "lufs": -21.32651791684036,
-     "peakDb": -5.087879819249138,
-     "levelDb": -20.635944883922996,
-     "leftMinusRightDb": 0.7365694283816424
+     "recorded": 0.9762666666574547,
+     "lufs": -21.105070940399113,
+     "peakDb": -4.826377740521342,
+     "levelDb": -20.42985217189031,
+     "leftMinusRightDb": 0.5757910552320311
     },
     "beforeStop": {
      "seconds": 1.8,
      "sampleRate": 48000,
-     "recorded": 0.9999999999905577,
-     "lufs": -21.194602907092644,
-     "peakDb": -6.328178492238107,
-     "levelDb": -20.76433571248712,
-     "leftMinusRightDb": 0.32546960108969714
+     "recorded": 0.9999999999905893,
+     "lufs": -20.764087806468726,
+     "peakDb": -5.9800815529923925,
+     "levelDb": -20.00808689305459,
+     "leftMinusRightDb": 0.1983503783918934
     },
     "afterStop": {
      "seconds": 2,
@@ -511,6 +539,20 @@
      "levelDb": null,
      "leftMinusRightDb": null
     }
+   },
+   "globe": {
+    "sweep": {
+     "seconds": 30,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": -32.03546520352025,
+     "peakDb": -14.94730975350457,
+     "levelDb": -32.9163229110361,
+     "leftMinusRightDb": 0.8162750885372745
+    },
+    "chimes": 16,
+    "flatChimes": 16,
+    "same": true
    }
   }
  ]

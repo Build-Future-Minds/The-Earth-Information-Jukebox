@@ -229,6 +229,30 @@ in a 390-pixel window, measured 15 Nov; its table is 640 wide, and on the radar 
 408). A tap on the picture now opens the fold-out, so this would be met often. The table now scrolls
 in its own box and the band list fits; a browser test checks the page width on a phone.
 
+**The scan on the globe (Dev A, 15 Nov):** the Globe tab plays the same scan, drawn round the 3D
+globe (`web/src/scan/ScanGlobe.tsx`; the drawing is in Student A's `web/src/globe/`). Same pixels,
+same score, same player and sound as Play along: a vertical line on the flat map is a meridian. The
+rule and the drawing are in `mapping_spec.md`, "On the globe". Decided by Developer A:
+- **Where:** the Globe tab only, not `globe.html` (Student A's region-picking tool), because Stop,
+  Esc, the page's speed and "changing view stops the sound" live in the app. When Play along and
+  Globe move into Listen (`page_plan.md`, P4), the globe drawing takes the shared scan state as it is.
+- **The circle stays the flat-map circle**, shown on the globe as the oval it is on the ground, with
+  its ground shape in words under the radar. A true ground circle waits for L7.
+- **Turn with the line is on** each time a scan starts; turning the globe yourself turns it off. Named
+  so it is not taken for the fold-out's "Follow the line while the scan plays" (from #64), which
+  moves the explanation, not the globe.
+- **Built for the ocean picture and the TEST INPUT picture first;** the aerosol and rain pictures
+  joined when their own settings were measured (P1a, below), through one function, `scanRuleOf`,
+  which now returns the picture's own rule from `data/sources.ts`. The globe does not hatch the
+  pixels a picture never reads; its legend says so.
+
+**Where it leaves `DESIGN.md`, for Student B and Developer B to accept:** the globe turns by itself
+while it follows the line (12° a second at normal speed), which is motion, not a 90 ms step. With
+reduced motion it only cuts, once per 45° step. The scan's settings now also hold the page's speed
+buttons, on Play along and on Globe, so the speed can change while the scan plays (before, it was set
+on Listen only, and changing view stops the sound). **Student A reviews** the shader and the globe
+code; **Developer B** the Globe tab and the shell.
+
 **Not decided here:** the Earth pulse keeps its sound. Changing it is task L1 in
 `idea_tasks.md` and needs the listening check to be run again.
 

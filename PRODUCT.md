@@ -65,9 +65,11 @@ numbers that made it.
 - Name: "Earth Sonata: Play the Planet". No logo or required colours.
 - Credit, visible wherever the image appears: "NASA/Goddard Space Flight Center Scientific
   Visualization Studio". The NASA logo is never used.
-- Three honesty lines in public material: it is a visualization of a computer model (ECCO2), not a
-  photo; the rhythm rule is a choice the team made; it describes the rendered image, not water
-  speed, turbulence or ocean health.
+- Three honesty lines in public material, word for word (one constant in the app,
+  `web/src/data/honesty.ts`; How it's made links each line to the section that backs it):
+  1. "It is a visualization of computer model output or satellite estimates, not a photo."
+  2. "The rules that turn it into sound are choices we made."
+  3. "It describes the drawn picture, not water speed, turbulence, air quality or rain amounts."
 - No images, music or video produced by a generative AI model in the product or demo. Sound is
   synthesised by our own code; AI help with that code is listed in `AI_USE.md`.
 

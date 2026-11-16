@@ -25,9 +25,14 @@ export const ExplainIcon = () => (
 export const SoundIcon = () => <Icon><path d="M3 8h3l4-3v10l-4-3H3zM13.5 7.5a3.5 3.5 0 0 1 0 5M15.8 5.2a6.8 6.8 0 0 1 0 9.6" /></Icon>;
 
 // Tab icons: what each view is for.
+export const HomeIcon = () => <Icon><path d="M3 9.5 10 3.5l7 6M5 8v8.5h3.5V12h3v4.5H15V8" /></Icon>;
 export const ListenIcon = () => <Icon><path d="M4 12v-1a6 6 0 0 1 12 0v1M4 12h2.5v4H4zM13.5 12H16v4h-2.5z" /></Icon>;
 export const CompareIcon = () => <Icon><circle cx="6" cy="10" r="3.5" /><circle cx="14" cy="10" r="3.5" /></Icon>;
 export const HowIcon = () => <Icon><path d="M3 15h4l2-10 2 10h6" /><path d="M3 5h14" /></Icon>;
 export const PlayAlongIcon = () => <Icon><rect x="3" y="4" width="14" height="12" rx="1" /><path d="M7.5 4v7M12.5 4v7M10 11v5" /></Icon>;
 export const GlobeIcon = () => <Icon><circle cx="10" cy="10" r="7.5" /><path d="M2.5 10h15M10 2.5c2.5 2.2 2.5 12.8 0 15M10 2.5c-2.5 2.2-2.5 12.8 0 15" /></Icon>;
 export const GameIcon = () => <Icon><rect x="2.5" y="5" width="6" height="6" rx="1" /><rect x="11.5" y="9" width="6" height="6" rx="1" /><path d="M5.5 14v2.5M14.5 4.5V7" /></Icon>;
+
+// Home page marks: "leads to" between the three pictures, and a link that leaves for a NASA page.
+export const ArrowIcon = () => <Icon><path d="M3 10h13M11.5 5.5 16 10l-4.5 4.5" /></Icon>;
+export const ExternalIcon = () => <Icon><path d="M11 3.5h5.5V9M16.5 3.5 9 11M14 12v4.5H3.5V6H8" /></Icon>;

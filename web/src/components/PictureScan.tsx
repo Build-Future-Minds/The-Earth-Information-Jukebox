@@ -27,6 +27,7 @@ import { chosenBand, explainPick, whyColumn } from '../audio/scanWhy';
 import { ScanButtons, ScanSettings, ScanStatus } from '../scan/ScanControls';
 import { starPath } from '../scan/ScanLegend';
 import { ScanSide } from '../scan/ScanSide';
+import { groundNote } from '../scan/groundNote';
 import { useScan, type ScanHandle, type ScanPicture } from '../scan/useScan';
 import { useScanFrame } from '../scan/useScanFrame';
 import { ScanExplanation, WHY_START, type WhyView } from './ScanExplanation';
@@ -40,6 +41,8 @@ interface Props {
   picture: ScanPicture;
   /** The page's speed setting: the scan follows it. */
   speed: number;
+  /** Change the page's speed from the scan's settings (the Earth rhythm follows it too). */
+  onSpeed?: (speed: number) => void;
 }
 
 /** Widest the shape riding the line gets (each side), as a share of the picture's width or the circle's radius. */
@@ -56,7 +59,7 @@ const RANGE_RINGS = [3, 6, 9];
 /** A press that moves further than this (CSS pixels) before it lets go is a drag, not a tap: it picks nothing. */
 const TAP_SLOP = 10;
 
-export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ picture, speed }, ref) {
+export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ picture, speed, onSpeed }, ref) {
   const scan = useScan({ picture, speed });
   const { scene, rule, mask, blueClass, choices, sound } = scan;
   const { loaded, target, state, traces, frame, region, worldMap, score, bands, labelOf, why, liveColumn, lastStruck, reducedMotion } = scan;
@@ -157,7 +160,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
       )}
 
       <ScanButtons scan={scan} />
-      <ScanSettings scan={scan} />
+      <ScanSettings scan={scan} speed={speed} onSpeed={onSpeed} />
       <ScanStatus scan={scan} />
 
       <figure className={figureClass} style={{ '--aspect': view.w / view.h } as React.CSSProperties}>
@@ -339,7 +342,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                   <circle className="ring" cx={region.center_px[0]} cy={region.center_px[1]} r={region.radius_px} />
                 </g>
               </svg>
-              <span>Where {labelOf(target)} is on the whole picture: {region.name}.</span>
+              <span>Where {labelOf(target)} is on the whole picture: {region.name}.{worldMap && ` ${groundNote(region, frame)}`}</span>
             </div>
           )}
         </ScanSide>

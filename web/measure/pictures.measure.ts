@@ -334,7 +334,23 @@ function section(p: PictureAudit, a: Audit): string[] {
   return out;
 }
 
-function report(a: Audit, meta: Record<string, string>): string {
+/** One scan read on the flat picture (Play along) and on the globe (Globe tab). */
+interface GlobeCheck {
+  scan: string;
+  cells: number;
+  chimes: number;
+  /** Levels, cell means, chimes and left-out peaks all equal, number for number. */
+  same: boolean;
+}
+
+/** The globe check of every picture: its own list, never mixed with another picture's. */
+interface GlobeChecks {
+  /** What drew the globe (software or the graphics card). */
+  renderer: string;
+  pictures: { label: string; checks: GlobeCheck[] }[];
+}
+
+function report(a: Audit, meta: Record<string, string>, globe: GlobeChecks): string {
   const out: string[] = [];
   out.push('# Picture scan: measurements on the NASA pictures', '');
   out.push('Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.', '');
@@ -352,6 +368,20 @@ function report(a: Audit, meta: Record<string, string>): string {
   out.push('- **Mask:** the picture\'s `scan_mask.png`, if it has one (written by `analysis/scan_mask.py`).', '');
   out.push('The ocean picture keeps the settings it was built with on 15 Nov; its section shows where they differ from the procedure.', '');
   for (const p of a.pictures) out.push(...section(p, a));
+
+  out.push('## The globe and the flat picture', '');
+  out.push('The Globe tab draws the scan round the globe from the same pixels and the same rule as Play along. Each scan of each picture was');
+  out.push(`read in both places in the running app; the globe was drawn by ${globe.renderer}. One table per picture.`, '');
+  for (const g of globe.pictures) {
+    out.push(`### ${g.label}`, '');
+    out.push(
+      table(
+        ['Scan', 'Cells', 'Chimes', 'Same levels, means, chimes and left-out peaks on the globe'],
+        g.checks.map((c) => [c.scan, c.cells, c.chimes, c.same ? 'yes, every number' : '**no**']),
+      ),
+      '',
+    );
+  }
   return out.join('\n');
 }
 
@@ -366,6 +396,48 @@ test('measure the picture scan on the NASA pictures', async ({ page, browser }) 
   // The tool's copy of the cell rule must agree with the rule itself, or its extra numbers mean nothing.
   for (const p of result.pictures) expect(p.selfCheck, `${p.key}: the tool's cells differ from the rule's`).toBe(0);
 
+  // The globe: every scan of each picture read on Play along and on the Globe tab, as a person would choose them.
+  const score = () =>
+    page.evaluate(() => {
+      const s = (window as unknown as { __scanScore: { levels: Float32Array; means: Float32Array; chimes: unknown[]; dropped: unknown[] } }).__scanScore;
+      return { levels: Array.from(s.levels), means: Array.from(s.means), chimes: s.chimes, dropped: s.dropped };
+    });
+  const readAll = async () => {
+    await page.getByText('Scan settings', { exact: true }).click();
+    const choice = page.locator('.scan select').first();
+    const names = await choice.locator('option').allTextContents();
+    const scores = [];
+    for (let index = 0; index < names.length; index++) {
+      await choice.selectOption({ index });
+      await expect(page.getByRole('button', { name: 'Play the picture' })).toBeEnabled();
+      scores.push({ name: names[index], ...(await score()) });
+    }
+    return scores;
+  };
+  const labels = await page.locator('.source-choice .source-label').allTextContents();
+  let renderer = '';
+  const globePictures: GlobeChecks['pictures'] = [];
+  for (const label of labels.length ? labels : ['Ocean']) {
+    await page.goto('/#play'); // the picture is chosen here, and kept when the view changes to Globe and back
+    if (labels.length) {
+      await page.getByRole('radio', { name: label }).check();
+      await expect(page.getByText(/^Reading the /)).toContainText(label === 'Ocean' ? 'ocean' : label.toLowerCase());
+    }
+    const flat = await readAll();
+    await page.goto('/#globe');
+    await page.waitForFunction(() => !!(window as unknown as { __globe?: unknown }).__globe, undefined, { timeout: 15_000 });
+    renderer = await page.evaluate(() => (window as unknown as { __globe: { renderer: () => string } }).__globe.renderer());
+    const onGlobe = await readAll();
+    const checks: GlobeCheck[] = flat.map((f, i) => {
+      const g = onGlobe[i];
+      const same = g?.name === f.name && JSON.stringify([g.levels, g.means, g.chimes, g.dropped]) === JSON.stringify([f.levels, f.means, f.chimes, f.dropped]);
+      return { scan: f.name, cells: f.levels.length, chimes: f.chimes.length, same };
+    });
+    for (const c of checks) expect(c.same, `${label}, ${c.scan}: the globe's score differs from the flat picture's`).toBe(true);
+    globePictures.push({ label, checks });
+  }
+  const globe: GlobeChecks = { renderer, pictures: globePictures };
+
   const meta = {
     date: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
     browser: `Chromium ${browser.version()}`,
@@ -374,7 +446,7 @@ test('measure the picture scan on the NASA pictures', async ({ page, browser }) 
   };
   const folder = resolve(repo, 'docs/measurements');
   mkdirSync(folder, { recursive: true });
-  writeFileSync(resolve(folder, 'scan_pictures.json'), JSON.stringify({ meta, files: options.files, ...result }, null, 1) + '\n');
-  writeFileSync(resolve(folder, 'scan_pictures.md'), report(result, meta));
-  console.log(report(result, meta));
+  writeFileSync(resolve(folder, 'scan_pictures.json'), JSON.stringify({ meta, files: options.files, ...result, globe }, null, 1) + '\n');
+  writeFileSync(resolve(folder, 'scan_pictures.md'), report(result, meta, globe));
+  console.log(report(result, meta, globe));
 });

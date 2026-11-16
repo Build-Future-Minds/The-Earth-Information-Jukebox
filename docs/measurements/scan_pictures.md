@@ -2,7 +2,7 @@
 
 Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.
 
-Measured 2026-11-16 03:57 UTC in Chromium 159.0.8154.6, on commit 7d8dfc6 with uncommitted changes.
+Measured 2026-11-16 05:06 UTC in Chromium 159.0.8154.6, on commit 9e282f1 with uncommitted changes.
 The rule is `web/src/audio/scanScore.ts`, run in the browser on the stills the app plays.
 
 **Each picture has its own section, its own settings and its own numbers. No table here holds two pictures. Never compare a number in one section with a number in another.**
@@ -545,3 +545,32 @@ Chimes: 16 as the rule stands, 17 with the weighting.
 ### Check on this tool
 
 The tool repeats the rule's "which cell is this pixel in" to add weights and masks. Largest difference between its levels and the rule's (must be 0): 0.
+
+## The globe and the flat picture
+
+The Globe tab draws the scan round the globe from the same pixels and the same rule as Play along. Each scan of each picture was
+read in both places in the running app; the globe was drawn by ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver). One table per picture.
+
+### Ocean
+
+| Scan | Cells | Chimes | Same levels, means, chimes and left-out peaks on the globe |
+| --- | --- | --- | --- |
+| Whole picture: a line, west to east | 2880 | 68 | yes, every number |
+| Region A: a radar turn | 1440 | 56 | yes, every number |
+| Region B: a radar turn | 1440 | 72 | yes, every number |
+
+### Aerosols
+
+| Scan | Cells | Chimes | Same levels, means, chimes and left-out peaks on the globe |
+| --- | --- | --- | --- |
+| Whole picture: a line, west to east | 2880 | 36 | yes, every number |
+| Region C: a radar turn | 1440 | 34 | yes, every number |
+| Region D: a radar turn | 1440 | 0 | yes, every number |
+
+### Rain
+
+| Scan | Cells | Chimes | Same levels, means, chimes and left-out peaks on the globe |
+| --- | --- | --- | --- |
+| Whole picture: a line, west to east | 2880 | 16 | yes, every number |
+| Region E: a radar turn | 1440 | 31 | yes, every number |
+| Region F: a radar turn | 1440 | 7 | yes, every number |

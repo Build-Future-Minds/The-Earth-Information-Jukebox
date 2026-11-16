@@ -280,22 +280,29 @@ def contrast() -> dict:
 
 
 def crop() -> dict:
-    field = S.line_field(size=(512, 512), n_lines=1200, spread_deg=20, seed=7)
-    random_ = S.line_field(size=(512, 512), n_lines=1200, spread_deg=None, seed=7)
+    field_px, n_lines, dash_px = 512, 1200, 40
+    field = S.line_field(size=(field_px, field_px), n_lines=n_lines, spread_deg=20, seed=7, length=dash_px)
+    random_ = S.line_field(size=(field_px, field_px), n_lines=n_lines, spread_deg=None, seed=7, length=dash_px)
     rng = np.random.default_rng(0)
     rows = []
     for size in (512, 256, 128, 64, 32):
         a, b = [], []
         for _ in range(12):
-            x, y = (int(v) for v in rng.integers(0, 512 - size + 1, 2))
+            x, y = (int(v) for v in rng.integers(0, field_px - size + 1, 2))
             a.append(_a(measure_region(field, (x, y, size, size), None, P)))
             b.append(_a(measure_region(random_, (x, y, size, size), None, P)))
-        rows.append([size, *_mean_sd(a), *_mean_sd(b)])
+        # Dash centres are spread over the field plus one dash length on every side (line_field's
+        # padding), so about this many dashes are centred inside a box. Chance level, as in
+        # random_floor: the mean resultant length of n random doubled angles, sqrt(pi)/2 / sqrt(n).
+        n_in_box = n_lines * (size / (field_px + 2 * dash_px)) ** 2
+        rows.append([size, *_mean_sd(a), *_mean_sd(b), round(n_in_box, 1), round(0.8862 / math.sqrt(n_in_box), 4)])
     return _experiment(
         "crop", "Crop size: 12 boxes at random positions in one large field of dashes",
         "same mean for a uniform field, but more scatter and an upward drift for small boxes "
-        "(fewer independent dashes leave a larger chance vote)",
-        ["box_px", "20 deg spread mean", "sd", "missing", "random mean", "sd ", "missing "], rows,
+        "(fewer independent dashes leave a larger chance vote: about 0.886/sqrt(n) for n dashes in the box)",
+        ["box_px", "20 deg spread mean", "sd", "missing", "random mean", "sd ", "missing ", "dashes in box (about)",
+         "0.886/sqrt(n)"],
+        rows,
     )
 
 
