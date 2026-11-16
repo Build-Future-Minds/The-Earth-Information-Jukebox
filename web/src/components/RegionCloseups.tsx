@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react';
 // alignment in this frame (DESIGN.md). The letter takes the region's colour; the ticks stay black and white.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { shapeWord } from './compare';
+import { timeWord } from '../data/sources';
 import { longFraction } from '../audio/earthVoice';
 import { lineTicks, type Tick } from '../data/lineTicks';
 import type { Features, Region, Scene } from '../data/types';
@@ -32,16 +33,22 @@ const TICK_LEN = 30; // canvas pixels
 
 export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, playing, onStop, rowFor, look = {} }: Props) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
+  // On a picture switch, drop the old picture at once and ignore a load that finishes late, so a
+  // region is never drawn from another picture's pixels (final review, 15 Nov).
   useEffect(() => {
+    setImage(null);
     if (!imageUrl) return;
+    let live = true;
     const img = new Image();
-    img.onload = () => setImage(img);
+    img.onload = () => { if (live) setImage(img); };
     img.src = imageUrl;
+    return () => { live = false; };
   }, [imageUrl]);
 
   // The preview image is the first frame, so its numbers are the first step's.
   const firstStep = (id: string) => features.steps.filter((s) => s.region === id).sort((a, b) => a.t - b.t)[0];
-  const frameNote = scene.frames.timestamps?.[0] ? `model time ${scene.frames.timestamps[0]}` : 'first frame';
+  // Rain is satellite observations, not a model: say "time", never "model time" (honest before impressive).
+  const frameNote = scene.frames.timestamps?.[0] ? `${timeWord({ scene })} ${scene.frames.timestamps[0]}` : 'first frame';
 
   return (
     <section className="closeups" aria-label="The two regions, up close">
@@ -67,7 +74,7 @@ export function RegionCloseups({ scene, features, imageUrl, regionId, onListen, 
         ))}
       </div>
       {/* Student B: the key appears once on the page. */}
-      <p className="numeral-key">thin = swirly · heavy = lined up</p>
+      <p className="numeral-key">thin = swirly · heavy = lined up · Ticks are drawn in your browser to show what is measured; the rhythm uses the measurement of every frame.</p>
     </section>
   );
 }

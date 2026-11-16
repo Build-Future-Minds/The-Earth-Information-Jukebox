@@ -99,3 +99,15 @@ export function dayLabels(track: EarthTrack): (string | null)[] {
     return `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]}`;
   });
 }
+
+/** "model time" for model output, plain "time" for observations (rain is satellite estimates). */
+export function timeWord(picture: { scene: Scene }): 'model time' | 'time' {
+  return picture.scene.source.data_kind === 'model_output' ? 'model time' : 'time';
+}
+
+/** Honesty line 3, per picture: what the sound does not tell you (PRODUCT.md "Brand Commitments"). */
+export function describesLine(picture: { key: SourceKey }): string {
+  if (picture.key === 'aerosols') return 'It describes the picture, not air quality or amounts.';
+  if (picture.key === 'imerg') return 'It describes the picture, not rainfall amounts.';
+  return 'It describes the picture, not water speed or ocean health.';
+}

@@ -120,11 +120,13 @@ export const RhythmExplanation = forwardRef<HTMLElement, Props>(function RhythmE
   { step, regionLabel, other, rows = [], imageUrl, frame },
   ref,
 ) {
-  const when = step?.step.source_time ? ` Model time: ${step.step.source_time}.` : '';
+  const when = step?.step.source_time ? ` Time: ${step.step.source_time}.` : '';
   return (
     <section ref={ref} tabIndex={-1} className="explanation" aria-labelledby="explain-heading">
       <h2 id="explain-heading">Why it sounds like this: {regionLabel}</h2>
       <p className="explain-line">{explainShort(step, regionLabel)}</p>
+      {/* The picture only once something is sounding: before Play nothing is missing, so no "no data". */}
+      {step && (
       <div className="explain-picture" aria-hidden="true">
         {rows.map((row) => (
           <div key={row.region.id} className={row.playing ? 'explain-row playing' : 'explain-row'} style={row.colour}>
@@ -137,6 +139,7 @@ export const RhythmExplanation = forwardRef<HTMLElement, Props>(function RhythmE
           </div>
         ))}
       </div>
+      )}
       {/* The full sentence with the comparison, for screen readers. */}
       <p className="sr-only">{explain(step, other)}{when}</p>
       {/* The honesty lines are said once, on How it's made (DISCLAIMER is used there). */}

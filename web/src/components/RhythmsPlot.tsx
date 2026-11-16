@@ -99,7 +99,7 @@ export function RhythmsPlot({ features, regions, activeRegionId, playState, getP
         <svg
           viewBox={`-34 -8 ${CW + 42 + LABEL} ${CH + 30}`}
           role="img"
-          aria-label={`Alignment over ${frames} model frames. ${series
+          aria-label={`Alignment over ${frames} frames. ${series
             .map((x) => `${regionLabel(regions, x.region.id, look.firstLetter)} from ${fmt(x.lo)} to ${fmt(x.hi)}`)
             .join('; ')}.`}
         >

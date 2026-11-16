@@ -735,3 +735,15 @@ figure.scene figcaption { font-size: 0.85rem; }
 @media (max-width: 900px) { .play-grid { grid-template-columns: 1fr; } .play-scan { grid-row: auto; } }
 
 .how-art figcaption { color: var(--white); }
+
+/* Tablets too (review: six tabs overflowed the top bar between 641 and ~1060px): tabs move to the
+   fixed bottom bar up to 900px; the player bar sticks above them. */
+@media (max-width: 900px) {
+  .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
+    border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(6, 1fr); }
+  .page-links li + li { border-left: 1px solid var(--rule); }
+  .page-links a { flex-direction: column; gap: 2px; padding: 8px 1px; font-size: 0.72rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
+  body { padding-bottom: 72px; }
+  .player { position: sticky; bottom: 72px; z-index: 15; }
+}
