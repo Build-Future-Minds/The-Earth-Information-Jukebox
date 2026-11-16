@@ -281,7 +281,7 @@ Alignment over the model frames, one 3px rounded curve per region on a 0, 0.5, 1
 The NASA picture inside a 1px ink neatline on the black well, with ticks and mono labels outside it.
 
 ### Scan overlay and note bars
-Marks drawn over the NASA picture are black and white only. Note bars fill with ink to show loudness and flash ink with a 3px ink ring when their band chimes.
+Marks drawn over the NASA picture are black and white only. The place a click or tap explains is outlined black under white, with four ticks pointing at it, and named in a line under the picture; it is a shape, not a colour, and it does not move. Note bars fill with ink to show loudness and flash ink with a 3px ink ring when their band chimes.
 
 ### Melody pad
 A 1px ink-bordered pad of 48px square key caps; the active pad gains a 1px inset ink ring and the held key fills with ink.

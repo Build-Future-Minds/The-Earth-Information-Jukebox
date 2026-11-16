@@ -283,7 +283,10 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 /* Play along: the picture scan, then the melody keys. Hairline rules, no boxes (DESIGN.md). */
 .scan h3,
 .melody h3 { font-size: 1.05rem; font-weight: 700; line-height: 1.3; margin: 0; }
-.scan { display: grid; gap: var(--xs); border-top: 1px solid var(--rule); padding-top: var(--sm); }
+/* One column no wider than the page: wide content inside it (the explanation's table) scrolls in its
+   own box instead of widening the scan and the page. On a phone the open fold-out used to push the
+   page to 656px in a 390px window (measured 15 Nov). */
+.scan { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--xs); border-top: 1px solid var(--rule); padding-top: var(--sm); }
 .scan .row, .melody .row { align-items: flex-end; }
 
 /* The picture takes at most about half the window's height, so its note bars, the legend, the
@@ -336,6 +339,21 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 .scan-view:not(.still) .trace .chime-dot { animation: scan-settle 1.4s ease-out forwards; }
 @keyframes scan-ripple { from { transform: scale(0.12); opacity: 0.95; } to { transform: scale(1); opacity: 0; } }
 @keyframes scan-settle { from { transform: scale(2); opacity: 1; } to { transform: scale(1); opacity: 0.7; } }
+/* The place explained in "Why the scan sounds like this": the cell's outline and four ticks pointing
+   at it, black under white. A shape, not a colour, and it never moves (so reduced motion needs no rule). */
+.scan-view .pick-mark { pointer-events: none; }
+.scan-view .pick-mark path,
+.scan-view .pick-mark line { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.scan-view .pick-mark .under path,
+.scan-view .pick-mark .under line { stroke: #000; stroke-width: 5px; }
+.scan-view .pick-mark .over path,
+.scan-view .pick-mark .over line { stroke: #fff; stroke-width: 2px; }
+/* A click or tap on the picture explains that place. The cursor is an extra cue; the line under the
+   picture says it in words. */
+.scan-picture svg { cursor: crosshair; }
+.scan-pick-hint { margin: 0; font-size: 0.85rem; line-height: 1.4; color: var(--ink-2); max-width: 70ch; }
+.scan-pick { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 0.95rem; color: var(--ink); max-width: 76ch; }
+.scan-why .why-follow { display: flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; font-size: 0.95rem; }
 
 /* Note bars: the low root, then the twelve held notes, low to high. The ink shows how loud each
    is now; a bar flashes Signal when its band chimes (live, so the one accent). */
@@ -376,13 +394,16 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 /* Why the scan sounds like this: sentences and a table written from the score; then the fixed choices. */
 .scan-why { margin-top: var(--sm); }
 .scan-why summary { cursor: pointer; font-weight: 600; color: var(--ink); }
-.scan-why-body { display: grid; gap: var(--sm); margin-top: var(--xs); max-width: 76ch; }
+.scan-why-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sm); margin-top: var(--xs); max-width: 76ch; }
 .scan-why h4 { margin: 0; font-size: 1.05rem; font-weight: 700; padding-top: var(--xs); border-top: 1px solid var(--rule); }
 .scan-why h5 { margin: var(--xs) 0 2px; font-size: 0.95rem; font-weight: 650; }
 .scan-why p { margin: 0; }
 .scan-why .why-last, .scan-why .why-band { max-width: 70ch; }
 .scan-why .why-controls { align-items: end; }
 .scan-why .why-pick { display: block; margin: var(--xs) 0; }
+/* The radar's band names are long ("92% to 100% of the way out from the centre"): the list never
+   gets wider than the fold-out; the open list still shows them in full. */
+.scan-why .why-pick select { max-width: 100%; }
 .why-table { overflow-x: auto; max-width: 100%; }
 .why-table table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.9rem; }
 .why-table caption { text-align: left; font-weight: 600; color: var(--ink-2); padding-bottom: 4px; }
