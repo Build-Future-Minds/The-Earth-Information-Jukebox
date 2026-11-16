@@ -70,6 +70,26 @@ function pickPictures(): Picture[] {
 export const PICTURES: Picture[] = pickPictures();
 export const SOURCES: Source[] = PICTURES.filter((p): p is Source => p.features !== null);
 
+/** A NASA page the app's pictures come from, as its scene.json gives it. */
+export interface NasaPage {
+  svsId: number;
+  url: string;
+  title: string;
+}
+
+/**
+ * The NASA page of every real picture, read from `data/scene.json` and each `data/<folder>/scene.json` (ocean first),
+ * never typed by hand. Read from the files even with practice data on: these are the sources, not
+ * the data being played. Test input has no SVS page and is left out.
+ */
+export const NASA_PAGES: NasaPage[] = Object.entries(
+  import.meta.glob<{ default: unknown }>(['../../../data/scene.json', '../../../data/*/scene.json'], { eager: true }),
+)
+  .sort(([a], [b]) => a.split('/').length - b.split('/').length || a.localeCompare(b))
+  .map(([, m]) => (m.default as Scene).source)
+  .filter((s) => s.svs_id !== null && /^https:\/\/svs\.gsfc\.nasa\.gov\//.test(s.url))
+  .map((s) => ({ svsId: s.svs_id!, url: s.url, title: s.title }));
+
 export function sourceByKey(key: SourceKey): Source {
   return SOURCES.find((s) => s.key === key) ?? SOURCES[0];
 }
@@ -103,6 +123,15 @@ export function dayLabels(track: EarthTrack): (string | null)[] {
 /** "model time" for model output, plain "time" for observations (rain is satellite estimates). */
 export function timeWord(picture: { scene: Scene }): 'model time' | 'time' {
   return picture.scene.source.data_kind === 'model_output' ? 'model time' : 'time';
+}
+
+/** Honesty line 1, per picture: "A computer model (ECCO2), not a photo." / satellite estimates / test input. */
+export function natureLine(p: { scene: Scene }): string {
+  const s = p.scene.source;
+  const what = s.model_or_instrument && s.model_or_instrument !== 'none' ? ` (${s.model_or_instrument})` : '';
+  if (s.data_kind === 'model_output') return `A computer model${what}, not a photo.`;
+  if (s.data_kind === 'observation') return `Satellite estimates${what}, drawn as a picture.`;
+  return 'Test input made by the team, not NASA data.';
 }
 
 /** Honesty line 3, per picture: what the sound does not tell you (PRODUCT.md "Brand Commitments"). */

@@ -16,6 +16,7 @@ colors:
   action-hover: "oklch(0.3 0 0)"
   on-action: "oklch(0.975 0 0)"
   well: "oklch(0.15 0 0)"
+  on-well-2: "oklch(0.78 0 0)"
   white: "#ffffff"
   black: "#000000"
 typography:
@@ -143,7 +144,7 @@ Two sleeves of one record. Light is a white sleeve with black ink and grey hairl
 
 Colour is held back for the side. It appears only on what is live or chosen, and then it is the playing side's colour: Side A violet or Side B rose. Everything else, including focus, is ink.
 
-The system is keyboard-first. The Tab order follows the screen: the six tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.
+The system is keyboard-first. The Tab order follows the screen: the tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.
 
 **Key Characteristics:**
 - One face, Geist. Geist Mono only for numbers, coordinates, key caps and readouts.
@@ -167,13 +168,14 @@ A one-ink print with no hue, plus two side colours that appear only when a side 
 - **White Sleeve** (`paper`): the ground. Dark: the matte black sleeve, oklch 0.15 0 0.
 - **Hairline** (`rule`) and **Faint Hairline** (`rule-2`): section rules, table rules, tab and switch frames and dividers; rule-2 is also the hover fill, the empty note bar and the missing-beat fill. Dark: oklch 0.34 0 0 and 0.22 0 0.
 - **Black Well** (`well`): the ground behind the NASA picture, the close-up canvases, the pulse plot and the legend glyphs. Black in both themes (oklch 0.09 0 0 in dark).
+- **On-Well Grey** (`on-well-2`): secondary marks drawn on the well (the beat drawing's second pulse and its rules). The same in both themes, because the well is black in both; `rule` is nearly the well's own colour in dark.
 - **Picture White and Black** (`white`, `black`): marks drawn over the NASA picture only (ring outlines, the scan needle, compass letters, map tag text). They never change with the theme.
 - **Signal** (`signal`) and **Action** (`action`): aliases of ink in the code (`--signal: var(--ink)`, `--action: var(--ink)`). They flip with the theme. `action-hover` is oklch 0.3 0 0 in light and 0.85 0 0 in dark.
 
 Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the sidecar carries them.
 
 ### Named Rules
-**The Colour Is the Side Rule.** Colour appears only on what is live or chosen, and it is always the playing side's colour, set as `--live` from the chosen region. It marks the needle, the played wash, and an end block on the current tab (7px) and on the primary buttons (8px). On pictures with neutral regions `--live` is ink, so no colour appears. A new surface does not get a colour of its own.
+**The Colour Is the Side Rule.** Colour appears only on what is live or chosen, and it is always the playing side's colour, set as `--live` from the chosen region. It marks the needle, the played wash, and an end block on the current tab (7px) and on the primary buttons (8px). On pictures with neutral regions, and on Home, where no side is chosen, `--live` is ink, so no colour appears. A new surface does not get a colour of its own.
 **The Signal Is Ink Rule.** The marks that used to be red-orange are ink now: the focus ring (2px ink, offset 3px), the chosen picture's underline, the chime flash on a note bar, the held melody key, the tide curves' playing line, text selection and the caret.
 **The Off-Scale Rule.** A region colour must not be a colour the picture itself uses for data. On the ocean picture (blue-to-red temperature) the regions are violet and rose, never blue, red, orange or yellow. Pictures whose own colours include those hues get neutral regions: the aerosol picture (regions C and D; blue sea salt, pink dust, orange-red smoke, green sulfates) and the rain picture (regions E and F; a blue-to-red rain scale). Neutral means an ink ring inside a white outline and an ink badge with an `on-region` letter, in both themes.
 **The Letter Rule.** A region colour never travels alone; its letter badge or end label goes with it. The end blocks on the current tab and on Play only repeat the side that the now chip and the region choice already name with its letter.
@@ -192,6 +194,7 @@ Both are bundled with `@fontsource-variable` so the app works offline.
 - **Value** (500 default, 200 to 800 driven, 2.6rem, 1): the live alignment readout. Mobile 1.9rem.
 - **Brand** (600, 0.95rem, uppercase, 0.32em tracking): EARTH SONATA in the top bar.
 - **Title** (600, 1.05rem, 1.3): section headings.
+- **Home title** (600, clamp 1.9rem to 2.4rem, 1.12, -0.025em, max 21ch): the problem sentence that opens Home, its first sentence at 300 in grey ink. Home's section headings are 600, 1.65rem (1.4rem on phones). Used on Home only.
 - **Status** (450, 1.05rem, 1.3, max 46ch): the sentence about what is playing.
 - **Body** (400, 17px, 1.55): prose capped at 65 to 70ch.
 - **Label** (600, 0.95rem): form labels and button text.
@@ -206,7 +209,7 @@ Both are bundled with `@fontsource-variable` so the app works offline.
 
 ## Layout
 
-A sticky top bar (10px 24px padding, 1px rule under it) holds the brand on the left (its title line shows from 1560px up), the tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding, 12px gaps). Below 1024px the tabs move to a fixed bottom bar of six equal cells, icon over word, with a 1px ink rule on top, and the player bar sticks just above it. At 640px and under the gutters drop to 16px and the chart margin tightens. Where each page puts its parts is set in `docs/page_plan.md`, not here.
+A sticky top bar (10px 24px padding, 1px rule under it) holds the brand on the left (its title line shows from 1560px up), the tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding, 12px gaps). Between 1024 and 1199px the tab cells tighten so seven tabs fit. Below 1024px the tabs move to a fixed bottom bar, one equal cell per tab, icon over word, with a 1px ink rule on top, and the player bar sticks just above it. At 640px and under the gutters drop to 16px and the chart margin tightens. The page keeps a focused control clear of both bars (`scroll-padding`). Where each page puts its parts is set in `docs/page_plan.md`, not here.
 
 Spacing scale: 10, 16, 22, 28, 40px. Sections are separated by a 1px top rule with 10 to 16px padding, not by gaps alone. The NASA picture sits in a chart frame (1px ink neatline, margin 22px top and 44px left) with ticks every 10 degrees, labelled every 30, and the credit directly under it.
 
@@ -241,7 +244,7 @@ A line icon over a one-word label. Team rule (15 Nov): more buttons, less text.
 - **Stop** carries `aria-keyshortcuts="Escape"`; Esc stops from anywhere.
 
 ### Page links (tabs)
-Six tabs in the top bar: five views and Game (opens the listening game page, which links back), each a 16px line icon and a caps word in grey ink. They are one joined strip with a 1px hairline frame and 1px hairline dividers. The current tab is filled in ink with paper text, carries `aria-current="page"`, and has a 7px `--live` end block. Hover fills with the faint hairline and turns the word ink. Below 1024px the strip becomes the fixed bottom bar.
+Seven tabs in the top bar: six views (Home first) and Game (opens the listening game page, which links back), each a 16px line icon and a caps word in grey ink. They are one joined strip with a 1px hairline frame and 1px hairline dividers. The current tab is filled in ink with paper text, carries `aria-current="page"`, and has a 7px `--live` end block. Hover fills with the faint hairline and turns the word ink. Below 1024px the strip becomes the fixed bottom bar.
 
 ### Player bar
 One framed strip under the picture, like a music player: 1px ink frame, square corners, 10px 12px 12px padding, paper ground. Left: Play / Pause, Stop with a small "Esc" hint in mono (hidden from screen readers; `aria-keyshortcuts` says it), Replay. Middle: the beat lane, taking the free width. Right: Explain and Sound. On phones it sticks above the tabs, the lane takes its own row and the five buttons share one row.
@@ -289,6 +292,9 @@ A 1px ink-bordered pad of 48px square key caps; the active pad gains a 1px inset
 
 ### Step marks
 A square ink block with a mono numeral in paper, used only for the real sequence on Listen (1 Picture, 2 Region, 3 Play).
+
+### Index rows (Home)
+The catalogue index: ruled rows under a 1px ink rule, hairlines between, each whole row one link (56px, 48px for quick links). A mono index numeral in grey ink on the left (01 to 05; screen readers hear "Step 1"), the words in the middle, and the page it opens on the right as a caps label with its line icon and an arrow. Hover fills with the faint hairline; focus is the ink ring drawn inside the row. Column labels above a ruled list are caps in grey with an ink rule under them, as in the tide table. Used for How to use it, the quick links and What it is and is not.
 
 ### Practice and missing states
 Hairline sections, not cards. Missing information is a 1px ink box stated plainly at weight 650, never red. Practice data is an ink band across the top.

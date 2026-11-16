@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { buildEarthTrack } from '../audio/earthVoice';
 import { regionLabel } from '../components/ExploreControls';
 import { stepAtSameMoment } from '../components/RhythmExplanation';
-import { dayLabels, otherRegionOf, PICTURES, regionLetter, sourceByKey, SOURCES, timeWord, describesLine } from './sources';
+import { dayLabels, otherRegionOf, PICTURES, regionLetter, sourceByKey, SOURCES, timeWord, describesLine, NASA_PAGES, natureLine } from './sources';
+import { mockScene } from './dataset';
 
 describe('sources', () => {
   it('lists every picture: ocean, aerosols, rain', () =>
@@ -91,5 +92,23 @@ describe('describesLine (honesty line 3, per picture)', () => {
     expect(describesLine(sourceByKey('ocean'))).toBe('It describes the picture, not water speed or ocean health.');
     expect(describesLine(sourceByKey('aerosols'))).toBe('It describes the picture, not air quality or amounts.');
     expect(describesLine(sourceByKey('imerg'))).toBe('It describes the picture, not rainfall amounts.');
+  });
+});
+
+describe('natureLine (honesty line 1, per picture)', () => {
+  it('model output, satellite estimates, or test input', () => {
+    expect(natureLine(sourceByKey('ocean'))).toBe('A computer model (ECCO2 (MIT/JPL), surface flows only), not a photo.');
+    expect(natureLine(PICTURES.find((p) => p.key === 'imerg')!)).toMatch(/^Satellite estimates \(GPM IMERG .*\), drawn as a picture\.$/);
+    expect(natureLine({ scene: mockScene })).toBe('Test input made by the team, not NASA data.');
+  });
+});
+
+describe('NASA_PAGES (Home quick links)', () => {
+  it('one page per real picture, ocean first, read from each scene.json', () => {
+    expect(NASA_PAGES.map((p) => p.svsId)).toEqual([3912, 5669, 4285]);
+    for (const p of PICTURES) {
+      const page = NASA_PAGES.find((n) => n.svsId === p.scene.source.svs_id)!;
+      expect([page.url, page.title]).toEqual([p.scene.source.url, p.scene.source.title]);
+    }
   });
 });
