@@ -316,10 +316,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   return (
     <div className="scan" role="group" aria-labelledby="scan-heading">
       <h3 id="scan-heading">Play the picture</h3>
-      <p className="muted">
-        A line sweeps the picture and plays what it crosses, the way NASA turns telescope images into sound. This is a rule we
-        chose: it describes the picture's colours and positions, and it leaves the Earth rhythm unchanged.
-      </p>
+      <p className="muted">A line sweeps the picture and plays the colours it crosses. A rule we chose; the Earth rhythm is unchanged.</p>
 
       <div className="row">
         {state === 'playing' ? (
@@ -330,6 +327,11 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
           </button>
         )}
         <button type="button" disabled={state === 'stopped'} onClick={() => player.current?.stop()}>Stop the scan</button>
+      </div>
+      {/* Settings folded away (UI pass, 15 Nov): one clear start, the rest on request. */}
+      <details className="scan-settings">
+        <summary>Scan settings</summary>
+        <div className="row">
         <label>
           Scan{' '}
           <select value={target} onChange={(e) => setTarget(e.target.value)}>
@@ -362,7 +364,8 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             aria-valuetext={`${volumeDb} decibels`}
           />
         </label>
-      </div>
+        </div>
+      </details>
 
       {/* Announced politely, and only when the scan starts, pauses or stops. Not role="status":
           the page has one status sentence, for the Earth rhythm. */}
@@ -511,7 +514,10 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             <span ref={lastChime}>none yet</span>
           </span>
 
-          <Legend sound={sound} order={order} radar={!!region} />
+          <details className="scan-legend-box">
+            <summary>What the marks mean</summary>
+            <Legend sound={sound} order={order} radar={!!region} />
+          </details>
 
           {region && loaded && !loaded.isTest && (
             <div className="scan-mini">

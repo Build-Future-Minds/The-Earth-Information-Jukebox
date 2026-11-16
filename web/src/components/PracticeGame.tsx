@@ -1,32 +1,19 @@
-// Launch section for Student B's listening game (tools/listening_game.html, published at /tools/).
-// Clearly a separate practice tool: the game uses its own sound settings to make differences easier
-// to hear, while this page plays the team's one rule (docs/mapping_spec.md).
+// The listening game, as a one-line card on Play along (Student B's card, docs/design/student_b_pictures.html).
+// It opens in the same tab and has a way back.
 import { agree, Key, scatter } from './LookingAt';
 
 const GAME = 'tools/listening_game.html';
 
 export function PracticeGame() {
   return (
-    <section className="practice" aria-labelledby="practice-title">
-      <div className="practice-text">
-        <h2 id="practice-title">Practice: test your ear</h2>
-        <p>Hear a mystery rhythm, then pick which of two ocean patches made it.</p>
-        <p className="muted small">A separate practice tool with its own sound settings.</p>
-        <a className="button-link primary" href={GAME}>
-          Open the listening game
-        </a>
+    <section className="game-card" aria-label="Test your ear">
+      <div className="game-art" aria-hidden="true">
+        <Key degrees={agree} />
+        <span className="game-q">?</span>
+        <Key degrees={scatter} />
       </div>
-      <div className="practice-preview" aria-hidden="true">
-        <figure>
-          <Key degrees={agree} />
-          <figcaption>Patch 1</figcaption>
-        </figure>
-        <span className="practice-q">?</span>
-        <figure>
-          <Key degrees={scatter} />
-          <figcaption>Patch 2</figcaption>
-        </figure>
-      </div>
+      <p><b>Test your ear.</b> Hear a mystery rhythm, then pick the patch that made it.</p>
+      <a className="button-link primary" href={GAME}>Play the listening game</a>
     </section>
   );
 }

@@ -14,7 +14,11 @@ interface ScanNote {
   pan: number;
 }
 
-test.beforeEach(async ({ page }) => openApp(page, 'play'));
+test.beforeEach(async ({ page }) => {
+  await openApp(page, 'play');
+  // The scan's settings and legend are folded away by default (UI pass, 15 Nov); these tests use them.
+  for (const name of ['Scan settings', 'What the marks mean']) await page.getByText(name, { exact: true }).click();
+});
 
 const scanNotes = (page: Page) => page.evaluate(() => (window as unknown as { __scanNotes?: ScanNote[] }).__scanNotes ?? []);
 const playButton = (page: Page) => page.getByRole('button', { name: 'Play the picture' });

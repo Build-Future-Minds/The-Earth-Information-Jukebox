@@ -13,9 +13,11 @@ interface Props {
   keyshortcuts?: string;
   /** A visible key hint ("Esc"), hidden from screen readers: aria-keyshortcuts already says it. */
   hint?: string;
+  /** A step number in the corner (Listen: 3 Play); decoration, hidden from screen readers. */
+  step?: number;
 }
 
-export function IconButton({ icon: Icon, label, onClick, primary, pressed, expanded, controls, keyshortcuts, hint }: Props) {
+export function IconButton({ icon: Icon, label, onClick, primary, pressed, expanded, controls, keyshortcuts, hint, step }: Props) {
   return (
     <button
       type="button"
@@ -26,6 +28,7 @@ export function IconButton({ icon: Icon, label, onClick, primary, pressed, expan
       aria-controls={controls}
       aria-keyshortcuts={keyshortcuts}
     >
+      {step !== undefined && <span className="step-mark corner" aria-hidden="true">{step}</span>}
       <Icon />
       <span className="icon-label">{label}</span>
       {hint && <kbd className="key-hint" aria-hidden="true">{hint}</kbd>}

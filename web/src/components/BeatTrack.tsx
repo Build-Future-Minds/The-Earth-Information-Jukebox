@@ -7,6 +7,7 @@ import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { EarthTrack } from '../audio/earthVoice';
 import { dayLabels } from '../data/sources';
+import { NowChip } from './NowChip';
 import type { PlayState } from '../audio/transport';
 
 interface Props {
@@ -86,12 +87,11 @@ export function BeatTrack({ track, regionLabel, colour, playState, speed, getPos
 
   return (
     <section className="track" aria-label="Beat visualizer" style={colour}>
-      {active && (
-        <div className="track-head">
-          <span>Now playing: {regionLabel}</span>
-          <span>{timeText}</span>
-        </div>
-      )}
+      {/* State as a chip, not a sentence (the full sentence is in the page's status line, for screen readers). */}
+      <div className="track-head">
+        <NowChip letter={regionLabel.replace('Region ', '')} playState={playState} />
+        {active && <span className="track-time">{timeText}</span>}
+      </div>
       {/* A two-mark legend instead of a sentence (team: less text). */}
       <p className="track-legend" aria-hidden="true">
         <span><i className="swatch lo" />First pulse</span>

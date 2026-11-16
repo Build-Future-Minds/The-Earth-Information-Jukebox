@@ -87,7 +87,7 @@ test('the explanation follows the sound: reset on Stop, never the old region aft
     region = region === 1 ? 2 : 1;
     await page.keyboard.press(String(region));
     await page.waitForTimeout(120);
-    const m = (await explanation.textContent())?.match(/Alignment is ([0-9.]+)/);
+    const m = (await explanation.textContent())?.match(/Alignment is (\d\.\d+)/); // exactly a number, not the full stop after it
     if (m) expect(region === 1 ? +m[1] > 0.5 : +m[1] < 0.5).toBe(true);
   }
   await page.keyboard.press('Escape');

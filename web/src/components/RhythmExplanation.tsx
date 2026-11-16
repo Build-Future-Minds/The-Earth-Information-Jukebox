@@ -1,9 +1,11 @@
 // Owner: Student B (v1 by Dev B). Explains the rhythm that is sounding right now.
 // It reads only the `why` on the notes actually playing, so it cannot disagree with the sound.
 // Ask Dev A to check every sentence means what the code does.
-import { forwardRef } from 'react';
+import { forwardRef, type CSSProperties } from 'react';
+import { thumbCss } from '../data/selection';
+import { BeatPicture } from './BeatPicture';
 import { longFraction, type TrackStep } from '../audio/earthVoice';
-import type { Step } from '../data/types';
+import type { Region, Step } from '../data/types';
 
 /**
  * Alignment gap below which two regions are called "about as even as" each other instead of more or less even.
@@ -77,6 +79,29 @@ export function explain(step: TrackStep | null, other?: OtherRegion | null): str
   );
 }
 
+/** One sentence under the Explain picture (Student B), with the number that made the rhythm. */
+export function explainShort(step: TrackStep | null, label: string): string {
+  if (!step) return 'Press Play to hear a rhythm, then ask for an explanation.';
+  if (step.step.status === 'missing') return `There is not enough visible detail in ${label} here, so the Earth voice is quiet.`;
+  const why = step.events[0].why!;
+  const kind = describeSplit(why.long_fraction);
+  const lines =
+    kind === 'even' ? 'line up, so its second pulse comes near the middle'
+      : kind === 'long–short' ? 'point every which way, so its second pulse comes late'
+        : 'partly line up, so its second pulse comes a little late';
+  return `${label}'s lines ${lines}. Alignment is ${why.alignment.toFixed(2)}.`;
+}
+
+/** A row of the Explain picture: one region's crop, then its beat drawn to scale. */
+export interface ExplainRow {
+  letter: string;
+  label: string;
+  region: Region;
+  step: Step | null;
+  playing: boolean;
+  colour: CSSProperties;
+}
+
 export const DISCLAIMER =
   'This is a visualization of a computer model. The rhythm rule is our choice. ' +
   'It describes the image, not water speed, turbulence or ocean health.';
@@ -85,17 +110,35 @@ interface Props {
   step: TrackStep | null;
   regionLabel: string;
   other?: OtherRegion | null;
+  /** Student B's picture: this region and the other, crop → beat. */
+  rows?: ExplainRow[];
+  imageUrl?: string | null;
+  frame?: { width: number; height: number };
 }
 
 export const RhythmExplanation = forwardRef<HTMLElement, Props>(function RhythmExplanation(
-  { step, regionLabel, other },
+  { step, regionLabel, other, rows = [], imageUrl, frame },
   ref,
 ) {
   const when = step?.step.source_time ? ` Model time: ${step.step.source_time}.` : '';
   return (
     <section ref={ref} tabIndex={-1} className="explanation" aria-labelledby="explain-heading">
       <h2 id="explain-heading">Why it sounds like this: {regionLabel}</h2>
-      <p>{explain(step, other)}{when}</p>
+      <p className="explain-line">{explainShort(step, regionLabel)}</p>
+      <div className="explain-picture" aria-hidden="true">
+        {rows.map((row) => (
+          <div key={row.region.id} className={row.playing ? 'explain-row playing' : 'explain-row'} style={row.colour}>
+            <span className="region-badge">{row.letter}</span>
+            {imageUrl && frame && (
+              <span className="region-thumb" style={{ backgroundImage: `url(${imageUrl})`, ...thumbCss(row.region, frame, 44) }} />
+            )}
+            <svg className="explain-arrow" viewBox="0 0 20 10" width="20" height="10"><path d="M1 5h16M13 1l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            {row.step?.status === 'ok' ? <BeatPicture alignment={row.step.alignment} /> : <span className="muted small">no data</span>}
+          </div>
+        ))}
+      </div>
+      {/* The full sentence with the comparison, for screen readers. */}
+      <p className="sr-only">{explain(step, other)}{when}</p>
       {/* The honesty lines are said once, on How it's made (DISCLAIMER is used there). */}
     </section>
   );

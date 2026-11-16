@@ -13,8 +13,9 @@ describe('views', () => {
     ['#nope', 'listen'],
     ['#Compare', 'listen'],
     ['#compare?x=1', 'listen'],
+    ['#globe', 'globe'],
   ])('viewFromHash(%j) is %s', (hash, view) => expect(viewFromHash(hash)).toBe(view));
 
   it('labels in order', () =>
-    expect(VIEWS.map((v) => v.label)).toEqual(['Listen', 'Compare', "How it's made", 'Play along']));
+    expect(VIEWS.map((v) => v.label)).toEqual(['Listen', 'Compare', "How it's made", 'Play along', 'Globe']));
 });

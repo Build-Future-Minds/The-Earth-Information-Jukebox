@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { stepToEvents, type TrackStep } from '../audio/earthVoice';
 import type { Step } from '../data/types';
-import { SAME_BELOW, compareLine, explain, stepAtSameMoment } from './RhythmExplanation';
+import { SAME_BELOW, compareLine, explain, explainShort, stepAtSameMoment } from './RhythmExplanation';
 
 const ok = (region: string, alignment: number, frame = 0, t = 0): Step => ({
   t,
@@ -115,5 +115,21 @@ describe('stepAtSameMoment', () => {
 
   it('returns null when the other region has no step at that moment', () => {
     expect(stepAtSameMoment(steps, ok('a', 0.5, 9, 9), 'b')).toBeNull();
+  });
+});
+
+describe('explainShort (Student B: one sentence under the picture)', () => {
+  it('swirly: the second pulse comes late', () => {
+    expect(explainShort(playing(ok('a', 0.08)), 'Region A')).toBe("Region A's lines point every which way, so its second pulse comes late. Alignment is 0.08.");
+  });
+  it('lined up: the second pulse comes near the middle', () => {
+    expect(explainShort(playing(ok('a', 0.95)), 'Region B')).toBe("Region B's lines line up, so its second pulse comes near the middle. Alignment is 0.95.");
+  });
+  it('partly: a little late', () => {
+    expect(explainShort(playing(ok('a', 0.67)), 'Region B')).toBe("Region B's lines partly line up, so its second pulse comes a little late. Alignment is 0.67.");
+  });
+  it('missing and not playing say so, with no number', () => {
+    expect(explainShort(playing(missing('a')), 'Region A')).toContain('Earth voice is quiet');
+    expect(explainShort(null, 'Region A')).toBe('Press Play to hear a rhythm, then ask for an explanation.');
   });
 });
