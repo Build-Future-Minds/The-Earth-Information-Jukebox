@@ -22,21 +22,17 @@ test('How it\'s made and Play along do not show the region sentence', async ({ p
   }
 });
 
-test('How it\'s made is three pictures, the rule in one line, three honesty lines and the credit, on one screen', async ({ page }) => {
+test('How it\'s made opens on its title, the honesty lines and the two pipelines, with the NASA credit (P3)', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openApp(page, 'how');
-  const steps = page.getByRole('list', { name: 'How a picture becomes a rhythm' }).getByRole('listitem');
-  await expect(steps).toHaveCount(3);
-  await expect(steps.nth(0)).toContainText('A circle on the NASA picture');
-  await expect(steps.nth(1)).toContainText('Which way the lines run');
-  await expect(steps.nth(2)).toContainText('Agreement sets the rhythm');
-  for (const i of [0, 1, 2]) await expect(steps.nth(i).locator('svg, .how-thumb')).not.toHaveCount(0);
-  await expect(page.getByRole('main')).toContainText('0.75 − 0.25 × alignment');
-  await expect(page.getByRole('main')).toContainText('The rhythm rule is a choice we made.');
-  await expect(page.getByRole('main')).toContainText('It describes the picture, not water speed or ocean health.');
-  await expect(page.getByRole('main')).toContainText('Synthetic fixture'); // practice credit
-  const [scroll, inner] = await page.evaluate(() => [document.documentElement.scrollHeight, window.innerHeight]);
-  expect(scroll).toBeLessThanOrEqual(inner + 2);
+  await expect(page.locator('.how-title')).toBeInViewport();
+  await expect(page.locator('.how-honest li')).toHaveCount(3);
+  await expect(page.locator('.how-honest li').nth(2)).toBeInViewport();
+  await expect(page.locator('.how-route')).toHaveCount(2);
+  await expect(page.locator('.how-route').first()).toContainText('Structure tensor');
+  // The rule, written from the app's own constants.
+  await expect(page.locator('#how-s1-7 .katex-mathml')).toContainText(['0.75']);
+  await expect(page.locator('#how-sources')).toContainText('NASA/Goddard Space Flight Center Scientific Visualization Studio');
 });
 
 test('Listen numbers the steps: region, then Play (practice data has one picture)', async ({ page }) => {

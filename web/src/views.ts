@@ -18,7 +18,8 @@ export const VIEWS: { key: View; label: string }[] = [
 export const GAME_HREF = 'tools/listening_game.html';
 
 export function viewFromHash(hash: string): View {
-  const key = hash.replace(/^#/, '');
+  // "#how/s1-5" is How it's made, opened at stage 1.5: the part after the slash is a place in the view.
+  const key = hash.replace(/^#/, '').split('/')[0];
   return VIEWS.find((v) => v.key === key)?.key ?? 'home';
 }
 

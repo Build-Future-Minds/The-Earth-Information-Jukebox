@@ -17,6 +17,7 @@ import argparse
 import json
 import math
 from dataclasses import replace
+from datetime import date
 from pathlib import Path
 
 import cv2
@@ -156,6 +157,9 @@ def main() -> int:
     parser.add_argument("--min-water", type=float, default=0.95,
                         help="smallest open-water share for a map position to count (islands lower it)")
     parser.add_argument("--map", action="store_true", help="score every circle position (about a minute)")
+    parser.add_argument("--report-out", type=Path, default=OUT / "regions_report.json",
+                        help="where to write the JSON report (the web page reads "
+                             "docs/measurements/nasa_regions.json, written with this option)")
     args = parser.parse_args()
 
     numbers = list(range(args.first, args.last + 1, args.step))
@@ -302,9 +306,16 @@ def main() -> int:
         draw_map(mean_map, valid, land, circles, report["map"], frames[0], radius, OUT / "alignment_map.png")
         print(f"\nfigure: {OUT / 'alignment_map.png'}")
 
-    with open(OUT / "regions_report.json", "w", encoding="utf-8", newline="\n") as handle:
+    args.report_out.parent.mkdir(parents=True, exist_ok=True)
+    report["generated_by"] = "analysis/explore_regions.py"
+    report["date"] = date.today().isoformat()
+    report["circles_added"] = args.also
+    report["note"] = ("NASA SVS 3912 frames (ECCO2 model output, as drawn). Measured on the flat map; the map-stretch "
+                      "values are a rough estimate (docs/science_review.md section 9).")
+    with open(args.report_out, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(report, handle, indent=1)
-    print(f"report: {OUT / 'regions_report.json'}")
+        handle.write("\n")
+    print(f"report: {args.report_out}")
 
     if args.write_draft_scene:
         write_draft_scene(args, draft, circles, land, numbers, (height, width))

@@ -742,34 +742,13 @@ figure.scene figcaption { font-size: 0.85rem; }
 .track-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sm); }
 .track-time { font: 400 0.75rem/1 var(--mono); color: var(--ink-2); }
 
-/* ---- How it's made: three pictures in a row (Student B), then the rule, honesty lines and credits ---- */
-.how-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--lg); counter-reset: step; }
-.how-strip li { display: grid; gap: 4px; align-content: start; counter-increment: step; }
-.how-strip li b::before { content: counter(step); display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; margin-right: 8px;
-  background: var(--ink); color: var(--paper); font: 500 0.75rem/1 var(--mono); }
-.how-strip li b { font-size: 1.05rem; font-weight: 600; }
-.how-strip li > span { color: var(--ink-2); padding-left: 2em; }
-.how-art { height: 150px; display: flex; align-items: center; justify-content: center; gap: var(--sm); background: var(--well);
-  border: 1px solid var(--ink); padding: var(--sm); margin-bottom: 8px; }
-.how-thumb { position: relative; display: block; width: 100%; height: 100%; background: var(--well) center / 100% 100% no-repeat; }
-.how-thumb i { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--black); }
-.how-art.how-ticks figure { margin: 0; display: grid; justify-items: center; gap: 4px; color: var(--white); font-size: 0.85rem; }
-.how-ticks svg { width: 120px; }
-.how-beats { flex-direction: column; gap: 6px; }
-.how-beats .beat-picture { width: 150px; }
+/* ---- Beat pictures (BeatPicture). How it's made has its own stylesheet, loaded with the page: src/how/how.css ---- */
 .beat-row { display: flex; align-items: center; gap: 10px; color: var(--white); font-size: 0.85rem; }
 .beat-picture .bp-base, .beat-picture .bp-edge { stroke: var(--on-well-2); stroke-width: 1; }
 .beat-picture .bp-mid { stroke: var(--on-well-2); stroke-width: 1; stroke-dasharray: 3 3; }
 .beat-picture .bp-lo { fill: var(--region, var(--white)); }
 .beat-picture .bp-hi { fill: var(--on-well-2); }
 .beat-picture .bp-label { fill: var(--on-well-2); font: 400 9px var(--mono); }
-.how-rule { margin: var(--sm) 0 0; font-size: 1.05rem; }
-.how-honest { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
-.how-honest li::before { content: "—"; margin-right: 8px; color: var(--ink-2); }
-.how-credits { border-top: 1px solid var(--rule); padding-top: 10px; display: grid; gap: 4px; font-size: 0.85rem; color: var(--ink-2); }
-.how-credits p { margin: 0; }
-.how-credits a { color: var(--ink); }
-@media (max-width: 760px) { .how-strip { grid-template-columns: 1fr; } .how-art { height: 120px; } }
 
 /* Explain as a picture (Student B): crop → beat for both regions, the playing one at full strength. */
 .explanation { display: grid; gap: 8px; }
@@ -807,8 +786,6 @@ figure.scene figcaption { font-size: 0.85rem; }
 .game-q { font-size: 1.6rem; font-weight: 300; color: var(--ink-2); }
 .scan-settings summary, .scan-legend-box summary { cursor: pointer; font-weight: 600; color: var(--ink); }
 @media (max-width: 900px) { .play-grid { grid-template-columns: 1fr; } .play-scan { grid-row: auto; } }
-
-.how-art figcaption { color: var(--white); }
 
 /* Tablets and narrow windows too (review: six tabs need about 1024px in the top bar; 920px
    overflowed): below 1024px the tabs move to the fixed bottom bar; the player bar sticks above them. */

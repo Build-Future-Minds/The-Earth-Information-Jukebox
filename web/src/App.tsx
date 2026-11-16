@@ -295,7 +295,7 @@ export function App() {
             <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop}
               speed={speed} onSpeed={changeSpeed} scanRef={scan} />
           )}
-          {view === 'how' && <HowView source={source} pictures={PICTURES} />}
+          {view === 'how' && <HowView />}
           {view === 'play' && (
             <PlayView
               scene={scanPicture.scene}
