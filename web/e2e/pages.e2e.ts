@@ -4,7 +4,6 @@ import { expect, test } from '@playwright/test';
 for (const [name, path] of [
   ['globe', '/globe.html'],
   ['listening game', '/tools/listening_game.html'],
-  ['quiz player', '/tools/listening_quiz_player.html'],
 ] as const) {
   test(`the ${name} page links back to the app`, async ({ page }) => {
     await page.goto(path);

@@ -25,8 +25,7 @@ python tools/build_listening_tasks.py fixtures/mock/features.mock.json --seed 42
 ### Practice game: "Which patch made this rhythm?" (real NASA image)
 
 Live: <https://build-future-minds.github.io/The-Earth-Information-Jukebox/tools/listening_game.html>
-(the quiz player is at `tools/listening_quiz_player.html` on the same site). The Pages workflow copies
-both pages and downloads the NASA still on every deploy. To run it locally instead:
+The Pages workflow copies the game and downloads the NASA still on every deploy. To run it locally instead:
 
 1. Download the NASA still (once; `assets/frames/` is git-ignored):
 
@@ -85,8 +84,7 @@ the melody; timing, pitch and note length still come from the patch exactly as b
   into the next. With Groove lock on, two sounds share one set of chords: a sound that joins extends
   them. With Groove lock off, a second sound starts its own chords on its own beat.
 - **The chords are the same for every patch and start only on the beat.** Nobody has checked by ear
-  yet whether they hide the spacing, so use Musical sound for practice and the quiz player for the
-  real test. The chords start where the melody's first note already is (checked by logging every
+  yet whether they hide the spacing, so keep Musical sound off for the real listening test. The chords start where the melody's first note already is (checked by logging every
   scheduled start: none of the chords' starts falls between beats). They sit about 4 dB under the
   melody. One sound peaked at 0.90 of full scale, two layered at 0.99 (measured before the loudness
   balance below; not measured again since).
@@ -112,7 +110,7 @@ Leave it off for the plain test tone. Switching on Rhythm only also switches Mus
 nothing away and the spacing of the pulses carries the answer. This is close to the team's rule
 (`docs/mapping_spec.md`) but not the same: each note is held for half its gap, so note length still
 follows the spacing, while the app uses one pitch and one note length. The real listening check
-uses the quiz player, not this game (`docs/ACCESSIBILITY_LOG.md`, "Listening task"). The speed
+uses this game with Musical sound off and Rhythm only on (`docs/ACCESSIBILITY_LOG.md`, "Listening task"); the quiz player was removed on 15 Nov. The speed
 control at 0.5× gives a 1-second beat.
 
 **Line directions on the patches:** after you answer, each patch is drawn with short white ticks,
@@ -151,13 +149,11 @@ These numbers are a **practice measurement in the browser**, not Dev A's checked
 Finding to share with Dev A: on this frame, real patches mostly score 0.15–0.60 (about 0.15–0.50 with the
 game's larger 192 × 120 crops), so the audible range is narrower than the 0–1 the rule allows.
 
-### Play the quiz (local test player)
+### The quiz file
 
-Open `tools/listening_quiz_player.html` in a browser (double-click it), choose the
-`listening_tasks.json` you made above, then press **Play both rhythms** and answer.
-Keyboard: `P` play both, `S` stop, `1` / `2` answer, `N` next. It plays the gaps from the quiz
-file at one fixed pitch; only the spacing changes. It is a testing aid, not the Earth Sonata app.
-Generated `listening_tasks*.json` files are git-ignored.
+The quiz player that played these files was removed on 15 Nov (team decision); the listening test now
+runs on the listening game. `build_listening_tasks.py` stays: it still lists which moments of the
+real pair are fair to compare. Generated `listening_tasks*.json` files are git-ignored.
 
 ### Test
 
@@ -198,7 +194,7 @@ frames 3 and 4 (missing).
 - **Pulse order:** the rule plays the long gap first (75 %, then 25 % of the beat), so the team
   calls this pattern "long–short" (renamed 15 Nov; words only). The Team Briefing still says
   "short–long", in one sentence; there is no table. The quiz file reports `short_gap_s` and `long_gap_s` without an
-  order, so the answers do not change. The quiz player now plays the long gap first, like the app.
+  order, so the answers do not change.
 
 ### Still open
 
