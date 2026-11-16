@@ -4,13 +4,6 @@
 // (audio/scanScore.ts, makeTestPicture), which is not NASA data and says so on screen.
 import { makeTestPicture, maskFromPixels, resampleMask, type Pixels } from '../audio/scanScore';
 
-/** Read a picture's mask (white = never read) and fit it to a still of `width` × `height`, nearest
- *  pixel. The app and the measuring tool both call this, so they mask the same pixels. */
-export async function loadMask(url: string, width: number, height: number): Promise<Uint8Array> {
-  const { pixels } = await loadPicture(url);
-  return resampleMask(maskFromPixels(pixels), pixels.width, pixels.height, width, height);
-}
-
 export interface LoadedPicture {
   /** URL shown on screen. */
   href: string;
@@ -19,9 +12,11 @@ export interface LoadedPicture {
   isTest: boolean;
 }
 
-export function loadPicture(imageUrl: string | null): Promise<LoadedPicture> {
+/** With no URL it makes a TEST INPUT picture (`make`; the ocean's three dots by default), which is
+ *  not NASA data. */
+export function loadPicture(imageUrl: string | null, make: () => Pixels = makeTestPicture): Promise<LoadedPicture> {
   if (!imageUrl) {
-    const pixels = makeTestPicture();
+    const pixels = make();
     const canvas = document.createElement('canvas');
     canvas.width = pixels.width;
     canvas.height = pixels.height;
@@ -43,4 +38,11 @@ export function loadPicture(imageUrl: string | null): Promise<LoadedPicture> {
     img.onerror = () => reject(new Error('The picture did not load.'));
     img.src = imageUrl;
   });
+}
+
+/** Read a picture's mask (white = never read) and fit it to a still of `width` × `height`, nearest
+ *  pixel. The app and the measuring tool both call this, so they mask the same pixels. */
+export async function loadMask(url: string, width: number, height: number): Promise<Uint8Array> {
+  const { pixels } = await loadPicture(url);
+  return resampleMask(maskFromPixels(pixels), pixels.width, pixels.height, width, height);
 }

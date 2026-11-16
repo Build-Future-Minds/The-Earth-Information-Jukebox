@@ -1,0 +1,298 @@
+/* How it's made (P3). Read mode inside Pulse Catalogue (DESIGN.md): one ink, no hue except the side
+   colours, square corners, 1px rules, caps labels, Geist with Geist Mono for numbers; KaTeX's math
+   faces only inside formulas. Loaded with the page, so none of this ships with Listen. */
+
+:root {
+  /* Chart marks are ink, predictions grey ink: a new surface gets no colour of its own (DESIGN.md,
+     "The Colour Is the Side Rule"). Only the regions keep their side colours, always with their letter. */
+  --how-mark: var(--ink);
+  /* The alignment map's scale: grey ink in 0.1 steps, pale to black (no hue). Checked with the dataviz
+     ordinal check: monotone, steps of 0.06 or more in lightness, the pale end at 2:1 or more against
+     the page in both themes. */
+  --how-hm-0: oklch(0.75 0 0);
+  --how-hm-1: oklch(0.68 0 0);
+  --how-hm-2: oklch(0.61 0 0);
+  --how-hm-3: oklch(0.54 0 0);
+  --how-hm-4: oklch(0.47 0 0);
+  --how-hm-5: oklch(0.4 0 0);
+  --how-hm-6: oklch(0.32 0 0);
+  --how-hm-7: oklch(0.24 0 0);
+}
+:root[data-theme='dark'] {
+  /* The black sleeve: the anchor flips, so high alignment is the light end. */
+  --how-hm-0: oklch(0.42 0 0);
+  --how-hm-1: oklch(0.49 0 0);
+  --how-hm-2: oklch(0.56 0 0);
+  --how-hm-3: oklch(0.63 0 0);
+  --how-hm-4: oklch(0.7 0 0);
+  --how-hm-5: oklch(0.77 0 0);
+  --how-hm-6: oklch(0.84 0 0);
+  --how-hm-7: oklch(0.92 0 0);
+}
+
+/* Caps labels (DESIGN.md "The Caps Label Rule"): names of fields, columns, legends and the contents. */
+.how-rail-h, .how-entry > dt, .how-table thead th, .how-legend, .how-tag, .how-onpage summary {
+  text-transform: uppercase; letter-spacing: var(--caps);
+}
+
+/* ---------- Layout: a contents rail and one reading column ---------- */
+.how { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 0 56px; padding-top: 14px; }
+/* The rail scrolls on short screens; its side padding keeps the links' focus rings inside it. */
+.how-rail { position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 100px); overflow-y: auto; font-size: 0.92rem; padding: 0 8px var(--md); margin: 0 -8px; }
+.how-rail-h { font-weight: 500; font-size: 0.72rem; color: var(--ink-2); margin: 4px 0 10px; }
+.how-contents, .how-contents ol { list-style: none; margin: 0; padding: 0; }
+.how-contents > li { padding: 5px 0; border-top: 1px solid var(--rule); }
+.how-contents > li:first-child { border-top: 0; }
+.how-contents a { display: block; padding: 3px 0; text-decoration: none; }
+.how-contents a:hover { text-decoration: underline; }
+.how-contents ol { margin: 4px 0 4px 2px; border-left: 1px solid var(--rule); }
+.how-contents ol li { position: relative; }
+.how-contents ol a { padding: 2px 0 2px 12px; color: var(--ink-2); }
+.how-contents li.current > a { font-weight: 700; color: var(--ink); }
+.how-contents ol li.current::before { content: ''; position: absolute; left: -4px; top: 10px; width: 7px; height: 7px; background: var(--ink); }
+
+.how-article { min-width: 0; max-width: 900px; padding-bottom: var(--xl); }
+.how-title { font-size: 2.6rem; font-weight: 400; line-height: 1.05; letter-spacing: -0.03em; margin: 0 0 14px; text-wrap: balance; }
+.how-stand { font-size: 1.15rem; max-width: 36em; margin: 0 0 var(--lg); }
+.how-onpage { display: none; }
+/* Stage and section numbers, and numbers inside sentences: the body face with tabular figures. */
+.how-n, .how-num { font-variant-numeric: tabular-nums; }
+.how-n { font-weight: 600; }
+
+/* A link past the contents, shown when it takes focus (48 stops come before the first stage otherwise). */
+.how-skip { position: absolute; left: -9999px; }
+.how-skip:focus { position: fixed; left: 16px; top: 76px; z-index: 40; background: var(--paper); padding: 8px 12px; border: 1px solid var(--ink); border-radius: var(--r); font-weight: 700; }
+/* Keep a focused control clear of the sticky top bar (and the phone's bottom bar) when the page scrolls to it. */
+html:has(.how) { scroll-padding: 84px 0 24px; }
+
+.how-section { border-top: 1px solid var(--rule); padding-top: var(--sm); margin-top: var(--xl); scroll-margin-top: 84px; }
+.how-section > h3 { font-size: 1.55rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.015em; margin: 0 0 var(--xs); }
+/* Math keeps its own letters: no caps, no tracking, even inside a caps label. */
+.how .katex { text-transform: none; letter-spacing: normal; }
+/* A heading takes focus only when a link lands on it (#how/nasa), so a screen reader starts there;
+   it is not a control, so it gets no focus ring. */
+.how-section > h3:focus { outline: none; }
+.how-section h4 { font-size: 1.2rem; font-weight: 600; margin: var(--lg) 0 var(--xs); }
+.how-section h5 { font-size: 1.1rem; font-weight: 600; margin: var(--lg) 0 6px; }
+.how-section h6 { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-2); margin: var(--sm) 0 6px; }
+/* About 70 characters a line: Atkinson's "0" is wider than its average letter, so "ch" overshoots. */
+.how-section p, .how-section li, .how-chart figcaption { max-width: 36em; }
+.how-lede { color: var(--ink-2); margin: 0 0 var(--sm); }
+.how-src { color: var(--ink-2); font-size: 0.9rem; }
+
+/* ---------- The honesty lines ---------- */
+.how-honest { list-style: none; margin: 0; padding: 0; counter-reset: honest; }
+.how-honest li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 0 10px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.how-honest li::before { counter-increment: honest; content: counter(honest); font-weight: 600; color: var(--ink-2); padding-top: 2px; }
+.how-honest b { display: block; font-size: 1.2rem; font-weight: 500; line-height: 1.35; text-wrap: pretty; }
+.how-honest a { font-size: 0.95rem; font-weight: 600; }
+
+/* ---------- The two pipelines as routes ---------- */
+.how-pipe { margin: 0 0 var(--md); }
+.how-pipe-h { font-weight: 700; margin: 0 0 6px; }
+.how-pipe-h span:last-child { font-weight: 400; color: var(--ink-2); }
+.how-route { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.how-route li { position: relative; padding-top: 20px; }
+.how-route li::before { content: ''; position: absolute; top: 6px; left: 0; right: 0; border-top: 2px solid var(--ink); }
+.how-route li:first-child::before { left: 7px; }
+.how-route li.how-route-end::before { right: auto; width: 14px; }
+.how-stop { position: absolute; top: 1px; left: 1px; width: 12px; height: 12px; border: 1px solid var(--ink); background: var(--paper); }
+.how-route-end .how-stop { background: var(--ink); }
+.how-route a { display: grid; text-decoration: none; padding: 0 10px 0 0; line-height: 1.25; }
+.how-route a:hover .how-route-name { text-decoration: underline; text-decoration-thickness: 2px; }
+.how-route .how-n { font-size: 0.8rem; color: var(--ink-2); }
+.how-route-name { font-size: 0.95rem; font-weight: 600; }
+.how-route-method { font-size: 0.82rem; color: var(--ink-2); line-height: 1.3; margin-top: 2px; }
+.how-route-end .how-route-name { display: block; font-weight: 400; color: var(--ink-2); }
+
+/* ---------- Stages: one ruled row each, opening in place ---------- */
+.how-stage { border-bottom: 1px solid var(--rule); scroll-margin-top: 84px; }
+.how-section > .how-lede + .how-stage, .how-section > .how-stage:first-of-type { border-top: 1px solid var(--rule); }
+.how-stage-h { margin: 0; font-size: inherit; font-weight: 400; }
+.how-stage-h button {
+  all: unset; box-sizing: border-box; cursor: pointer; width: 100%;
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto 20px; gap: 0 12px; align-items: center; padding: 12px 0 2px;
+  min-height: 48px;
+}
+.how-stage-h button:hover .how-stage-name { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+/* `all: unset` above also unsets the global focus ring, so the button gets it back here, unchanged. */
+.how-stage-h button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.how-stage-n { font-size: 1.15rem; font-weight: 400; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.how-stage-name { font-size: 1.15rem; font-weight: 600; }
+.how-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.how-chevron { transition: transform var(--snap); }
+.how-stage.open .how-chevron { transform: rotate(180deg); }
+.how-plain { margin: 0 0 12px 56px; color: var(--ink-2); max-width: 64ch; }
+.how-stage.open .how-plain { color: var(--ink); font-size: 1.1rem; }
+.how-stage-body { padding: 0 0 var(--lg) 56px; }
+
+.how-tag { display: inline-block; font: 500 0.72rem/1 var(--font); padding: 5px 7px; border: 1px solid var(--ink); white-space: nowrap; vertical-align: 0.1em; }
+.how-tag-verified { background: var(--ink); color: var(--paper); }
+.how-tag-unverified { border-style: dashed; }
+
+/* The entry: label column, then formula, why, use, check, always in that order. */
+.how-entry { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px 16px; margin: 0; }
+.how-entry > dt { font-weight: 500; font-size: 0.68rem; color: var(--ink-2); padding-top: 5px; }
+.how-entry > dd { margin: 0; min-width: 0; }
+.how-entry > dd > p { margin: 0 0 8px; }
+.how-props { margin: 0; padding-left: 1.1em; }
+.how-props li { margin-bottom: 8px; max-width: 64ch; }
+
+/* ---------- Formulas ---------- */
+.how-formula + .how-formula { margin-top: 14px; }
+.how-math { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+/* A formula wider than its column fades at the right edge, so the cut shows there is more to scroll. */
+.how-math[tabindex] { mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
+.how-math[tabindex]:focus-visible { mask-image: none; }
+.how-math .katex-display { margin: 2px 0; text-align: left; }
+.how-math .katex-display > .katex { text-align: left; }
+.how-article .katex { font-size: 1.08em; }
+.how-words { margin: 6px 0 0; max-width: 64ch; }
+.how-words-label { font-weight: 600; }
+
+/* ---------- Tables (DESIGN.md "Tide table") ---------- */
+/* The padding keeps the focus ring of a link in the first column inside the scroll box. */
+.how-table-wrap { overflow-x: auto; margin: 4px -6px 0; padding: 6px; }
+.how-table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.how-table caption { text-align: left; font-weight: 600; font-size: 0.9rem; padding: 0 0 6px; caption-side: top; }
+.how-table th, .how-table td { text-align: left; padding: 7px 12px 7px 0; border-bottom: 1px solid var(--rule); vertical-align: top; font-weight: 400; }
+.how-table thead th { font-weight: 500; font-size: 0.68rem; color: var(--ink-2); border-bottom-color: var(--ink); vertical-align: bottom; }
+.how-table tbody th { font-weight: 600; }
+.how-table .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.how-table thead .num { font-family: var(--font); white-space: normal; }
+.how-where { display: block; font-weight: 400; font-size: 0.82rem; color: var(--ink-2); }
+
+/* ---------- Charts ---------- */
+/* Inside a stage a chart lines up with the entry's text column; elsewhere it starts at the column's edge. */
+.how-chart { margin: var(--lg) 0 0; }
+.how-stage-body > .how-chart { margin-left: 128px; }
+/* The app's figcaption is a grid (one line per child); here a caption is one paragraph of prose. */
+.how-chart figcaption, .how-diagram figcaption { display: block; max-width: 64ch; color: var(--ink); }
+.how-chart figcaption .how-src { display: block; margin-top: 2px; }
+.how-diagram figcaption { color: var(--ink-2); }
+.how-legend { list-style: none; margin: 8px 0 2px; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.68rem; font-weight: 500; color: var(--ink-2); }
+.how-legend li { display: inline-flex; align-items: center; gap: 7px; }
+.how-key { display: inline-block; flex: none; }
+.how-key-line { width: 18px; border-top: 2px solid var(--how-mark); }
+.how-key-faint { width: 18px; border-top: 2px solid var(--ink-2); }
+.how-key-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--how-mark); }
+.how-key-region-a { width: 18px; border-top: 3px solid var(--region-a); }
+.how-key-region-b { width: 18px; border-top: 3px solid var(--region-b); }
+.how-key-hatch { width: 14px; height: 14px; border: 1px solid var(--rule); background: repeating-linear-gradient(45deg, var(--ink-2) 0 1px, transparent 1px 5px); }
+.how-key-gap { width: 14px; height: 14px; background: var(--rule-2); border: 1px dashed var(--rule); }
+.how-ramp-item { gap: 4px !important; }
+.how-ramp-item .how-key { width: 18px; height: 12px; }
+.how-ramp-item span { font: 400 0.8rem var(--mono); letter-spacing: 0; }
+.how-plot { margin-top: 2px; }
+.how-readout { margin: 4px 0 0; font-size: 0.85rem; font-variant-numeric: tabular-nums; color: var(--ink-2); min-height: 1.5em; }
+.how-svg { display: block; overflow: visible; }
+.how-grid { stroke: var(--rule); stroke-width: 1; }
+.how-axis { font: 400 12px var(--mono); fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+.how-axis-label { font: 400 12px var(--font); fill: var(--ink-2); }
+.how-line { fill: none; stroke: var(--how-mark); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.how-line-faint { fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.how-dot { fill: var(--how-mark); stroke: var(--paper); stroke-width: 2; }
+.how-hover { fill: none; stroke: var(--ink); stroke-width: 2; pointer-events: none; }
+.how-hit { fill: transparent; pointer-events: all; }
+.how-gap { fill: var(--rule-2); stroke: var(--rule); stroke-dasharray: 3 3; }
+.how-whisker { stroke: var(--how-mark); stroke-width: 2; stroke-linecap: round; opacity: 0.55; }
+.how-stem { stroke: var(--how-mark); stroke-width: 2; stroke-linecap: round; }
+.how-bar { fill: var(--how-mark); }
+.how-bar-label { font: 600 13px var(--font); fill: var(--ink); }
+.how-region-a { --how-region: var(--region-a); }
+.how-region-b { --how-region: var(--region-b); }
+.how-region-line { fill: none; stroke: var(--how-region); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.how-region-dot { fill: var(--how-region); stroke: var(--paper); stroke-width: 2; }
+.how-region-label { font: 700 13px var(--mono); fill: var(--ink); }
+/* Two rules side by side: a shared row for caption, legend, plot and numbers, so the plots line up. */
+.how-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); gap: 0 32px; margin-left: 128px; }
+.how-pair .how-chart { margin-left: 0; display: grid; grid-row: span 4; grid-template-rows: subgrid; align-content: start; }
+
+.how-numbers { margin-top: 6px; }
+.how-numbers summary { cursor: pointer; font-weight: 600; font-size: 0.95rem; padding: 8px 0; width: fit-content; }
+.how-numbers .how-table-wrap { max-width: 640px; }
+
+/* The alignment map: single-hue bins, hatched where there is no number, region rings and letters. */
+.how-map { position: relative; }
+.how-hm-0 { fill: var(--how-hm-0); background: var(--how-hm-0); }
+.how-hm-1 { fill: var(--how-hm-1); background: var(--how-hm-1); }
+.how-hm-2 { fill: var(--how-hm-2); background: var(--how-hm-2); }
+.how-hm-3 { fill: var(--how-hm-3); background: var(--how-hm-3); }
+.how-hm-4 { fill: var(--how-hm-4); background: var(--how-hm-4); }
+.how-hm-5 { fill: var(--how-hm-5); background: var(--how-hm-5); }
+.how-hm-6 { fill: var(--how-hm-6); background: var(--how-hm-6); }
+.how-hm-7 { fill: var(--how-hm-7); background: var(--how-hm-7); }
+.how-hatch-line { stroke: var(--ink-2); stroke-width: 0.12; }
+.how-map-ring-under { fill: none; stroke: var(--paper); stroke-width: 6px; vector-effect: non-scaling-stroke; }
+.how-map-ring { fill: none; stroke: var(--how-region); stroke-width: 3px; vector-effect: non-scaling-stroke; }
+.how-map-tag {
+  position: absolute; transform: translate(-50%, -50%); display: inline-grid; place-items: center;
+  width: 1.6em; height: 1.6em; font: 600 0.8rem var(--mono);
+  background: var(--how-region); color: var(--on-region); box-shadow: inset 0 0 0 1px var(--white), 0 0 0 1px var(--black); pointer-events: none;
+}
+
+/* ---------- Diagrams ---------- */
+.how-diagram { margin: var(--sm) 0 0; }
+.how-diagram svg { display: block; max-width: 100%; height: auto; }
+.how-diagram figcaption { font-size: 0.9rem; color: var(--ink-2); max-width: 64ch; margin-top: 6px; }
+.how-d-frame { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.how-d-thin { fill: none; stroke: var(--rule); stroke-width: 1; }
+.how-d-sweep { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.how-d-arrow { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.how-chain-link { stroke: var(--ink); stroke-width: 2; }
+.how-chain-stop { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.how-chain-stop.ours { fill: var(--ink); }
+.how-chain-label { font: 600 14px var(--font); fill: var(--ink); }
+.how-chain-sub { font-weight: 400; font-size: 13px; fill: var(--ink-2); }
+
+/* ---------- Lists ---------- */
+.how-choices { margin: var(--lg) 0 0 56px; border-top: 1px solid var(--rule); }
+.how-choice-list, .how-refs { margin: 0; padding-left: 1.1em; }
+.how-choice-list li, .how-refs li { margin: 0 0 10px; max-width: 68ch; }
+.how-choice-why { display: block; color: var(--ink-2); font-size: 0.95rem; }
+.how-limits ol { margin: 0; padding-left: 1.4em; }
+.how-limits li { margin: 0 0 10px; max-width: 68ch; }
+.how-listen { border-top: 1px solid var(--rule); margin-top: var(--lg); }
+.how-test { font: 400 0.82rem var(--mono); overflow-wrap: anywhere; }
+
+/* ---------- Narrow screens: no rail, contents in a fold-out, entries stacked ---------- */
+@media (max-width: 1023px) {
+  .how { grid-template-columns: minmax(0, 1fr); padding-top: 4px; }
+  .how-rail { display: none; }
+  /* Contents in a fold-out that stays under the top bar, naming where the reader is. */
+  .how-onpage { display: block; position: sticky; top: 60px; z-index: 10; background: var(--paper); border: 1px solid var(--ink); padding: 0 12px; margin: 0 0 var(--md); max-height: calc(100vh - 150px); overflow-y: auto; }
+  .how-onpage summary { padding: 10px 0; cursor: pointer; font-weight: 600; min-height: 44px; box-sizing: border-box; }
+  .how-onpage summary { font-size: 0.72rem; font-weight: 500; }
+  .how-onpage-here { font-size: 0.95rem; font-weight: 400; color: var(--ink-2); text-transform: none; letter-spacing: 0; }
+  .how-onpage .how-contents { padding-bottom: 10px; }
+  .how-onpage .how-contents a { padding-block: 9px; }
+  html:has(.how) { scroll-padding: 120px 0 96px; }
+  .how-section, .how-stage { scroll-margin-top: 120px; }
+  .how-route a { padding-block: 6px; }
+  .how-title { font-size: 2rem; }
+  .how-stand { font-size: 1.05rem; }
+  .how-honest b { font-size: 1.12rem; }
+  .how-route { grid-auto-flow: row; grid-auto-columns: auto; }
+  .how-route li { padding: 0 0 12px 26px; }
+  .how-route li::before { top: 6px; bottom: 0; left: 6px; right: auto; border-top: 0; border-left: 2px solid var(--ink); }
+  .how-route li:first-child::before { left: 6px; }
+  .how-route li.how-route-end::before { display: none; }
+  .how-route a { grid-template-columns: 34px 1fr; align-items: baseline; }
+  .how-stage-h button { grid-template-columns: 34px minmax(0, 1fr) 20px; }
+  .how-stage-h .how-tags { grid-column: 2; grid-row: 2; justify-content: flex-start; padding-top: 6px; }
+  .how-chevron { grid-column: 3; grid-row: 1; }
+  .how-plain { margin-left: 46px; }
+  .how-stage-body { padding-left: 0; }
+  .how-entry { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .how-entry > dd { margin-bottom: 14px; }
+  .how-chart, .how-stage-body > .how-chart, .how-pair, .how-choices { margin-left: 0; }
+  .how-pair { grid-template-columns: minmax(0, 1fr); }
+  .how-preds thead { display: none; }
+  .how-preds tr { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  .how-preds th, .how-preds td { border: 0; padding: 0; }
+  .how-preds th { grid-column: 1 / -1; }
+  .how-preds td.num { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .how-chevron { transition: none; }
+}

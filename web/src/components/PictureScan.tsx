@@ -9,51 +9,57 @@
 // and the legend are shared with the globe (web/src/scan/); this file draws the line on the flat
 // picture.
 //
+// Each picture is read by its own rule (data/sources.ts, `scan`), measured on its own still; its
+// numbers are never compared with another picture's.
+//
 // What you see is what you hear, drawn from the same score and the same audio clock as the sound:
 //   - the picture lights up as the line passes (the part not played yet is dimmed);
 //   - a white shape rides the line: wide where a band is loud;
-//   - every chime leaves a mark on the picture (round for warm colours, a diamond for cool ones);
+//   - every chime leaves a mark on the picture (round for warm colours, a diamond for cool ones,
+//     an asterisk for the third instrument of a picture that has one);
+//   - pixels the picture's rule never reads are hatched: no data, never a zero;
 //   - the bars beside the picture are the low note and the twelve held notes, low to high;
 //   - the legend names every one of these, with the same shapes.
 // Everything drawn over the NASA image is black or white: its colours are never changed.
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import type { Scene } from '../data/types';
-import { scanChoicesFor } from '../audio/scanChoices';
-import { factsOf, type ScanRule } from '../data/sources';
 import { cellAt, cellOutline, cellTicks, type ScanPlacement } from '../audio/scanPick';
 import { chosenBand, explainPick, whyColumn } from '../audio/scanWhy';
 import { ScanButtons, ScanSettings, ScanStatus } from '../scan/ScanControls';
 import { ScanHow } from '../scan/ScanLegend';
 import { ScanOverlay, drawSweep, viewOf } from '../scan/ScanOverlay';
 import { ScanSide } from '../scan/ScanSide';
-import { useScan, type ScanHandle } from '../scan/useScan';
+import { groundNote } from '../scan/groundNote';
+import { useScan, type ScanHandle, type ScanPicture } from '../scan/useScan';
 import { useScanFrame } from '../scan/useScanFrame';
 import { ScanExplanation, WHY_START, type WhyView } from './ScanExplanation';
 
 export type PictureScanHandle = ScanHandle;
+export type { ScanPicture };
 
 interface Props {
-  scene: Scene;
-  /** The NASA still, or null in practice mode. */
-  imageUrl: string | null;
+  /** The picture the scan plays, with its measured rule. The view remounts this (a React `key`)
+   *  when the picture changes, so a new picture starts stopped, on the whole picture. */
+  picture: ScanPicture;
   /** The page's speed setting: the scan follows it. */
   speed: number;
-  /** This picture's own settings (data/sources.ts). null: not measured yet, so the scan does not play it. */
-  rule: ScanRule | null;
+  /** Change the page's speed from the scan's settings (the Earth rhythm follows it too). */
+  onSpeed?: (speed: number) => void;
 }
 
 /** A press that moves further than this (CSS pixels) before it lets go is a drag, not a tap: it picks nothing. */
 const TAP_SLOP = 10;
 
-export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, rule }, ref) {
-  const scan = useScan({ scene, imageUrl, speed, rule });
+export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ picture, speed, onSpeed }, ref) {
+  const scan = useScan({ picture, speed });
+  const { scene, rule, mask, choices, sound } = scan;
   const { loaded, target, state, traces, frame, region, worldMap, score, bands, labelOf, why, liveColumn, lastStruck, reducedMotion } = scan;
+  const nodataNote = mask ? (rule.mask?.what ?? 'the hatched part of the picture') : null;
   const sweep = useRef<SVGGElement>(null);
   const profile = useRef<SVGPathElement>(null);
   const unplayed = useRef<SVGPathElement>(null);
   const played = useRef<SVGPathElement>(null);
   const sweepRefs = useMemo(() => ({ sweep, profile, unplayed, played }), []);
-  const picture = useRef<SVGSVGElement>(null);
+  const svg = useRef<SVGSVGElement>(null);
   /** The pointer pressed on the picture and where, until it lets go. */
   const press = useRef<{ id: number; x: number; y: number } | null>(null);
   const bandSentenceId = useId();
@@ -99,7 +105,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
     const p = press.current;
     press.current = null;
     if (!p || p.id !== e.pointerId || Math.hypot(e.clientX - p.x, e.clientY - p.y) > TAP_SLOP) return;
-    const m = picture.current?.getScreenCTM();
+    const m = svg.current?.getScreenCTM();
     if (!m || !score || !placement) return;
     // Screen to picture units, through the SVG's own viewBox (the radar view is zoomed to its circle).
     const at = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
@@ -109,8 +115,6 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   };
 
   useImperativeHandle(ref, () => ({ stop: scan.stop }), []);
-  // "Why the scan sounds like this" lists this picture's own floor, full level and switch.
-  const choices = useMemo(() => scanChoicesFor(rule ? factsOf(rule) : undefined), [rule]);
 
   // The line on the flat picture, moved every frame by the shared loop.
   useScanFrame(scan, ({ position, levels, region: r, frame: f }) => drawSweep(sweepRefs, f, r, position, levels));
@@ -124,22 +128,28 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
     <div className="scan" role="group" aria-labelledby="scan-heading">
       <h3 id="scan-heading">Play the picture</h3>
       <p className="muted">A line sweeps the picture and plays the colours it crosses. A rule we chose; the Earth rhythm is unchanged.</p>
+      {!loaded?.isTest && (
+        <p className="muted scan-which">
+          Reading {picture.label === 'Ocean' ? 'the ocean picture' : `the ${picture.label.toLowerCase()} picture`}: {scene.source.title}, with its own settings.
+        </p>
+      )}
 
       <ScanButtons scan={scan} />
-      <ScanSettings scan={scan} />
+      <ScanSettings scan={scan} speed={speed} onSpeed={onSpeed} />
       <ScanStatus scan={scan} />
-      {!rule && <p className="missing">The scan has not been measured on this picture yet, so it does not play it.</p>}
 
       <figure className={figureClass} style={{ '--aspect': view.w / view.h } as React.CSSProperties}>
         <div className="scan-picture">
           {loaded?.isTest && <span className="scan-test">TEST INPUT — a made-up picture, not NASA data</span>}
           <svg
-            ref={picture}
+            ref={svg}
             viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
             role="img"
             aria-label={
               loaded?.isTest
-                ? 'Test picture for the scan: three coloured dots and a grey block on black.'
+                ? picture.test
+                  ? `Test picture for the scan (made up, not NASA data): dots in the colours of the ${picture.label.toLowerCase()} picture's legend${mask ? ', and a hatched block that is never read' : ''}.`
+                  : 'Test picture for the scan: three coloured dots and a grey block on black.'
                 : `${scene.source.title}, with the scan line${region ? ` on ${labelOf(target)}, ${region.name}` : ''}.`
             }
             aria-describedby={hintId}
@@ -152,8 +162,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             ) : (
               <rect width={frame.width} height={frame.height} className="frame-placeholder" />
             )}
-
-            <ScanOverlay frame={frame} region={region} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} />
+            <ScanOverlay frame={frame} region={region} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} mask={mask} />
 
             {/* The place explained in "Why the scan sounds like this": the cell's own outline and four
                 ticks pointing at it, black under white. It never moves. */}
@@ -171,6 +180,11 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             )}
           </svg>
           {!loaded?.isTest && <span className="credit">Visualization: {scene.source.credit}</span>}
+          {nodataNote && (
+            <p className="scan-nodata-note">
+              The hatched part is never read: {nodataNote}. There the scan has no data, so it is silent; that is not a zero.
+            </p>
+          )}
           <p className="scan-pick-hint" id={hintId}>
             Click or tap a place on the picture to see why it sounds as it does, or use the column slider in “Why the scan sounds like this”.
           </p>
@@ -195,7 +209,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                   <circle className="ring" cx={region.center_px[0]} cy={region.center_px[1]} r={region.radius_px} />
                 </g>
               </svg>
-              <span>Where {labelOf(target)} is on the whole picture: {region.name}.</span>
+              <span>Where {labelOf(target)} is on the whole picture: {region.name}.{worldMap && ` ${groundNote(region, frame)}`}</span>
             </div>
           )}
         </ScanSide>
@@ -203,20 +217,20 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
 
       <details className="scan-how">
         <summary>How the picture becomes sound</summary>
-        <ScanHow scene={scene} rule={rule} isTest={!!loaded?.isTest} />
+        <ScanHow scene={scene} rule={rule} isTest={!!loaded?.isTest} sound={sound} />
       </details>
 
       {score && (
         <ScanExplanation
           score={score}
           ctx={why}
+          choices={choices}
           playing={state === 'playing'}
           getColumn={liveColumn}
           lastStruck={lastStruck}
           view={whyView}
           onChange={changeWhy}
           bandSentenceId={bandSentenceId}
-          choices={choices}
         />
       )}
     </div>

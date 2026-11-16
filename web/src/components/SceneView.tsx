@@ -1,5 +1,6 @@
 // The source image with the two region boxes drawn on it. Without an image (practice data)
 // it draws the frame outline and boxes only.
+import type { ReactNode } from 'react';
 import type { Scene } from '../data/types';
 import { regionLabel, regionStyle, type RegionLook } from './ExploreControls';
 
@@ -46,9 +47,13 @@ interface Props {
   look?: RegionLook;
   /** Pressing a circle selects that region (keyboard users use the region choice). */
   onSelect?: (regionId: string) => void;
+  /** The picture's text description, when no region is selected (Home names both circles). */
+  label?: string;
+  /** More caption after the credit (Home: the key naming each circle). */
+  caption?: ReactNode;
 }
 
-export function SceneView({ scene, imageUrl, regionId, look = {}, onSelect }: Props) {
+export function SceneView({ scene, imageUrl, regionId, look = {}, onSelect, label, caption }: Props) {
   const { width, height } = scene.frames;
   const active = scene.regions.find((r) => r.id === regionId);
   return (
@@ -57,7 +62,7 @@ export function SceneView({ scene, imageUrl, regionId, look = {}, onSelect }: Pr
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={`${scene.source.title}. Selected: ${active ? `${regionLabel(scene.regions, active.id, look.firstLetter)}, ${active.name}. ${active.description}` : 'none'}`}
+        aria-label={label ?? `${scene.source.title}. Selected: ${active ? `${regionLabel(scene.regions, active.id, look.firstLetter)}, ${active.name}. ${active.description}` : 'none'}`}
       >
         {imageUrl ? (
           <image href={imageUrl} width={width} height={height} />
@@ -100,6 +105,7 @@ export function SceneView({ scene, imageUrl, regionId, look = {}, onSelect }: Pr
         <span className="credit">Visualization: {scene.source.credit}</span>
         {/* The selected region's name is in the region choice right above; screen readers get it
             from the picture's label. */}
+        {caption}
       </figcaption>
     </figure>
   );

@@ -31,6 +31,8 @@ export interface ScanLogEntry {
   column: number;
   band: number;
   warm: boolean;
+  /** Which instrument struck it: warm, cool or (a picture with a third class) blue. */
+  colour: Chime['colour'];
   note: number;
   /** The root note sounding under this chime (decoration: scanScore.ts, rootNoteAt). */
   root: number;
@@ -64,6 +66,9 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
  *  radar setting, so the louder region is the one with more colour. Design choice. */
 const SHAPE_TRIM = { line: 1, radar: 0.5 } as const;
 
+/** How often the player checks for chimes whose moment has come, to show them (about a frame). */
+const SHOW_EVERY_MS = 16;
+
 /** Everything that makes sound for one choice from the library. Replaced whole when the choice changes. */
 interface Rig {
   def: ScanSoundDef;
@@ -74,6 +79,7 @@ interface Rig {
   bass: ScanBass;
   warm: BarInstrument;
   cool: BarInstrument;
+  blue: BarInstrument;
 }
 
 export class ScanPlayer {
@@ -90,6 +96,9 @@ export class ScanPlayer {
   private disposed = false;
   /** Bumped whenever queued sound is cancelled, so screen updates queued for it are ignored. */
   private generation = 0;
+  /** Chimes handed to an instrument whose moment has not been shown on screen yet, in time order. */
+  private due: { time: number; chime: Chime; generation: number }[] = [];
+  private showTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(private listener: ScanListener) {}
 
@@ -127,6 +136,7 @@ export class ScanPlayer {
     }
     this.rig.room.open();
     this.clock.start();
+    this.showTimer ??= setInterval(() => this.showDue(), SHOW_EVERY_MS);
     this.setState('playing');
   }
 
@@ -172,6 +182,7 @@ export class ScanPlayer {
     old.bass.silence();
     old.warm.damp();
     old.cool.damp();
+    old.blue.damp();
     setTimeout(() => disposeRig(old), 400);
   }
 
@@ -205,8 +216,9 @@ export class ScanPlayer {
     const bass = createScanBass(def);
     const warm = new BarInstrument(def.warm, def.warmLevel);
     const cool = new BarInstrument(def.cool, def.coolLevel);
-    for (const source of [choir, bass, warm, cool]) source.output.connect(volume);
-    return { def, room, panner, volume, choir, bass, warm, cool };
+    const blue = new BarInstrument(def.blue, def.blueLevel);
+    for (const source of [choir, bass, warm, cool, blue]) source.output.connect(volume);
+    return { def, room, panner, volume, choir, bass, warm, cool, blue };
   }
 
   /** One column of the score, at exact audio time `time`. */
@@ -236,18 +248,34 @@ export class ScanPlayer {
 
     for (const chime of this.chimesByColumn.get(column) ?? []) {
       const note = chimeNote(chime);
-      (chime.warm ? rig.warm : rig.cool).strike(note, time, chimeVelocity(chime.level));
-      window.__scanNotes?.push({ audioTime: time, column, band: chime.band, warm: chime.warm, note, root, pan, sound: rig.def.id });
-      const generation = this.generation;
-      Tone.getDraw().schedule(() => {
-        if (generation === this.generation) this.listener.onChime?.(chime);
-      }, time);
+      rig[chime.colour].strike(note, time, chimeVelocity(chime.level));
+      window.__scanNotes?.push({ audioTime: time, column, band: chime.band, warm: chime.warm, colour: chime.colour, note, root, pan, sound: rig.def.id });
+      this.due.push({ time, chime, generation: this.generation });
+    }
+  }
+
+  /**
+   * Tell the screen about every chime whose moment has come, however late the page is: a note that
+   * sounded always leaves its mark. (Tone's Draw, used before, drops a screen update that is more
+   * than 0.25 s late, and a page busy drawing the globe in software can be that late: the note was
+   * heard and never shown. Found by the globe's browser test, 15 Nov.)
+   */
+  private showDue(): void {
+    if (!this.due.length) return;
+    const now = Tone.immediate();
+    while (this.due.length && this.due[0].time <= now) {
+      const d = this.due.shift()!;
+      if (d.generation === this.generation) this.listener.onChime?.(d.chime);
     }
   }
 
   /** Stop the clock and silence everything this player makes, echo included. */
   private halt(next: ScanState): void {
     this.generation++;
+    // Chimes queued for the screen belong to the sound just cancelled.
+    this.due = [];
+    if (this.showTimer !== null) clearInterval(this.showTimer);
+    this.showTimer = null;
     const now = Tone.immediate();
     if (this.clock) {
       if (next === 'paused') this.clock.pause(now);
@@ -258,6 +286,7 @@ export class ScanPlayer {
       this.rig.bass.silence();
       this.rig.warm.damp();
       this.rig.cool.damp();
+      this.rig.blue.damp();
       this.rig.room.close();
     }
     this.setState(next);
@@ -275,6 +304,7 @@ function disposeRig(rig: Rig): void {
   rig.bass.dispose();
   rig.warm.dispose();
   rig.cool.dispose();
+  rig.blue.dispose();
   rig.volume.dispose();
   rig.panner.dispose();
   rig.room.dispose();

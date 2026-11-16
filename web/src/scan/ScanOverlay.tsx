@@ -18,6 +18,17 @@ export const TRAIL_RADAR_DEGREES = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 6
 export const COMPASS: [string, number, number][] = [['E', 1, 0], ['N', 0, 1], ['W', -1, 0], ['S', 0, -1]];
 /** Thin rings on the radar: every third band. */
 export const RANGE_RINGS = [3, 6, 9];
+/** An asterisk of three crossing strokes, radius r, centred on (cx, cy): the third instrument's mark. */
+export function starPath(r: number, cx = 0, cy = 0): string {
+  return [90, 30, 150]
+    .map((deg) => {
+      const a = (deg * Math.PI) / 180;
+      const dx = r * Math.cos(a);
+      const dy = r * Math.sin(a);
+      return `M${(cx - dx).toFixed(2)} ${(cy - dy).toFixed(2)}L${(cx + dx).toFixed(2)} ${(cy + dy).toFixed(2)}`;
+    })
+    .join('');
+}
 /** The SVG elements that move with the line. */
 export interface SweepRefs {
   sweep: RefObject<SVGGElement | null>;
@@ -58,10 +69,13 @@ interface OverlayProps {
   /** Compass letters round the radar: only on a whole-world map. */
   worldMap: boolean;
   refs: SweepRefs;
+  /** The pixels the picture's rule never reads, as a black-and-white picture (white = never read):
+   *  they are hatched, because no data is not a zero. null: every pixel is read. */
+  mask?: { href: string } | null;
 }
 
 /** Everything the scan draws on the picture. Place it inside the picture's <svg>, after the image. */
-export function ScanOverlay({ frame, region, bands, traces, worldMap, refs }: OverlayProps) {
+export function ScanOverlay({ frame, region, bands, traces, worldMap, refs, mask = null }: OverlayProps) {
   const { view, margin, unit } = viewOf(frame, region);
   return (
     <>
@@ -76,7 +90,20 @@ export function ScanOverlay({ frame, region, bands, traces, worldMap, refs }: Ov
           <stop offset="0" stopColor="#fff" stopOpacity="0" />
           <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
         </linearGradient>
+        {mask && (
+          <>
+            {/* Black and white stripes, seen only where the mask is white: the pixels never read. */}
+            <pattern id="scan-nodata-hatch" patternUnits="userSpaceOnUse" width={unit * 1.6} height={unit * 1.6} patternTransform="rotate(45)">
+              <rect width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-light" />
+              <rect x={unit * 0.8} width={unit * 0.8} height={unit * 1.6} className="nodata-stripe-dark" />
+            </pattern>
+            <mask id="scan-nodata-mask" maskUnits="userSpaceOnUse" x={0} y={0} width={frame.width} height={frame.height}>
+              <image href={mask.href} width={frame.width} height={frame.height} preserveAspectRatio="none" />
+            </mask>
+          </>
+        )}
       </defs>
+      {mask && <rect className="nodata-hatch" width={frame.width} height={frame.height} fill="url(#scan-nodata-hatch)" mask="url(#scan-nodata-mask)" />}
 
       {region && (
         <>
@@ -114,15 +141,18 @@ export function ScanOverlay({ frame, region, bands, traces, worldMap, refs }: Ov
       {/* Marks left by the chimes of this sweep. */}
       <g className="traces">
         {traces.map((t) => (
-          <g key={t.id} className={t.warm ? 'trace warm' : 'trace cool'} transform={`translate(${t.x} ${t.y})`}>
+          <g key={t.id} className={`trace ${t.colour}`} transform={`translate(${t.x} ${t.y})`}>
             <circle className="ripple" r={unit * 5.5} />
-            {t.warm ? (
+            {t.colour === 'warm' ? (
               <circle className="chime-dot" r={unit * 1.15} />
+            ) : t.colour === 'blue' ? (
+              <path className="chime-star-outline" d={starPath(unit * 1.5)} />
             ) : (
               <g transform="rotate(45)">
                 <rect className="chime-dot" x={-unit * 1.1} y={-unit * 1.1} width={unit * 2.2} height={unit * 2.2} />
               </g>
             )}
+            {t.colour === 'blue' && <path className="chime-star" d={starPath(unit * 1.5)} />}
           </g>
         ))}
       </g>

@@ -185,5 +185,5 @@ test('the explanation opens by keyboard and receives focus', async ({ page }) =>
   // The honesty lines are said once, on How it's made, not repeated in every explanation.
   await expect(explanation).not.toContainText('computer model');
   await openApp(page, 'how');
-  await expect(page.getByRole('main')).toContainText('not water speed or ocean health');
+  await expect(page.getByRole('main')).toContainText('not water speed, turbulence, air quality or rain amounts');
 });

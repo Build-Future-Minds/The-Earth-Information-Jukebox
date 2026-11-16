@@ -1,11 +1,13 @@
 // The picture scan's controls, shared by every view that shows the scan, so each has the same
 // buttons, the same labels and the same announcements: Play / Pause / Resume and Stop, the folded
 // Scan settings, and the polite status line.
+import type { ReactNode } from 'react';
 import { SCAN_SOUNDS, type ScanSoundId } from '../audio/instruments';
-import { regionLabel } from '../components/ExploreControls';
+import { regionLabel, SPEED_LABEL, SPEEDS } from '../components/ExploreControls';
 import type { Scan } from './useScan';
 
-export function ScanButtons({ scan }: { scan: Scan }) {
+/** Play / Pause / Resume and Stop. A view may add its own buttons after them (the globe: Turn with the line). */
+export function ScanButtons({ scan, children }: { scan: Scan; children?: ReactNode }) {
   const { state, ready, player } = scan;
   return (
     <div className="row">
@@ -17,13 +19,22 @@ export function ScanButtons({ scan }: { scan: Scan }) {
         </button>
       )}
       <button type="button" disabled={state === 'stopped'} onClick={() => player.current?.stop()}>Stop the scan</button>
+      {children}
     </div>
   );
 }
 
+interface SettingsProps {
+  scan: Scan;
+  /** The page's speed. With `onSpeed`, the settings show the speed buttons: the scan and the Earth
+   *  rhythm both follow them, as they follow the ones on Listen. */
+  speed?: number;
+  onSpeed?: (speed: number) => void;
+}
+
 /** Settings folded away (UI pass, 15 Nov): one clear start, the rest on request. */
-export function ScanSettings({ scan }: { scan: Scan }) {
-  const { target, setTarget, across, regions, loaded, scene, soundId, setSoundId, volumeDb, setVolumeDb } = scan;
+export function ScanSettings({ scan, speed, onSpeed }: SettingsProps) {
+  const { target, setTarget, across, regions, loaded, scene, picture, soundId, setSoundId, volumeDb, setVolumeDb } = scan;
   return (
     <details className="scan-settings">
       <summary>Scan settings</summary>
@@ -33,7 +44,7 @@ export function ScanSettings({ scan }: { scan: Scan }) {
           <select value={target} onChange={(e) => setTarget(e.target.value)}>
             <option value="map">Whole picture: a line, {across}</option>
             {regions.map((r) => (
-              <option key={r.id} value={r.id}>{loaded?.isTest ? 'Test circle' : regionLabel(scene.regions, r.id)}: a radar turn</option>
+              <option key={r.id} value={r.id}>{loaded?.isTest ? 'Test circle' : regionLabel(scene.regions, r.id, picture.firstLetter)}: a radar turn</option>
             ))}
           </select>
         </label>
@@ -60,18 +71,30 @@ export function ScanSettings({ scan }: { scan: Scan }) {
             aria-valuetext={`${volumeDb} decibels`}
           />
         </label>
+        {onSpeed && (
+          // The page's speed: changing it while the scan plays keeps the scan going at the new speed.
+          <div className="row" role="group" aria-label="Speed">
+            {SPEEDS.map((v) => (
+              <button key={v} type="button" className="speed" aria-pressed={speed === v} onClick={() => onSpeed(v)}>
+                {SPEED_LABEL[v]}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </details>
   );
 }
 
 /** Announced politely, and only when the scan starts, pauses or stops. Not role="status": the page
- *  has one status sentence, for the Earth rhythm. */
-export function ScanStatus({ scan }: { scan: Scan }) {
+ *  has one status sentence, for the Earth rhythm. A view may add a sentence of its own (the globe:
+ *  that Turn with the line has been turned off). */
+export function ScanStatus({ scan, children }: { scan: Scan; children?: ReactNode }) {
   const { status, loadError, score, labelOf, target } = scan;
   return (
     <div aria-live="polite">
       <p className="scan-status">{status}</p>
+      {children}
       {loadError && <p className="missing">The picture scan is not available: {loadError}</p>}
       {score?.status === 'missing' && (
         <p className="missing">

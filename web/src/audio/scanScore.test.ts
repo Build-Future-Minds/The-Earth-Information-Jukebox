@@ -19,6 +19,7 @@ import {
   scanPan,
   bandNote,
   buildScanScore,
+  chimeColour,
   chimeNote,
   chimeVelocity,
   colourStrength,
@@ -28,6 +29,7 @@ import {
   findChimes,
   findChimesDetailed,
   hasData,
+  isBlue,
   isWarm,
   levelOf,
   makeTestPicture,
@@ -639,6 +641,71 @@ describe('no data next to a peak: compared only with the neighbour that has data
     const levels = row({ 0: 0.8 });
     const reads = allRead();
     expect(findChimes(levels, new Float32Array(40), grid, false, undefined, reads).map((c) => c.column)).toEqual([0]);
+  });
+});
+
+describe('which instrument: two classes, or three where a picture gives blue its own meaning', () => {
+  // The step colours of NASA's rain and snow bars for SVS 4285, as `npm run measure` read them from
+  // rainbarwhite2.png and snowbarwhite2.png (docs/measurements/scan_pictures.md, "Rain").
+  const RAIN_STEPS: [number, number, number][] = [
+    [0, 179, 48], [96, 211, 0], [180, 231, 0], [255, 251, 0], [255, 196, 0],
+    [255, 147, 0], [255, 73, 0], [255, 0, 0], [200, 0, 0], [145, 0, 0],
+  ];
+  const SNOW_STEPS: [number, number, number][] = [
+    [69, 255, 255], [73, 221, 255], [77, 187, 255], [79, 154, 255], [81, 122, 255],
+    [82, 93, 255], [83, 70, 255], [90, 47, 217], [115, 33, 187], [140, 20, 156],
+  ];
+
+  it('on NASA\'s bars the blue side is every snow step and no rain step', () => {
+    expect(RAIN_STEPS.filter((c) => isBlue(...c))).toEqual([]);
+    expect(SNOW_STEPS.every((c) => isBlue(...c))).toBe(true);
+    // And red-side-of-yellow is rain steps 4 to 10 (yellow to dark red), never snow.
+    expect(RAIN_STEPS.map((c) => isWarm(...c))).toEqual([false, false, false, true, true, true, true, true, true, true]);
+    expect(SNOW_STEPS.some((c) => isWarm(...c))).toBe(false);
+  });
+  it('ties: cyan (green equal to blue) is blue; magenta (red equal to blue) is warm, not blue', () => {
+    expect(isBlue(0, 255, 255)).toBe(true);
+    expect(isWarm(255, 0, 255)).toBe(true);
+    expect(isBlue(255, 0, 255)).toBe(false);
+    expect(isBlue(0, 255, 0)).toBe(false);
+  });
+  it('two classes: warm when half or more of the drawn colour is warm, as before', () => {
+    expect(chimeColour(0.5, null)).toBe('warm');
+    expect(chimeColour(0.49, null)).toBe('cool');
+  });
+  it('three classes: the largest share wins; a tie goes to warm, then to cool', () => {
+    expect(chimeColour(0.2, 0.7)).toBe('blue');
+    expect(chimeColour(0.4, 0.3)).toBe('warm');
+    expect(chimeColour(0.2, 0.3)).toBe('cool'); // cool 0.5
+    expect(chimeColour(0.4, 0.4)).toBe('warm'); // warm ties with blue
+    expect(chimeColour(0.2, 0.4)).toBe('cool'); // cool 0.4 ties with blue
+  });
+  it('the three dots: the same notes at the same times; with a third class the blue dot moves to it', () => {
+    const two = buildScanScore(makeTestPicture(), { kind: 'line' });
+    const three = buildScanScore(makeTestPicture(), { kind: 'line' }, { blueClass: true });
+    expect(three.chimes.map((c) => [c.column, c.band, c.level])).toEqual(two.chimes.map((c) => [c.column, c.band, c.level]));
+    expect(two.chimes.map((c) => c.colour)).toEqual(['warm', 'cool', 'cool']);
+    expect(three.chimes.map((c) => c.colour)).toEqual(['warm', 'cool', 'blue']); // red, green (0, 220, 60), blue (0, 80, 255)
+    expect(three.chimes.every((c) => c.warm === (c.colour === 'warm'))).toBe(true);
+    expect(two.blueClass).toBe(false);
+    expect(Array.from(two.blueShare).every((s) => s === 0)).toBe(true);
+  });
+  it('only what is drawn above the floor chooses the instrument: a navy sea never makes light rain into snow', () => {
+    // Each scan column is one pixel wide: rows 0–8 of band 11 navy, row 9 green rain. 240 × 120 picture.
+    const p = paint(flat(240, 120, NAVY), 50, 9, 1, 1, [0, 179, 48]);
+    const cell = 50 * 12 + 11;
+    const atItsFloor = buildScanScore(p, { kind: 'line' }, { floor: NAVY_FLOOR, blueClass: true });
+    expect(atItsFloor.warmShare[cell]).toBe(0);
+    expect(atItsFloor.blueShare[cell]).toBe(0); // the navy is below the floor: it does not vote
+    expect(chimeColour(atItsFloor.warmShare[cell], atItsFloor.blueShare[cell])).toBe('cool');
+    const atOceanFloor = buildScanScore(p, { kind: 'line' }, { blueClass: true });
+    expect(atOceanFloor.blueShare[cell]).toBeGreaterThan(0.5); // at 12/255 the navy would outvote the rain
+  });
+  it('a cell with nothing drawn above the floor has no shares, and the ocean\'s grey and black never vote', () => {
+    const s = buildScanScore(makeTestPicture(), { kind: 'line' }, { blueClass: true });
+    const greyCell = 110 * 12 + 5; // inside the grey block
+    expect(s.warmShare[greyCell]).toBe(0);
+    expect(s.blueShare[greyCell]).toBe(0);
   });
 });
 

@@ -68,7 +68,7 @@ test('Esc stops on listen', async ({ page }) => {
 
 test('Tab order on Listen follows the screen: tabs, theme, step 1, step 2, then Play; Enter starts', async ({ page }) => {
   await openApp(page);
-  for (const name of ['Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'Game']) {
+  for (const name of ['Home', 'Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'Game']) {
     await page.keyboard.press('Tab');
     await expect(pages(page).getByRole('link', { name })).toBeFocused();
   }

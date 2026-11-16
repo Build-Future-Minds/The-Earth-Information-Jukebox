@@ -1,8 +1,8 @@
 {
  "meta": {
-  "date": "2026-11-16 00:33 UTC",
+  "date": "2026-11-16 06:01 UTC",
   "browser": "Chromium 159.0.8154.6 (headless)",
-  "commit": "cdca469",
+  "commit": "c88871c",
   "dirty": "yes"
  },
  "steps": {
@@ -15,156 +15,570 @@
    {
     "target": 0.125,
     "level": 0.12121212482452393,
-    "toneDb": -45.50940262800967,
-    "levelDb": -43.491328492362214,
-    "lufs": -44.022484784689205
+    "toneDb": -43.5200388570306,
+    "levelDb": -42.402875245868714,
+    "lufs": -43.06298367589084
    },
    {
     "target": 0.25,
     "level": 0.25108224153518677,
-    "toneDb": -38.99144546935277,
-    "levelDb": -37.22919680415257,
-    "lufs": -37.46407345973012
+    "toneDb": -37.252565080487926,
+    "levelDb": -36.42808770911352,
+    "lufs": -36.68709168696408
    },
    {
     "target": 0.5,
     "level": 0.5021644830703735,
-    "toneDb": -32.80782737003071,
-    "levelDb": -30.970763911777873,
-    "lufs": -31.18956728562391
+    "toneDb": -31.20042953337366,
+    "levelDb": -30.257997929794854,
+    "lufs": -30.602650011782387
    },
    {
     "target": 1,
     "level": 1,
-    "toneDb": -26.831204283946136,
-    "levelDb": -24.651981326563753,
-    "lufs": -25.11181157195504
+    "toneDb": -25.30362121877125,
+    "levelDb": -24.09697556442112,
+    "lufs": -24.713074157988817
    }
   ]
  },
- "sweeps": [
+ "strikes": {
+  "note": "C6",
+  "strikes": [
+   {
+    "sound": "Ocean choir",
+    "colour": "warm",
+    "name": "marimba",
+    "level": 0.5,
+    "lufs": -18.230614582860934,
+    "peakDb": -3.5828136151738894
+   },
+   {
+    "sound": "Ocean choir",
+    "colour": "cool",
+    "name": "bells",
+    "level": 0.3,
+    "lufs": -19.51875585300471,
+    "peakDb": -5.533309377530871
+   },
+   {
+    "sound": "Ocean choir",
+    "colour": "blue",
+    "name": "harp",
+    "level": 0.32,
+    "lufs": -19.36015817408472,
+    "peakDb": -6.834229436736666
+   },
+   {
+    "sound": "Music box",
+    "colour": "warm",
+    "name": "kalimba",
+    "level": 0.42,
+    "lufs": -20.49842061229543,
+    "peakDb": -6.546150072611564
+   },
+   {
+    "sound": "Music box",
+    "colour": "cool",
+    "name": "music box",
+    "level": 0.26,
+    "lufs": -21.58048513670131,
+    "peakDb": -10.212450414952537
+   },
+   {
+    "sound": "Music box",
+    "colour": "blue",
+    "name": "harp",
+    "level": 0.25,
+    "lufs": -21.504122871815245,
+    "peakDb": -8.970823924670247
+   },
+   {
+    "sound": "Plain (first instruments)",
+    "colour": "warm",
+    "name": "marimba",
+    "level": 0.5,
+    "lufs": -18.289574887512757,
+    "peakDb": -3.680403733628941
+   },
+   {
+    "sound": "Plain (first instruments)",
+    "colour": "cool",
+    "name": "bells",
+    "level": 0.3,
+    "lufs": -19.61696800111694,
+    "peakDb": -7.5443081820866
+   },
+   {
+    "sound": "Plain (first instruments)",
+    "colour": "blue",
+    "name": "harp",
+    "level": 0.31,
+    "lufs": -19.635631472373213,
+    "peakDb": -7.125354007353945
+   }
+  ]
+ },
+ "pictures": [
   {
-   "name": "Whole picture: a line, west to east",
-   "measured": {
-    "seconds": 30,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000009428,
-    "lufs": -24.432091454726812,
-    "peakDb": -7.6475192546468,
-    "levelDb": -24.14530091023766,
-    "leftMinusRightDb": -0.7402424588461081
+   "label": "Ocean",
+   "sweeps": [
+    {
+     "name": "Whole picture: a line, west to east",
+     "measured": {
+      "seconds": 30,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012224,
+      "lufs": -24.773931428227133,
+      "peakDb": -6.576415432224,
+      "levelDb": -24.487121896100184,
+      "leftMinusRightDb": -0.6099112983841337
+     },
+     "firstSixth": {
+      "seconds": 5,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -23.803917822006838,
+      "peakDb": -6.576415432224,
+      "levelDb": -23.500298915175645,
+      "leftMinusRightDb": 9.278875938189408
+     },
+     "lastSixth": {
+      "seconds": 5,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -22.3476229902935,
+      "peakDb": -8.834606639059642,
+      "levelDb": -22.245524814866307,
+      "leftMinusRightDb": -9.751529459099174
+     }
+    },
+    {
+     "name": "Region A: a radar turn",
+     "measured": {
+      "seconds": 15,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -24.74574317281621,
+      "peakDb": -10.851280601022626,
+      "levelDb": -25.281930152784305,
+      "leftMinusRightDb": -0.15808650865132634
+     },
+     "firstSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012164,
+      "lufs": -23.91158613232913,
+      "peakDb": -12.306373893794799,
+      "levelDb": -24.794019576491696,
+      "leftMinusRightDb": -8.760754137855297
+     },
+     "lastSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 1.000000000001228,
+      "lufs": -28.85440838378537,
+      "peakDb": -15.132034030534243,
+      "levelDb": -29.113955932346695,
+      "leftMinusRightDb": -8.49871298411097
+     }
+    },
+    {
+     "name": "Region B: a radar turn",
+     "measured": {
+      "seconds": 15,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -21.807386016392083,
+      "peakDb": -6.724020978843971,
+      "levelDb": -21.680577564256794,
+      "leftMinusRightDb": 0.7075471903043926
+     },
+     "firstSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -23.426278091090335,
+      "peakDb": -9.115408553317291,
+      "levelDb": -22.96446146360686,
+      "leftMinusRightDb": -9.046101986453106
+     },
+     "lastSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -21.006777452495193,
+      "peakDb": -7.517891758298702,
+      "levelDb": -21.107548674784585,
+      "leftMinusRightDb": -8.990823430383536
+     }
+    }
+   ],
+   "together": {
+    "keys": [
+     "a",
+     "s",
+     "d",
+     "f"
+    ],
+    "seconds": 20,
+    "allVoices": {
+     "seconds": 20,
+     "sampleRate": 48000,
+     "recorded": 1.0000000000012221,
+     "lufs": -20.528513084800302,
+     "peakDb": -3.713486199769575,
+     "levelDb": -19.941432425271586,
+     "leftMinusRightDb": 1.0632689466485772
+    },
+    "beforeStop": {
+     "seconds": 1.8,
+     "sampleRate": 48000,
+     "recorded": 1.0000000000012317,
+     "lufs": -20.52194369202281,
+     "peakDb": -6.381739480093916,
+     "levelDb": -19.938150339037385,
+     "leftMinusRightDb": -0.6660918067411821
+    },
+    "afterStop": {
+     "seconds": 2,
+     "sampleRate": 48000,
+     "recorded": 1.0000000000012221,
+     "lufs": null,
+     "peakDb": null,
+     "levelDb": null,
+     "leftMinusRightDb": null
+    },
+    "attempts": 1
    },
-   "firstSixth": {
-    "seconds": 5,
-    "sampleRate": 48000,
-    "recorded": 0.9999999999998899,
-    "lufs": -23.11838371870482,
-    "peakDb": -8.464533210036679,
-    "levelDb": -22.807059696739096,
-    "leftMinusRightDb": 9.085136123279774
-   },
-   "lastSixth": {
-    "seconds": 5,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -22.033209009324768,
-    "peakDb": -7.6475192546468,
-    "levelDb": -21.968585684122843,
-    "leftMinusRightDb": -9.790357494589067
+   "sameScore": [
+    {
+     "sound": "Ocean choir",
+     "chimes": 21,
+     "same": true,
+     "largestTimeDifference": 0
+    },
+    {
+     "sound": "Music box",
+     "chimes": 21,
+     "same": true,
+     "largestTimeDifference": 0
+    },
+    {
+     "sound": "Plain (first instruments)",
+     "chimes": 21,
+     "same": true,
+     "largestTimeDifference": 0
+    }
+   ],
+   "globe": {
+    "sweep": {
+     "seconds": 30,
+     "sampleRate": 48000,
+     "recorded": 1.0000000000012221,
+     "lufs": -24.751547607740726,
+     "peakDb": -8.024537085321931,
+     "levelDb": -24.464954477814963,
+     "leftMinusRightDb": -0.6043550221562022
+    },
+    "chimes": 68,
+    "flatChimes": 68,
+    "same": true
    }
   },
   {
-   "name": "Region A: a radar turn",
-   "measured": {
-    "seconds": 15,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -24.216740464821246,
-    "peakDb": -8.410111528337506,
-    "levelDb": -24.78483430396674,
-    "leftMinusRightDb": -0.030404189995643094
+   "label": "Aerosols",
+   "sweeps": [
+    {
+     "name": "Whole picture: a line, west to east",
+     "measured": {
+      "seconds": 30,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -27.504568367308615,
+      "peakDb": -12.128566972271202,
+      "levelDb": -27.801564481801062,
+      "leftMinusRightDb": -1.466640648475277
+     },
+     "firstSixth": {
+      "seconds": 5,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -27.189082057462453,
+      "peakDb": -14.059076298243607,
+      "levelDb": -28.79334484004203,
+      "leftMinusRightDb": 9.853545402268544
+     },
+     "lastSixth": {
+      "seconds": 5,
+      "sampleRate": 48000,
+      "recorded": 1.0000000000012221,
+      "lufs": -26.4867711087897,
+      "peakDb": -12.128566972271202,
+      "levelDb": -26.3199415924228,
+      "leftMinusRightDb": -9.845411754339771
+     }
+    },
+    {
+     "name": "Region C: a radar turn",
+     "measured": {
+      "seconds": 15,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -21.982377194781304,
+      "peakDb": -6.067084293298287,
+      "levelDb": -22.712219575159303,
+      "leftMinusRightDb": 2.2189775655974238
+     },
+     "firstSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -27.348004049270703,
+      "peakDb": -11.535066384063864,
+      "levelDb": -26.87320697824287,
+      "leftMinusRightDb": -8.737981066632791
+     },
+     "lastSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -21.867448100408016,
+      "peakDb": -6.400774447919456,
+      "levelDb": -21.5241283694831,
+      "leftMinusRightDb": -10.268055762154393
+     }
+    },
+    {
+     "name": "Region D: a radar turn",
+     "measured": {
+      "seconds": 15,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -54.034069558606255,
+      "peakDb": -37.73374951986357,
+      "levelDb": -53.39100440395229,
+      "leftMinusRightDb": -1.1436071546844602
+     },
+     "firstSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.9999999999905412,
+      "lufs": -52.999377550834254,
+      "peakDb": -40.262693030942856,
+      "levelDb": -52.151227585462586,
+      "leftMinusRightDb": -8.46770967456466
+     },
+     "lastSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.9999999999905868,
+      "lufs": -55.90313186830018,
+      "peakDb": -43.317956307103856,
+      "levelDb": -55.503021924054046,
+      "leftMinusRightDb": -8.538274798248104
+     }
+    }
+   ],
+   "together": {
+    "keys": [
+     "a",
+     "s",
+     "d",
+     "f"
+    ],
+    "seconds": 20,
+    "allVoices": {
+     "seconds": 20,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": -21.458582391581242,
+     "peakDb": -4.326543412291014,
+     "levelDb": -20.852834953336256,
+     "leftMinusRightDb": 0.33653439686796816
+    },
+    "beforeStop": {
+     "seconds": 1.8,
+     "sampleRate": 48000,
+     "recorded": 0.9999999999905577,
+     "lufs": -21.590643766781977,
+     "peakDb": -7.196067913343871,
+     "levelDb": -20.789292178223718,
+     "leftMinusRightDb": -0.41092283282303654
+    },
+    "afterStop": {
+     "seconds": 2,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": null,
+     "peakDb": null,
+     "levelDb": null,
+     "leftMinusRightDb": null
+    },
+    "attempts": 1
    },
-   "firstSixth": {
-    "seconds": 2.5,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -23.772689162912247,
-    "peakDb": -11.964234934237153,
-    "levelDb": -24.713433996888078,
-    "leftMinusRightDb": -8.469947781971097
-   },
-   "lastSixth": {
-    "seconds": 2.5,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -27.97049016768887,
-    "peakDb": -15.533338771816428,
-    "levelDb": -28.712852305436954,
-    "leftMinusRightDb": -7.883825086722695
+   "sameScore": null,
+   "globe": {
+    "sweep": {
+     "seconds": 30,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": -27.393939737235524,
+     "peakDb": -12.278038079983663,
+     "levelDb": -27.745338897979597,
+     "leftMinusRightDb": -1.6191573176785
+    },
+    "chimes": 36,
+    "flatChimes": 36,
+    "same": true
    }
   },
   {
-   "name": "Region B: a radar turn",
-   "measured": {
-    "seconds": 15,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -21.643542532361987,
-    "peakDb": -6.968096239772609,
-    "levelDb": -21.522889656619817,
-    "leftMinusRightDb": 0.3754287617884984
+   "label": "Rain",
+   "sweeps": [
+    {
+     "name": "Whole picture: a line, west to east",
+     "measured": {
+      "seconds": 30,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -32.65531803062508,
+      "peakDb": -14.374165824063729,
+      "levelDb": -33.587857881548196,
+      "leftMinusRightDb": -0.49192410282694965
+     },
+     "firstSixth": {
+      "seconds": 5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -33.97341964189693,
+      "peakDb": -16.669600139067153,
+      "levelDb": -34.14134048336611,
+      "leftMinusRightDb": 8.49573603199483
+     },
+     "lastSixth": {
+      "seconds": 5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -34.1743799857952,
+      "peakDb": -19.38290960351948,
+      "levelDb": -35.709492970989494,
+      "leftMinusRightDb": -9.136628319184751
+     }
+    },
+    {
+     "name": "Region E: a radar turn",
+     "measured": {
+      "seconds": 15,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -23.831652555807022,
+      "peakDb": -7.759251763604405,
+      "levelDb": -25.34274062869233,
+      "leftMinusRightDb": -1.4164351453113966
+     },
+     "firstSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -22.439683437805503,
+      "peakDb": -8.807501353957953,
+      "levelDb": -22.33541449961401,
+      "leftMinusRightDb": -10.450377346498588
+     },
+     "lastSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -24.70725643904946,
+      "peakDb": -9.932524816875864,
+      "levelDb": -26.243028428119782,
+      "leftMinusRightDb": -12.28456986596025
+     }
+    },
+    {
+     "name": "Region F: a radar turn",
+     "measured": {
+      "seconds": 15,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -25.32871816794662,
+      "peakDb": -8.666914332125971,
+      "levelDb": -33.70779760201839,
+      "leftMinusRightDb": 4.933788157536036
+     },
+     "firstSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -55.34811830696694,
+      "peakDb": -41.868453020670046,
+      "levelDb": -60.74947643649872,
+      "leftMinusRightDb": -9.200110028101733
+     },
+     "lastSixth": {
+      "seconds": 2.5,
+      "sampleRate": 48000,
+      "recorded": 0.999999999990564,
+      "lufs": -29.09879137957508,
+      "peakDb": -17.293045975416803,
+      "levelDb": -35.189559475420936,
+      "leftMinusRightDb": -10.288477369920145
+     }
+    }
+   ],
+   "together": {
+    "keys": [
+     "a",
+     "s",
+     "d",
+     "f"
+    ],
+    "seconds": 20,
+    "allVoices": {
+     "seconds": 20,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": -21.94916476130682,
+     "peakDb": -5.3113129887607125,
+     "levelDb": -21.264714671064215,
+     "leftMinusRightDb": 0.07076321758413329
+    },
+    "beforeStop": {
+     "seconds": 1.8,
+     "sampleRate": 48000,
+     "recorded": 0.9999999999905577,
+     "lufs": -22.520853612101078,
+     "peakDb": -7.374392972766326,
+     "levelDb": -21.773775967813766,
+     "leftMinusRightDb": -0.04974007963232907
+    },
+    "afterStop": {
+     "seconds": 2,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": null,
+     "peakDb": null,
+     "levelDb": null,
+     "leftMinusRightDb": null
+    },
+    "attempts": 1
    },
-   "firstSixth": {
-    "seconds": 2.5,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -22.805954140322658,
-    "peakDb": -8.977262042122089,
-    "levelDb": -22.362042533982695,
-    "leftMinusRightDb": -9.629221112909612
-   },
-   "lastSixth": {
-    "seconds": 2.5,
-    "sampleRate": 48000,
-    "recorded": 1.0000000000012221,
-    "lufs": -20.83258475560287,
-    "peakDb": -7.966706627528853,
-    "levelDb": -21.018528611234494,
-    "leftMinusRightDb": -8.50150983543357
+   "sameScore": null,
+   "globe": {
+    "sweep": {
+     "seconds": 30,
+     "sampleRate": 48000,
+     "recorded": 0.999999999990564,
+     "lufs": -31.800529785272236,
+     "peakDb": -14.432477129340029,
+     "levelDb": -32.6428132922298,
+     "leftMinusRightDb": 0.5100634451125643
+    },
+    "chimes": 16,
+    "flatChimes": 16,
+    "same": true
    }
   }
- ],
- "keys": [
-  "a",
-  "s",
-  "d",
-  "f"
- ],
- "allVoices": {
-  "seconds": 19.989333333333335,
-  "sampleRate": 48000,
-  "recorded": 0.9994666666678882,
-  "lufs": -20.147681302900185,
-  "peakDb": -5.182201304657189,
-  "levelDb": -19.583789184900912,
-  "leftMinusRightDb": 1.1440748452423826
- },
- "beforeStop": {
-  "seconds": 1.8,
-  "sampleRate": 48000,
-  "recorded": 1.0000000000012237,
-  "lufs": -20.11201690662113,
-  "peakDb": -6.382485375752976,
-  "levelDb": -19.658250739312457,
-  "leftMinusRightDb": -0.7628011303731164
- },
- "afterStop": {
-  "seconds": 2,
-  "sampleRate": 48000,
-  "recorded": 1.0000000000012221,
-  "lufs": null,
-  "peakDb": null,
-  "levelDb": null,
-  "leftMinusRightDb": null
- }
+ ]
 }

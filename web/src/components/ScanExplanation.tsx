@@ -9,11 +9,13 @@
 // It is not a live region: nothing here is announced while the scan plays. While the scan plays it
 // follows the line, until a place is chosen (with the slider, the buttons or a click on the picture);
 // "Follow the line" brings it back. Every column can be reached by keyboard, playing or not.
+// It speaks about the picture being played only, with that picture's own numbers.
 //
-// What it shows (open or not, which column, which band, following or not) is kept by PictureScan, so
-// a click on the picture can choose a place here, and the picture can mark the place explained.
+// What it shows (open or not, which column, which band, following or not) is kept by the view that
+// shows the scan (PictureScan, or the globe), so a click on the flat picture can choose a place here,
+// and the picture can mark the place explained. The globe has no such click: a press on it turns it.
 import { useEffect, useMemo } from 'react';
-import { SCAN_CHOICES, type ScanChoice } from '../audio/scanChoices';
+import type { ScanChoice } from '../audio/scanChoices';
 import { chimeSummary, chosenBand, explainBand, explainRoot, heldSummary, placeOf, whyBand, whyColumn, type WhyContext } from '../audio/scanWhy';
 import type { Chime, ScanScore } from '../audio/scanScore';
 
@@ -32,6 +34,8 @@ export const WHY_START: WhyView = { open: false, column: 0, pick: null, follow: 
 interface Props {
   score: ScanScore;
   ctx: WhyContext;
+  /** The fixed choices behind the scan of this picture (audio/scanChoices.ts, scanChoicesFor). */
+  choices: ScanChoice[];
   /** The scan is playing. */
   playing: boolean;
   /** Which column the line is on right now, from the audio clock. */
@@ -42,13 +46,13 @@ interface Props {
   onChange: (change: Partial<WhyView>) => void;
   /** id for the full sentence about the chosen band, so "Read why" under the picture can move focus to it. */
   bandSentenceId: string;
-  /** The fixed choices, with this picture's own floor, full level and switch (scanChoicesFor). */
-  choices?: ScanChoice[];
+  /** A click on the picture chooses a place (the flat picture). False on the globe, where it does not. */
+  pickOnPicture?: boolean;
 }
 
 const FOLLOW_MS = 250;
 
-export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, view, onChange, bandSentenceId, choices = SCAN_CHOICES }: Props) {
+export function ScanExplanation({ score, ctx, choices, playing, getColumn, lastStruck, view, onChange, bandSentenceId, pickOnPicture = true }: Props) {
   const { open, column, pick, follow } = view;
   const { columns, bands } = score.grid;
   const following = playing && follow;
@@ -77,9 +81,9 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, vi
       {open && (
         <div className="scan-why-body">
           <p className="muted">
-            Pick any moment of the scan to see where on the picture it is, what was measured there, and how that became its
-            pitch, loudness and instrument. These sentences are written from the same numbers the sound is made from. Nothing
-            here is announced while the scan plays.
+            Pick any moment of the scan to see where in this picture it is, what was measured there, and how that became its
+            pitch, loudness and instrument. These sentences are written from the same numbers the sound is made from, with this
+            picture's own settings. Nothing here is announced while the scan plays.
           </p>
 
           <section aria-labelledby="why-picture">
@@ -119,10 +123,10 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, vi
             </div>
             <p className="muted">
               {following
-                ? 'Following the line while the scan plays. Untick “Follow the line”, or click the picture, to look at another place.'
+                ? `Following the line while the scan plays. Untick “Follow the line”${pickOnPicture ? ', or click the picture,' : ''} to look at another place.`
                 : playing
                   ? 'Showing the place you chose while the scan plays on. Tick “Follow the line” to follow it again. Choosing a place does not move the scan or make a sound.'
-                  : 'Choose a column with the slider or the two buttons, or click the picture. This does not move the scan or make a sound.'}
+                  : `Choose a column with the slider or the two buttons${pickOnPicture ? ', or click the picture' : ''}. This does not move the scan or make a sound.`}
             </p>
 
             <div className="why-table" role="region" aria-label="Table of the bands in this column" tabIndex={0}>
@@ -143,12 +147,13 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, vi
                 </thead>
                 <tbody>
                   {[...here.bands].reverse().map((b) => (
-                    <tr key={b.band}>
+                    // No data: nothing was read, so there is no mean and no level, and never a 0.
+                    <tr key={b.band} className={b.reads === 0 ? 'nodata' : undefined}>
                       <th scope="row">{b.band + 1}</th>
                       <td>{b.along}</td>
                       <td className="num">{b.reads}</td>
-                      <td className="num">{b.mean.toFixed(3)}</td>
-                      <td className="num">{b.level.toFixed(2)}</td>
+                      <td className="num">{b.reads === 0 ? '—' : b.mean.toFixed(3)}</td>
+                      <td className="num">{b.reads === 0 ? 'no data' : b.level.toFixed(2)}</td>
                       <td>{heldSummary(b)}</td>
                       <td>{chimeSummary(b.chime)}</td>
                     </tr>
@@ -174,10 +179,11 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, vi
           </section>
 
           <section aria-labelledby="why-fixed">
-            <h4 id="why-fixed">Fixed by us</h4>
+            <h4 id="why-fixed">Fixed by us, for this picture</h4>
             <p className="muted">
-              Choices the picture cannot change. Each says why it was made and what supports it, tagged the way the team tags every
-              claim: <strong>Verified</strong>, <strong>Design choice</strong> or <strong>Unverified</strong>.
+              Choices the picture cannot change. Each says why it was made and what supports it, with this picture's own numbers,
+              tagged the way the team tags every claim: <strong>Verified</strong>, <strong>Design choice</strong> or{' '}
+              <strong>Unverified</strong>.
             </p>
             <ChoiceList heading="Rules for reading the picture" choices={rules} />
             <ChoiceList heading="Decoration: carries no data" choices={decoration} />

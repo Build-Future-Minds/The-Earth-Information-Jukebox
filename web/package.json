@@ -9,11 +9,13 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "measure": "playwright test -c measure/playwright.config.ts"
+    "measure": "playwright test -c measure/playwright.config.ts",
+    "count-tests": "node scripts/count-tests.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
+    "katex": "0.19.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tonal": "6.5.1",

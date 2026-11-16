@@ -3,8 +3,8 @@
 //   ocean     SVS 3912, data/           30 frames, regions A and B (EIC visualization, model output)
 //   aerosols  SVS 5669, data/aerosols/  one still, regions C and D (a challenge resource, not EIC)
 //   imerg     SVS 4285, data/imerg/     30 hourly frames, regions E and F (EIC, satellite observations)
-//   practice  fixtures/mock/            test input only, regions A and B
 //   <folder>  data/<folder>/            any other picture: it appears by itself (P1, Listen step 1)
+//   practice  fixtures/mock/            test input only, regions A and B
 //
 // A picture is found by its files: data/scene.json for the ocean (the ACTIVE dataset), and every
 // data/<folder>/scene.json. PICTURES is every picture with a scene (the globe shows them all).
@@ -13,10 +13,10 @@
 // Never compare numbers between pictures (Dev A, 15 Nov): each is drawn and measured with its own
 // settings. Every comparison helper here takes ONE source, so two pictures can never meet.
 import type { EarthTrack } from '../audio/earthVoice';
-import type { PictureFacts } from '../audio/scanChoices';
-import { LINE_GRID, RADAR_GRID, STRENGTH_FLOOR, TEST_CIRCLE, type ScanMeasure } from '../audio/scanScore';
+import { LINE_GRID, RADAR_GRID, STRENGTH_FLOOR, TEST_CIRCLE, type Pixels, type ScanMeasure } from '../audio/scanScore';
 import { OCEAN_LAND, type LandRule } from '../globe/geo';
 import { ACTIVE, type Dataset } from './dataset';
+import { makeAerosolTestPicture, makeRainTestMask, makeRainTestPicture } from './testPictures';
 import type { Features, Region, Scene } from './types';
 
 /** 'ocean', 'practice', or the picture's folder in data/ ('aerosols', 'imerg', ...). */
@@ -44,8 +44,9 @@ export interface ScanRule {
   /** A whole-world map, 180° W to 180° E and 90° N to 90° S: places are longitudes and latitudes.
    *  Stated for each picture, from its map check (assets/source_manifest.json). */
   worldMap: boolean;
-  /** What each instrument means in this picture's own legend. */
-  instruments: { warm: string; cool: string };
+  /** What each instrument means in this picture's own legend. `blue`, when present, gives colours
+   *  on the blue side their own instrument (a third class: scanScore.ts, isBlue). */
+  instruments: { warm: string; cool: string; blue?: string };
   /** Which still the scan reads, and how we know. */
   still: { frame: string; time: string | null; how: string };
   /** Every measured number the app quotes for this picture, exactly as `npm run measure` wrote it
@@ -53,9 +54,6 @@ export interface ScanRule {
   measured: Record<string, number>;
   /** What the scan cannot tell you about this picture. */
   limits: string[];
-  /** Why this picture's floor, full level and instrument switch are what they are, with the
-   *  evidence, for "Why the scan sounds like this" (audio/scanChoices.ts). */
-  evidence: { floor: string; full: string; switch: string };
 }
 
 export interface Picture extends Omit<Dataset, 'features'> {
@@ -79,6 +77,9 @@ export interface Picture extends Omit<Dataset, 'features'> {
   /** How the picture scan reads this picture; null until it has been measured (the scan does not
    *  play it). */
   scan: ScanRule | null;
+  /** TEST INPUT only (practice data): the made-up picture the scan reads in place of a NASA still,
+   *  and the pixels it never reads. */
+  test?: { pixels: () => Pixels; mask?: () => Uint8Array };
 }
 
 /** A picture the app can play: it has measurements. */
@@ -116,6 +117,9 @@ const KIND_WORDS: Record<Scene['source']['data_kind'], string> = {
   synthetic_test_input: 'Test input, not NASA data',
 };
 
+/** The rain picture's scan mask (analysis/scan_mask.py): its land, a photo, is never read. */
+const imergMask: string | null = MASKS['../../../data/imerg/scan_mask.png'] ?? null;
+
 // ---------- The picture scan's rule for each picture ----------
 
 /** The ocean picture: the settings the scan was built with on 15 Nov. Design choices, each measured
@@ -132,18 +136,29 @@ export const OCEAN_SCAN: ScanRule = {
     cool: 'lines drawn yellow-green, green or blue, the rest of the bar',
   },
   still: { frame: 'frame 23000', time: '2007-03-25T12:00Z', how: 'the first of the 30 frames the Earth rhythm plays (data/scene.json)' },
-  measured: {},
+  measured: {
+    floor255: 12,
+    exactQuiet90Cells: 746,
+    exactQuiet90Sounding: 0,
+    exactQuiet90Largest255: 7.67,
+    largestLineMean: 0.463,
+    largestRadarMean: 0.8,
+    linePeaks: 112,
+    lineLeftOut: 44,
+    radar0Peaks: 102,
+    radar0LeftOut: 46,
+    radar1Peaks: 187,
+    radar1LeftOut: 115,
+    bar0SwitchPct: 74.4,
+    bar0SwitchValue: 23.6,
+    bar0LabelsOffC: 0.07,
+    bar0HueSamePct: 99.65,
+    stillDifference: 6.93,
+  },
   limits: [
-    'Warm colours are drawn stronger than cold ones, so warm water sounds louder than cold water with the same amount of line.',
+    'Lines of some colours are drawn paler than others (light blue the most), so the same amount of line sounds a little quieter in those colours.',
     'The still is a compressed copy of NASA\'s frame, which blurs its finest lines.',
   ],
-  evidence: {
-    floor:
-      'Measured on 15 Nov (docs/measurements/scan_pictures.md, "Ocean"): of the 746 cells that are 90% or more grey land or black sea in the uncompressed frame, none sounds; the largest has a mean of 7.67 of 255.',
-    full: 'The most colourful map-sweep cell on the ocean picture measures 0.463, so 0.5 is its full level. Thin lines can fill the small radar cells up to about 0.8 (docs/measurements/scan_pictures.md, "Ocean").',
-    switch:
-      'On NASA\'s colour bar for the ocean picture the rule switches at 74.4% of the bar\'s length, which is 23.8 °C if the bar\'s scale is even (docs/measurements/scan_pictures.md). Unverified: that the bar\'s scale is even, and that the lines in the frame use the bar\'s colours.',
-  },
 };
 
 /** The practice picture: TEST INPUT, a made-up picture with known answers, read with the ocean's settings. */
@@ -158,87 +173,153 @@ export const PRACTICE_SCAN: ScanRule = {
 };
 
 /**
- * The aerosol picture (SVS 5669). Every number below was measured on this picture's own still by
- * `npm run measure` (docs/measurements/scan_pictures.md, "Aerosols"), and set by the procedure at the
- * top of that page, the same for every picture. Never compare them with another picture's.
- *   floor  20/255  Design choice: the commonest colour's strength (8) plus 12 for JPEG noise.
- *   full   0.45 (map sweep: largest cell 0.429), 0.8 (radar: largest cell 0.77). Design choice.
- *   mask   none    Verified: 0 of the 201 cells that are 90% or more grey land sound.
+ * The aerosol picture. Settings from the procedure in docs/measurements/scan_pictures.md (floor: its
+ * commonest colour, the grey-green land, plus 12 grey levels; full levels: its largest cell means,
+ * rounded up to 0.05). No mask: aerosol over land is data. Approved by Developer A, 15 Nov, with
+ * its limits: sea salt is quiet and dust rings the same instrument as sea salt and sulfate.
  */
+const AEROSOLS_MEASURED = {
+  floor255: 20,
+  backgroundSpread: 8,
+  quiet90Cells: 194,
+  quiet90Sounding: 0,
+  quiet90Largest255: 11.07,
+  greyLand90Cells: 201,
+  greyLand90Sounding: 0,
+  largestLineMean: 0.429,
+  largestRadarMean: 0.77,
+  linePeaks: 47,
+  lineLeftOut: 11,
+  lineWarm: 3,
+  lineCool: 33,
+  radar0Peaks: 55,
+  radar0LeftOut: 21,
+  radar1Peaks: 0,
+  radar1LeftOut: 0,
+  radar1LargestMean: 0.15,
+  bar0Steps: 4,
+  bar0WarmSteps: 1,
+  stillDifference: 2.65,
+};
 export const AEROSOLS_SCAN: ScanRule = {
   status: 'measured',
   measure: 'colour',
   floor: 20 / 255,
   full: { line: 0.45, radar: 0.8 },
   mask: null,
-  // The scene file: a 16:9 world map, 0.094° per pixel east-west and 0.083° north-south.
   worldMap: true,
   instruments: {
-    warm: 'black carbon, drawn red-brown on NASA\'s aerosol colour bar',
-    cool: 'dust, sea salt and sulfate, drawn purple, grey-green and green',
+    warm: 'black carbon (smoke from fires), drawn orange-red',
+    cool: 'dust (lilac), sea salt (pale grey-teal) and sulfate (green)',
   },
-  still: {
-    frame: 'the one still',
-    time: '2025-08-19T20:00Z',
-    how: 'NASA\'s only frame of this picture; the app\'s still differs from NASA\'s full-size frame by 2.65 grey levels a channel on average',
-  },
-  measured: {},
+  still: { frame: 'the one still', time: '2025-08-19T20:00Z', how: 'NASA\'s only frame of this picture, scaled down for the app' },
+  measured: AEROSOLS_MEASURED,
   limits: [
-    'Sea salt is drawn faint (colour strength 0.145 on NASA\'s bar, against 0.659 for sulfate), so sea salt plays quietly. Region D\'s circle strikes no notes, only soft held ones: its strongest cell is 0.15.',
-    'Louder means more vivid colour in the drawing, not more aerosol in the air.',
-    'One moment only (19 Aug 2025, 20:00 UTC).',
+    `Sea salt is drawn pale grey-teal, barely coloured, so it is nearly silent: the sea-salt circle strikes no note, and its most colourful cell measures ${AEROSOLS_MEASURED.radar1LargestMean}, so its loudest held note is about a tenth of full loudness.`,
+    'Dust, sea salt and sulfate all ring the same instrument. Only black carbon (smoke) strikes the other.',
+    'Loudness is how strongly coloured the drawing is, not how much aerosol there is.',
   ],
-  evidence: {
-    floor:
-      'Measured on 16 Nov (docs/measurements/scan_pictures.md, "Aerosols"): the commonest colour is RGB (62, 69, 61), strength 8 of 255; 12 is added for JPEG noise. Of the 201 cells that are 90% or more grey land, none sounds; the largest has a mean of 10.84 of 255.',
-    full: 'Measured on 16 Nov: the most colourful map-sweep cell is 0.429 and the most colourful radar cell 0.77, so 0.45 and 0.8 (rounded up to 0.05, so no cell is clipped).',
-    switch:
-      'On NASA\'s aerosol colour bar the rule switches at 27.6% of the bar\'s length, between black carbon (warm) and dust (cool) (docs/measurements/scan_pictures.md). The step names were read by eye from the labels on the bar.',
-  },
 };
 
-const IMERG_MASK = MASKS['../../../data/imerg/scan_mask.png'] ?? null;
-
 /**
- * The rain picture (SVS 4285). Measured on its own still (docs/measurements/scan_pictures.md, "Rain"),
- * set by the same procedure. Its land is a satellite photo, not data, so the scan never reads it.
- *   floor  30/255  Design choice: the commonest colour's strength (18) plus 12 for JPEG noise.
- *   full   0.85 (map sweep: largest cell 0.810), 0.95 (radar: largest cell 0.90). Design choice.
- *   mask   data/imerg/scan_mask.png  Verified: inside each rain circle it marks exactly the pixels
- *          that region's own mask leaves out (analysis/scan_mask.py stops on any difference).
+ * The rain picture. Its land is a satellite photo, so it is masked (analysis/scan_mask.py); its
+ * empty sea is drawn navy, so the floor is the navy's own strength plus 12 grey levels. Snow, drawn
+ * cyan to purple, has its own instrument (Developer A, 15 Nov). Null when the mask is missing.
  */
-export const IMERG_SCAN: ScanRule | null = IMERG_MASK
+const IMERG_MEASURED = {
+  floor255: 30,
+  backgroundSpread: 18.2,
+  quiet90Cells: 1108,
+  quiet90Sounding: 1,
+  largestLineMean: 0.81,
+  largestRadarMean: 0.9,
+  linePeaks: 18,
+  lineLeftOut: 2,
+  lineChimes: 16,
+  lineBlue: 5,
+  radar0Peaks: 50,
+  radar0LeftOut: 19,
+  radar1Peaks: 11,
+  radar1LeftOut: 4,
+  maskPct: 40.21,
+  legend10Cells: 742,
+  legend10Sounding: 510,
+  bar0Steps: 10,
+  bar0WarmSteps: 7,
+  bar0SwitchStep: 4,
+  bar0BlueSteps: 0,
+  bar1Steps: 10,
+  bar1WarmSteps: 0,
+  bar1BlueSteps: 10,
+  stillDifference: 4.48,
+  stillRunnerUpDifference: 7.84,
+  stillCandidates: 30,
+};
+export const IMERG_SCAN: ScanRule | null = imergMask
   ? {
       status: 'measured',
       measure: 'colour',
       floor: 30 / 255,
       full: { line: 0.85, radar: 0.95 },
-      mask: { url: IMERG_MASK, what: 'land and ice, which in this picture are a satellite photo, not rain data' },
+      mask: { url: imergMask, what: 'land, which in this picture is a satellite photo, not rain data' },
       worldMap: true,
       instruments: {
-        warm: 'rain drawn yellow to dark red: steps 4 to 10 of NASA\'s rain colour bar, the heavier end',
-        cool: 'rain drawn green to yellow-green (steps 1 to 3, the lightest) and all snow (blue)',
+        warm: 'rain drawn yellow, orange or red (steps 4 to 10 of NASA\'s rain bar)',
+        cool: 'rain drawn green or yellow-green (steps 1 to 3 of the rain bar)',
+        blue: 'snow, drawn cyan to purple (every step of NASA\'s snow bar)',
       },
-      still: {
-        frame: 'frame 0',
-        time: '2026-11-14T00:00Z',
-        how: 'the closest of NASA\'s 30 frames to the app\'s still: 4.48 grey levels a channel apart, against 7.84 for the next closest',
-      },
-      measured: {},
+      still: { frame: 'frame 0', time: '2026-11-14T00:00Z', how: 'the first of the 30 hourly frames, found by comparing the still with each of them' },
+      measured: IMERG_MEASURED,
       limits: [
-        'The land is a photo, so the scan never reads it: 40.21% of the picture. Rain over land is not heard.',
-        'Colour strength is not rain rate: the heaviest step on NASA\'s bar (0.569) is drawn weaker than the lightest (0.702), so loudness says how much of a band is drawn as rain, not how hard it rains.',
-        'One frame of the 30 (frame 0).',
+        `Over land the scan reads nothing: land is a photo here (${IMERG_MEASURED.maskPct}% of the map). No data there, not "no rain".`,
+        `The empty sea is drawn navy, so the floor sits above it, and thin or faint rain at sea can be too faint to sound: of the ${IMERG_MEASURED.legend10Cells} map cells that are 10% or more rain or snow colour, ${IMERG_MEASURED.legend10Sounding} sound.`,
+        'NASA\'s rain bar has no numbers on it. Its legend calls yellow 0.5 to 1 mm an hour, so the warm instrument starts at about 0.5 mm an hour: read from the legend\'s words, not measured (Unverified).',
+        'It describes the drawn rain picture, not how much it rains.',
       ],
-      evidence: {
-        floor:
-          'Measured on 16 Nov (docs/measurements/scan_pictures.md, "Rain"): the commonest colour is RGB (2, 5, 20), strength 18 of 255; 12 is added for JPEG noise. Of the 1108 cells that are 90% or more this colour, 1 sounds, at level 0.019.',
-        full: 'Measured on 16 Nov: the most colourful map-sweep cell is 0.810 and the most colourful radar cell 0.90, so 0.85 and 0.95 (rounded up to 0.05, so no cell is clipped).',
-        switch:
-          'On NASA\'s rain colour bar the rule switches at 28.7% of the bar\'s length, between step 3 (yellow-green, cool) and step 4 (yellow, warm); every step of the snow bar is cool (docs/measurements/scan_pictures.md).',
-      },
     }
   : null;
+
+/**
+ * TEST INPUT pictures for the browser tests (VITE_DATASET=practice-pictures): the practice data,
+ * plus a made-up rain picture and a made-up aerosol picture read with the REAL rain and aerosol
+ * rules. Only the still (and the rain picture's mask) are made up; the settings are the real ones.
+ */
+function practicePictures(practice: Picture): Picture[] {
+  const list: Picture[] = [practice];
+  const testRule = (rule: ScanRule, mask: string | null): ScanRule => ({
+    ...rule,
+    status: 'test input',
+    worldMap: false,
+    mask: mask ? { url: '', what: mask } : null,
+    still: { frame: 'TEST INPUT', time: null, how: 'made up by the code (data/testPictures.ts), not NASA data' },
+    limits: ['A made-up picture with a known answer, for testing. Not NASA data.'],
+  });
+  list.push({
+    ...practice,
+    key: 'aerosols',
+    label: 'Aerosols',
+    short: 'Aerosols',
+    kind: 'Test input, not NASA data',
+    firstLetter: 'C',
+    regionStyle: 'neutral',
+    scan: testRule(AEROSOLS_SCAN, null),
+    test: { pixels: makeAerosolTestPicture },
+  });
+  if (IMERG_SCAN) {
+    list.push({
+      ...practice,
+      key: 'imerg',
+      label: 'Rain',
+      short: 'Rain',
+      kind: 'Test input, not NASA data',
+      firstLetter: 'E',
+      regionStyle: 'neutral',
+      scan: testRule(IMERG_SCAN, 'the block that stands for land'),
+      test: { pixels: makeRainTestPicture, mask: makeRainTestMask },
+    });
+  }
+  return list;
+}
 
 /** What the app knows about each picture beyond its scene.json: the words on screen, the region
  *  look, and its scan rule. A folder not listed here still appears, with neutral regions, its
@@ -254,7 +335,19 @@ const ORDER = ['aerosols', 'imerg'];
 
 function pickPictures(): Picture[] {
   if (ACTIVE.origin === 'fixtures/mock/') {
-    return [{ ...ACTIVE, key: 'practice', label: 'Practice', short: 'Practice picture', kind: 'Test input, not NASA data', firstLetter: 'A', regionStyle: 'hue', resource: 'practice', landRule: OCEAN_LAND, scan: PRACTICE_SCAN }];
+    const practice: Picture = {
+      ...ACTIVE,
+      key: 'practice',
+      label: 'Practice',
+      short: 'Practice picture',
+      kind: 'Test input, not NASA data',
+      firstLetter: 'A',
+      regionStyle: 'hue',
+      resource: 'practice',
+      landRule: OCEAN_LAND,
+      scan: PRACTICE_SCAN,
+    };
+    return import.meta.env.VITE_DATASET === 'practice-pictures' ? practicePictures(practice) : [practice];
   }
   const list: Picture[] = [
     { ...ACTIVE, key: 'ocean', label: 'Ocean', short: 'Sea surface currents and temperature', kind: 'Model output (ECCO2)', firstLetter: 'A', regionStyle: 'hue', resource: 'eic', landRule: OCEAN_LAND, scan: OCEAN_SCAN },
@@ -290,44 +383,28 @@ function pickPictures(): Picture[] {
   return list;
 }
 
-// ---------- What the picture scan can play on a picture ----------
-
-/** What the scan reads: the whole picture ('map', the map sweep) or one circle (its id, the radar). */
-export type ScanTarget = 'map' | string;
-
-/** The circles the radar can turn in: the picture's regions, or the one test circle on the TEST
- *  INPUT picture that stands in for a NASA picture in practice mode. */
-export function scanRegions(p: Picture): Region[] {
-  return p.imageUrl ? p.scene.regions : [TEST_CIRCLE];
-}
-
-/** "Region C" (the picture's own letters), or "Test circle" on the TEST picture. */
-export function targetName(p: Picture, target: ScanTarget): string {
-  if (target === 'map') return 'Whole picture';
-  if (!p.imageUrl) return 'Test circle';
-  return `Region ${regionLetter(p, target)}`;
-}
-
-/** The facts "Why the scan sounds like this" lists for a picture's floor, full level and
- *  instrument switch (audio/scanChoices.ts). */
-export function factsOf(rule: ScanRule): PictureFacts {
-  const own = rule !== OCEAN_SCAN && rule !== PRACTICE_SCAN;
-  return { floor: rule.floor, full: rule.full, evidence: rule.evidence, procedure: own };
-}
-
 export const PICTURES: Picture[] = pickPictures();
 export const SOURCES: Source[] = PICTURES.filter((p): p is Source => p.features !== null);
 
-/** "30 hourly frames", "30 frames", "1 still": how many frames NASA's picture has, from its scene. */
-export function framesText(scene: Scene): { count: number; words: string } {
-  const count = scene.frames.count;
-  if (count <= 1) return { count: 1, words: 'still' };
-  const times = (scene.frames.timestamps ?? []).map((t) => Date.parse(t));
-  const steps = times.slice(1).map((t, i) => t - times[i]);
-  const even = steps.length > 0 && steps.every((s) => Number.isFinite(s) && s === steps[0]);
-  const every = even ? ({ 3_600_000: 'hourly ', 86_400_000: 'daily ' } as Record<number, string>)[steps[0]] ?? '' : '';
-  return { count, words: `${every}frames` };
+/** A NASA page the app's pictures come from, as its scene.json gives it. */
+export interface NasaPage {
+  svsId: number;
+  url: string;
+  title: string;
 }
+
+/**
+ * The NASA page of every real picture, read from `data/scene.json` and each `data/<folder>/scene.json` (ocean first),
+ * never typed by hand. Read from the files even with practice data on: these are the sources, not
+ * the data being played. Test input has no SVS page and is left out.
+ */
+export const NASA_PAGES: NasaPage[] = Object.entries(
+  import.meta.glob<{ default: unknown }>(['../../../data/scene.json', '../../../data/*/scene.json'], { eager: true }),
+)
+  .sort(([a], [b]) => a.split('/').length - b.split('/').length || a.localeCompare(b))
+  .map(([, m]) => (m.default as Scene).source)
+  .filter((s) => s.svs_id !== null && /^https:\/\/svs\.gsfc\.nasa\.gov\//.test(s.url))
+  .map((s) => ({ svsId: s.svs_id!, url: s.url, title: s.title }));
 
 export function sourceByKey(key: SourceKey): Source {
   return SOURCES.find((s) => s.key === key) ?? SOURCES[0];
@@ -379,4 +456,33 @@ export function describesLine(picture: { key: SourceKey }): string {
   if (picture.key === 'imerg') return 'It describes the picture, not rainfall amounts.';
   if (picture.key === 'ocean' || picture.key === 'practice') return 'It describes the picture, not water speed or ocean health.';
   return 'It describes the picture, not the amounts it shows.';
+}
+
+// ---------- What the picture scan can play on a picture ----------
+
+/** What the scan reads: the whole picture ('map', the map sweep) or one circle (its id, the radar). */
+export type ScanTarget = 'map' | string;
+
+/** The circles the radar can turn in: the picture's regions, or the one test circle on the TEST
+ *  INPUT picture that stands in for a NASA picture in practice mode. */
+export function scanRegions(p: Picture): Region[] {
+  return p.imageUrl ? p.scene.regions : [TEST_CIRCLE];
+}
+
+/** "Region C" (the picture's own letters), or "Test circle" on the TEST picture. */
+export function targetName(p: Picture, target: ScanTarget): string {
+  if (target === 'map') return 'Whole picture';
+  if (!p.imageUrl) return 'Test circle';
+  return `Region ${regionLetter(p, target)}`;
+}
+
+/** "30 hourly frames", "30 frames", "1 still": how many frames NASA's picture has, from its scene. */
+export function framesText(scene: Scene): { count: number; words: string } {
+  const count = scene.frames.count;
+  if (count <= 1) return { count: 1, words: 'still' };
+  const times = (scene.frames.timestamps ?? []).map((t) => Date.parse(t));
+  const steps = times.slice(1).map((t, i) => t - times[i]);
+  const even = steps.length > 0 && steps.every((s) => Number.isFinite(s) && s === steps[0]);
+  const every = even ? ({ 3_600_000: 'hourly ', 86_400_000: 'daily ' } as Record<number, string>)[steps[0]] ?? '' : '';
+  return { count, words: `${every}frames` };
 }

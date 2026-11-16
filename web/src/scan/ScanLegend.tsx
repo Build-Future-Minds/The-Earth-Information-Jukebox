@@ -6,10 +6,37 @@
 import type { ScanSoundDef } from '../audio/instruments';
 import type { ScanRule } from '../data/sources';
 import type { Scene } from '../data/types';
-import { stillTime } from './ScanOverlay';
+import { starPath, stillTime } from './ScanOverlay';
+
+// The third instrument's mark is drawn by ScanOverlay; the globe and the legend use the same shape.
+export { starPath };
 
 /** What every mark and bar means, with the same shapes as on the picture. */
-export function ScanLegend({ sound, order, radar, bars = 'below' }: { sound: ScanSoundDef; order: string; radar: boolean; bars?: 'below' | 'beside' }) {
+export function ScanLegend({
+  sound,
+  order,
+  radar,
+  bars = 'below',
+  instruments = null,
+  third = false,
+  hatched = false,
+  hatchDrawn = true,
+}: {
+  sound: ScanSoundDef;
+  order: string;
+  radar: boolean;
+  /** Where the bars are: below the legend's own picture (Play along), or beside the picture (Listen). */
+  bars?: 'below' | 'beside';
+  /** What each instrument means in this picture's legend (data/sources.ts, `scan.instruments`). */
+  instruments?: { warm: string; cool: string; blue?: string } | null;
+  /** The picture has a third instrument, for colours on the blue side. */
+  third?: boolean;
+  /** Some of the picture's pixels are never read: they are hatched. */
+  hatched?: boolean;
+  /** This view draws that hatch (Play along). The globe does not: it says so instead of describing a hatch. */
+  hatchDrawn?: boolean;
+}) {
+  const here = (meaning: string | undefined) => (instruments && meaning ? <> In this picture: {meaning}.</> : null);
   return (
     <ul className="scan-legend" aria-label="What the marks and bars mean">
       <li className="legend-group"><strong>From the picture</strong></li>
@@ -32,14 +59,42 @@ export function ScanLegend({ sound, order, radar, bars = 'below' }: { sound: Sca
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <circle cx="15" cy="11" r="5" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.</span>
+        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.{here(instruments?.warm)}</span>
       </li>
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <rect x="10.5" y="6.5" width="9" height="9" transform="rotate(45 15 11)" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly yellow-green, green or blue.</span>
+        <span>
+          <strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly {third ? 'yellow-green or green' : 'yellow-green, green or blue'}.{here(instruments?.cool)}
+        </span>
       </li>
+      {third && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <path d={starPath(6, 15, 11)} stroke="#000" strokeWidth="4" strokeLinecap="round" />
+            <path d={starPath(6, 15, 11)} stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <span><strong>Asterisk: a {sound.blueName} note.</strong> The line crossed a peak of colour that is mostly blue (cyan to purple).{here(instruments?.blue)}</span>
+        </li>
+      )}
+      {hatched && hatchDrawn && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <path d="M-2 8L8 -2M-2 18L18 -2M4 24L26 2M14 24L32 6M24 24L32 16" stroke="#fff" strokeWidth="2.5" />
+            <path d="M-2 13L13 -2M-2 23L23 -2M9 24L31 2M19 24L32 11" stroke="#000" strokeWidth="2.5" />
+          </svg>
+          <span><strong>Hatched: never read.</strong> No data there: silent, never struck, not a zero.</span>
+        </li>
+      )}
+      {hatched && !hatchDrawn && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <rect x="3" y="3" width="24" height="16" fill="none" stroke="#fff" strokeWidth="1.5" strokeDasharray="3 3" />
+          </svg>
+          <span><strong>Never read (not drawn on the globe).</strong> Some of this picture's pixels carry no data: the scan is silent there, never strikes a note, and it is not a zero. Play along hatches them; the globe does not.</span>
+        </li>
+      )}
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <circle cx="15" cy="11" r="8.5" fill="none" stroke="#fff" strokeWidth="1.5" strokeOpacity="0.7" />
@@ -100,22 +155,42 @@ export function ScanLegend({ sound, order, radar, bars = 'below' }: { sound: Sca
   );
 }
 
-/** "How the picture becomes sound": the rule in a few lines, with this picture's own facts. */
-export function ScanHow({ scene, rule, isTest }: { scene: Scene; rule: ScanRule | null; isTest: boolean }) {
+/**
+ * "How the picture becomes sound": the rule in a few lines, with this picture's own facts (its floor,
+ * what it never reads, what each instrument means in its legend, what the scan cannot tell you).
+ * `sound` gives the chosen scan sound's names for the instruments.
+ */
+export function ScanHow({ scene, rule, isTest, sound }: { scene: Scene; rule: ScanRule | null; isTest: boolean; sound?: ScanSoundDef }) {
+  const blueClass = !!rule?.instruments.blue;
+  const warmName = sound?.warmName ?? 'warm instrument';
+  const coolName = sound?.coolName ?? 'cool instrument';
+  const blueName = sound?.blueName ?? 'third instrument';
   return (
     <ul>
       {!isTest && rule && (
         <li>
-          <strong>Which picture.</strong> One still: {scene.source.title}
-          {stillTime(rule.still.time)} ({rule.still.frame}): {rule.still.how}. Each picture is read with its own settings, measured on its own still.
+          <strong>Which picture.</strong> One still: {scene.source.title}, {rule.still.frame}
+          {stillTime(rule.still.time)}, {rule.still.how}. This picture has its own settings, measured on this still; its numbers are never compared with
+          another picture's.
         </li>
       )}
       <li><strong>Where.</strong> Higher on the picture is a higher note (on the radar: further from the centre). There are 12 bands, on the five notes C, D, E, G and A. Low bands are far apart and high bands close together, as a choir is spaced.</li>
-      <li><strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone. What the picture draws as its background is silent. A soft held note sounds for every band the line is crossing.</li>
+      <li>
+        <strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone.
+        {rule ? (
+          <>
+            {' '}In this picture a cell at or below {Number((rule.floor * 255).toFixed(2))} of 255 is silent
+            {rule.floor === 12 / 255 ? ' (black sea and grey land)' : ', just above the colour drawn where there is nothing'}.
+          </>
+        ) : (
+          ' What the picture draws as its background is silent.'
+        )}{' '}
+        A soft held note sounds for every band the line is crossing.
+      </li>
       {!isTest && rule?.mask && (
         <li>
-          <strong>Never read.</strong> In this picture the scan never reads {rule.mask.what}. A part it never reads is no data: silent, and not counted as
-          nothing there.
+          <strong>Pixels never read.</strong> The scan never reads {rule.mask.what}. There it has no data: it is silent, it strikes no note, and it does not
+          count as a zero. They are hatched on the picture.
         </li>
       )}
       <li>
@@ -123,9 +198,19 @@ export function ScanHow({ scene, rule, isTest }: { scene: Scene; rule: ScanRule 
         band's held note. Peaks that follow each other too closely are left out, so each struck note can be heard.
       </li>
       <li>
-        <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is struck on one instrument. Where it is
-        not (yellow-green, green and blue), it is struck on another.
-        {rule && !isTest && <> In this picture the warm instrument plays {rule.instruments.warm}; the cool one plays {rule.instruments.cool}.</>}
+        <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is struck on one instrument.{' '}
+        {blueClass
+          ? 'Where most of it has blue as its largest channel, it is struck on a third. Otherwise it is struck on the second.'
+          : 'Where it is not (yellow-green, green and blue), it is struck on another.'}
+        {rule && !isTest && (
+          <>
+            {' '}In this picture the {warmName} means {rule.instruments.warm}; the {coolName}, {rule.instruments.cool}
+            {rule.instruments.blue ? <>; the {blueName}, {rule.instruments.blue}</> : null}.
+            {rule.measured.bar0SwitchValue !== undefined && (
+              <> On NASA's colour bar for this picture the switch falls at about {rule.measured.bar0SwitchValue.toFixed(1)} °C, and the picture's lines use the bar's hues. We measured the bar and the picture's colours, not the sea.</>
+            )}
+          </>
+        )}
       </li>
       {!isTest && rule && rule.limits.length > 0 && (
         <li>

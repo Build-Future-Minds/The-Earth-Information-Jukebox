@@ -79,11 +79,11 @@ scan note came from, and Explain on the rhythm says why each beat is split as it
 - Name: "Earth Sonata: Play the Planet". No logo or required colours.
 - Credit, visible wherever the image appears: "NASA/Goddard Space Flight Center Scientific
   Visualization Studio". The NASA logo is never used.
-- Three honesty lines in public material, said for each picture: what it is (a visualization of a
-  computer model such as ECCO2, or satellite estimates, not a photo); the sound rules (the picture
-  scan Listen plays, and the rhythm of Compare and the game) are choices the team made; it
-  describes the rendered image, not what it shows (not water speed, turbulence or ocean health;
-  not air quality; not rainfall amounts).
+- Three honesty lines in public material, word for word (one constant in the app,
+  `web/src/data/honesty.ts`; How it's made links each line to the section that backs it):
+  1. "It is a visualization of computer model output or satellite estimates, not a photo."
+  2. "The rules that turn it into sound are choices we made."
+  3. "It describes the drawn picture, not water speed, turbulence, air quality or rain amounts."
 - No images, music or video produced by a generative AI model in the product or demo. Sound is
   synthesised by our own code; AI help with that code is listed in `AI_USE.md`.
 

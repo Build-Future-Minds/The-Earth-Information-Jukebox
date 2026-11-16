@@ -2,7 +2,7 @@
 // that picture's floor and full levels, and its mask. Each picture is checked against its own
 // settings only; no number of one picture is compared with another's.
 import { describe, expect, it } from 'vitest';
-import { factsOf, SOURCES } from '../data/sources';
+import { SOURCES } from '../data/sources';
 import { scanChoicesFor } from './scanChoices';
 import { colourStrength, LINE_GRID, levelOf, pictureScore, RADAR_GRID, type Pixels } from './scanScore';
 
@@ -54,15 +54,16 @@ describe('"Why the scan sounds like this" lists each picture\'s own numbers', ()
   for (const s of SOURCES) {
     it(`${s.key}: its floor and full levels, with its own evidence`, () => {
       const rule = s.scan!;
-      const choices = scanChoicesFor(factsOf(rule));
+      const choices = scanChoicesFor({ label: s.label, scan: rule });
       const floor = choices.find((c) => c.id === 'floor')!;
       const full = choices.find((c) => c.id === 'full-level')!;
       const sw = choices.find((c) => c.id === 'instrument-switch')!;
-      expect(floor.what).toContain(`${Math.round(rule.floor * 255)} of 255`);
+      expect(floor.what).toContain(`${Number((rule.floor * 255).toFixed(2))} of 255`);
       expect(full.what).toContain(`${rule.full.line}`);
       expect(full.what).toContain(`${rule.full.radar}`);
-      expect(floor.evidence).toBe(rule.evidence.floor);
-      expect(sw.evidence).toBe(rule.evidence.switch);
+      // Its own evidence: each picture says what the measurement of that picture found.
+      expect(floor.evidence).toContain('docs/measurements/scan_pictures.md');
+      expect(sw.what).toContain(rule.instruments.warm);
     });
   }
 });

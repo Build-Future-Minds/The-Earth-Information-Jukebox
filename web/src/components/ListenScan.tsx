@@ -12,14 +12,13 @@
 // ListenView gives each picture its own ListenScan, whose player is disposed with it).
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import { SCAN_SOUNDS, type ScanSoundId } from '../audio/instruments';
-import { scanChoicesFor } from '../audio/scanChoices';
 import type { ScanState } from '../audio/scanPlayer';
 import { bandNote, noteName, type ScanScore } from '../audio/scanScore';
-import { factsOf, regionLetter, scanRegions, targetName, type ScanTarget, type Source } from '../data/sources';
+import { regionLetter, scanRegions, targetName, type ScanTarget, type Source } from '../data/sources';
 import type { Region } from '../data/types';
 import { ScanHow, ScanLegend } from '../scan/ScanLegend';
 import { ScanOverlay, drawSweep, viewOf } from '../scan/ScanOverlay';
-import { longitude, useScan, type ScanHandle } from '../scan/useScan';
+import { longitude, useScan, type ScanHandle, type ScanPicture } from '../scan/useScan';
 import { useScanFrame } from '../scan/useScanFrame';
 import { PlayerBar, regionStyle, type RegionLook } from './ExploreControls';
 import { ScanExplanation, WHY_START, type WhyView } from './ScanExplanation';
@@ -49,11 +48,47 @@ const WORD: Record<ScanState, string> = { stopped: 'Ready', paused: 'Paused', pl
 /** "0:13": minutes and seconds. */
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
+/** A picture whose scan has not been measured is shown, and says so; nothing plays (it has no rule, so no score). */
 export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenScan(p, ref) {
+  if (!p.picture.scan) return <ListenNotMeasured picture={p.picture} ref={ref} />;
+  return <ListenMeasured {...p} picture={p.picture as ScanPicture & Source} ref={ref} />;
+});
+
+const NOT_MEASURED = 'The scan has not been measured on this picture yet, so it does not play it.';
+
+const ListenNotMeasured = forwardRef<ListenScanHandle, { picture: Source }>(function ListenNotMeasured({ picture }, ref) {
+  useImperativeHandle(ref, () => ({ stop: () => {} }), []);
+  const { scene, imageUrl } = picture;
+  return (
+    <div className="listen-scan line stopped">
+      <div className="listen-area">
+        <div className="listen-axes">
+          <figure className="listen-figure scan-view line stopped">
+            <div className="chart">
+              {imageUrl ? (
+                <img src={imageUrl} alt={`${scene.source.title}.`} />
+              ) : (
+                <p className="muted">There is no NASA picture for this one.</p>
+              )}
+            </div>
+          </figure>
+          <div className="listen-under">
+            <span className="credit">Visualization: {scene.source.credit}</span>
+            <div className="listen-notes" aria-live="polite">
+              <p className="missing">{NOT_MEASURED}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p className="status sr-only" role="status">{`Stopped. ${NOT_MEASURED}`}</p>
+    </div>
+  );
+});
+
+const ListenMeasured = forwardRef<ListenScanHandle, Props & { picture: ScanPicture & Source }>(function ListenMeasured(p, ref) {
   const { picture, target } = p;
-  const rule = picture.scan;
-  const scan = useScan({ scene: picture.scene, imageUrl: picture.imageUrl, speed: p.speed, rule });
-  const { loaded, loadError, state, traces, frame, region, worldMap, score, bands, sound, why, liveColumn, lastStruck, side, setTarget, setVolumeDb, setSoundId } = scan;
+  const scan = useScan({ picture, speed: p.speed });
+  const { rule, mask, blueClass, choices, loaded, loadError, state, traces, frame, region, worldMap, score, bands, sound, why, liveColumn, lastStruck, side, setTarget, setVolumeDb, setSoundId } = scan;
   // Step 2, the volume and the instruments are the page's (App); the shared scan follows them.
   useEffect(() => setTarget(target), [target, setTarget]);
   useEffect(() => setVolumeDb(p.volumeDb), [p.volumeDb, setVolumeDb]);
@@ -108,7 +143,6 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
   );
   useEffect(() => changeWhy({ column: 0, pick: null, follow: true }), [score, changeWhy]);
   const bandSentenceId = useId();
-  const choices = useMemo(() => scanChoicesFor(rule ? factsOf(rule) : undefined), [rule]);
 
   const across = worldMap ? 'west to east' : 'left to right';
   const fullName = region && !test ? `${name}, ${region.name}` : region ? name : 'the whole picture';
@@ -143,7 +177,7 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
               <figure className={`listen-figure scan-view radar ${figureState}`}>
                 <div className="zoom">
                   <RadarPicture frame={frame} region={region} href={loaded?.href ?? null} label={`${test ? 'Test picture' : picture.scene.source.title}, zoomed to ${fullName}.`}>
-                    <ScanOverlay frame={frame} region={region} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} />
+                    <ScanOverlay frame={frame} region={region} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} mask={mask} />
                   </RadarPicture>
                 </div>
               </figure>
@@ -188,7 +222,7 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
                         <circle className="ring" cx={r.center_px[0]} cy={r.center_px[1]} r={r.radius_px} />
                       </g>
                     ))}
-                  <ScanOverlay frame={frame} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} />
+                  <ScanOverlay frame={frame} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} mask={mask} />
                 </svg>
                 {!test && <MapTags picture={picture} regions={regions} frame={frame} look={p.look} />}
                 {worldMap && <Graticule />}
@@ -214,12 +248,11 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
             ) : (
               <span className="credit">
                 Visualization: {picture.scene.source.credit}
-                {rule?.mask && <span className="never-read"> · The scan never reads {rule.mask.what}.</span>}
+                {rule.mask && <span className="never-read"> · The scan never reads {rule.mask.what}.</span>}
               </span>
             )}
             <div className="listen-notes" aria-live="polite">
               {loadError && <p className="missing">The picture did not load: {loadError}. The scan stays quiet.</p>}
-              {!rule && <p className="missing">The scan has not been measured on this picture yet, so it does not play it.</p>}
               {score?.status === 'missing' && <p className="missing">Nothing to play for {fullName}: {score.reason}. The scan stays quiet.</p>}
             </div>
           </div>
@@ -259,7 +292,12 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
               </span>
               <span className="sl-where" ref={whereText} />
               <span className="sl-key">
-                <i className="warm" /> red or orange <i className="cool" /> other colours
+                <i className="warm" /> red or orange <i className="cool" /> {blueClass ? 'green' : 'other colours'}
+                {blueClass && (
+                  <>
+                    {' '}<i className="blue" /> blue
+                  </>
+                )}
               </span>
               <span className="sl-time" ref={timeText}>0:00 / {clock(seconds / p.speed)}</span>
             </div>
@@ -288,7 +326,7 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
           <h3 id="explain-scan-title">Explain</h3>
           <div className="explain-key">
             <h4>What the marks mean</h4>
-            <ScanLegend sound={sound} order={order} radar={!!region} bars="beside" />
+            <ScanLegend sound={sound} order={order} radar={!!region} bars="beside" instruments={rule.instruments} third={blueClass} hatched={!!mask} />
           </div>
           {score ? (
             <ScanExplanation
@@ -301,13 +339,14 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
               onChange={changeWhy}
               bandSentenceId={bandSentenceId}
               choices={choices}
+              pickOnPicture={false}
             />
           ) : (
             <p className="muted">Nothing to explain yet: the scan has no score for this picture.</p>
           )}
           <details className="scan-how">
             <summary>How the picture becomes sound</summary>
-            <ScanHow scene={picture.scene} rule={rule} isTest={test} />
+            <ScanHow scene={picture.scene} rule={rule} isTest={test} sound={sound} />
           </details>
         </section>
       )}
@@ -336,7 +375,7 @@ function SoundMarks({ score, played = false }: { score: ScanScore | null; played
       {score.chimes.map((c) => (
         <i
           key={`${c.column}-${c.band}`}
-          className={c.warm ? 'warm' : 'cool'}
+          className={c.colour}
           style={{ left: `${(100 * (c.column + 0.5)) / columns}%`, top: `${100 * (1 - (c.band + 0.5) / bands)}%` }}
         />
       ))}

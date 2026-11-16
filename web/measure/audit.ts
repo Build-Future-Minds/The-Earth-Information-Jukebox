@@ -26,10 +26,12 @@ import {
   buildScanScore,
   colourStrength,
   findChimes,
+  isBlue,
   isWarm,
   levelOf,
   radarPoint,
   regionScan,
+  type ChimeColour,
   type Pixels,
   type RadarShape,
   type ScanGrid,
@@ -38,7 +40,7 @@ import {
 } from '../src/audio/scanScore';
 import { loadMask, loadPicture } from '../src/scan/loadPicture';
 import { PICTURES, type Picture } from '../src/data/sources';
-import type { LandRule } from '../src/globe/geo';
+import { OCEAN_LAND, landShare, type LandRule } from '../src/globe/geo';
 
 /** Every scan mask in data/, served by the dev server. A picture without a rule may use its own. */
 const MASK_FILES = import.meta.glob<string>('../../data/**/scan_mask.png', { eager: true, query: '?url', import: 'default' });
@@ -59,6 +61,12 @@ export interface BarFile {
   /** The numbers printed at the bar's two ends, read by eye. */
   ends?: [number, number];
   unit?: string;
+  /**
+   * Every number printed under the bar, left to right, read by eye. Where each sits is measured
+   * (measureBarLabels), so the bar's scale is checked, not assumed. With it the bar is also read as
+   * the file stores it (no colour management), and the browser's drawing is compared with that.
+   */
+  labels?: number[];
 }
 /** One of NASA's full frames the still may have been made from. */
 export interface FrameFile {
@@ -71,6 +79,8 @@ export interface FrameFile {
 export interface PictureFiles {
   frames: FrameFile[];
   bars: BarFile[];
+  /** Other copies of the best frame to compare with the uncompressed frame, besides the still the app reads. */
+  stills?: { name: string; url: string }[];
 }
 export interface AuditOptions {
   /** The NASA files on this machine, for each picture. A picture missing here skips those parts. */
@@ -84,6 +94,8 @@ export interface Settings {
   full: { line: number; radar: number };
   /** The mask's file, or null. */
   mask: string | null;
+  /** A third instrument for colours on the blue side (the rule's `instruments.blue`). */
+  blueClass: boolean;
 }
 
 /** What one scan of one picture gives. */
@@ -105,6 +117,8 @@ export interface ScanSummary {
   chimes: number;
   warm: number;
   cool: number;
+  /** Struck on the third instrument (only for a picture with a blue class). */
+  blue: number;
 }
 
 const ceil20 = (x: number) => Math.ceil(x * 20 - 1e-9) / 20;
@@ -127,8 +141,9 @@ function summarise(score: ScanScore): ScanSummary {
     largest = Math.max(largest, score.means[c]);
   }
   // The chime rule with its two "leave out" steps switched off, one at a time.
-  const peaks = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, minGap: 0, perColumn: Infinity }, score.reads);
-  const spaced = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, perColumn: Infinity }, score.reads);
+  const blue = score.blueClass ? score.blueShare : undefined;
+  const peaks = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, minGap: 0, perColumn: Infinity }, score.reads, blue);
+  const spaced = findChimes(score.levels, score.warmShare, score.grid, cyclic, { ...CHIME_RULE, perColumn: Infinity }, score.reads, blue);
   return {
     cells: score.levels.length,
     sounding,
@@ -138,8 +153,9 @@ function summarise(score: ScanScore): ScanSummary {
     peaks: peaks.length,
     afterSpacing: spaced.length,
     chimes: score.chimes.length,
-    warm: score.chimes.filter((c) => c.warm).length,
-    cool: score.chimes.filter((c) => !c.warm).length,
+    warm: score.chimes.filter((c) => c.colour === 'warm').length,
+    cool: score.chimes.filter((c) => c.colour === 'cool').length,
+    blue: score.chimes.filter((c) => c.colour === 'blue').length,
   };
 }
 
@@ -153,12 +169,14 @@ function lineCell(x: number, y: number, width: number, height: number, grid: Sca
  * The map sweep's cells, measured by colour strength, with two extras the rule does not have:
  * a weight for each row, and a mask of pixels to leave out. `selfCheck` proves the copy agrees.
  */
-function lineCells(pixels: Pixels, grid: ScanGrid, floor: number, weightOfRow?: (y: number) => number, skip?: Uint8Array | null) {
+function lineCells(pixels: Pixels, grid: ScanGrid, floor: number, blueClass: boolean, weightOfRow?: (y: number) => number, skip?: Uint8Array | null) {
   const { columns, bands } = grid;
   const { data, width, height } = pixels;
   const n = columns * bands;
   const sum = new Float64Array(n);
+  const drawn = new Float64Array(n); // colour above the floor: what votes for the instrument
   const warm = new Float64Array(n);
+  const blue = new Float64Array(n);
   const read = new Float64Array(n);
   for (let y = 0; y < height; y++) {
     const w = weightOfRow ? weightOfRow(y) : 1;
@@ -169,19 +187,24 @@ function lineCells(pixels: Pixels, grid: ScanGrid, floor: number, weightOfRow?: 
       const s = colourStrength(data[i], data[i + 1], data[i + 2]);
       read[cell] += w;
       sum[cell] += w * s;
+      if (s <= floor) continue;
+      drawn[cell] += w * s;
       if (isWarm(data[i], data[i + 1], data[i + 2])) warm[cell] += w * s;
+      else if (blueClass && isBlue(data[i], data[i + 1], data[i + 2])) blue[cell] += w * s;
     }
   }
   const mean = new Float64Array(n);
   const levels = new Float32Array(n);
   const warmShare = new Float32Array(n);
+  const blueShare = new Float32Array(n);
   for (let c = 0; c < n; c++) {
     if (read[c] === 0) continue;
     mean[c] = sum[c] / read[c];
     levels[c] = levelOf(mean[c], grid.fullStrength, floor);
-    warmShare[c] = sum[c] > 0 ? warm[c] / sum[c] : 0;
+    warmShare[c] = drawn[c] > 0 ? warm[c] / drawn[c] : 0;
+    blueShare[c] = drawn[c] > 0 ? blue[c] / drawn[c] : 0;
   }
-  return { mean, levels, warmShare, read };
+  return { mean, levels, warmShare, blueShare, read };
 }
 
 /** For each map-sweep cell: the share of the pixels it reads that `flag` marks (NaN: reads none). */
@@ -275,6 +298,8 @@ interface BarStep {
   to: number;
   rgb: [number, number, number];
   warm: boolean;
+  /** On the blue side (isBlue): only matters for a picture with a blue class. */
+  blue: boolean;
   strength: number;
   name: string;
 }
@@ -285,22 +310,44 @@ interface BarStep {
  * coloured pixels only, so gaps between swatches never count.
  */
 function measureBar(bar: Pixels, file: BarFile) {
-  let best = { row: 0, count: -1 };
-  for (let y = 0; y < bar.height; y++) {
+  const counts = Array.from({ length: bar.height }, (_, y) => {
     let count = 0;
     for (let x = 0; x < bar.width; x++) if (spreadOf(bar.data, (y * bar.width + x) * 4) > file.coloured) count++;
-    if (count > best.count) best = { row: y, count };
-  }
-  const at = (x: number) => (best.row * bar.width + x) * 4;
+    return count;
+  });
+  const most = Math.max(...counts);
+  // The bar is the row with the most coloured pixels (the first, if several tie).
+  const row = counts.indexOf(most);
+  // Every row of the bar: the rows with nearly as many coloured pixels.
+  const rows = counts.flatMap((c, y) => (c >= 0.9 * most ? [y] : []));
+  const at = (x: number, y = row) => (y * bar.width + x) * 4;
   const rgbAt = (x: number) => [bar.data[at(x)], bar.data[at(x) + 1], bar.data[at(x) + 2]] as [number, number, number];
   const coloured = Array.from({ length: bar.width }, (_, x) => x).filter((x) => spreadOf(bar.data, at(x)) > file.coloured);
   const [x0, x1] = [coloured[0], coloured[coloured.length - 1]];
   const warmAt = (x: number) => isWarm(...rgbAt(x));
   const switches: { at: number; from: [number, number, number]; to: [number, number, number] }[] = [];
+  /** The first pixel after each change of answer. */
+  const switchPixels: number[] = [];
   for (let k = 1; k < coloured.length; k++) {
-    if (warmAt(coloured[k]) !== warmAt(coloured[k - 1])) switches.push({ at: (coloured[k] - x0) / (x1 - x0), from: rgbAt(coloured[k - 1]), to: rgbAt(coloured[k]) });
+    if (warmAt(coloured[k]) !== warmAt(coloured[k - 1])) {
+      switches.push({ at: (coloured[k] - x0) / (x1 - x0), from: rgbAt(coloured[k - 1]), to: rgbAt(coloured[k]) });
+      switchPixels.push(coloured[k]);
+    }
   }
   const strengthAt = (f: number) => colourStrength(...rgbAt(Math.round(x0 + f * (x1 - x0))));
+  // Each column's colour, averaged over the bar's rows, and the most any row differs from the bar's row.
+  let rowDifference = 0;
+  const colours: [number, number, number][] = [];
+  for (let x = x0; x <= x1; x++) {
+    const sum = [0, 0, 0];
+    for (const y of rows) {
+      for (let k = 0; k < 3; k++) {
+        sum[k] += bar.data[at(x, y) + k];
+        rowDifference = Math.max(rowDifference, Math.abs(bar.data[at(x, y) + k] - bar.data[at(x) + k]));
+      }
+    }
+    colours.push([sum[0] / rows.length, sum[1] / rows.length, sum[2] / rows.length]);
+  }
 
   // Steps: runs of one colour (every channel within 12 of the run's mean), at least 4 pixels long.
   const steps: BarStep[] = [];
@@ -310,7 +357,7 @@ function measureBar(bar: Pixels, file: BarFile) {
     const close = () => {
       if (run.length >= 4) {
         const rgb = sum.map((s) => round(s / run.length, 1)) as [number, number, number];
-        steps.push({ from: run[0], to: run[run.length - 1], rgb, warm: isWarm(...rgb), strength: round(colourStrength(...rgb), 3), name: '' });
+        steps.push({ from: run[0], to: run[run.length - 1], rgb, warm: isWarm(...rgb), blue: isBlue(...rgb), strength: round(colourStrength(...rgb), 3), name: '' });
       }
       run = [];
       sum = [0, 0, 0];
@@ -339,7 +386,9 @@ function measureBar(bar: Pixels, file: BarFile) {
     name: file.name,
     width: bar.width,
     height: bar.height,
-    row: best.row,
+    row,
+    rows: [rows[0], rows[rows.length - 1]] as [number, number],
+    rowDifference,
     from: x0,
     to: x1,
     colouredThreshold: file.coloured,
@@ -349,15 +398,26 @@ function measureBar(bar: Pixels, file: BarFile) {
     warmAtEnd: warmAt(x1),
     /** Each place the rule changes its answer, as a share of the bar from its first coloured pixel. */
     switches,
+    /** The first pixel past each of those places. */
+    switchPixels,
     /** Colour strength at every tenth of the bar, first end first. */
     strength: Array.from({ length: 11 }, (_, k) => strengthAt(k / 10)),
+    /** The colour of each column from `from` to `to`, first end first, for a smooth ramp (not a stepped bar). */
+    colours: file.stepped ? null : colours,
     steps,
     names: file.names ?? null,
     ends: file.ends ?? null,
     unit: file.unit ?? null,
   };
 }
-type Bar = ReturnType<typeof measureBar>;
+/** Where the numbers printed under a bar sit (measureBarLabels), or why they could not be found. */
+type BarLabels = ReturnType<typeof measureBarLabels>;
+type Bar = ReturnType<typeof measureBar> & {
+  /** Largest difference in a colour channel between the browser's drawing of the bar and the file's own numbers; null when only the browser's drawing was read. */
+  decodeDifference: number | null;
+  /** Where the printed numbers sit, for a bar given its `labels`; else null. */
+  labels: BarLabels | null;
+};
 
 // ---------- Which colour of the legend is under a struck note ----------
 
@@ -412,14 +472,13 @@ function classify(classes: ColourClass[], r: number, g: number, b: number): numb
 }
 /** A struck note's colour: the class with the most votes in its cell. Each pixel read above the
  *  floor votes for its class (or "no colour of the bar"), weighted by its colour strength. */
-function tally(classes: ColourClass[], chimes: { warm: boolean; votes: Float64Array }[]) {
-  const out = { warm: {} as Record<string, number>, cool: {} as Record<string, number> };
+function tally(classes: ColourClass[], chimes: { colour: ChimeColour; votes: Float64Array }[]) {
+  const out: Record<ChimeColour, Record<string, number>> = { warm: {}, cool: {}, blue: {} };
   for (const c of chimes) {
     let best = -1;
     for (let k = 0; k <= classes.length; k++) if (c.votes[k] > 0 && (best < 0 || c.votes[k] > c.votes[best])) best = k;
     const name = best < 0 ? 'nothing above the floor' : best === classes.length ? 'no colour of the bar' : classes[best].name;
-    const side = c.warm ? out.warm : out.cool;
-    side[name] = (side[name] ?? 0) + 1;
+    out[c.colour][name] = (out[c.colour][name] ?? 0) + 1;
   }
   return out;
 }
@@ -475,21 +534,24 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
   const crops = p.scene.regions.map((r) => ({ region: r, ...regionScan(pixels, frameWidth, r, mask) }));
   const largestLine = largestOf(buildScanScore(pixels, { kind: 'line' }, { mask }));
   const largestRadar = Math.max(...crops.map((c) => largestOf(buildScanScore(c.crop, c.shape, { mask: c.mask }))));
+  const blueClass = !!rule?.instruments.blue;
   const procedure: Settings = {
     measure: 'colour',
     floor: (Math.round(background.spread) + 12) / 255,
     full: { line: ceil20(largestLine), radar: ceil20(largestRadar) },
     mask: maskFile,
+    blueClass,
   };
-  const settings: Settings = rule ? { measure: rule.measure, floor: rule.floor, full: rule.full, mask: maskFile } : procedure;
+  const settings: Settings = rule ? { measure: rule.measure, floor: rule.floor, full: rule.full, mask: maskFile, blueClass } : procedure;
   const lineGrid: ScanGrid = { ...LINE_GRID, fullStrength: settings.full.line };
   const radarGrid: ScanGrid = { ...RADAR_GRID, fullStrength: settings.full.radar };
+  const as = { floor: settings.floor, measure: settings.measure, blueClass: settings.blueClass };
 
   // ---- The map sweep ----
-  const line = buildScanScore(pixels, { kind: 'line' }, { grid: lineGrid, floor: settings.floor, mask, measure: settings.measure });
-  const lineBrightness = buildScanScore(pixels, { kind: 'line' }, { grid: lineGrid, floor: settings.floor, mask, measure: 'brightness' });
-  const atOceanFloor = buildScanScore(pixels, { kind: 'line' }, { grid: lineGrid, floor: STRENGTH_FLOOR, mask, measure: settings.measure });
-  const cells = lineCells(pixels, lineGrid, settings.floor, undefined, mask);
+  const line = buildScanScore(pixels, { kind: 'line' }, { ...as, grid: lineGrid, mask });
+  const lineBrightness = buildScanScore(pixels, { kind: 'line' }, { ...as, grid: lineGrid, mask, measure: 'brightness' });
+  const atOceanFloor = buildScanScore(pixels, { kind: 'line' }, { ...as, grid: lineGrid, mask, floor: STRENGTH_FLOOR });
+  const cells = lineCells(pixels, lineGrid, settings.floor, settings.blueClass, undefined, mask);
   let selfCheck = 0;
   for (let c = 0; c < cells.levels.length; c++) selfCheck = Math.max(selfCheck, Math.abs(cells.levels[c] - line.levels[c]));
 
@@ -515,7 +577,15 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
     try {
       const px = (await loadPicture(b.url)).pixels;
       barPixels.set(b.file, px);
-      bars.push(measureBar(px, b));
+      if (b.labels) {
+        // The bar file carries a colour profile, so the browser may convert it when it draws it.
+        // Measure the file's own numbers, and say how far the browser's drawing is from them.
+        const raw = await rawPixels(b.url);
+        const measured = measureBar(raw, b);
+        bars.push({ ...measured, decodeDifference: largestChannelDifference(px, raw), labels: measureBarLabels(raw, measured.rows[1], b.labels) });
+      } else {
+        bars.push({ ...measureBar(px, b), decodeDifference: null, labels: null });
+      }
     } catch {
       barsMissing.push(b.file);
     }
@@ -542,7 +612,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
       if (votes) votes[classOfPixel[q]] += colourStrength(pixels.data[q * 4], pixels.data[q * 4 + 1], pixels.data[q * 4 + 2]);
     }
   }
-  const lineColours = tally(classes, line.chimes.map((c) => ({ warm: c.warm, votes: lineVotes.get(c.column * lineGrid.bands + c.band)! })));
+  const lineColours = tally(classes, line.chimes.map((c) => ({ colour: c.colour, votes: lineVotes.get(c.column * lineGrid.bands + c.band)! })));
   // What the floor costs: cells where some pixels are drawn in a colour of NASA's bar (above the
   // floor), and how many of them sound at this floor and at the ocean's.
   const legendPixel = new Uint8Array(width * height);
@@ -570,7 +640,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
 
   // ---- The radar, each circle ----
   const regions = crops.map(({ region: r, crop, shape, mask: cropMask }) => {
-    const score = buildScanScore(crop, shape, { grid: radarGrid, floor: settings.floor, mask: cropMask, measure: settings.measure });
+    const score = buildScanScore(crop, shape, { ...as, grid: radarGrid, mask: cropMask });
     const votes = score.chimes.map((c) => {
       const v = new Float64Array(classes.length + 1);
       for (let i = 0; i < RADAR_SAMPLES; i++) {
@@ -586,7 +656,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
           v[cls < 0 ? classes.length : cls] += s;
         }
       }
-      return { warm: c.warm, votes: v };
+      return { colour: c.colour, votes: v };
     });
     // Where the circle is and how wide it is on the ground. The frame is a whole-globe map with
     // x = (lon + 180) · width ÷ 360 and y = (90 − lat) · height ÷ 180 (assets/source_manifest.json).
@@ -603,14 +673,14 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
       groundRatio: (eastWest * Math.cos((lat * Math.PI) / 180)) / northSouth,
       radar: summarise(score),
       /** The same circle at the ocean's floor, 12/255, for the record. */
-      radarAtOceanFloor: summarise(buildScanScore(crop, shape, { grid: radarGrid, floor: STRENGTH_FLOOR, mask: cropMask, measure: settings.measure })),
+      radarAtOceanFloor: summarise(buildScanScore(crop, shape, { ...as, grid: radarGrid, mask: cropMask, floor: STRENGTH_FLOOR })),
       colours: tally(classes, votes),
     };
   });
 
   // ---- Equal latitude bands on a stretched map ----
   const { columns, bands } = LINE_GRID;
-  const weighted = lineCells(pixels, lineGrid, settings.floor, (y) => Math.cos(((90 - ((y + 0.5) * 180) / height) * Math.PI) / 180), mask);
+  const weighted = lineCells(pixels, lineGrid, settings.floor, settings.blueClass, (y) => Math.cos(((90 - ((y + 0.5) * 180) / height) * Math.PI) / 180), mask);
   const latitude = {
     bands: Array.from({ length: bands }, (_, band) => {
       const south = -90 + (180 * band) / bands;
@@ -641,7 +711,7 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
       };
     }),
     chimes: line.chimes.length,
-    chimesWeighted: findChimes(weighted.levels, weighted.warmShare, lineGrid, false, CHIME_RULE, weighted.read).length,
+    chimesWeighted: findChimes(weighted.levels, weighted.warmShare, lineGrid, false, CHIME_RULE, weighted.read, settings.blueClass ? weighted.blueShare : undefined).length,
   };
 
   // ---- Which of NASA's frames the still is, and the still against that frame ----
@@ -669,9 +739,23 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
         best: { frame: best.frame, time: best.time, file: best.file, meanDifference: best.meanDifference },
         runnerUp: second ? { frame: second.frame, meanDifference: second.meanDifference } : null,
       };
-      frame = await compareWithFrame(p, best.url, best.frame, pixels, mask, maskUrl, settings, lineGrid, radarGrid, line);
+      frame = await compareWithFrame(p, best.url, best.frame, pixels, mask, maskUrl, settings, lineGrid, radarGrid, line, bars, files?.stills ?? []);
     }
   }
+  // The two checks that need the uncompressed frame and a smooth colour bar (the ocean picture): do
+  // the frame's lines use the bar's colours, and which copy of the frame should the scan read?
+  type Palette = ReturnType<typeof frameAgainstBar>;
+  type Stills = ReturnType<typeof compareStills>;
+  let palette: Palette | null = null;
+  let stills: Stills | null = null;
+  if (frame) {
+    palette = (frame.palette ?? null) as Palette | null;
+    stills = (frame.stills ?? null) as Stills | null;
+    delete frame.palette;
+    delete frame.stills;
+  }
+  /** The bar the palette was read against, if any. */
+  const paletteBar = bars.findIndex((b) => b.colours);
 
   const summaryLine = summarise(line);
   const quoted: Record<string, number> = {
@@ -692,17 +776,31 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
     lineLeftOut: summaryLine.peaks - summaryLine.chimes,
     lineWarm: summaryLine.warm,
     lineCool: summaryLine.cool,
+    lineBlue: summaryLine.blue,
+    latitudeChimesWeighted: latitude.chimesWeighted,
   };
+  if (still) {
+    quoted.stillDifference = round(still.best.meanDifference, 2);
+    if (still.runnerUp) quoted.stillRunnerUpDifference = round(still.runnerUp.meanDifference, 2);
+    quoted.stillCandidates = still.candidates.length;
+  }
   regions.forEach((r, i) => {
     quoted[`radar${i}Peaks`] = r.radar.peaks;
     quoted[`radar${i}Chimes`] = r.radar.chimes;
     quoted[`radar${i}LeftOut`] = r.radar.peaks - r.radar.chimes;
     quoted[`radar${i}Warm`] = r.radar.warm;
     quoted[`radar${i}Cool`] = r.radar.cool;
+    quoted[`radar${i}Blue`] = r.radar.blue;
     quoted[`radar${i}LargestMean`] = round(r.radar.largestCellMean, 2);
     quoted[`radar${i}SoundingPct`] = round((100 * r.radar.sounding) / r.radar.cells, 0);
   });
   if (mask) quoted.maskPct = round((100 * masked) / (width * height), 2);
+  if (legendDrawn) {
+    // Cells where 10% or more of the pixels are drawn in a colour of NASA's bar: how many sound.
+    quoted.legend10Cells = legendDrawn[1].cells;
+    quoted.legend10Sounding = legendDrawn[1].sounding;
+    quoted.legend10SoundingAtOceanFloor = legendDrawn[1].soundingAtOceanFloor;
+  }
   if (greyLand) {
     quoted.greyLand90Cells = greyLand.cells;
     quoted.greyLand90Sounding = greyLand.sounding;
@@ -710,11 +808,25 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
   bars.forEach((b, i) => {
     quoted[`bar${i}Switches`] = b.switches.length;
     if (b.switches.length) quoted[`bar${i}SwitchPct`] = round(100 * b.switches[0].at, 1);
-    if (b.switches.length && b.ends) quoted[`bar${i}SwitchValue`] = round(b.ends[0] + b.switches[0].at * (b.ends[1] - b.ends[0]), 1);
+    const fit = b.labels && !('error' in b.labels) ? b.labels.byInk : null;
+    if (b.switches.length && fit) {
+      // The switch's edge (half a pixel before the first pixel past it) read through the straight
+      // line fitted to where the bar's printed labels sit: the scale is measured, not assumed.
+      quoted[`bar${i}SwitchValue`] = round((b.switchPixels[0] - 0.5 - fit.a) / fit.b, 1);
+      /** The largest distance of a printed label from that line, in the bar's own unit. */
+      quoted[`bar${i}LabelsOffC`] = round(fit.largest / fit.b, 2);
+    } else if (b.switches.length && b.ends) {
+      quoted[`bar${i}SwitchValue`] = round(b.ends[0] + b.switches[0].at * (b.ends[1] - b.ends[0]), 1);
+    }
     const first = b.steps.findIndex((s, k) => k > 0 && s.warm !== b.steps[k - 1].warm);
     if (first > 0) quoted[`bar${i}SwitchStep`] = first + 1; // the first step on the other side, counted from 1
     quoted[`bar${i}Steps`] = b.steps.length;
+    quoted[`bar${i}WarmSteps`] = b.steps.filter((s) => s.warm).length;
+    quoted[`bar${i}BlueSteps`] = b.steps.filter((s) => s.blue).length;
   });
+  // Weighted by colour strength, as the scan weighs them: the share of the frame's colour that is on
+  // the same side of the instrument switch as the bar colour of the nearest hue.
+  if (palette && paletteBar >= 0) quoted[`bar${paletteBar}HueSamePct`] = round(100 * palette.all.agreeByMass, 2);
   if (frame && typeof frame.exactQuiet90Cells === 'number') {
     quoted.exactQuiet90Cells = frame.exactQuiet90Cells as number;
     quoted.exactQuiet90Sounding = frame.exactQuiet90Sounding as number;
@@ -748,6 +860,8 @@ async function auditPicture(p: Picture, files: PictureFiles | undefined) {
     bars,
     barsMissing,
     frame,
+    palette,
+    stills,
     quoted,
   };
 }
@@ -764,6 +878,8 @@ async function compareWithFrame(
   lineGrid: ScanGrid,
   radarGrid: ScanGrid,
   stillLine: ScanScore,
+  bars: Bar[],
+  extraStills: { name: string; url: string }[],
 ): Promise<Record<string, unknown>> {
   let exact: Pixels;
   try {
@@ -772,7 +888,8 @@ async function compareWithFrame(
     return { error: (e as Error).message };
   }
   const mask = maskUrl ? await loadMask(maskUrl, exact.width, exact.height) : null;
-  const b = buildScanScore(exact, { kind: 'line' }, { grid: lineGrid, floor: settings.floor, mask, measure: settings.measure });
+  const as = { floor: settings.floor, measure: settings.measure, blueClass: settings.blueClass };
+  const b = buildScanScore(exact, { kind: 'line' }, { ...as, grid: lineGrid, mask });
   let sum = 0;
   let top = 0;
   let both = 0;
@@ -783,7 +900,7 @@ async function compareWithFrame(
     top = Math.max(top, d);
     both++;
   }
-  const key = (c: { column: number; band: number; warm: boolean }) => `${c.column}:${c.band}:${c.warm}`;
+  const key = (c: { column: number; band: number; colour: ChimeColour }) => `${c.column}:${c.band}:${c.colour}`;
   const exactChimes = new Set(b.chimes.map(key));
   const sounding = (s: ScanScore) => s.levels.filter((l) => l > 0).length;
   const out: Record<string, unknown> = {
@@ -797,8 +914,8 @@ async function compareWithFrame(
     regions: p.scene.regions.map((r) => {
       const s = regionScan(still, p.scene.frames.width, r, stillMask);
       const e = regionScan(exact, p.scene.frames.width, r, mask);
-      const sa = buildScanScore(s.crop, s.shape, { grid: radarGrid, floor: settings.floor, mask: s.mask, measure: settings.measure });
-      const ea = buildScanScore(e.crop, e.shape, { grid: radarGrid, floor: settings.floor, mask: e.mask, measure: settings.measure });
+      const sa = buildScanScore(s.crop, s.shape, { ...as, grid: radarGrid, mask: s.mask });
+      const ea = buildScanScore(e.crop, e.shape, { ...as, grid: radarGrid, mask: e.mask });
       const ek = new Set(ea.chimes.map(key));
       return { id: r.id, still: sa.chimes.length, frame: ea.chimes.length, samePlaceAndInstrument: sa.chimes.filter((c) => ek.has(key(c))).length };
     }),
@@ -835,8 +952,411 @@ async function compareWithFrame(
       exactQuiet90Sounding: groups[2].sounding,
       exactQuiet90Largest255: round(groups[2].largestMean * 255, 2),
     });
+
+    // Do the frame's lines use the colours of NASA's colour bar (a smooth ramp, read as the file stores it)?
+    const ramp = bars.find((x) => x.colours);
+    if (ramp?.colours) out.palette = frameAgainstBar(exact, ramp.colours, PALETTE_TOLERANCE_DEGREES);
+
+    // Which still should the scan read? Each copy of this frame against the uncompressed one.
+    const candidates: { name: string; url: string | null; pixels: Pixels }[] = [{ name: 'app', url: p.imageUrl, pixels: still }];
+    for (const s of extraStills) {
+      try {
+        candidates.push({ name: s.name, url: s.url, pixels: (await loadPicture(s.url)).pixels });
+      } catch {
+        // A copy missing on this machine is left out; the report lists what was compared.
+      }
+    }
+    candidates.push({ name: 'uncompressed', url, pixels: exact });
+    out.stills = compareStills(candidates, exact, p.scene.regions, p.scene.frames.width);
   }
   return out;
+}
+
+/**
+ * Where the numbers printed under the bar sit, and whether they lie on one straight line. Below
+ * the bar's coloured rows come its frame, a gap, and the row of labels. A label's place is the
+ * centre of its ink (each pixel weighted by how much of the label it is); the centre of its box is
+ * given too. A straight line x = a + b · value is fitted to the places by least squares.
+ */
+function measureBarLabels(bar: Pixels, lastBarRow: number, values: number[]) {
+  const { data, width, height } = bar;
+  let translucent = false;
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] < 250) {
+      translucent = true;
+      break;
+    }
+  }
+  // How much of a label a pixel is: its opacity on a transparent bar, its darkness on an opaque one.
+  const ink = (x: number, y: number) => {
+    const i = (y * width + x) * 4;
+    return translucent ? data[i + 3] / 255 : (255 - (data[i] + data[i + 1] + data[i + 2]) / 3) / 255;
+  };
+  const rowInk = (y: number) => {
+    let s = 0;
+    for (let x = 0; x < width; x++) s += ink(x, y);
+    return s;
+  };
+  let y = lastBarRow + 1;
+  while (y < height && rowInk(y) > 0.5) y++; // the bar's frame
+  while (y < height && rowInk(y) <= 0.5) y++; // the gap
+  const top = y;
+  while (y < height && rowInk(y) > 0.5) y++;
+  const bottom = y - 1;
+  if (top >= height || bottom < top) return { error: 'no row of labels was found under the bar' };
+
+  const column = Array.from({ length: width }, (_, x) => {
+    let s = 0;
+    for (let r = top; r <= bottom; r++) s += ink(x, r);
+    return s;
+  });
+  // Six empty columns or more start a new label; the digits of one label are closer than that.
+  const groups: number[][] = [];
+  let gap = Infinity;
+  for (let x = 0; x < width; x++) {
+    if (column[x] > 0.05) {
+      if (gap >= 6) groups.push([]);
+      groups[groups.length - 1].push(x);
+      gap = 0;
+    } else {
+      gap++;
+    }
+  }
+  if (groups.length !== values.length) {
+    return { error: `${groups.length} labels were found under the bar (rows ${top} to ${bottom}), not ${values.length}` };
+  }
+  const labels = groups.map((xs, k) => {
+    const mass = xs.reduce((s, x) => s + column[x], 0);
+    return {
+      value: values[k],
+      from: xs[0],
+      to: xs[xs.length - 1],
+      centre: xs.reduce((s, x) => s + x * column[x], 0) / mass,
+      boxCentre: (xs[0] + xs[xs.length - 1]) / 2,
+    };
+  });
+  const fit = (place: (l: (typeof labels)[number]) => number) => {
+    const n = labels.length;
+    const mv = labels.reduce((s, l) => s + l.value, 0) / n;
+    const mx = labels.reduce((s, l) => s + place(l), 0) / n;
+    const b = labels.reduce((s, l) => s + (l.value - mv) * (place(l) - mx), 0) / labels.reduce((s, l) => s + (l.value - mv) ** 2, 0);
+    const a = mx - b * mv;
+    const residuals = labels.map((l) => place(l) - (a + b * l.value));
+    return { a, b, residuals, largest: Math.max(...residuals.map(Math.abs)) };
+  };
+  return { translucent, rows: [top, bottom] as [number, number], labels, byInk: fit((l) => l.centre), byBox: fit((l) => l.boxCentre) };
+}
+
+/** A pixel's hue in degrees, 0 to 360 (red 0, green 120, blue 240). NaN for grey, which has none.
+ *  Scaling all three channels by the same number does not change it, so a line drawn faintly over
+ *  black (anti-aliased) keeps the hue of its colour. */
+function hueOf(r: number, g: number, b: number): number {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  if (d === 0) return NaN;
+  const h = 60 * (max === r ? (g - b) / d : max === g ? (b - r) / d + 2 : (r - g) / d + 4);
+  return h < 0 ? h + 360 : h;
+}
+const hueGap = (a: number, b: number) => {
+  const d = Math.abs(a - b) % 360;
+  return Math.min(d, 360 - d);
+};
+
+/** The spread of a pixel (largest − smallest channel, 0–255) in four groups, faint to strong. */
+const SPREAD_GROUPS: [number, number][] = [[13, 31], [32, 63], [64, 127], [128, 255]];
+
+/**
+ * Do the frame's coloured pixels use the colours of NASA's colour bar? For every pixel above the
+ * scan's floor (spread over 12), find the bar colour with the nearest hue, and the bar colour at
+ * the smallest angle between the two (red, green, blue) arrows. Neither changes when a colour is
+ * drawn faintly over black. Then: is the pixel on the same side of the instrument switch as that
+ * bar colour?
+ */
+function frameAgainstBar(frame: Pixels, colours: [number, number, number][], toleranceDegrees: number) {
+  const n = colours.length;
+  const barHue = colours.map(([r, g, b]) => hueOf(r, g, b));
+  const barWarm = colours.map(([r, g, b]) => isWarm(r, g, b));
+  const barLength = colours.map(([r, g, b]) => Math.hypot(r, g, b));
+  // Is the bar's hue one-way from end to end? Then each hue is found at one place only.
+  let up = 0;
+  let down = 0;
+  const reversals: number[] = [];
+  let direction = 0;
+  for (let j = 1; j < n; j++) {
+    let d = barHue[j] - barHue[j - 1];
+    if (d > 180) d -= 360;
+    if (d < -180) d += 360;
+    if (d > 0) up++;
+    if (d < 0) down++;
+    const s = Math.sign(d);
+    if (s !== 0 && direction !== 0 && s !== direction) reversals.push(j / (n - 1));
+    if (s !== 0) direction = s;
+  }
+
+  // Count each colour once: the frame has far fewer colours than pixels.
+  const seen = new Map<number, number>();
+  const { data } = frame;
+  for (let i = 0; i < data.length; i += 4) {
+    if (spreadOf(data, i) <= 12) continue;
+    const key = (data[i] << 16) | (data[i + 1] << 8) | data[i + 2];
+    seen.set(key, (seen.get(key) ?? 0) + 1);
+  }
+
+  const BINS = 3600; // 0.05° bins of hue distance, 0 to 180°
+  const group = () => ({ pixels: 0, mass: 0, withinPixels: 0, withinMass: 0, adaptivePixels: 0, adaptiveMass: 0, anglePixels: 0, agreeMass: 0, agreePixels: 0, histogram: new Float64Array(BINS) });
+  const groups = SPREAD_GROUPS.map(group);
+  const all = group();
+  const offBar = new Map<number, { mass: number; pixels: number; example: number; exampleCount: number }>();
+  const disagreeAt = new Float64Array(20); // where on the bar (by twentieths) the pixels that disagree sit
+  let warmMass = 0;
+  let pastSwitchMass = 0;
+  // For each tenth of the bar, how strong the colours of the frame's pixels of those hues are:
+  // a histogram of their spread, and the brightest one's brightness against the bar's.
+  const tenths = Array.from({ length: 10 }, () => ({ spread: new Float64Array(256), pixels: 0, brightest: 0, brightestBar: 0, saturation: new Float64Array(201) }));
+
+  for (const [key, count] of seen) {
+    const r = key >> 16;
+    const g = (key >> 8) & 255;
+    const b = key & 255;
+    const spread = Math.max(r, g, b) - Math.min(r, g, b);
+    const strength = spread / 255;
+    const h = hueOf(r, g, b);
+    let nearest = 0;
+    let dHue = Infinity;
+    let bestCos = -Infinity;
+    const length = Math.hypot(r, g, b);
+    for (let j = 0; j < n; j++) {
+      const d = hueGap(h, barHue[j]);
+      if (d < dHue) {
+        dHue = d;
+        nearest = j;
+      }
+      const c = (r * colours[j][0] + g * colours[j][1] + b * colours[j][2]) / (length * barLength[j]);
+      if (c > bestCos) bestCos = c;
+    }
+    const angle = (Math.acos(Math.min(1, bestCos)) * 180) / Math.PI;
+    const agree = isWarm(r, g, b) === barWarm[nearest];
+    const within = dHue <= toleranceDegrees;
+    // Rounding to whole grey levels moves the hue by up to 60° ÷ spread for each level; allow two.
+    const adaptive = dHue <= Math.max(toleranceDegrees, 120 / spread);
+    const mass = count * strength;
+    if (isWarm(r, g, b)) warmMass += mass;
+    if (barWarm[nearest]) pastSwitchMass += mass;
+    for (const target of [all, groups[SPREAD_GROUPS.findIndex(([lo, hi]) => spread >= lo && spread <= hi)]]) {
+      target.pixels += count;
+      target.mass += mass;
+      if (within) {
+        target.withinPixels += count;
+        target.withinMass += mass;
+      }
+      if (adaptive) {
+        target.adaptivePixels += count;
+        target.adaptiveMass += mass;
+      }
+      if (angle <= toleranceDegrees) target.anglePixels += count;
+      if (agree) {
+        target.agreeMass += mass;
+        target.agreePixels += count;
+      }
+      target.histogram[Math.min(BINS - 1, Math.floor(dHue / 0.05))] += count;
+    }
+    if (!agree) disagreeAt[Math.min(19, Math.floor((20 * nearest) / n))] += mass;
+    const tenth = tenths[Math.min(9, Math.floor((10 * nearest) / n))];
+    tenth.spread[spread] += count;
+    tenth.pixels += count;
+    const value = Math.max(r, g, b);
+    const [br, bg, bb] = colours[nearest];
+    const barValue = Math.max(br, bg, bb);
+    if (value / barValue > tenth.brightest / Math.max(1, tenth.brightestBar)) {
+      tenth.brightest = value;
+      tenth.brightestBar = barValue;
+    }
+    // Saturation (spread ÷ largest channel) of the pixel against that of its bar colour, in hundredths, up to 2.
+    const ratio = spread / value / ((barValue - Math.min(br, bg, bb)) / barValue);
+    tenth.saturation[Math.min(200, Math.round(100 * ratio))] += count;
+    if (!adaptive) {
+      const bin = Math.floor(h / 10) * 10;
+      const o = offBar.get(bin) ?? { mass: 0, pixels: 0, example: key, exampleCount: 0 };
+      o.mass += mass;
+      o.pixels += count;
+      if (count > o.exampleCount) {
+        o.example = key;
+        o.exampleCount = count;
+      }
+      offBar.set(bin, o);
+    }
+  }
+
+  const percentile = (histogram: Float64Array, total: number, p: number) => {
+    let run = 0;
+    for (let k = 0; k < BINS; k++) {
+      run += histogram[k];
+      if (run >= p * total) return (k + 1) * 0.05;
+    }
+    return 180;
+  };
+  const summary = (g: ReturnType<typeof group>) => ({
+    pixels: g.pixels,
+    mass: g.mass,
+    /** Pixels further than the tolerance from every bar hue, and further than the tolerance or two grey levels. */
+    outside: g.pixels - g.withinPixels,
+    outsideAdaptive: g.pixels - g.adaptivePixels,
+    within: g.pixels ? g.withinPixels / g.pixels : 0,
+    withinByMass: g.mass ? g.withinMass / g.mass : 0,
+    adaptive: g.pixels ? g.adaptivePixels / g.pixels : 0,
+    adaptiveByMass: g.mass ? g.adaptiveMass / g.mass : 0,
+    angleWithin: g.pixels ? g.anglePixels / g.pixels : 0,
+    agree: g.pixels ? g.agreePixels / g.pixels : 0,
+    agreeByMass: g.mass ? g.agreeMass / g.mass : 0,
+    p50: percentile(g.histogram, g.pixels, 0.5),
+    p90: percentile(g.histogram, g.pixels, 0.9),
+    p99: percentile(g.histogram, g.pixels, 0.99),
+  });
+  const offTotal = Array.from(offBar.values()).reduce((s, o) => s + o.mass, 0);
+  const fromHistogram = (histogram: Float64Array, total: number, p: number, scale: number) => {
+    let run = 0;
+    for (let k = 0; k < histogram.length; k++) {
+      run += histogram[k];
+      if (run >= p * total) return k / scale;
+    }
+    return (histogram.length - 1) / scale;
+  };
+  const barStrength = colours.map(([r, g, b]) => (Math.max(r, g, b) - Math.min(r, g, b)) / 255);
+  const strengthByTenth = tenths.map((t, k) => {
+    const part = barStrength.slice(Math.floor((k * n) / 10), Math.floor(((k + 1) * n) / 10));
+    let top = 0;
+    for (let s = 255; s >= 0; s--) {
+      if (t.spread[s] > 0) {
+        top = s;
+        break;
+      }
+    }
+    return {
+      pixels: t.pixels,
+      /** The bar's own colour strength, averaged over this tenth. */
+      bar: part.reduce((s, x) => s + x, 0) / part.length,
+      /** The strongest frame pixel of these hues, and the strength 99% of them are below. */
+      frameLargest: top / 255,
+      frame99: fromHistogram(t.spread, t.pixels, 0.99, 255),
+      /** The brightest pixel's largest channel against its bar colour's. */
+      brightestAgainstBar: t.brightestBar ? t.brightest / t.brightestBar : 0,
+      /** Middle saturation ratio, pixel against its bar colour. */
+      saturationRatio: fromHistogram(t.saturation, t.pixels, 0.5, 100),
+    };
+  });
+  return {
+    toleranceDegrees,
+    colours: seen.size,
+    /** How far apart neighbouring bar colours are in hue, at most: any hue inside the bar's range is within half of this of a bar colour. */
+    largestHueStep: Math.max(...barHue.slice(1).map((h, j) => hueGap(h, barHue[j]))),
+    strengthByTenth,
+    bar: { hueAtColdEnd: barHue[0], hueAtWarmEnd: barHue[n - 1], stepsUp: up, stepsDown: down, reversals },
+    all: summary(all),
+    groups: SPREAD_GROUPS.map((range, k) => ({ range, ...summary(groups[k]) })),
+    /** Share of the colour (each pixel weighted by its colour strength) that is warm by the pixel rule. */
+    warmShare: all.mass ? warmMass / all.mass : 0,
+    /** Share of the colour whose nearest bar colour is past the switch. */
+    pastSwitchShare: all.mass ? pastSwitchMass / all.mass : 0,
+    /** Where on the bar the colour that disagrees sits, by twentieths of the bar, as a share of all colour. */
+    disagreeAt: Array.from(disagreeAt, (m) => (all.mass ? m / all.mass : 0)),
+    /** Colour further from the bar than the tolerance allows, by 10° of hue, largest first. */
+    offBar: Array.from(offBar.entries())
+      .map(([hue, o]) => ({ hue, share: all.mass ? o.mass / all.mass : 0, ofOffBar: offTotal ? o.mass / offTotal : 0, pixels: o.pixels, example: [o.example >> 16, (o.example >> 8) & 255, o.example & 255] }))
+      .sort((p, q) => q.share - p.share)
+      .slice(0, 6),
+  };
+}
+
+/** A picture's pixels exactly as stored in the file: no colour management. The app's own path
+ *  (`loadPicture`) lets the browser convert an image that carries a colour profile. */
+async function rawPixels(url: string): Promise<Pixels> {
+  const blob = await (await fetch(url)).blob();
+  const bitmap = await createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
+  const canvas = document.createElement('canvas');
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+  ctx.drawImage(bitmap, 0, 0);
+  const d = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  return { data: d.data, width: d.width, height: d.height };
+}
+
+/** Largest difference in any colour channel between two decodes, over the pixels both show fully opaque. */
+function largestChannelDifference(a: Pixels, b: Pixels): number {
+  let top = 0;
+  for (let i = 0; i < a.data.length; i += 4) {
+    if (a.data[i + 3] < 255 || b.data[i + 3] < 255) continue;
+    for (let k = 0; k < 3; k++) top = Math.max(top, Math.abs(a.data[i + k] - b.data[i + k]));
+  }
+  return top;
+}
+
+/** The hue tolerance for "uses the bar's colours", in degrees. */
+const PALETTE_TOLERANCE_DEGREES = 3;
+
+type Chimeish = { column: number; band: number; warm: boolean };
+const chimeKey = (c: Chimeish) => `${c.column}:${c.band}:${c.warm}`;
+const placeKey = (c: Chimeish) => `${c.column}:${c.band}`;
+
+/** One scan of a still against the same scan of the uncompressed frame. */
+function againstExact(score: ReturnType<typeof buildScanScore>, exact: ReturnType<typeof buildScanScore>) {
+  const same = new Set(exact.chimes.map(chimeKey));
+  const samePlace = new Set(exact.chimes.map(placeKey));
+  let sum = 0;
+  let top = 0;
+  for (let c = 0; c < score.levels.length; c++) {
+    const d = Math.abs(score.levels[c] - exact.levels[c]);
+    sum += d;
+    top = Math.max(top, d);
+  }
+  return {
+    sounding: score.levels.filter((l) => l > 0).length,
+    cells: score.levels.length,
+    chimes: score.chimes.length,
+    warm: score.chimes.filter((c) => c.warm).length,
+    cool: score.chimes.filter((c) => !c.warm).length,
+    /** Chimes at the same column and band as one of the uncompressed frame, on the same instrument. */
+    samePlaceAndInstrument: score.chimes.filter((c) => same.has(chimeKey(c))).length,
+    /** At the same column and band, whichever instrument. */
+    samePlace: score.chimes.filter((c) => samePlace.has(placeKey(c))).length,
+    meanLevelChange: sum / score.levels.length,
+    largestLevelChange: top,
+  };
+}
+
+/**
+ * Each candidate still against the uncompressed frame: the map sweep and the radar on each approved
+ * circle, read exactly as the app reads them, and the globe's land rule on each circle (the globe
+ * draws the still at the frame's size and counts flat grey pixels: geo.ts, landShare).
+ */
+function compareStills(
+  candidates: { name: string; url: string | null; pixels: Pixels }[],
+  exact: Pixels,
+  regions: { id: string; name: string; center_px: [number, number]; radius_px: number; box_px: [number, number, number, number] }[],
+  frameWidth: number,
+) {
+  const exactLine = buildScanScore(exact, { kind: 'line' });
+  const exactRadar = regions.map((r) => {
+    const { crop, shape } = regionScan(exact, frameWidth, r);
+    return buildScanScore(crop, shape);
+  });
+  return candidates.map(({ name, url, pixels }) => {
+    const k = pixels.width / frameWidth;
+    return {
+      name,
+      url,
+      size: { width: pixels.width, height: pixels.height },
+      /** Largest difference in any channel of any pixel from the uncompressed frame: 0 means the same picture. */
+      largestPixelDifference: pixels.width === exact.width && pixels.height === exact.height ? largestChannelDifference(pixels, exact) : null,
+      line: againstExact(buildScanScore(pixels, { kind: 'line' }), exactLine),
+      regions: regions.map((r, i) => {
+        const { crop, shape } = regionScan(pixels, frameWidth, r);
+        const spot = { center_px: [Math.round(r.center_px[0] * k), Math.round(r.center_px[1] * k)] as [number, number], radius_px: Math.round(r.radius_px * k) };
+        return { id: r.id, name: r.name, radar: againstExact(buildScanScore(crop, shape), exactRadar[i]), land: landShare(pixels.data, pixels.width, pixels.height, spot, OCEAN_LAND) };
+      }),
+    };
+  });
 }
 
 export async function runAudit(options: AuditOptions) {
