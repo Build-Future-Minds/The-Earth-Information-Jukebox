@@ -141,7 +141,8 @@ browser.** Test on the demo machine before relying on it.
 ## D9. Play along: a picture scan and new instruments, kept apart from the Earth voice
 
 **Design choice**, after **Verified** NASA examples. Owner: Dev A, 15 Nov. Code:
-`web/src/audio/scanScore.ts`, `scanPlayer.ts`, `instruments.ts`, `components/PictureScan.tsx`.
+`web/src/audio/scanScore.ts`, `scanPlayer.ts`, `instruments.ts`, `components/PictureScan.tsx`, and
+`web/src/scan/` (what every view of the scan shares: picture, score, player, drawing loop, controls, legend).
 Rule, settings, measurements and limits: `mapping_spec.md`, "Play along: the picture scan".
 
 **What:** the "Play along" section has two extras. "Play the picture" sweeps a line over the

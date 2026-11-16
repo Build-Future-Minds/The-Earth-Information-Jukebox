@@ -55,7 +55,8 @@ No sound plays until you press Start.
 | `src/audio/scanScore.ts` | Play along: turns the pixels under a scan line into held notes and chimes (pure functions) |
 | `src/audio/scanPlayer.ts` | Play along: plays a scan with its own clock, instruments and volume |
 | `src/audio/instruments.ts` | Play along: marimba, bells, choir pad, the melody sounds and the reverb (all synthesised) |
-| `src/components/PictureScan.tsx` | "Play the picture": the image with the moving line, and the scan controls |
+| `src/components/PictureScan.tsx` | "Play the picture": the flat image with the moving line |
+| `src/scan/` | What every view of the scan shares: the picture, the score, the player and the marks (`useScan.ts`), the drawing loop (`useScanFrame.ts`), the controls, the bars and the legend |
 | `src/components/MelodyPad.tsx` | "Your melody": the keys, the sound choice and its volume |
 
 ## Deploy
