@@ -1,42 +1,376 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-11-15T00:00:00Z",
-  "title": "Design System: Tide Table",
-  "scope": "The app (web/, styles in web/src/styles.css) and the listening game (tools/listening_game.html). Shared tokens (the game names its region slots --patch-1 and --patch-2, same values as --region-a and --region-b), shared graticule and theme switch, shared theme choice in localStorage key es-theme.",
+  "title": "Design System: Pulse Catalogue",
+  "scope": "The app (web/, styles in web/src/styles.css, Geist and Geist Mono loaded in web/src/main.tsx). Visual world only; page layouts are owned per page in docs/page_plan.md. The listening game (tools/listening_game.html) still uses the Tide Table tokens until its own redesign (docs/page_plan.md, P5); it shares the theme choice in localStorage key es-theme.",
   "extensions": {
     "colorMeta": {
-      "signal": { "role": "secondary", "displayName": "High-Water Signal", "canonical": "oklch(0.55 0.18 33)", "dark": "oklch(0.72 0.17 42)", "tonalRamp": ["oklch(0.20 0.06 33)", "oklch(0.30 0.10 33)", "oklch(0.40 0.14 33)", "oklch(0.55 0.18 33)", "oklch(0.65 0.17 38)", "oklch(0.72 0.17 42)", "oklch(0.84 0.09 42)", "oklch(0.95 0.03 42)"] },
-      "action": { "role": "primary", "displayName": "Tide Blue", "canonical": "oklch(0.48 0.13 255)", "dark": "oklch(0.74 0.11 250)", "tonalRamp": ["oklch(0.20 0.05 255)", "oklch(0.30 0.09 255)", "oklch(0.42 0.13 255)", "oklch(0.48 0.13 255)", "oklch(0.60 0.12 253)", "oklch(0.74 0.11 250)", "oklch(0.86 0.06 250)", "oklch(0.95 0.02 250)"] },
-      "region-a": { "role": "tertiary", "displayName": "Region A Violet", "canonical": "oklch(0.47 0.15 300)", "dark": "oklch(0.77 0.11 300)", "tonalRamp": ["oklch(0.20 0.06 300)", "oklch(0.30 0.10 300)", "oklch(0.40 0.14 300)", "oklch(0.47 0.15 300)", "oklch(0.60 0.14 300)", "oklch(0.77 0.11 300)", "oklch(0.88 0.06 300)", "oklch(0.96 0.02 300)"] },
-      "region-b": { "role": "tertiary", "displayName": "Region B Rose", "canonical": "oklch(0.52 0.17 5)", "dark": "oklch(0.79 0.11 0)", "tonalRamp": ["oklch(0.20 0.06 5)", "oklch(0.32 0.11 5)", "oklch(0.42 0.15 5)", "oklch(0.52 0.17 5)", "oklch(0.64 0.15 3)", "oklch(0.79 0.11 0)", "oklch(0.89 0.06 0)", "oklch(0.96 0.02 0)"] },
-      "ink": { "role": "neutral", "displayName": "Navy Ink", "canonical": "oklch(0.26 0.05 260)", "dark": "oklch(0.95 0.01 250)", "tonalRamp": ["oklch(0.15 0.03 260)", "oklch(0.26 0.05 260)", "oklch(0.36 0.05 258)", "oklch(0.46 0.04 255)", "oklch(0.60 0.03 252)", "oklch(0.74 0.02 250)", "oklch(0.87 0.015 245)", "oklch(0.972 0.004 230)"] },
-      "ink-2": { "role": "neutral", "displayName": "Slate Ink", "canonical": "oklch(0.46 0.04 255)", "dark": "oklch(0.78 0.03 255)", "tonalRamp": ["oklch(0.15 0.03 260)", "oklch(0.26 0.05 260)", "oklch(0.36 0.05 258)", "oklch(0.46 0.04 255)", "oklch(0.60 0.03 252)", "oklch(0.74 0.02 250)", "oklch(0.87 0.015 245)", "oklch(0.972 0.004 230)"] },
-      "paper": { "role": "neutral", "displayName": "Almanac White", "canonical": "oklch(0.972 0.004 230)", "dark": "oklch(0.17 0.03 262)", "tonalRamp": ["oklch(0.15 0.03 262)", "oklch(0.26 0.05 260)", "oklch(0.46 0.04 255)", "oklch(0.70 0.02 250)", "oklch(0.87 0.015 245)", "oklch(0.94 0.008 240)", "oklch(0.96 0.005 235)", "oklch(0.972 0.004 230)"] },
-      "rule": { "role": "neutral", "displayName": "Hairline", "canonical": "oklch(0.87 0.015 245)", "dark": "oklch(0.34 0.035 262)", "tonalRamp": ["oklch(0.15 0.03 262)", "oklch(0.26 0.05 260)", "oklch(0.46 0.04 255)", "oklch(0.70 0.02 250)", "oklch(0.80 0.018 247)", "oklch(0.87 0.015 245)", "oklch(0.94 0.008 240)", "oklch(0.972 0.004 230)"] },
-      "rule-2": { "role": "neutral", "displayName": "Faint Hairline", "canonical": "oklch(0.94 0.008 240)", "dark": "oklch(0.225 0.035 262)", "tonalRamp": ["oklch(0.15 0.03 262)", "oklch(0.26 0.05 260)", "oklch(0.46 0.04 255)", "oklch(0.70 0.02 250)", "oklch(0.80 0.018 247)", "oklch(0.87 0.015 245)", "oklch(0.94 0.008 240)", "oklch(0.972 0.004 230)"] },
-      "well": { "role": "neutral", "displayName": "Chart Well", "canonical": "oklch(0.20 0.03 262)", "dark": "oklch(0.12 0.02 262)", "tonalRamp": ["oklch(0.08 0.015 262)", "oklch(0.12 0.02 262)", "oklch(0.16 0.025 262)", "oklch(0.20 0.03 262)", "oklch(0.28 0.035 262)", "oklch(0.38 0.035 260)", "oklch(0.55 0.03 258)", "oklch(0.75 0.02 255)"] }
+      "region-a": {
+        "role": "primary",
+        "displayName": "Side A Violet",
+        "canonical": "oklch(0.52 0.2 295)",
+        "dark": "oklch(0.73 0.16 295)",
+        "tonalRamp": [
+          "oklch(0.20 0.08 295)",
+          "oklch(0.30 0.13 295)",
+          "oklch(0.40 0.17 295)",
+          "oklch(0.52 0.2 295)",
+          "oklch(0.62 0.18 295)",
+          "oklch(0.73 0.16 295)",
+          "oklch(0.85 0.08 295)",
+          "oklch(0.95 0.03 295)"
+        ]
+      },
+      "region-b": {
+        "role": "primary",
+        "displayName": "Side B Rose",
+        "canonical": "oklch(0.53 0.19 5)",
+        "dark": "oklch(0.76 0.14 5)",
+        "tonalRamp": [
+          "oklch(0.22 0.08 15)",
+          "oklch(0.32 0.13 15)",
+          "oklch(0.44 0.18 15)",
+          "oklch(0.53 0.19 5)",
+          "oklch(0.65 0.19 15)",
+          "oklch(0.76 0.14 5)",
+          "oklch(0.86 0.08 15)",
+          "oklch(0.95 0.03 15)"
+        ]
+      },
+      "on-region": {
+        "role": "primary",
+        "displayName": "On Side",
+        "canonical": "oklch(0.99 0 0)",
+        "dark": "oklch(0.15 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Sleeve Ink",
+        "canonical": "oklch(0.15 0 0)",
+        "dark": "oklch(0.96 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Grey Ink",
+        "canonical": "oklch(0.42 0 0)",
+        "dark": "oklch(0.72 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "White Sleeve",
+        "canonical": "oklch(0.975 0 0)",
+        "dark": "oklch(0.15 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.82 0 0)",
+        "dark": "oklch(0.34 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "rule-2": {
+        "role": "neutral",
+        "displayName": "Faint Hairline",
+        "canonical": "oklch(0.93 0 0)",
+        "dark": "oklch(0.22 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "signal": {
+        "role": "neutral",
+        "displayName": "Signal (ink)",
+        "canonical": "oklch(0.15 0 0)",
+        "dark": "oklch(0.96 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ],
+        "alias": "var(--ink)"
+      },
+      "on-signal": {
+        "role": "neutral",
+        "displayName": "On Signal (paper)",
+        "canonical": "oklch(0.975 0 0)",
+        "dark": "oklch(0.15 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ],
+        "alias": "var(--paper)"
+      },
+      "action": {
+        "role": "neutral",
+        "displayName": "Action (ink)",
+        "canonical": "oklch(0.15 0 0)",
+        "dark": "oklch(0.96 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ],
+        "alias": "var(--ink)"
+      },
+      "action-hover": {
+        "role": "neutral",
+        "displayName": "Action Hover",
+        "canonical": "oklch(0.3 0 0)",
+        "dark": "oklch(0.85 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "on-action": {
+        "role": "neutral",
+        "displayName": "On Action (paper)",
+        "canonical": "oklch(0.975 0 0)",
+        "dark": "oklch(0.15 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ],
+        "alias": "var(--paper)"
+      },
+      "well": {
+        "role": "neutral",
+        "displayName": "Black Well",
+        "canonical": "oklch(0.15 0 0)",
+        "dark": "oklch(0.09 0 0)",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Picture White",
+        "canonical": "#ffffff",
+        "dark": "#ffffff",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      },
+      "black": {
+        "role": "neutral",
+        "displayName": "Picture Black",
+        "canonical": "#000000",
+        "dark": "#000000",
+        "tonalRamp": [
+          "oklch(0.09 0 0)",
+          "oklch(0.15 0 0)",
+          "oklch(0.22 0 0)",
+          "oklch(0.34 0 0)",
+          "oklch(0.42 0 0)",
+          "oklch(0.72 0 0)",
+          "oklch(0.82 0 0)",
+          "oklch(0.93 0 0)"
+        ]
+      }
+    },
+    "liveColor": {
+      "name": "--live",
+      "value": "the playing region's colour (var(--region-a) or var(--region-b)); var(--ink) on neutral pictures",
+      "setOn": "header.topbar and main.stage, from App.tsx",
+      "purpose": "End block on the current tab (7px) and on primary buttons (8px)."
     },
     "typographyMeta": {
-      "numeral": { "displayName": "Giant Numeral", "purpose": "Alignment number under each region's patch; weight 200 to 800 carries the value." },
-      "value": { "displayName": "Live Value", "purpose": "The live alignment readout in the now-playing row; weight follows alignment." },
-      "headline": { "displayName": "Page Title", "purpose": "H1 in the rail." },
-      "title": { "displayName": "Section Title", "purpose": "H2 section headings." },
-      "status": { "displayName": "Status Sentence", "purpose": "The one sentence about what is playing." },
-      "body": { "displayName": "Body", "purpose": "Prose, capped at 65 to 70ch." },
-      "label": { "displayName": "Label", "purpose": "Form labels, legends, table headers." },
-      "readout": { "displayName": "Readout (mono)", "purpose": "Numbers, coordinates, axes, key caps; the only use of the mono face." }
+      "numeral": {
+        "displayName": "Giant Numeral",
+        "purpose": "Alignment number in the region colour; weight 200 to 800 carries the value."
+      },
+      "value": {
+        "displayName": "Live Value",
+        "purpose": "The live alignment readout; weight follows alignment."
+      },
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "EARTH SONATA in the top bar, uppercase, 0.32em tracking."
+      },
+      "title": {
+        "displayName": "Section Title",
+        "purpose": "Section headings."
+      },
+      "status": {
+        "displayName": "Status Sentence",
+        "purpose": "The one sentence about what is playing."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose, capped at 65 to 70ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form labels and button text."
+      },
+      "caps": {
+        "displayName": "Caps Label",
+        "purpose": "Uppercase letterspaced labels: tabs, theme switch, legends (0.16em); icon-button labels, table headers, map tags, now chip (0.12em)."
+      },
+      "readout": {
+        "displayName": "Readout (mono)",
+        "purpose": "Numbers, coordinates, axes, dates, key caps, region letters; the only use of the mono face."
+      }
     },
     "shadows": [
-      { "name": "none", "value": "none", "purpose": "The system is flat. No elevation shadows." },
-      { "name": "map-tag-ring", "value": "0 0 0 2px #000", "purpose": "A solid outline (3px when active) so the region tag reads on any part of the picture. Not elevation." },
-      { "name": "current-underline", "value": "inset 0 -3px 0 var(--signal)", "purpose": "Marks the playing region's name in the rhythm rows." }
+      {
+        "name": "none",
+        "value": "none",
+        "purpose": "The system is flat. No elevation shadows."
+      },
+      {
+        "name": "map-tag-ring",
+        "value": "inset 0 0 0 1px oklch(1 0 0 / 0.5)",
+        "purpose": "Outline so the map tag reads on any part of the picture; full white when active. Not elevation."
+      },
+      {
+        "name": "current-underline",
+        "value": "inset 0 -3px 0 var(--region)",
+        "purpose": "Marks the playing region's name in the rhythm rows."
+      },
+      {
+        "name": "chime-ring",
+        "value": "0 0 0 3px var(--signal)",
+        "purpose": "Start of the 0.6s chime flash on a note bar."
+      },
+      {
+        "name": "pad-active",
+        "value": "inset 0 0 0 1px var(--ink)",
+        "purpose": "Doubles the active melody pad's border."
+      },
+      {
+        "name": "pulse-needle-halo",
+        "value": "0 0 0 1px oklch(0.1 0 0 / 0.6)",
+        "purpose": "Keeps the pulse plot needle legible over the white lines."
+      }
     ],
     "motion": [
-      { "name": "snap", "value": "180ms steps(2, jump-end)", "purpose": "Two 90 ms steps, no easing, for every state change. Disabled under prefers-reduced-motion." }
+      {
+        "name": "snap",
+        "value": "180ms steps(2, jump-end)",
+        "purpose": "Two 90 ms steps, no easing, for every state change. Disabled under prefers-reduced-motion."
+      },
+      {
+        "name": "chime-flash",
+        "value": "0.6s ease-out",
+        "purpose": "A note bar flashes ink when its band chimes. Disabled under prefers-reduced-motion."
+      }
     ],
     "breakpoints": [
-      { "name": "narrow", "value": "640px" },
-      { "name": "stack", "value": "960px" }
+      {
+        "name": "phone",
+        "value": "640px"
+      },
+      {
+        "name": "narrow",
+        "value": "900px"
+      },
+      {
+        "name": "bottom-tabs",
+        "value": "1023px"
+      },
+      {
+        "name": "title-line",
+        "value": "1560px"
+      }
     ]
   },
   "components": [
@@ -44,96 +378,143 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Start and the main action; tide blue, ink-weight outline shape.",
-      "html": "<button class=\"ds-btn ds-btn-primary\">Start</button>",
-      "css": ".ds-btn { font: 700 1rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; min-height: 48px; padding: 0 16px; border: 2px solid var(--ink); border-radius: 4px; background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 10px; } .ds-btn:hover { background: var(--rule-2); } .ds-btn-primary { background: var(--action); border-color: var(--action); color: var(--on-action); } .ds-btn-primary:hover { background: var(--action-hover); border-color: var(--action-hover); } .ds-btn:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }"
+      "description": "Play and Pause: ink fill, paper text, an 8px end block in the playing side's colour.",
+      "html": "<button class=\"ds-btn ds-btn-primary\" style=\"--live: var(--region-a)\">Play</button>",
+      "css": ".ds-btn { font: 600 0.95rem/1 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif; min-height: 48px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: background-color 180ms steps(2, jump-end), color 180ms steps(2, jump-end); } .ds-btn:hover { background: var(--rule-2); } .ds-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; } .ds-btn-primary { position: relative; background: var(--action); border-color: var(--action); color: var(--on-action); padding-right: 24px; } .ds-btn-primary::after { content: ''; position: absolute; top: -1px; right: -1px; bottom: -1px; width: 8px; background: var(--live); } .ds-btn-primary:hover { background: var(--action-hover); border-color: var(--action-hover); }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button",
-      "description": "Outlined button for pause, stop, replay.",
-      "html": "<button class=\"ds-btn\">Pause</button>",
-      "css": ".ds-btn { font: 700 1rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; min-height: 48px; padding: 0 16px; border: 2px solid var(--ink); border-radius: 4px; background: transparent; color: var(--ink); cursor: pointer; } .ds-btn:hover { background: var(--rule-2); } .ds-btn[aria-expanded='true'], .ds-btn[aria-pressed='true'] { background: var(--ink); color: var(--paper); } .ds-btn:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }"
+      "description": "Boxed button for Stop, Replay, Explain, Sound; ink fill when pressed or expanded.",
+      "html": "<button class=\"ds-btn\">Stop</button> <button class=\"ds-btn\" aria-pressed=\"true\">1×</button>",
+      "css": ".ds-btn { font: 600 0.95rem/1 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif; min-height: 48px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: background-color 180ms steps(2, jump-end), color 180ms steps(2, jump-end); } .ds-btn:hover { background: var(--rule-2); } .ds-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; } .ds-btn[aria-expanded='true'], .ds-btn[aria-pressed='true'] { background: var(--ink); color: var(--paper); }"
+    },
+    {
+      "name": "Tabs",
+      "kind": "nav",
+      "refersTo": "tab-current",
+      "description": "Joined strip of caps tabs with 1px hairline dividers; the current one filled in ink with a 7px end block in the side's colour.",
+      "html": "<nav class=\"ds-tabs\" style=\"--live: var(--region-b)\"><a href=\"#\" aria-current=\"page\">Listen</a><a href=\"#\">Compare</a><a href=\"#\">How it's made</a></nav>",
+      "css": ".ds-tabs { display: inline-flex; border: 1px solid var(--rule); } .ds-tabs a { position: relative; display: inline-flex; align-items: center; padding: 11px 14px; color: var(--ink-2); text-decoration: none; font: 500 0.72rem/1 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.16em; white-space: nowrap; } .ds-tabs a + a { border-left: 1px solid var(--rule); } .ds-tabs a:hover { background: var(--rule-2); color: var(--ink); } .ds-tabs a[aria-current='page'] { background: var(--ink); color: var(--paper); padding-right: 22px; } .ds-tabs a[aria-current='page']::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 7px; background: var(--live); } .ds-tabs a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }"
     },
     {
       "name": "Theme Switch",
       "kind": "custom",
-      "description": "Light / Dark, two joined buttons, the chosen one filled in ink.",
+      "description": "Light / Dark, two joined caps buttons in a 1px hairline frame, the chosen one filled in ink.",
       "html": "<div class=\"ds-theme\" role=\"group\" aria-label=\"Colour theme\"><button aria-pressed=\"true\">Light</button><button aria-pressed=\"false\">Dark</button></div>",
-      "css": ".ds-theme { display: inline-flex; gap: 2px; background: var(--ink); border: 2px solid var(--ink); border-radius: 4px; overflow: hidden; } .ds-theme button { border: 0; min-height: 40px; padding: 0 12px; font: 700 0.9rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; background: var(--paper); color: var(--ink); cursor: pointer; } .ds-theme button[aria-pressed='true'] { background: var(--ink); color: var(--paper); } .ds-theme button:focus-visible { outline: 3px solid var(--signal); outline-offset: -6px; }"
+      "css": ".ds-theme { display: inline-flex; border: 1px solid var(--rule); } .ds-theme button { border: 0; border-radius: 0; min-height: 40px; padding: 0 12px; font: 500 0.72rem/1 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.16em; background: var(--paper); color: var(--ink-2); cursor: pointer; } .ds-theme button + button { border-left: 1px solid var(--rule); } .ds-theme button[aria-pressed='true'] { background: var(--ink); color: var(--paper); } .ds-theme button:focus-visible { outline: 2px solid var(--ink); outline-offset: -6px; }"
     },
     {
       "name": "Range",
       "kind": "input",
       "description": "Label row with name left and mono readout right; 2px track, square ink thumb.",
-      "html": "<label class=\"ds-range\"><span class=\"ds-range-row\"><span>Volume</span><span class=\"ds-readout\">-12 dB</span></span><input type=\"range\"></label>",
-      "css": ".ds-range { display: inline-grid; gap: 2px; min-width: 160px; font: 600 0.95rem 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; color: var(--ink); } .ds-range-row { display: flex; justify-content: space-between; gap: 10px; } .ds-readout { font: 400 0.9rem/1.5 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; color: var(--ink-2); font-variant-numeric: tabular-nums; } .ds-range input { appearance: none; background: transparent; height: 28px; width: 100%; } .ds-range input::-webkit-slider-runnable-track { height: 2px; background: var(--ink-2); } .ds-range input::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; margin-top: -8px; background: var(--ink); border-radius: 4px; } .ds-range input:focus-visible::-webkit-slider-thumb { background: var(--signal); }"
+      "html": "<label class=\"ds-range\"><span class=\"ds-range-row\"><span>Volume</span><span class=\"ds-readout\">70%</span></span><input type=\"range\"></label>",
+      "css": ".ds-range { display: inline-grid; gap: 2px; min-width: 160px; font: 600 0.95rem 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif; color: var(--ink); } .ds-range-row { display: flex; justify-content: space-between; gap: 10px; } .ds-readout { font: 400 0.9rem/1.5 'Geist Mono Variable', 'Geist Mono', ui-monospace, Menlo, monospace; color: var(--ink-2); font-variant-numeric: tabular-nums; } .ds-range input { appearance: none; background: transparent; height: 28px; width: 100%; } .ds-range input::-webkit-slider-runnable-track { height: 2px; background: var(--ink-2); } .ds-range input::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; margin-top: -8px; background: var(--ink); border-radius: 0; } .ds-range input:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }"
     },
     {
       "name": "Region Badge",
       "kind": "chip",
       "refersTo": "region-badge-a",
-      "description": "The region's colour holding its letter, used wherever the region is named.",
+      "description": "A square in the region's colour holding its mono letter, used wherever the region is named.",
       "html": "<span class=\"ds-badge\" style=\"--region: var(--region-a)\">A</span> <span class=\"ds-badge\" style=\"--region: var(--region-b)\">B</span>",
-      "css": ".ds-badge { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--region); color: var(--on-region); font: 800 0.8rem/1 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; }"
+      "css": ".ds-badge { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; background: var(--region); color: var(--on-region); font: 600 0.8rem/1 'Geist Mono Variable', 'Geist Mono', ui-monospace, Menlo, monospace; }"
+    },
+    {
+      "name": "Beat Lane and Needle",
+      "kind": "custom",
+      "description": "Signature: pulse bars on a ruled lane; a 2px needle in the side's colour with a square cap and a foot dot; the played part washed at 12%; a missing beat as a dashed box.",
+      "html": "<div class=\"ds-lane\" style=\"--region: var(--region-a)\"><span class=\"wash\" style=\"width:42%\"></span><svg viewBox=\"0 0 400 64\" preserveAspectRatio=\"none\"><rect class=\"lo played\" x=\"20\" y=\"8\" width=\"4\" height=\"48\"/><rect class=\"hi played\" x=\"70\" y=\"26\" width=\"4\" height=\"30\"/><rect class=\"lo played\" x=\"120\" y=\"8\" width=\"4\" height=\"48\"/><rect class=\"hi\" x=\"180\" y=\"26\" width=\"4\" height=\"30\"/><rect class=\"missing\" x=\"221\" y=\"6\" width=\"78\" height=\"52\"/><rect class=\"lo\" x=\"320\" y=\"8\" width=\"4\" height=\"48\"/></svg><span class=\"needle\" style=\"left:42%\"></span><span class=\"dot\" style=\"left:42%\"></span></div>",
+      "css": ".ds-lane { position: relative; height: 64px; margin-top: 8px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--ink); } .ds-lane svg { display: block; width: 100%; height: 100%; } .ds-lane .lo { fill: var(--region); opacity: 0.16; } .ds-lane .hi { fill: var(--ink-2); opacity: 0.16; } .ds-lane .played { opacity: 1; } .ds-lane .missing { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; } .ds-lane .wash { position: absolute; left: 0; top: 0; bottom: 0; background: color-mix(in oklch, var(--region) 12%, transparent); } .ds-lane .needle { position: absolute; top: -8px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--region); } .ds-lane .needle::before { content: ''; position: absolute; top: 0; left: 50%; width: 11px; height: 11px; transform: translateX(-50%); background: var(--region); } .ds-lane .dot { position: absolute; bottom: -5px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: var(--region); }"
+    },
+    {
+      "name": "Pulse Plot",
+      "kind": "custom",
+      "description": "Signature: stacked hairline pulse lines on the black well, one per model frame; the sounding beat in the side's colour with a needle; a missing frame as a dashed flat line. Ready for Compare (P2).",
+      "html": "<div class=\"ds-pulse\" style=\"--region: var(--region-b)\"><svg viewBox=\"0 0 400 200\"><path d=\"M40 50 L70 50 Q80 15 90 50 L200 50 Q208 30 216 50 L360 50\"/><path class=\"on\" d=\"M40 80 L70 80 Q80 45 90 80 L230 80 Q238 60 246 80 L360 80\"/><path class=\"gap\" d=\"M40 110 L360 110\"/><path d=\"M40 140 L70 140 Q80 105 90 140 L180 140 Q188 120 196 140 L360 140\"/><path d=\"M40 170 L70 170 Q80 135 90 170 L250 170 Q258 150 266 170 L360 170\"/></svg><span class=\"needle\" style=\"left:52%\"></span></div>",
+      "css": ".ds-pulse { position: relative; border: 1px solid var(--ink); background: var(--well); aspect-ratio: 2 / 1; width: 100%; } .ds-pulse svg { display: block; width: 100%; height: 100%; } .ds-pulse path { fill: var(--well); stroke: rgba(255,255,255,0.92); stroke-width: 1.1; } .ds-pulse path.on { stroke: var(--region); stroke-width: 2.6; } .ds-pulse path.gap { stroke-dasharray: 3 4; } .ds-pulse .needle { position: absolute; top: 3%; bottom: 3%; width: 2px; margin-left: -1px; background: var(--region); box-shadow: 0 0 0 1px oklch(0.1 0 0 / 0.6); }"
     },
     {
       "name": "Tide Table",
       "kind": "custom",
-      "description": "Ruled columns, mono numbers, header rule in ink, playing region's row in weight 700.",
+      "description": "Ruled columns, caps headers with an ink rule, mono numbers, playing region's row in weight 700.",
       "html": "<table class=\"ds-tide\"><thead><tr><th>Region</th><th class=\"num\">Alignment, low-high</th></tr></thead><tbody><tr class=\"current\"><th><span class=\"ds-badge\" style=\"--region: var(--region-a)\">A</span> Region A</th><td class=\"num\">0.31-0.88</td></tr><tr><th><span class=\"ds-badge\" style=\"--region: var(--region-b)\">B</span> Region B</th><td class=\"num\">0.12-0.64</td></tr></tbody></table>",
-      "css": ".ds-tide { border-collapse: collapse; width: 100%; font: 400 0.95rem 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif; color: var(--ink); } .ds-tide th, .ds-tide td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); font-weight: 400; } .ds-tide thead th { font-weight: 600; font-size: 0.85rem; color: var(--ink-2); border-bottom-color: var(--ink); } .ds-tide tbody th { display: flex; align-items: center; gap: 8px; } .ds-tide .num { text-align: right; white-space: nowrap; font-family: 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; font-variant-numeric: tabular-nums; } .ds-tide tr.current th { font-weight: 700; } .ds-badge { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--region); color: var(--on-region); font: 800 0.8rem/1 sans-serif; }"
-    },
-    {
-      "name": "Tide Curves",
-      "kind": "custom",
-      "description": "Alignment over the model frames: one curve per region, labelled at its right end, signal line for the playing position, a gap where a frame is missing.",
-      "html": "<svg class=\"ds-curves\" viewBox=\"-34 -8 712 150\" width=\"100%\" role=\"img\" aria-label=\"Alignment over frames\"><line class=\"grid\" x1=\"0\" x2=\"600\" y1=\"0\" y2=\"0\"/><line class=\"grid\" x1=\"0\" x2=\"600\" y1=\"60\" y2=\"60\"/><line class=\"grid\" x1=\"0\" x2=\"600\" y1=\"120\" y2=\"120\"/><g style=\"--region: var(--region-a)\"><path class=\"curve\" d=\"M0 70 L100 40 L200 55 M300 30 L400 25 L600 20\"/><text class=\"end\" x=\"610\" y=\"25\">A 0.83</text></g><g style=\"--region: var(--region-b)\"><path class=\"curve\" d=\"M0 100 L100 90 L300 80 L600 60\"/><text class=\"end\" x=\"610\" y=\"65\">B 0.50</text></g><line class=\"now\" x1=\"250\" x2=\"250\" y1=\"-6\" y2=\"120\"/></svg>",
-      "css": ".ds-curves { display: block; overflow: visible; } .ds-curves .grid { stroke: var(--rule); stroke-width: 1; } .ds-curves .curve { fill: none; stroke: var(--region); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; } .ds-curves .end { fill: var(--region); font: 700 14px 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; } .ds-curves .now { stroke: var(--signal); stroke-width: 2; }"
-    },
-    {
-      "name": "Chart Frame",
-      "kind": "custom",
-      "description": "The NASA picture inside a 1px ink neatline with graticule ticks and mono labels outside it.",
-      "html": "<div class=\"ds-chart\"><div class=\"well\"></div><span class=\"tick lat\"><b>30</b></span><span class=\"tick lon\"><b>60</b></span></div>",
-      "css": ".ds-chart { position: relative; margin: 22px 0 0 44px; border: 1px solid var(--ink); height: 140px; } .ds-chart .well { position: absolute; inset: 0; background: var(--well); } .ds-chart .tick { position: absolute; font: 400 0.75rem/1 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace; color: var(--ink-2); } .ds-chart .lat { left: -7px; right: -7px; top: 50%; height: 1px; background: linear-gradient(90deg, var(--ink) 7px, transparent 7px, transparent calc(100% - 7px), var(--ink) calc(100% - 7px)); } .ds-chart .lat b { position: absolute; right: calc(100% + 4px); top: -0.5em; font-weight: 400; } .ds-chart .lon { top: -7px; bottom: -7px; left: 50%; width: 1px; background: linear-gradient(var(--ink) 7px, transparent 7px, transparent calc(100% - 7px), var(--ink) calc(100% - 7px)); } .ds-chart .lon b { position: absolute; top: -18px; transform: translateX(-50%); font-weight: 400; }"
+      "css": ".ds-tide { border-collapse: collapse; width: 100%; font: 400 0.95rem 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif; color: var(--ink); } .ds-tide th, .ds-tide td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); font-weight: 400; } .ds-tide thead th { font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-2); border-bottom-color: var(--ink); } .ds-tide tbody th { display: flex; align-items: center; gap: 8px; } .ds-tide .num { text-align: right; white-space: nowrap; font-family: 'Geist Mono Variable', 'Geist Mono', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; } .ds-tide thead .num { font-family: 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif; } .ds-tide tr.current th { font-weight: 700; } .ds-badge { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; background: var(--region); color: var(--on-region); font: 600 0.8rem/1 'Geist Mono Variable', 'Geist Mono', ui-monospace, Menlo, monospace; }"
     }
   ],
   "narrative": {
-    "northStar": "The Tide Table on the Chart",
-    "overview": "Earth Sonata reads like a tide table printed on a sea chart. The NASA picture sits inside a chart frame with latitude and longitude ticks, and each region's numbers are set in ruled columns. Structure is 1px hairline rules, never boxes, cards or side stripes. Corners are 4px, nothing casts a shadow, and depth comes from rules, ink and the dark well behind the picture.\n\nTwo editions of one print. Light is almanac white with navy ink and tide-blue actions. Dark is the night edition: deep navy ground with the same inks lifted. The theme follows the saved choice, else the system setting, and is set before first paint. One red-orange, the signal, is the only loud colour and it means live, chosen or focused, nothing else.\n\nThe system is keyboard-first. Start is the first Tab stop, so the theme switch sits under the playback controls in the rail. Colour is never the only cue: every region mark carries its letter.",
+    "northStar": "The Record Catalogue",
+    "overview": "Earth Sonata reads like a record catalogue. Each NASA picture is a catalogue entry and each region is a side. Controls are square boxes joined by 1px rules, like a catalogue index. Labels are letterspaced caps. The rhythm is drawn as hairline pulse lines from the real alignment numbers. Nothing casts a shadow and no corner is rounded.\n\nTwo sleeves of one record. Light is a white sleeve with black ink and grey hairlines, with no hue at all. Dark is a matte black sleeve with white ink. The theme follows the saved choice, else the system setting, and is set before first paint so there is no flash. The NASA picture always sits on a black well in both themes.\n\nColour is held back for the side. It appears only on what is live or chosen, and then it is the playing side's colour: Side A violet or Side B rose. Everything else, including focus, is ink.\n\nThe system is keyboard-first. The Tab order follows the screen: the six tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.",
     "keyCharacteristics": [
-      "One face, Atkinson Hyperlegible Next. Atkinson Hyperlegible Mono only for numbers, coordinates and readouts.",
-      "Signal red-orange is live, chosen or focused only.",
-      "Region A violet, Region B rose, both off the NASA picture's blue-to-red temperature scale, so a region colour is never read as warm or cold.",
-      "Hairline rules for structure; no boxes, no side stripes.",
-      "Type weight carries data: the giant numeral and the live value run weight 200 to 800 with alignment.",
-      "A missing frame breaks a tide curve and is never drawn as zero."
+      "One face, Geist. Geist Mono only for numbers, coordinates, key caps and readouts.",
+      "Colour is the side: the needle, the played wash, and the end block on the current tab and on the primary buttons.",
+      "Region A violet, Region B rose, both off the NASA picture's blue-to-red temperature scale.",
+      "Square corners and 1px borders everywhere. No shadows, no cards.",
+      "Letterspaced uppercase labels for tabs, the theme switch, legends, icon-button labels, table headers and map tags.",
+      "Type weight carries data: the numeral and the live value run weight 200 to 800 with alignment.",
+      "A missing frame is a break or a dashed flat line, never zero."
     ],
     "rules": [
-      { "name": "The Live Only Rule", "body": "Signal red-orange appears only on something live, chosen or focused. If it is decoration, it is wrong.", "section": "colors" },
-      { "name": "The Off-Scale Rule", "body": "Region colours stay violet and rose. Never blue, red, orange or yellow, because the NASA picture already uses that range for temperature.", "section": "colors" },
-      { "name": "The Letter Rule", "body": "A region colour never travels alone; its letter badge or end label goes with it.", "section": "colors" },
-      { "name": "The Weight Is the Value Rule", "body": "Alignment 0 maps to weight 200 and alignment 1 to 800, so the numeral's weight still carries alignment. Do not flatten it to one weight.", "section": "typography" },
-      { "name": "The Numbers in Mono Rule", "body": "Coordinates, table cells, axes and readouts use the mono face with tabular figures. Words never do.", "section": "typography" },
-      { "name": "The No Shadow Rule", "body": "Nothing floats. A new surface gets a hairline rule or a neatline, not a shadow.", "section": "elevation" }
+      {
+        "name": "The Colour Is the Side Rule",
+        "body": "Colour appears only on what is live or chosen, and it is always the playing side's colour, set as `--live` from the chosen region. It marks the needle, the played wash, and an end block on the current tab (7px) and on the primary buttons (8px). On pictures with neutral regions `--live` is ink, so no colour appears. A new surface does not get a colour of its own.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signal Is Ink Rule",
+        "body": "The marks that used to be red-orange are ink now: the focus ring (2px ink, offset 3px), the chosen picture's underline, the chime flash on a note bar, the held melody key, the tide curves' playing line, text selection and the caret.",
+        "section": "colors"
+      },
+      {
+        "name": "The Off-Scale Rule",
+        "body": "A region colour must not be a colour the picture itself uses for data. On the ocean picture (blue-to-red temperature) the regions are violet and rose, never blue, red, orange or yellow. Pictures whose own colours include those hues get neutral regions: the aerosol picture (regions C and D; blue sea salt, pink dust, orange-red smoke, green sulfates) and the rain picture (regions E and F; a blue-to-red rain scale). Neutral means an ink ring inside a white outline and an ink badge with an `on-region` letter, in both themes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Letter Rule",
+        "body": "A region colour never travels alone; its letter badge or end label goes with it. The end blocks on the current tab and on Play only repeat the side that the now chip and the region choice already name with its letter.",
+        "section": "colors"
+      },
+      {
+        "name": "The Weight Is the Value Rule",
+        "body": "Alignment 0 maps to weight 200 and alignment 1 to 800 (`weightFor` in `NowPlaying.tsx`, used by the live value and the Compare numerals). Do not flatten it to one weight.",
+        "section": "typography"
+      },
+      {
+        "name": "The Numbers in Mono Rule",
+        "body": "Coordinates, table cells, axes, dates, region letters and readouts use Geist Mono with tabular figures. Words never do.",
+        "section": "typography"
+      },
+      {
+        "name": "The Caps Label Rule",
+        "body": "Labels that name a control or a column are uppercase and letterspaced (0.12em to 0.16em) at 0.6rem to 0.72rem, weight 500. Headings, prose and button words in the body are not.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Shadow Rule",
+        "body": "Nothing floats. A new surface gets a hairline rule or a 1px frame, not a shadow.",
+        "section": "elevation"
+      }
     ],
     "dos": [
-      "Do use hairline rules (1px `rule`) to separate sections and table rows.",
-      "Do reserve signal for live, chosen and focused.",
+      "Do use 1px borders and hairline rules (`rule`) to separate sections, join controls and rule tables.",
+      "Do keep every corner square.",
+      "Do show colour only on what is live or chosen, as the playing side's colour through `--live` or `--region`.",
+      "Do use ink for focus, selection, the chosen picture, the chime flash and the held key.",
       "Do pair every region colour with its letter.",
-      "Do set coordinates, table cells and readouts in the mono face with tabular figures.",
+      "Do set labels for controls and columns in letterspaced caps.",
+      "Do set coordinates, table cells and readouts in Geist Mono with tabular figures.",
       "Do let font weight (200 to 800) carry alignment on the numeral and live value.",
-      "Do draw a missing frame as a break or hatched gap.",
-      "Do give both themes the same structure; only the inks lift.",
-      "Do keep Start the first Tab stop."
+      "Do draw a missing frame as a break, a dashed box or a dashed flat line.",
+      "Do give both themes the same structure; only the inks flip.",
+      "Do keep the Tab order the same as the screen order: tabs, theme, picture, region, then Play."
     ],
     "donts": [
-      "Don't put content in boxes, cards or floating panels, or add side stripes.",
-      "Don't add drop shadows.",
+      "Don't round corners or add drop shadows.",
+      "Don't put content in cards or floating panels, or add edge stripes. The only edge block is the `--live` end block on the current tab and the primary buttons.",
+      "Don't add a hue to the neutrals or give a surface a colour that is not the side's.",
       "Don't colour a region blue, red, orange or yellow.",
-      "Don't use signal for decoration, errors or missing data.",
+      "Don't use a side colour for decoration, errors or missing data.",
       "Don't draw a missing frame as zero.",
       "Don't add a second text face or use the mono face for prose.",
       "Don't let colour be the only cue for a region or a state."
