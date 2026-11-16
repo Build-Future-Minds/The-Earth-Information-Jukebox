@@ -134,7 +134,8 @@ test('no sound starts before a press', async ({ page }) => {
   expect(await audioStarted(page)).toBe(false);
   expect(await noteCount(page)).toBe(0);
   await expect(page.getByRole('status')).toHaveText(/Stopped/);
-  // The check can fail: one press of Play does start the sound.
+  // The check can fail: one press of Play does start the sound. On Listen that sound is the picture
+  // scan (decision D1), whose first chime comes a few seconds into the sweep.
   await page.getByRole('button', { name: 'Play', exact: true }).click();
-  await expect.poll(() => noteCount(page)).toBeGreaterThan(0);
+  await expect.poll(() => scanNotes(page), { timeout: 20_000 }).toBeGreaterThan(0);
 });

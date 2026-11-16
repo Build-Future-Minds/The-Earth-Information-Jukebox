@@ -119,7 +119,7 @@ test('choosing another picture while one plays stops the sound, and the new one 
 
 test('the rain picture says its land is never read, and its whole-picture scan has cells with no data', async ({ page }) => {
   await page.getByRole('radio', { name: /^Precipitation/ }).check();
-  await expect(page.locator('.listen-under')).toContainText('The scan never reads land and ice');
+  await expect(page.locator('.listen-under')).toContainText('The scan never reads land, which in this picture is a satellite photo');
   await expect.poll(async () => page.evaluate(() => {
     const s = (window as unknown as { __scanScore?: { reads: Uint32Array } | null }).__scanScore;
     return s ? Array.from(s.reads).filter((r) => r === 0).length : -1;
