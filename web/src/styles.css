@@ -736,9 +736,9 @@ figure.scene figcaption { font-size: 0.85rem; }
 
 .how-art figcaption { color: var(--white); }
 
-/* Tablets too (review: six tabs overflowed the top bar between 641 and ~1060px): tabs move to the
-   fixed bottom bar up to 900px; the player bar sticks above them. */
-@media (max-width: 900px) {
+/* Tablets and narrow windows too (review: six tabs need about 1024px in the top bar; 920px
+   overflowed): below 1024px the tabs move to the fixed bottom bar; the player bar sticks above them. */
+@media (max-width: 1023px) {
   .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
     border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(6, 1fr); }

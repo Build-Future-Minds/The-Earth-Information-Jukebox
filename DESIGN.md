@@ -183,7 +183,7 @@ Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the side
 
 ## Layout
 
-A sticky top bar (10px 24px padding, 1px rule under it) holds the title on the left (the title line shows from 1560px up), the six tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding). On Listen, the picture choice and region choice sit in one row above the picture; the picture is capped to the screen height so the whole view fits a 1440 x 900 screen; the player bar sits right under the picture. Below 900px the title line hides. At 900px and below the tabs move to a fixed bottom bar (six equal cells, icon over word), the player bar sticks just above it, and the chart margin tightens.
+A sticky top bar (10px 24px padding, 1px rule under it) holds the title on the left (the title line shows from 1560px up), the six tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding). On Listen, the picture choice and region choice sit in one row above the picture; the picture is capped to the screen height so the whole view fits a 1440 x 900 screen; the player bar sits right under the picture. Below 900px the title line hides. Below 1024px the tabs move to a fixed bottom bar (six equal cells, icon over word), the player bar sticks just above it, and the chart margin tightens.
 
 Spacing scale: 10, 16, 22, 28, 40px. Sections are separated by a 1px top rule with 16px padding, not by gaps alone. The NASA picture sits in a chart frame (1px ink neatline, margin 22px top and 44px left) with ticks every 10 degrees, labelled every 30, and the credit directly under it.
 
