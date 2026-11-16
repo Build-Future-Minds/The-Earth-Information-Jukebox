@@ -18,12 +18,16 @@ records the app's sound. It writes its reports here:
 - `docs/measurements/scan_repeat.md`: the same sweep recorded again and again.
 - `docs/measurements/scan_spacing.md`: the held notes against the ear's critical bandwidth.
 - `docs/measurements/scan_timing.md`: the held notes started at the times of real builds, rendered offline.
+- `docs/measurements/earth_sound.md` (from `earth.measure.ts` and `earthTap.ts`): the Earth voice's
+  sounds, rendered offline from the app's own code. Whether the band ever strikes inside a beat,
+  how far the second pulse stands above it, and loudness. It also writes
+  `web/test-results/measure/earth_listen.wav` (not in git) to listen to.
 - A `.json` beside each: the same numbers, for checking. A unit test (`src/data/scanRules.test.ts`)
   fails if a picture's settings or the numbers `sources.ts` quotes differ from `scan_pictures.json`.
 
 It takes about half an hour, because the sound is recorded in real time; the repeated sweeps take
 most of it. One part can be run alone, for example `npx playwright test -c measure/playwright.config.ts pictures`
-(or `sound`, `repeat`, `spacing`, `timing`). Do not edit those files by hand. Change the rule, a
+(or `sound`, `repeat`, `spacing`, `timing`, `earth`). Do not edit those files by hand. Change the rule, a
 setting or the pictures, then run the command again. If port 5175 is in use (another copy of the
 repo measuring), set `MEASURE_PORT`.
 

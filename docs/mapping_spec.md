@@ -52,6 +52,39 @@ Tempo, pitch, timbre and loudness stay fixed and carry no data.
 One measured step is one beat. Pulse 1 starts the beat. Pulse 2 falls at `long_fraction` of the
 way through it. The two gaps always add up to one beat, so the tempo never changes.
 
+### The Earth voice as music (decoration that carries no data)
+
+"Fixed" means the data cannot change it, not that it must be plain (`DECISIONS.md` D10).
+"Earth sound" on Play along chooses one of three, and applies wherever the Earth voice plays
+(Compare, Globe); all three play the same notes at the same times.
+
+- **Piano and band** (default). Every Earth note is a soft piano note on E4 with a quiet bell on
+  the same note, in a small room. Under it, a band plays the listening game's chords: C, Am7, F,
+  Gsus and home to C, two beats each, counted from the start of play so they keep moving across
+  loops. Code: `web/src/audio/earthSound.ts`, `earthBand.ts`.
+- **Piano only.** The same piano and room, no band.
+- **Plain pulse.** The first version: a short drum-like pulse, dry.
+
+Rules that keep the data clear, each checked by a test or a measurement:
+
+- The band strikes only on beat starts, where pulse 1 already is. Nothing it plays has a time
+  inside the beat, so pulse 2 is always alone (`earthBand.test.ts`, `e2e/earthMusic.e2e.ts`).
+- Every band note is below E4, so the Earth voice is the top voice and is never doubled. The F
+  chord leaves its E to the Earth voice, so E4 over F is a major seventh, the one sharp interval.
+- The band is the same for both regions and every alignment. It is never told either.
+- While information is missing the band only holds its chord (a pad that swells in): no strike
+  where the Earth voice has no pulse.
+- While a picture scan plays, the band fades out: the scan's own chords run on another clock.
+- Each Earth note is held for its fixed `dur`, then damped. How long it rings never depends on
+  the gap after it, so note length still carries no data.
+
+Measured (`docs/measurements/earth_sound.md`, rendered offline from the app's own code): no band
+note starts inside a beat; pulse 2 stands at least 13.9 dB above the band with a 1 s beat and
+7.3 dB at the fastest practice speed (a 0.1 s gap). In the full sound, pulse 2 still jumps by at
+least 16.5 dB (9.8 dB at the fastest speed). The room's echo is made from random noise, so these
+move by about 1 dB from run to run. The musical sounds are trimmed to the plain pulse's loudness
+(about −24 LUFS at the default Volume).
+
 ### Two worked examples (practice images — TEST INPUTS, not NASA data)
 
 Measured by the engine, with a 1-second beat:
