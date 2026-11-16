@@ -14,6 +14,10 @@ describe('views', () => {
     ['#Compare', 'listen'],
     ['#compare?x=1', 'listen'],
     ['#globe', 'globe'],
+    // A place inside a view: How it's made opened at a section or stage.
+    ['#how/s1-5', 'how'],
+    ['#how/chain', 'how'],
+    ['#nope/s1-5', 'listen'],
   ])('viewFromHash(%j) is %s', (hash, view) => expect(viewFromHash(hash)).toBe(view));
 
   it('labels in order', () =>

@@ -1,0 +1,31 @@
+{
+ "schema_version": "0.1",
+ "note": "Written by web/scripts/count-tests.mjs from a real run. Do not edit by hand: run it again.",
+ "date": "2026-11-15",
+ "commit": "b410107",
+ "uncommitted_changes": true,
+ "suites": {
+  "engine": {
+   "command": "python -m pytest (in analysis/)",
+   "total": 183,
+   "passed": 183,
+   "failed": 0,
+   "skipped": 0
+  },
+  "unit": {
+   "command": "npm test (in web/)",
+   "total": 308,
+   "passed": 307,
+   "failed": 0,
+   "skipped": 1
+  },
+  "browser": {
+   "command": "npm run test:e2e (in web/)",
+   "total": 102,
+   "passed": 102,
+   "failed": 0,
+   "flaky": 0,
+   "skipped": 0
+  }
+ }
+}

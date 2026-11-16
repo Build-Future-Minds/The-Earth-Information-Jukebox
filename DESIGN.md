@@ -202,6 +202,7 @@ Both are bundled with `@fontsource-variable` so the app works offline.
 **The Weight Is the Value Rule.** Alignment 0 maps to weight 200 and alignment 1 to 800 (`weightFor` in `NowPlaying.tsx`, used by the live value and the Compare numerals). Do not flatten it to one weight.
 **The Numbers in Mono Rule.** Coordinates, table cells, axes, dates, region letters and readouts use Geist Mono with tabular figures. Words never do.
 **The Caps Label Rule.** Labels that name a control or a column are uppercase and letterspaced (0.12em to 0.16em) at 0.6rem to 0.72rem, weight 500. Headings, prose and button words in the body are not.
+**The Math Face Rule.** KaTeX's math faces (pinned with KaTeX 0.19.1, loaded only with How it's made) are the one second face allowed, and only inside formulas. A formula is never set in caps or tracked, even inside a caps label.
 
 ## Layout
 
@@ -291,6 +292,11 @@ A square ink block with a mono numeral in paper, used only for the real sequence
 
 ### Practice and missing states
 Hairline sections, not cards. Missing information is a 1px ink box stated plainly at weight 650, never red. Practice data is an ink band across the top.
+
+### Claim tags and charts (How it's made)
+- **Claim tags:** a square box in caps (0.72rem, 500, `--caps`) holding the word, always shown: Verified filled in ink with paper text, Design choice outlined in 1px ink, Unverified outlined with a dashed line. Never a side colour.
+- **Formulas:** KaTeX display math, each with an "In words" line under it. A formula wider than its column scrolls inside its own box, fades at the right edge and takes keyboard focus.
+- **Charts:** hand-drawn SVG. Marks are ink and predictions grey ink, with no hue. Regions keep their side colours and always carry their letter. The alignment map uses grey ink in 0.1 steps, with hatching where there is no number. Every chart leads with its takeaway and has a "Show the numbers" table.
 
 ### One-moment pictures
 A picture with a single frame (aerosols) has one value per region. Its tide curve is one dot per region labelled "one moment", never an empty line. Its beat lane repeats one beat as a steady rhythm, with its one date under it.

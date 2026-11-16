@@ -59,7 +59,7 @@ test('both rhythms are drawn on one time line, from the same rule as the sound',
 
 test('the explainer and close-ups are present; Listen picks a region and plays it', async ({ page }) => {
   await openApp(page, 'how');
-  await expect(page.getByRole('list', { name: 'How a picture becomes a rhythm' })).toContainText('Which way the lines run');
+  await expect(page.locator('.how-route').first()).toContainText('Alignment');
   await openApp(page, 'compare');
   await expect(page.locator('.patch')).toHaveCount(2);
   await page.getByRole('button', { name: 'Listen to Region B' }).click();

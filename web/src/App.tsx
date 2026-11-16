@@ -12,7 +12,7 @@ import { ThemeSwitch } from './components/ThemeSwitch';
 import { stepAtSameMoment } from './components/RhythmExplanation';
 import { SourceChoice } from './components/SourceChoice';
 import { selectSource } from './data/selection';
-import { otherRegionOf, PICTURES, sourceByKey, SOURCES, type SourceKey } from './data/sources';
+import { otherRegionOf, sourceByKey, SOURCES, type SourceKey } from './data/sources';
 import { useView, VIEWS } from './views';
 import { CompareView } from './views/CompareView';
 import { HowView } from './views/HowView';
@@ -280,7 +280,7 @@ export function App() {
             />
           )}
           {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop} />}
-          {view === 'how' && <HowView source={source} pictures={PICTURES} />}
+          {view === 'how' && <HowView />}
           {view === 'play' && (
             <PlayView
               scene={scanPicture.scene}

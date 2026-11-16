@@ -27,6 +27,9 @@ export default defineConfig({
   plugins: [react(), devTools()],
   // The app imports the shared fixtures and data from the repo root (../fixtures, ../data).
   server: { fs: { allow: ['..'] } },
+  // KaTeX is only imported by How it's made, which loads on demand. Bundle it for the dev server up
+  // front, so opening that view does not make Vite re-optimise and reload the page mid-test.
+  optimizeDeps: { include: ['katex'] },
   // Two pages: the app (index.html) and Student A's globe prototype (globe.html, see src/globe/README.md).
   build: { rollupOptions: { input: { main: 'index.html', globe: 'globe.html' } } },
 });
