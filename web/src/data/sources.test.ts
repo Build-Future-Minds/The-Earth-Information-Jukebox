@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { buildEarthTrack } from '../audio/earthVoice';
 import { regionLabel } from '../components/ExploreControls';
 import { stepAtSameMoment } from '../components/RhythmExplanation';
-import { dayLabels, otherRegionOf, PICTURES, regionLetter, sourceByKey, SOURCES } from './sources';
+import { dayLabels, otherRegionOf, PICTURES, regionLetter, sourceByKey, SOURCES, timeWord, describesLine } from './sources';
 
 describe('sources', () => {
   it('lists every picture: ocean, aerosols, rain', () =>
@@ -75,5 +75,21 @@ describe('sources', () => {
     expect(new Set(labels).size).toBe(labels.length);
     const aero = sourceByKey('aerosols');
     expect(dayLabels(buildEarthTrack(aero.features, aero.scene.regions[0].id))).toEqual(['19 Aug']);
+  });
+});
+
+describe('timeWord', () => {
+  it('model pictures say "model time"; observations say "time"', () => {
+    expect(timeWord(sourceByKey('ocean'))).toBe('model time');
+    expect(timeWord(sourceByKey('aerosols'))).toBe('model time');
+    expect(timeWord(sourceByKey('imerg'))).toBe('time');
+  });
+});
+
+describe('describesLine (honesty line 3, per picture)', () => {
+  it('names what each picture does not tell you', () => {
+    expect(describesLine(sourceByKey('ocean'))).toBe('It describes the picture, not water speed or ocean health.');
+    expect(describesLine(sourceByKey('aerosols'))).toBe('It describes the picture, not air quality or amounts.');
+    expect(describesLine(sourceByKey('imerg'))).toBe('It describes the picture, not rainfall amounts.');
   });
 });

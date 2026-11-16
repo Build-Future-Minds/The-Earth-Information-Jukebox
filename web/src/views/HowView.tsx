@@ -3,7 +3,7 @@
 import { RULE_TEXT } from '../audio/earthVoice';
 import { BeatPicture } from '../components/BeatPicture';
 import { agree, Key, scatter } from '../components/LookingAt';
-import type { Picture, Source } from '../data/sources';
+import { describesLine, type Picture, type Source } from '../data/sources';
 
 /** "A computer model (ECCO2), not a photo." / satellite estimates / test input, per picture. */
 function natureLine(p: Picture): string {
@@ -57,7 +57,7 @@ export function HowView({ source, pictures }: { source: Source; pictures: Pictur
       <ul className="how-honest" aria-label="What the sound does not tell you">
         <li>{natureLine(source)}</li>
         <li>The rhythm rule is a choice we made.</li>
-        <li>It describes the picture, not water speed or ocean health.</li>
+        <li>{describesLine(source)}</li>
       </ul>
 
       <footer className="how-credits" aria-label="Sources and credits">

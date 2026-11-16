@@ -96,3 +96,27 @@ test('on Globe, the playing region\'s button stops it (no keyboard needed)', asy
   await expect(page.getByRole('status')).toHaveText(/Stopped/);
   await expect(page.getByRole('button', { name: /^Play Region B/ })).toHaveAttribute('aria-pressed', 'false');
 });
+
+for (const [w, h] of [[1024, 768], [768, 1024]] as const) {
+  test(`no sideways scroll at ${w}x${h}, and all six tabs are on screen`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: h });
+    await openApp(page);
+    const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+    expect(sw).toBeLessThanOrEqual(iw);
+    for (const name of ['Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'Game']) {
+      await expect(page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name })).toBeInViewport();
+    }
+  });
+}
+
+test('Explain before Play says Press Play and shows no "no data" (nothing is missing)', async ({ page }) => {
+  await openApp(page);
+  await page.getByRole('button', { name: 'Explain', exact: true }).click();
+  await expect(page.locator('.explain-line')).toHaveText(/Press Play/);
+  await expect(page.locator('.explanation')).not.toContainText('no data');
+});
+
+test('Compare says the ticks are drawn in the browser to show what is measured', async ({ page }) => {
+  await openApp(page, 'compare');
+  await expect(page.locator('.numeral-key')).toContainText('Ticks are drawn in your browser');
+});
