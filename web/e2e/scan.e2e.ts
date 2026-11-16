@@ -77,6 +77,25 @@ test('what you see follows what you hear: the line shows while playing and a chi
   await expect(view.locator('.trace')).toHaveCount(0);
 });
 
+test('a chime that sounds while the page is busy still leaves its mark', async ({ page }) => {
+  // The fault this guards against: the screen heard about a chime through Tone's Draw, which drops
+  // an update more than 0.25 s late. A page busy for longer (the globe drawn in software) showed no
+  // mark, no flash and no "last chime" for a note that sounded (found by the globe's test, 15 Nov).
+  const view = page.locator('.scan-view');
+  await startScanWithKeyboard(page);
+  // The red dot's chime is handed to the marimba a moment before it sounds (5.1 s in): keep the page
+  // busy from then for 0.7 s, past the moment it sounds.
+  await page.waitForFunction(() => ((window as unknown as { __scanNotes?: unknown[] }).__scanNotes?.length ?? 0) >= 1, undefined, { timeout: 10_000, polling: 10 });
+  await page.evaluate(() => {
+    const until = performance.now() + 700;
+    while (performance.now() < until) {
+      // busy
+    }
+  });
+  await expect(view.locator('.trace.warm')).toHaveCount(1);
+  await expect(page.getByText(/last chime: marimba G4/)).toBeVisible();
+});
+
 /** Seconds of chimes compared, from each sound's first chime. */
 const SAME_SCORE_SECONDS = 10;
 

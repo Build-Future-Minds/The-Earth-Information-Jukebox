@@ -41,6 +41,8 @@ then fails with "No chime was played").
   `measureBarLabels` and `frameAgainstBar`).
 - Which still the scan could read: the app's JPEG, a 4:4:4 JPEG at quality 90, a lossless WebP
   and the uncompressed frame, each scanned by the app's rule and compared chime by chime.
+- The globe: each scan of the ocean picture read on Play along and on the Globe tab, compared
+  number for number.
 
 And the sound, recorded from the running app at the last point before the speakers:
 
@@ -48,6 +50,7 @@ And the sound, recorded from the running app at the last point before the speake
 - The loudness and the largest sample of one sweep of each scan of the ocean picture.
 - The Earth voice, the scan and a melody chord together, and what is left after Stop.
 - That all three scan sounds play the same chimes in the first 10 s of the ocean picture.
+- One map sweep played on the Globe tab: the same chimes at the same moments as on Play along.
 - The same map sweep recorded again and again (`repeat.measure.ts`): in a page loaded afresh each
   time, the same with the page's random numbers fixed, and in one page; plus the held notes
   rendered offline through many reverbs, and how far the audio clock moves while the instruments

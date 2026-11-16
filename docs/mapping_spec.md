@@ -203,9 +203,11 @@ the Earth voice. The fold-out "Why the scan sounds like this" (Play along) has f
 
 - *Last struck note.* The place on the picture, what was measured there, and how that became the
   held note's loudness and the struck note's pitch, instrument and strength.
-- *Look at a column.* While the scan plays this follows the line, a few times a second. Paused or
-  stopped, a slider and two buttons choose a column; this makes no sound and does not move the scan.
-  A table gives every band in that column: place, pixels read, mean, level, held note, struck note.
+- *Look at a column.* While the scan plays this follows the line, a few times a second, until a
+  place is chosen. A slider and two buttons choose a column; choosing one stops the following, and a
+  checkbox, "Follow the line while the scan plays", turns it off and on from the keyboard. None of
+  this makes a sound or moves the scan. A table gives every band in that column: place, pixels read,
+  mean, level, held note, struck note.
 - *Explain band.* One band in full, in words, with the arithmetic: level = (mean − floor) ÷ (full −
   floor), and the chime rule's numbers. A peak the chime rule left out says which stronger peak took
   its place and why (too close in the same band, or a stronger peak in the same column).
@@ -223,12 +225,99 @@ and latitude range and a band's share of the globe's surface (12.9% at the equat
 pole); on any other picture it is a share of the way across and up, and no ground is claimed. The
 legend and the fold-out each keep "From the picture" apart from "Fixed by us" in words, not colour.
 
+**Pick a place on the picture.** A click or tap on the scan's picture opens the fold-out on the cell
+under the pointer: its column, and its band as the one explained in full, exactly as if they had been
+chosen with the slider and the band list. It makes no sound and does not move the scan; while the scan
+plays it stops the following, and the scan plays on. A point outside the picture, or outside the
+radar's circle, does nothing. The slider and the list remain the complete keyboard route: the click
+reaches nothing they cannot.
+
+- *Which cell.* Map sweep: the point is taken to the still's pixel under it, and that pixel to the
+  cell it was counted in, with the same two expressions the score uses. Radar: the bearing from the
+  centre (0° east, anticlockwise) gives the column, and the distance gives the band, so the cell is
+  the ring sector that holds all 16 points the radar read for it (`web/src/audio/scanPick.ts`).
+  **Verified by unit tests** (`scanPick.test.ts`): on the map sweep, counting every pixel's cell gives
+  the score's own pixel counts, cell for cell, at the test picture's size (240 × 120), the ocean
+  frame's (2048 × 1024) and a still smaller than its frame (1000 × 500 in 2048 × 1024), and every point
+  inside a pixel gives that pixel's cell; on the radar, every one of the 16 points read for every cell
+  gives that cell back, for the test circle and both ocean regions; a chime mark's centre gives its own
+  cell back; and the circle the radar reads is the circle drawn, which holds because the still and the
+  frames are both 2048 × 1024 (the test fails if that changes).
+- *What shows.* The cell is outlined on the picture, black under white, with four ticks pointing at it
+  so a column one or two screen pixels wide can be found. It is a shape, not a colour, and it never
+  moves. One line under the picture names the cell in the table's words; where no note is struck
+  there, it also names the nearest struck note in the same band (on the radar, round the circle), so a
+  click on the middle of a spot of colour finds the note the spot made. The outline and the line show
+  whenever the fold-out is open and not following the line, whichever way the place was chosen.
+- *Words, focus and pointers.* **Design choices** (Developer A, 15 Nov): a click never moves focus;
+  the line under the picture is plain text, not a live region, and its "Read why" button moves focus
+  to the band's full sentence when pressed. The picture is described to a screen reader by the same
+  sentence that is on screen: click or tap, or use the column slider. Mouse, touch and pen all send
+  pointer events; a press that moves more than 10 CSS pixels before it lets go is a drag and picks
+  nothing; nothing happens on hover. The radar's locator map is not clickable.
+- *Limit: precision on a phone.* **Measured, 15 Nov**, in Chromium at 390 × 844 pixels: the map
+  picture is 358 CSS pixels wide, so one column is 1.49 pixels; on the radar one column is 8.1 pixels
+  of arc at the rim and 0.34 at the middle of the innermost band. A fingertip covers many columns, so
+  a tap picks the cell under the touch point, the outline shows which, and the buttons step to the one
+  wanted.
+- *Checked on the real picture, 15 Nov.* In the running app with the ocean still, a click on the
+  centre of a struck cell explained exactly that cell (column, band, and its struck note) for two cells
+  of the map sweep, one marimba and one bells, and one cell in each radar circle; a click on the
+  radar's locator map changed nothing. The check script was a one-off and is not in the repo; the
+  browser tests run on the TEST INPUT picture.
+- *Not checked:* a real phone or tablet, a real pen and a real screen reader. The browser tests
+  (`web/e2e/scan-click.e2e.ts`) use Chromium with touch emulation and synthetic pen events.
+
 **Checked on the real picture, 15 Nov.** Five cells of the ocean picture were explained in the running
 app (a struck marimba note, a struck bells note, a peak left out for spacing, a peak left out for
 the column, a silent cell) and recomputed from `data/preview.jpg` in Python with an independent copy
 of the rule. The cell means, the pixels read and the levels agreed to six decimals, and the winner of
 both left-out peaks was the same. The Python script was a one-off and is not in the repo; the unit
 tests on made-up pictures are what stays.
+
+**On the globe (Developer A, 15 Nov).** The Globe tab plays the same scan, drawn round the 3D globe.
+A vertical line on the flat map is a meridian, so the score, the player and the sound are the same:
+both views use one module, `web/src/scan/`, that loads the picture, builds the score and plays it.
+What changes is only the drawing and the turning of the globe.
+
+- *What is drawn.* Everything that wraps the sphere is drawn by the globe's shader, in frame pixels,
+  so the globe shows exactly the cells being played: the part not played yet dimmed, a glow behind
+  the line, the white line with a black edge at a constant width on screen, and the white shape on
+  it; for a radar, the dimmed outside and the sector not reached yet, three range rings, the rim and
+  the part of it passed, and the needle. The chime marks (round for warm, diamond for cool), the
+  needle's ends and the compass letters are an SVG layer placed by the same rotation and scale the
+  shader gets (`projectToScreen` in `web/src/globe/geo.ts`); marks on the far side are hidden. Black
+  and white only, as on the flat picture. **Design choice.**
+- *Turn with the line.* On each time a scan starts: the line sits 20° east of the middle of the globe,
+  so the part already played is in view, and the globe turns with it (12° of longitude a second at
+  normal speed). A radar turns the globe once to face its circle and zooms to it. Dragging the globe,
+  an arrow key or turning to a region turns it off; the button turns it back on. The button is not
+  called "Follow the line": the fold-out's checkbox "Follow the line while the scan plays" moves the
+  explanation with the line, not the globe. With reduced
+  motion the globe never turns: it cuts once per step of the low note (every 45° of longitude), and
+  the line moves once a second as on the flat map. **Design choice.**
+- *The circle stays the flat-map circle.* On the globe it is an oval, the true ground shape of the
+  area the Earth voice measures, and the needle turns unevenly on it: on the Kuroshio circle about 30%
+  faster near east and west than near north and south. The text under the radar gives the circle's
+  ground width over height and the largest gap between equal turns and compass bearings (3.8° on
+  Kuroshio, 0.0° on the Equatorial Pacific), computed from the scene, not typed in. **Derived** from
+  the map geometry (`groundShape`, tested against `docs/measurements/scan_pictures.md`). A true
+  ground circle would read pixels outside the measured area and needs a region-format change; it
+  belongs with task L7.
+- *Which pictures.* The globe scans the picture shown on the globe, with that picture's own rule.
+  Until the aerosol and rain pictures have their own measured settings (`docs/page_plan.md`, P1a),
+  only the ocean picture (and the TEST INPUT picture in practice mode) can be scanned there; the
+  other two say so.
+- *Picking a place.* Not built on the globe: a press on the globe turns it, so a click there does
+  not open "Why the scan sounds like this" on a cell, and the fold-out's words on the Globe tab do not
+  offer it. Its slider, buttons and band list choose a place, as on Play along.
+- *A note that sounds always shows.* Found while testing the globe, 15 Nov: the player told the
+  screen about a chime through Tone's Draw, which drops an update more than 0.25 s late. A page busy
+  for longer than that (in the test, the globe drawn in software while another test run loaded the
+  machine) played the note with no mark, no bar flash and no "last chime". The player now shows every
+  chime once its moment has passed, however late. This changes the screen only, on both views, not
+  the sound. A browser test keeps the page busy for 0.7 s as the red dot sounds: it failed with the
+  old player and needs the mark.
 
 **Other pictures.** The level can be measured by colour strength (the default) or by brightness
 (the largest of red, green and blue), for pictures whose data is white or grey on a dark ground.
@@ -279,17 +368,17 @@ Stop the output was below −84 dB from 0.15 s on. These last two figures were m
 first instruments; the next paragraph repeats them with today's.
 
 **Measured again, 15 Nov**, by `npm run measure`, which records the running app in headless
-Chromium (three runs; `docs/measurements/scan_sound.md` holds the third). Ocean choir, default
-volumes.
+Chromium (four runs; `docs/measurements/scan_sound.md` holds the fourth, on the code merged with
+the globe scan). Ocean choir, default volumes.
 
-| | First run | Second run | Third run | The table above |
-| --- | --- | --- | --- | --- |
-| Whole picture, one sweep | −25.1 LUFS | −24.4 LUFS | −24.9 LUFS | −25.0 LUFS |
-| Region A, one turn | −24.7 LUFS | −24.2 LUFS | −24.8 LUFS | −24.6 LUFS |
-| Region B, one turn | −21.8 LUFS | −21.6 LUFS | −21.9 LUFS | −21.4 LUFS |
-| Largest sample in the three sweeps | −6.6 dBFS | −7.0 dBFS | −5.4 dBFS | −5.6 dBFS |
-| Earth voice, map sweep and a four-key chord: largest sample | −5.0 dBFS | −5.2 dBFS | −3.1 dBFS | −4.4 dBFS (first instruments) |
-| From 0.15 s to 2.15 s after Stop | every sample 0 | every sample 0 | every sample 0 | below −84 dB |
+| | First run | Second run | Third run | Fourth run | The table above |
+| --- | --- | --- | --- | --- | --- |
+| Whole picture, one sweep | −25.1 LUFS | −24.4 LUFS | −24.9 LUFS | −24.9 LUFS | −25.0 LUFS |
+| Region A, one turn | −24.7 LUFS | −24.2 LUFS | −24.8 LUFS | −24.2 LUFS | −24.6 LUFS |
+| Region B, one turn | −21.8 LUFS | −21.6 LUFS | −21.9 LUFS | −21.6 LUFS | −21.4 LUFS |
+| Largest sample in the three sweeps | −6.6 dBFS | −7.0 dBFS | −5.4 dBFS | −5.0 dBFS | −5.6 dBFS |
+| Earth voice, map sweep and a four-key chord: largest sample | −5.0 dBFS | −5.2 dBFS | −3.1 dBFS | −4.9 dBFS | −4.4 dBFS (first instruments) |
+| From 0.15 s to 2.15 s after Stop | every sample 0 | every sample 0 | every sample 0 | every sample 0 | below −84 dB |
 
 So nothing clipped and Stop leaves silence. A loudness on this page is good to about half a
 LUFS, not to the decimal it is written with.
@@ -344,19 +433,19 @@ held oscillator, with the scan's clock started at that time too.
 
 Loudness follows the level. On a test picture with levels 0.121, 0.251, 0.502 and 1 in one band
 and the chime rule switched off, that band's tone rose by 6.2, 6.0 and 5.9 dB in the first run,
-6.5, 6.2 and 6.0 dB in the second, and 6.1, 5.9 and 5.5 dB in the third (`scan_sound.md`).
-20·log₁₀ of the level ratios gives 6.3, 6.0 and 6.0 dB. The third run's last step is 0.4 dB short
-of that; why was not looked into.
+6.5, 6.2 and 6.0 dB in the second, 6.1, 5.9 and 5.5 dB in the third, and 6.4, 6.2 and 6.0 dB in
+the fourth (`scan_sound.md`). 20·log₁₀ of the level ratios gives 6.3, 6.0 and 6.0 dB. The third
+run's last step was 0.4 dB short of that; why was not looked into.
 
 Checked in a recording of the map sweep:
 
 - Low note: in each of the 8 steps the expected root (C2, A1, F2, G2, twice) is the strongest
   of the four root tones, by 41 dB or more. This is from an earlier recording the same day;
   `npm run measure` does not repeat it.
-- Left and right: in the first sixth of the sweep (5 s) the left channel is 9.0 dB louder than
-  the right, and in the last sixth the right is 9.9 dB louder (`scan_sound.md`, the third run).
-  An earlier recording the same day gave 9.5 and 9.3 dB, with the two channels crossing between
-  15 and 20 s; the tool does not measure the crossing.
+- Left and right: in the first sixth of the sweep (5 s) the left channel is 8.3 dB louder than
+  the right, and in the last sixth the right is 10.2 dB louder (`scan_sound.md`, the fourth run;
+  the third gave 9.0 and 9.9). An earlier recording the same day gave 9.5 and 9.3 dB, with the
+  two channels crossing between 15 and 20 s; the tool does not measure the crossing.
 
 **Tests.** `web/src/audio/scanScore.test.ts`: 57 tests on made-up pictures (TEST INPUTS). The
 main one is a picture with three dots, which must give exactly three chimes: columns 41, 81 and
@@ -365,26 +454,41 @@ grey and grey with JPEG-sized noise are `missing` and silent. The root steps, th
 position, the note spacing and the brightness measure each have their own tests. Three more say
 exactly which notes clash (none of the held notes with each other; F under E).
 `web/src/audio/instruments.test.ts`: 3 tests solve the two bar equations again and compare the
-answers with the ratios the instruments use. `web/src/audio/scanWhy.test.ts`: 27 tests on made-up
+answers with the ratios the instruments use. `web/src/audio/scanWhy.test.ts`: 34 tests on made-up
 pictures: each dot explains itself with its place, numbers and instrument; a peak left out names
 the stronger one that took its place, for both reasons; places on a world map, another picture and
-the radar; the whole column; and the list of fixed choices. `web/e2e/scan-why.e2e.ts`: 8 browser
+the radar; the whole column; the list of fixed choices; and, for a place picked on the picture,
+the few words under it and the nearest struck note. `web/e2e/scan-why.e2e.ts`: 8 browser
 tests that do what a person does: open it by keyboard, walk to a column with the arrow keys and
 read its table, follow the line while it plays, change the scan sound while it plays, use the radar,
 and check nothing in it is announced.
-`web/e2e/scan.e2e.ts`: 12 browser tests. They include a radar turn on a test circle, and a check that
+`web/e2e/scan.e2e.ts`: 13 browser tests. They include a radar turn on a test circle, and a check that
 the line keeps moving when another scan is chosen while one is playing (it once stood still while
 the notes played; found by Developer A and fixed on 15 Nov). The two first chimes sound 5.000 s apart within 5 ms (10 s at half speed), over the roots
-A1 and F2; the line on screen is where the audio clock says; a chime leaves one mark; Esc stops
-the scan and clears the picture; and all five melody sounds let go of their notes. All three scan
-sounds play the same chimes, at the same times after the first, for 10 s (two chimes on the test
-picture; 15 Nov). The scan-why test that changes the sound while it plays waited 10 s for a text
-that never appears, then raced the next chime; it failed on a busy machine and now waits only for
-the first chime (15 Nov).
+A1 and F2; the line on screen is where the audio clock says; a chime leaves one mark, even when the
+page is busy for 0.7 s as it sounds; Esc stops the scan and clears the picture; and all five melody
+sounds let go of their notes. All three scan sounds play the same chimes, at the same times after
+the first, for 10 s (two chimes on the test picture; 15 Nov). The scan-why test that changes the
+sound while it plays waited 10 s for a text that never appears, then raced the next chime; it now
+waits only for the first chime (15 Nov).
 `web/measure/spacing.test.ts`: 14 tests check the spacing and roughness functions against their
 sources: Sethares's dips at 2:1, 3:2, 4:3, 5:4 and 5:3 for a harmonic tone, the peak of his formula,
 and the bandwidth curve's shape. `web/measure/meter.test.ts` checks the faster band meter against
 the slower one.
+
+**Tests of the scan on the globe.** `web/src/globe/geo.test.ts`: the projection against the vertex
+shader's sums and the globe's own mesh (the place faced lands in the middle, places 90° away on the
+edge, further ones hidden), Turn with the line (the 20° offset, the 45° cuts under reduced motion), each approved
+circle's ground shape against `docs/measurements/scan_pictures.md`, and the shading rule.
+`web/src/scan/scanGlobeWords.test.ts`: the sentence under the radar, and which pictures have a rule.
+`web/e2e/globe.e2e.ts`: 13 browser tests in practice mode, on the TEST INPUT picture. The flat
+picture and the globe make the same score, number for number, and the globe plays it by the rule;
+a pixel read back from the GPU is the picture's own grey behind the line, 0.58 of it ahead and white
+on the line; a chime mark sits where the projection says and the GPU draws the dot that made it there;
+Turn with the line keeps the line 20° east of the middle; a drag or an arrow key turns it off while the line
+and the sound go on; changing scan, sound or speed while it plays keeps both going; Esc stops it;
+reduced motion gives cuts only; every control is reached by Tab; the Earth rhythm keeps its schedule.
+In headless Chromium the globe is drawn by SwiftShader (software), and the first test logs it.
 
 **Audit of the scan's claims, 15 Nov.** Every picture number below comes from `npm run measure`
 (in `web/`), which runs the rule in Chromium on the stills the app plays and writes
@@ -398,7 +502,7 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
 | The line runs west to east and the readout gives its longitude | Verified for the ocean | Map geometry checked by Student A, 14 Nov. The app finds a world map by the word "equirectangular" in a scene's limitations; the aerosol and rain scenes lack the word, so this must be fixed before either is played |
 | Pitch is height on the map, in 12 equal bands | Design choice | Limits in "What we do not claim" |
 | Loudness is a cell's mean colour strength | Design choice | Limits in "What we do not claim" |
-| The sound gets louder as the level rises | Verified | On a recorded test picture each doubling of the level raised that band's tone by 5.5 to 6.5 dB over three runs; the exact steps are 6.3, 6.0 and 6.0 |
+| The sound gets louder as the level rises | Verified | On a recorded test picture each doubling of the level raised that band's tone by 5.5 to 6.5 dB over four runs; the exact steps are 6.3, 6.0 and 6.0 |
 | Black sea and grey land are silent | Verified for the ocean | Of 746 cells that are 90% or more grey land or black sea in the uncompressed frame, none sounds. Largest cell mean 7.67/255; the floor is 12/255 |
 | A peak of colour gives one struck note | Design choice | 39% to 61% of peaks are left out |
 | Red and orange strike one instrument, the rest another | Design choice | The rule is ours. Where it falls was **measured** below |
@@ -413,12 +517,17 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
 | The bars' tone ratios | Verified | A test solves both equations |
 | The low note's steps and the left–right position carry no data | Verified | Recordings above |
 | Every scan sound plays the same score | Verified (15 Nov) | The browser test compares every chime in 10 s from the first (two on the test picture); `npm run measure` compares the 21 chimes in the first 10 s of the ocean picture: same columns, bands, instruments, notes, roots, left–right places and times |
-| Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop. The latest run (`scan_sound.md`): −3.1 dBFS, still under full scale, and silence after Stop. The tool now fails if part of this recording is missing, since a gap there could hide the largest sample |
+| The globe plays the same score as the flat picture | Verified | `npm run measure`: the ocean line and both radars, every level, mean and chime equal; a recorded sweep on the globe has the same chimes at the same moments. A browser test does the same on the TEST INPUT picture |
+| The globe draws the scan where the score reads | Verified on the TEST INPUT picture | Pixels read back from the GPU match the rule's copy in TypeScript within 3 grey levels; marks sit on the dot that made them |
+| Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop. Two later runs: −3.1 dBFS, and in the latest (`scan_sound.md`) −4.9 dBFS, both under full scale, with silence after Stop. The tool now fails if part of this recording is missing, since a gap there could hide the largest sample |
 | The counts in "Measured, 15 Nov" | Verified again | The tool gives the same: 60.0% and 68 chimes (53, 15); 98% and 56; 100% and 72 |
-| The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | The same map sweep recorded 10 times as the app is: standard deviation 0.24 LU, range 0.66 (`scan_repeat.md`). The table's −25.0 LUFS is inside that range (−25.19 to −24.53). The regions were recorded in three runs; they differ by up to 0.6 |
+| The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | The same map sweep recorded 10 times as the app is: standard deviation 0.24 LU, range 0.66 (`scan_repeat.md`). The table's −25.0 LUFS is inside that range (−25.19 to −24.53). The regions were recorded in four runs; they differ by up to 0.6 |
 | The same sweep varies in loudness because of the reverb and the held notes' start times, not the picture | Verified as causes (15 Nov); how a sweep's spread divides between them is not settled | Offline, each one alone changes the loudness (20 reverbs: standard deviation 0.16 LU; the start times of 20 real builds: 0.24), and without them two renders are identical (`scan_repeat.md`, `scan_timing.md`). In the app, a fixed reverb made the level around E4, A4 and D5 repeat within 0.4 dB, where it moved 2.2 to 2.9 dB |
 | It sounds good, and a region's character can be heard | Unverified | Needs listeners. The third round has had none. A protocol is drafted, not run: `docs/scan_listening_protocol.md` |
 | The scan reads a still close enough to NASA's frame | Measured; decided 15 Nov, not built yet | The JPEG the app reads puts 49 of its 68 chimes at the same place and on the same instrument as a chime of the uncompressed frame (84). A 4:4:4 JPEG at quality 90 would put 76 of 86 there; a lossless WebP is the frame itself. Developer A chose a lossless WebP read by the scan alone (15 Nov) |
+| A click on the picture explains the cell the scan read there | Verified | Unit tests (`scanPick.test.ts`), and a one-off check in the running app on the ocean still: see "Pick a place on the picture" |
+| A click makes no sound and does not move the scan | Verified | Browser tests, stopped, paused and playing. A click while playing leaves the first two notes with the same columns, instruments, 5 s spacing, low notes and left–right places that `scan.e2e.ts` checks without a click |
+| A click works by mouse, touch and pen | Verified in emulation only | Chromium touch emulation and synthetic pen events. No real phone, tablet or pen tried |
 
 **What we do not claim.**
 
@@ -485,7 +594,12 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
   elsewhere, and gives 70 chimes in place of 68. We keep the unweighted rule.
 - A circle is round on the flat map, not on the ground: Kuroshio is 0.876 times as wide
   east–west as it is tall, the Equatorial Pacific circle 1.000. So equal turns of the radar are
-  not equal compass bearings.
+  not equal compass bearings: a map angle θ points along the ground bearing atan2(sin θ, 0.876 cos θ),
+  at most 3.8° away on Kuroshio, and a 3° column covers 3.4° of bearing near east and west and 2.6°
+  near north and south. Bands are equal map distances too, so on Kuroshio the same ground distance
+  east and north of the centre plays up to 1.5 bands apart. The other approved circles differ by at
+  most 2.1° and 0.9 bands. Derived from the map geometry at each centre; across the Kuroshio circle
+  the ratio itself runs from 0.77 at its north edge to 0.95 at its south edge.
 - The scan has its own clock. Its notes can fall close to an Earth pulse, so run the listening
   check with the scan off.
 - The chime rule leaves out bright spots that are too close together. The choir still plays them.

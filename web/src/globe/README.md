@@ -39,11 +39,43 @@ After a merge to `main` it is also published at `.../globe.html` next to the app
 
 | File | What it is |
 | --- | --- |
-| `src/globe/geo.ts` | Map maths: lon/lat ↔ pixels, bounding square, slider limits, land share, region JSON. Tested in `geo.test.ts`. |
-| `src/globe/globeRenderer.ts` | The WebGL globe, the spotlight shader and the night sky |
-| `src/globe/GlobeView.tsx` | React component: drag, arrow keys and zoom. Props: `imageUrl`, `frame`, `spot`, `faceSpotToken`, `label` |
+| `src/globe/geo.ts` | Map maths: lon/lat ↔ pixels, bounding square, slider limits, land share, region JSON; and the globe on screen (`viewRotation`, `globeScale`, `projectToScreen`), turning with the line, a circle's ground shape, the scan's shading rule. Tested in `geo.test.ts`. |
+| `src/globe/globeRenderer.ts` | The WebGL globe, the spotlight shader, the picture scan's shader and the night sky |
+| `src/globe/GlobeView.tsx` | React component: drag, arrow keys and zoom; the scan's marks layer and Turn with the line. Props: `imageUrl`, `frame`, `spot`, `faceSpotToken`, `label`, and `scan`, `follow`, `onFollowOff` for the scan |
+| `src/globe/GlobeSection.tsx` | The app's Globe tab: the chosen picture on the globe, its regions, and the picture scan |
 | `src/globe/GlobePage.tsx` | The prototype page: source choice, sliders, presets, readout |
 | `src/globe/sources.ts` | The sources the globe can show (ocean from `data/`, aerosols from `data/aerosols/`) |
+
+## The picture scan on the globe (Dev A, 15 Nov)
+
+On the app's Globe tab, "Play the picture" plays the same scan as Play along (the same pixels, the
+same score, the same player: `src/scan/`) and draws it round the globe. A vertical line on the flat
+map is a meridian, so nothing about the sound changes. `globe.html` does not have the scan.
+
+- **Drawn in the shader** (`uMode` 1 and 2), in frame pixels like the spotlight, so the globe shows
+  exactly the cells being played: the part not played yet dimmed (0.42 toward black, soft edge), a
+  white glow behind the line, the white line with a black edge at a constant width on screen (the
+  shader turns map distances into screen distances with `dFdx`/`dFdy`), the white shape riding the
+  line, and for the radar the dimmed outside and sector not reached yet, three range rings, the rim,
+  the part of the rim passed, and the needle. Black and white only: the picture's colours are never
+  changed. The spotlight, the 0.85 darkening and the blue rim tint are off while the scan shows.
+  The spotlight code is unchanged (`uMode` 0).
+- **Drawn in an SVG layer** over the canvas: the chime marks (round or diamond, as on the flat
+  picture), the needle's ends and the compass letters. `projectToScreen` places them with the same
+  rotation and scale the shader gets; marks on the far side are hidden.
+- **Turn with the line** (a toggle, on each time a scan starts): the line sits 20° east of the middle,
+  so the part already played is in view; a radar turns the globe once to its circle and zooms to it.
+  Dragging, an arrow key or turning to a region turns it off. With reduced motion the globe only
+  cuts, once per step of the low note (45° of longitude), and the line moves once a second.
+- **The stars hold still** while the scan shows: the sky is drawn once into a texture and copied.
+  Measured on 15 Nov in headless Chromium (software rendering): the sky alone takes 5.4 ms a frame at
+  400 × 400 pixels and 20.2 ms at 800 × 800, and the scan redraws every frame.
+- **A circle on the flat map is an oval on the globe**, and the radar's needle turns unevenly on it
+  (about 30% faster near east and west on the Kuroshio circle). That is the true ground shape of the
+  area the Earth voice measures; regions stay flat in version one.
+- **For tests**, in development only: `window.__globe` gives what the globe shows (`state`), where a
+  place is drawn (`project`), the drawn colour at a place (`probe`) and the WebGL renderer's name.
+  In practice mode the globe wraps the TEST INPUT picture (240 × 120) so the browser tests can run.
 
 ## For Dev B
 

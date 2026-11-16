@@ -140,7 +140,7 @@ export const SCAN_CHOICES: ScanChoice[] = [
     name: 'Left and right',
     what: `The sound sits where the line is, at most ${PAN_WIDTH} of the way to one speaker: the map sweep travels left to right, the radar swings right, centre, left, centre.`,
     why: 'It repeats what the screen shows, so no fact is given by stereo alone.',
-    evidence: 'Recorded on 15 Nov (docs/measurements/scan_sound.md): the left channel is 9.0 dB louder in the first sixth of the map sweep, the right 9.9 dB louder in the last sixth.',
+    evidence: 'Recorded on 15 Nov (docs/measurements/scan_sound.md): the left channel is 8.3 dB louder in the first sixth of the map sweep, the right 10.2 dB louder in the last sixth.',
     tag: 'Design choice',
   },
   {

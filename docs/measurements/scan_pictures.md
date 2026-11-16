@@ -2,7 +2,7 @@
 
 Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.
 
-Measured 2026-11-16 03:24 UTC in Chromium 159.0.8154.6, on commit 1db3619 with uncommitted changes.
+Measured 2026-11-16 04:46 UTC in Chromium 159.0.8154.6, on commit 5049697 with uncommitted changes.
 The rule is `web/src/audio/scanScore.ts`, run in the browser on the stills the app plays.
 Map sweep: 240 columns × 12 bands. Floor 12/255.
 A chime needs level 0.3, 6 columns from the next in its band, 1 per column.
@@ -211,6 +211,17 @@ The 4:4:4 JPEG (quality=90, subsampling=0) and the lossless WebP (lossless=True,
 | Radar, Equatorial Pacific streaks: chimes (marimba, bells) | 72 (72, 0) | 85 (85, 0) | 81 (81, 0) | 81 (81, 0) |
 | Radar, Equatorial Pacific streaks: same place and instrument | 33 | 66 | 81 | 81 |
 | Globe land rule, Equatorial Pacific streaks: flat grey share of the circle | 0.04% | 0.01% | 0.00% | 0.00% |
+
+## The globe and the flat picture (ocean)
+
+The Globe tab draws the scan round the globe from the same pixels and the same rule as Play along. Each scan was
+read in both places in the running app; the globe was drawn by ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver).
+
+| Scan | Cells | Chimes | Same levels, means, chimes and left-out peaks on the globe |
+| --- | --- | --- | --- |
+| Whole picture: a line, west to east | 2880 | 68 | yes, every number |
+| Region A: a radar turn | 1440 | 56 | yes, every number |
+| Region B: a radar turn | 1440 | 72 | yes, every number |
 
 ## Check on this tool
 

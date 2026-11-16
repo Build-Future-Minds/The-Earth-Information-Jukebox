@@ -19,7 +19,7 @@ import {
   type ScanMeasure,
   type ScanShape,
 } from '../src/audio/scanScore';
-import { loadPicture } from '../src/components/PictureScan';
+import { loadPicture } from '../src/scan/loadPicture';
 import { PICTURES } from '../src/data/sources';
 import { OCEAN_LAND, landShare, type LandRule } from '../src/globe/geo';
 

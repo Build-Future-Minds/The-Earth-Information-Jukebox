@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ACTIVE, isPractice } from './data/dataset';
 import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
@@ -6,7 +6,7 @@ import { UserVoice, type InputSource } from './audio/userVoice';
 import { DEFAULT_MELODY_INSTRUMENT, type MelodyInstrumentId } from './audio/instruments';
 import type { PictureScanHandle } from './components/PictureScan';
 import { BeatTrack } from './components/BeatTrack';
-import { PlayerBar, RegionChoice, regionLabel, regionStyle } from './components/ExploreControls';
+import { PlayerBar, RegionChoice, regionColour, regionLabel, regionStyle } from './components/ExploreControls';
 import { PageLinks } from './components/PageLinks';
 import { ThemeSwitch } from './components/ThemeSwitch';
 import { stepAtSameMoment } from './components/RhythmExplanation';
@@ -75,6 +75,12 @@ export function App() {
     setSounding(null);
   }, []);
   const replay = useCallback(() => void transport.current?.replay(), []);
+  // The page's speed: the Earth rhythm and the picture scan both follow it. Set on Listen, and in the
+  // scan's settings on Play along and Globe, so it can change while the scan plays.
+  const changeSpeed = useCallback((s: number) => {
+    setSpeed(s);
+    transport.current?.setSpeed(s);
+  }, []);
   // Melody inputs (keyboard, on-screen keys, later MIDI) all send MIDI note numbers.
   const onMelodyNoteOn = useCallback(
     (note: number, source: InputSource) => void melody.current?.noteOn(note, 0.7, source),
@@ -160,6 +166,10 @@ export function App() {
           ? `${label}: missing information. The Earth voice is quiet.`
           : `Playing ${label}.`;
 
+  // The playing side's colour (DESIGN.md "Live"): the end block on the current tab and on Play.
+  // Pictures with neutral regions (aerosols, rain) use ink.
+  const live = { ['--live' as string]: look.neutral ? 'var(--ink)' : regionColour(scene.regions, regionId) } as CSSProperties;
+
   return (
     <>
       {isPractice(ACTIVE) && (
@@ -169,7 +179,7 @@ export function App() {
       )}
       {/* Layout (Dev B, after seeing it live): a sticky top bar with the title, four tabs and the
           theme switch (on phones the tabs move to a fixed bottom bar), then one main column. */}
-      <header className="topbar">
+      <header className="topbar" style={live}>
         <div className="brand">
           <h1>Earth Sonata</h1>
           {/* Student B's title line (docs/design/student_b_pictures.html), made picture-neutral
@@ -180,7 +190,7 @@ export function App() {
         <ThemeSwitch />
       </header>
 
-      <main className="stage">
+      <main className="stage" style={live}>
         {/* Focus target on a view change, announced by screen readers; the tab already shows it. */}
         <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
 
@@ -240,10 +250,7 @@ export function App() {
                 onStop={stop}
                 onReplay={replay}
                 onExplain={() => setExplaining((x) => !x)}
-                onSpeed={(s) => {
-                  setSpeed(s);
-                  transport.current?.setSpeed(s);
-                }}
+                onSpeed={changeSpeed}
                 onVolume={(db) => {
                   setVolumeDb(db);
                   transport.current?.setVolume(db);
@@ -275,13 +282,17 @@ export function App() {
               look={look}
             />
           )}
-          {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop} />}
+          {view === 'globe' && (
+            <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop}
+              speed={speed} onSpeed={changeSpeed} scanRef={scan} />
+          )}
           {view === 'how' && <HowView source={source} pictures={PICTURES} />}
           {view === 'play' && (
             <PlayView
               scene={scanPicture.scene}
               imageUrl={scanPicture.imageUrl}
               speed={speed}
+              onSpeed={changeSpeed}
               scanRef={scan}
               playState={playState}
               onStart={start}

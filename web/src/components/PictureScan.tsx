@@ -4,6 +4,10 @@
 // changes the Earth rhythm. In practice mode there is no NASA image, so it scans a labelled
 // TEST INPUT picture instead.
 //
+// This is the flat view of the scan. The picture, the score, the player, the controls, the bars
+// and the legend are shared with the globe (web/src/scan/); this file draws the line on the flat
+// picture.
+//
 // What you see is what you hear, drawn from the same score and the same audio clock as the sound:
 //   - the picture lights up as the line passes (the part not played yet is dimmed);
 //   - a white shape rides the line: wide where a band is loud;
@@ -11,32 +15,19 @@
 //   - the bars beside the picture are the low note and the twelve held notes, low to high;
 //   - the legend names every one of these, with the same shapes.
 // Everything drawn over the NASA image is black or white: its colours are never changed.
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Region, Scene } from '../data/types';
-import { DEFAULT_SCAN_SOUND, SCAN_SOUNDS, scanSound, type ScanSoundDef, type ScanSoundId } from '../audio/instruments';
-import { ScanPlayer, type ScanState } from '../audio/scanPlayer';
-import {
-  ROOT_NOTES,
-  bandNote,
-  buildScanScore,
-  chimeNote,
-  TEST_CIRCLE,
-  makeTestPicture,
-  noteName,
-  regionScan,
-  rootNoteAt,
-  type Chime,
-  type Pixels,
-  type ScanMeasure,
-  type ScanScore,
-} from '../audio/scanScore';
-import { regionLabel } from './ExploreControls';
-import { ScanExplanation } from './ScanExplanation';
+import type { ScanMeasure } from '../audio/scanScore';
+import { cellAt, cellOutline, cellTicks, type ScanPlacement } from '../audio/scanPick';
+import { chosenBand, explainPick, whyColumn } from '../audio/scanWhy';
+import { ScanButtons, ScanSettings, ScanStatus } from '../scan/ScanControls';
+import { ScanSide } from '../scan/ScanSide';
+import { groundNote } from '../scan/groundNote';
+import { useScan, type ScanHandle } from '../scan/useScan';
+import { useScanFrame } from '../scan/useScanFrame';
+import { ScanExplanation, WHY_START, type WhyView } from './ScanExplanation';
 
-export interface PictureScanHandle {
-  /** Silence the scan and rewind it (the page's Stop and Esc). */
-  stop: () => void;
-}
+export type PictureScanHandle = ScanHandle;
 
 interface Props {
   scene: Scene;
@@ -44,34 +35,10 @@ interface Props {
   imageUrl: string | null;
   /** The page's speed setting: the scan follows it. */
   speed: number;
+  /** Change the page's speed from the scan's settings (the Earth rhythm follows it too). */
+  onSpeed?: (speed: number) => void;
   /** What counts as light in this picture. Colour suits the ocean picture (grey land is silent). */
   measure?: ScanMeasure;
-}
-
-/** What the line reads: the whole picture, or one region's circle. */
-type Target = 'map' | string;
-
-interface Loaded {
-  /** URL shown on screen. */
-  href: string;
-  pixels: Pixels;
-  /** true: the made-up TEST INPUT picture, not NASA data. */
-  isTest: boolean;
-}
-
-/** A chime that has sounded in this sweep: where it is on the picture. */
-interface Trace {
-  id: number;
-  x: number;
-  y: number;
-  warm: boolean;
-}
-
-declare global {
-  interface Window {
-    /** Development only: the score being played, for measurements and browser tests. */
-    __scanScore?: ScanScore | null;
-  }
 }
 
 /** Widest the shape riding the line gets (each side), as a share of the picture's width or the circle's radius. */
@@ -85,231 +52,87 @@ const TRAIL_RADAR_DEGREES = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
 const COMPASS: [string, number, number][] = [['E', 1, 0], ['N', 0, 1], ['W', -1, 0], ['S', 0, -1]];
 /** Thin rings on the radar: every third band. */
 const RANGE_RINGS = [3, 6, 9];
-/** Most chime marks kept on the picture (one sweep makes about 70). */
-const MAX_TRACES = 160;
+/** A press that moves further than this (CSS pixels) before it lets go is a drag, not a tap: it picks nothing. */
+const TAP_SLOP = 10;
 
-/** Read a picture's pixels the way the scan does. Exported for the measuring tool (web/measure),
- *  so its numbers come from the same pixels the app plays. */
-export function loadPicture(imageUrl: string | null): Promise<Loaded> {
-  if (!imageUrl) {
-    const pixels = makeTestPicture();
-    const canvas = document.createElement('canvas');
-    canvas.width = pixels.width;
-    canvas.height = pixels.height;
-    canvas.getContext('2d')!.putImageData(new ImageData(new Uint8ClampedArray(pixels.data), pixels.width, pixels.height), 0, 0);
-    return Promise.resolve({ href: canvas.toDataURL('image/png'), pixels, isTest: true });
-  }
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      if (!ctx) return reject(new Error('This browser cannot read the picture.'));
-      ctx.drawImage(img, 0, 0);
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      resolve({ href: imageUrl, pixels: { data: data.data, width: data.width, height: data.height }, isTest: false });
-    };
-    img.onerror = () => reject(new Error('The picture did not load.'));
-    img.src = imageUrl;
-  });
-}
-
-export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, measure = 'colour' }, ref) {
-  const [loaded, setLoaded] = useState<Loaded | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [target, setTarget] = useState<Target>('map');
-  const [state, setState] = useState<ScanState>('stopped');
-  const [volumeDb, setVolumeDb] = useState(-8);
-  const [soundId, setSoundId] = useState<ScanSoundId>(DEFAULT_SCAN_SOUND);
-  const [traces, setTraces] = useState<Trace[]>([]);
-  // The note most recently struck, with the names the sound had when it was struck: switching the
-  // scan sound afterwards must not change what the explanation says about a note already played.
-  const [lastStruck, setLastStruck] = useState<{ chime: Chime; names: { held: string; warm: string; cool: string } } | null>(null);
-  const player = useRef<ScanPlayer | null>(null);
+export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, onSpeed, measure = 'colour' }, ref) {
+  const scan = useScan({ scene, imageUrl, speed, measure });
+  const { loaded, target, state, traces, frame, region, worldMap, score, bands, labelOf, why, liveColumn, lastStruck, reducedMotion } = scan;
   const sweep = useRef<SVGGElement>(null);
   const profile = useRef<SVGPathElement>(null);
   const unplayed = useRef<SVGPathElement>(null);
   const played = useRef<SVGPathElement>(null);
-  const bars = useRef<(HTMLElement | null)[]>([]);
-  const rootBar = useRef<HTMLElement>(null);
-  const rootName = useRef<HTMLElement>(null);
-  const readout = useRef<HTMLSpanElement>(null);
-  const lastChime = useRef<HTMLSpanElement>(null);
-  const traceId = useRef(0);
-  const reducedMotion = useMemo(() => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, []);
-  const sound = scanSound(soundId);
+  const picture = useRef<SVGSVGElement>(null);
+  /** The pointer pressed on the picture and where, until it lets go. */
+  const press = useRef<{ id: number; x: number; y: number } | null>(null);
+  const bandSentenceId = useId();
+  const hintId = useId();
 
-  // The picture's size on screen, in the units the scene uses (frame pixels).
-  const frame = loaded?.isTest ? { width: loaded.pixels.width, height: loaded.pixels.height } : scene.frames;
-  // Circles a radar can turn in: the scene's regions, or one test circle on the TEST picture.
-  const regions: Region[] = loaded?.isTest ? [TEST_CIRCLE] : scene.regions;
-  const region = target === 'map' ? undefined : regions.find((r) => r.id === target);
-  // "West to east" only for a whole-world map; any other picture is read left to right.
-  const worldMap = !!loaded && !loaded.isTest && scene.source.limitations.some((l) => /equirectangular/i.test(l));
-  const across = worldMap ? 'west to east' : 'left to right';
-
-  // What the line reads, and the score it makes. Same picture, same score, every time.
-  const score = useMemo<ScanScore | null>(() => {
-    if (!loaded) return null;
-    if (!region) return buildScanScore(loaded.pixels, { kind: 'line' }, { measure });
-    // The still may be smaller than the frames the region's pixels are counted in.
-    const { crop, shape } = regionScan(loaded.pixels, loaded.isTest ? loaded.pixels.width : scene.frames.width, region);
-    return buildScanScore(crop, shape, { measure });
-  }, [loaded, region, scene.frames.width, measure]);
-
-  const bands = score?.grid.bands ?? 12;
-  const columns = score?.grid.columns ?? 1;
-
-  const onChime = useCallback(
-    (chime: Chime) => {
-      if (lastChime.current) lastChime.current.textContent = `${chime.warm ? sound.warmName : sound.coolName} ${noteName(chimeNote(chime))}`;
-      setLastStruck({ chime, names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } });
-      // The bar for this band flashes. Restarting the animation needs the class to go and come back.
-      const bar = bars.current[chime.band];
-      if (bar) {
-        bar.classList.remove('hit');
-        void bar.offsetWidth;
-        bar.classList.add('hit');
-      }
-      const [x, y] = chimePosition(chime, columns, bands, frame, region);
-      const id = ++traceId.current;
-      setTraces((t) => [...t.slice(-(MAX_TRACES - 1)), { id, x, y, warm: chime.warm }]);
-    },
-    [columns, bands, frame, region, sound],
+  // What "Why the scan sounds like this" shows. Kept here so a click on the picture can choose a
+  // place in it, and the picture can mark the place it explains.
+  const [whyView, setWhyView] = useState<WhyView>(WHY_START);
+  const changeWhy = useCallback(
+    (change: Partial<WhyView>) =>
+      setWhyView((v) => ((Object.keys(change) as (keyof WhyView)[]).some((k) => v[k] !== change[k]) ? { ...v, ...change } : v)),
+    [],
   );
-  const onChimeRef = useRef(onChime);
-  onChimeRef.current = onChime;
+  // A new score is a new picture or a new scan: the explanation starts again at its first column.
+  useEffect(() => changeWhy({ column: 0, pick: null, follow: true }), [score, changeWhy]);
 
-  useEffect(() => {
-    const p = new ScanPlayer({ onState: setState, onChime: (c) => onChimeRef.current(c) });
-    player.current = p;
-    return () => p.dispose();
-  }, []);
+  // Where the scan lies on the picture, for a click and for the mark.
+  const placement = useMemo<ScanPlacement | null>(() => {
+    if (!loaded) return null;
+    const frameSize = { width: frame.width, height: frame.height };
+    return region
+      ? { kind: 'radar', frame: frameSize, center: region.center_px, radius: region.radius_px }
+      : { kind: 'line', frame: frameSize, pixels: { width: loaded.pixels.width, height: loaded.pixels.height } };
+  }, [loaded, region, frame.width, frame.height]);
 
-  useEffect(() => {
-    let live = true;
-    loadPicture(imageUrl).then(
-      (l) => live && setLoaded(l),
-      (e: Error) => live && setLoadError(e.message),
-    );
-    return () => {
-      live = false;
-    };
-  }, [imageUrl]);
+  // The place the fold-out explains: its column, and the band it explains in full. It is marked on
+  // the picture, with a line of words under it, whenever it is not moving with the line: the fold-out
+  // is open and the scan is not following the line as it plays.
+  const explained = useMemo(
+    () => (score ? chosenBand(whyColumn(score, whyView.column, why).bands, whyView.pick) : null),
+    [score, whyView.column, whyView.pick, why],
+  );
+  const showPlace = whyView.open && !(state === 'playing' && whyView.follow) && !!explained && !!placement;
 
-  useEffect(() => {
-    player.current?.setScore(score);
-    setTraces([]);
-    setLastStruck(null);
-    if (import.meta.env.DEV) window.__scanScore = score;
-  }, [score]);
+  // Click or tap a place on the picture: the fold-out opens on that column and band, as if they had
+  // been chosen with its slider and list. It never touches the player: no sound, and the line stays
+  // where it is. Mouse, touch and pen all send pointer events. A press that moves (a drag, or a finger
+  // scrolling the page, which the browser cancels) picks nothing, and nothing happens on hover.
+  const onPressStart = (e: React.PointerEvent<SVGSVGElement>) => {
+    press.current = e.isPrimary && e.button === 0 ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null;
+  };
+  const onPressEnd = (e: React.PointerEvent<SVGSVGElement>) => {
+    const p = press.current;
+    press.current = null;
+    if (!p || p.id !== e.pointerId || Math.hypot(e.clientX - p.x, e.clientY - p.y) > TAP_SLOP) return;
+    const m = picture.current?.getScreenCTM();
+    if (!m || !score || !placement) return;
+    // Screen to picture units, through the SVG's own viewBox (the radar view is zoomed to its circle).
+    const at = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+    const cell = cellAt(at.x, at.y, score.grid, placement);
+    if (!cell) return; // outside the picture, or outside the circle: nothing happens
+    changeWhy({ open: true, column: cell.column, pick: cell.band, follow: false });
+  };
 
-  useEffect(() => player.current?.setSpeed(speed), [speed]);
-  useEffect(() => player.current?.setVolume(volumeDb), [volumeDb]);
-  useEffect(() => player.current?.setSound(soundId), [soundId]);
-  // A stopped scan shows the clean picture: no marks from the last sweep.
-  useEffect(() => {
-    if (state === 'stopped') {
-      setTraces([]);
-      setLastStruck(null);
+  useImperativeHandle(ref, () => ({ stop: scan.stop }), []);
+
+  // The line on the flat picture, moved every frame by the shared loop.
+  useScanFrame(scan, ({ position, levels, grid, region: r, frame: f }) => {
+    if (r) {
+      const [cx, cy] = r.center_px;
+      sweep.current?.setAttribute('transform', `rotate(${-position * 360} ${cx} ${cy})`);
+      profile.current?.setAttribute('d', profilePath(levels, (b) => cx + ((b + 0.5) * r.radius_px) / grid.bands, cy, r.radius_px * PROFILE_RADAR, cx, cx + r.radius_px, true));
+      unplayed.current?.setAttribute('d', sectorPath(cx, cy, r.radius_px * 1.02, position));
+      played.current?.setAttribute('d', arcPath(cx, cy, r.radius_px, position));
+    } else {
+      sweep.current?.setAttribute('transform', `translate(${position * f.width} 0)`);
+      profile.current?.setAttribute('d', profilePath(levels, (b) => f.height - ((b + 0.5) * f.height) / grid.bands, 0, f.width * PROFILE_LINE, f.height, 0, false));
     }
-  }, [state]);
+  });
 
-  useImperativeHandle(ref, () => ({ stop: () => player.current?.stop() }), []);
-
-  // Draw with the sound. One loop runs for as long as the scan is on the page, and on every frame
-  // it asks the player itself where the line is. It must not wait for React to report "playing":
-  // choosing another scan while one plays stops and restarts the player within one tick, React
-  // sees "playing" before and after and re-renders nothing, and a loop tied to that change was
-  // never restarted. The notes played and the needle stood still (found and fixed 15 Nov).
-  const drawFrame = useRef<(now: number) => void>(() => {});
-  /** Set whenever something other than the moving line changes what should be on screen. */
-  const redraw = useRef(true);
-  const drawn = useRef({ position: 0, textAt: 0, levels: new Float32Array(0) });
-  useEffect(() => {
-    redraw.current = true;
-    drawFrame.current = (now: number) => {
-      const p = player.current;
-      if (!score || !p) return;
-      const playing = p.getState() === 'playing';
-      if (!playing && !redraw.current) return; // nothing is moving: leave the picture as it is
-      redraw.current = false;
-      const grid = score.grid;
-      const cyclic = score.shape === 'radar';
-      if (drawn.current.levels.length !== grid.bands) drawn.current.levels = new Float32Array(grid.bands);
-      const levels = drawn.current.levels;
-
-      let position = p.position();
-      // Reduced motion: the line jumps once a second instead of gliding.
-      if (reducedMotion) position = Math.floor(position * grid.seconds) / grid.seconds;
-      // A new sweep starts with a clean picture.
-      if (position < drawn.current.position - 0.5) setTraces([]);
-      drawn.current.position = position;
-
-      // Levels under the line right now, gliding from one column to the next as the sound does.
-      const at = position * grid.columns;
-      const c0 = Math.min(grid.columns - 1, Math.floor(at));
-      const c1 = cyclic ? (c0 + 1) % grid.columns : Math.min(grid.columns - 1, c0 + 1);
-      const mix = reducedMotion ? 0 : at - c0;
-      let sounding = 0;
-      let mean = 0;
-      for (let band = 0; band < grid.bands; band++) {
-        const level = score.levels[c0 * grid.bands + band] * (1 - mix) + score.levels[c1 * grid.bands + band] * mix;
-        levels[band] = level;
-        mean += level / grid.bands;
-        if (level > 0) sounding++;
-        bars.current[band]?.style.setProperty('--level', level.toFixed(3));
-      }
-      rootBar.current?.style.setProperty('--level', Math.min(1, mean * 2).toFixed(3));
-
-      if (region) {
-        const [cx, cy] = region.center_px;
-        sweep.current?.setAttribute('transform', `rotate(${-position * 360} ${cx} ${cy})`);
-        profile.current?.setAttribute('d', profilePath(levels, (b) => cx + ((b + 0.5) * region.radius_px) / grid.bands, cy, region.radius_px * PROFILE_RADAR, cx, cx + region.radius_px, true));
-        unplayed.current?.setAttribute('d', sectorPath(cx, cy, region.radius_px * 1.02, position));
-        played.current?.setAttribute('d', arcPath(cx, cy, region.radius_px, position));
-      } else {
-        sweep.current?.setAttribute('transform', `translate(${position * frame.width} 0)`);
-        profile.current?.setAttribute('d', profilePath(levels, (b) => frame.height - ((b + 0.5) * frame.height) / grid.bands, 0, frame.width * PROFILE_LINE, frame.height, 0, false));
-      }
-
-      // Text a few times a second is enough, and easier to read than a blur of digits.
-      if (now - drawn.current.textAt > 240 || !playing) {
-        drawn.current.textAt = now;
-        const root = noteName(rootNoteAt(grid, c0));
-        if (rootName.current) rootName.current.textContent = root;
-        if (readout.current) {
-          const where = region
-            ? `line at ${Math.round(position * 360)}° (0° is east, turning anticlockwise)`
-            : worldMap
-              ? `line at about ${longitude(position)}`
-              : `line ${Math.round(position * 100)}% of the way across`;
-          readout.current.textContent = `${where} · ${sounding} of ${grid.bands} bands sounding · low note ${root}`;
-        }
-      }
-    };
-  }, [score, state, region, frame.width, frame.height, worldMap, reducedMotion]);
-  useEffect(() => {
-    let raf = requestAnimationFrame(function tick(now) {
-      drawFrame.current(now);
-      raf = requestAnimationFrame(tick);
-    });
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  const labelOf = (t: Target) => (t === 'map' ? 'the whole picture' : loaded?.isTest ? 'the test circle' : regionLabel(scene.regions, t));
-  const status =
-    state === 'playing'
-      ? region
-        ? `Scanning ${labelOf(target)}: a radar line turns once around the circle.`
-        : `Scanning ${labelOf(target)}: a line moves from ${across}.`
-      : state === 'paused'
-        ? `Scan paused on ${labelOf(target)}.`
-        : 'Scan stopped.';
-
-  const ready = score?.status === 'ok';
   // Radar view: zoom to the circle with a small margin.
   const margin = region ? region.radius_px * 0.16 : 0;
   const view = region
@@ -319,84 +142,21 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   // the map and on the zoomed circle.
   const unit = view.h / 100;
   const figureClass = ['scene', 'scan-view', region ? 'radar' : 'line', state, reducedMotion ? 'still' : ''].join(' ').trim();
-  const order = region ? 'the centre to the rim' : worldMap ? 'south to north' : 'bottom to top';
-  // For "Why the scan sounds like this": the words for what is sounding, and which column the line is on.
-  const why = useMemo(
-    () => ({ geometry: worldMap ? ('world' as const) : ('plain' as const), names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } }),
-    [worldMap, sound],
-  );
-  const liveColumn = useCallback(() => Math.min(columns - 1, Math.floor((player.current?.position() ?? 0) * columns)), [columns]);
 
   return (
     <div className="scan" role="group" aria-labelledby="scan-heading">
       <h3 id="scan-heading">Play the picture</h3>
       <p className="muted">A line sweeps the picture and plays the colours it crosses. A rule we chose; the Earth rhythm is unchanged.</p>
 
-      <div className="row">
-        {state === 'playing' ? (
-          <button type="button" onClick={() => player.current?.pause()}>Pause the scan</button>
-        ) : (
-          <button type="button" className="primary" disabled={!ready} onClick={() => void player.current?.start()}>
-            {state === 'paused' ? 'Resume the scan' : 'Play the picture'}
-          </button>
-        )}
-        <button type="button" disabled={state === 'stopped'} onClick={() => player.current?.stop()}>Stop the scan</button>
-      </div>
-      {/* Settings folded away (UI pass, 15 Nov): one clear start, the rest on request. */}
-      <details className="scan-settings">
-        <summary>Scan settings</summary>
-        <div className="row">
-        <label>
-          Scan{' '}
-          <select value={target} onChange={(e) => setTarget(e.target.value)}>
-            <option value="map">Whole picture: a line, {across}</option>
-            {regions.map((r) => (
-              <option key={r.id} value={r.id}>{loaded?.isTest ? 'Test circle' : regionLabel(scene.regions, r.id)}: a radar turn</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Scan sound{' '}
-          <select value={soundId} onChange={(e) => setSoundId(e.target.value as ScanSoundId)}>
-            {SCAN_SOUNDS.map((s) => (
-              <option key={s.id} value={s.id}>{s.label}</option>
-            ))}
-          </select>
-        </label>
-        <label className="range">
-          <span className="range-row">
-            <span>Scan volume</span>
-            <span className="readout" aria-hidden="true">{volumeDb} dB</span>
-          </span>
-          <input
-            type="range"
-            min={-36}
-            max={0}
-            step={1}
-            value={volumeDb}
-            onChange={(e) => setVolumeDb(Number(e.target.value))}
-            aria-valuetext={`${volumeDb} decibels`}
-          />
-        </label>
-        </div>
-      </details>
-
-      {/* Announced politely, and only when the scan starts, pauses or stops. Not role="status":
-          the page has one status sentence, for the Earth rhythm. */}
-      <div aria-live="polite">
-        <p className="scan-status">{status}</p>
-        {loadError && <p className="missing">The picture scan is not available: {loadError}</p>}
-        {score?.status === 'missing' && (
-          <p className="missing">
-            Nothing to play for {labelOf(target)}: {score.reason}. The scan stays quiet.
-          </p>
-        )}
-      </div>
+      <ScanButtons scan={scan} />
+      <ScanSettings scan={scan} speed={speed} onSpeed={onSpeed} />
+      <ScanStatus scan={scan} />
 
       <figure className={figureClass} style={{ '--aspect': view.w / view.h } as React.CSSProperties}>
         <div className="scan-picture">
           {loaded?.isTest && <span className="scan-test">TEST INPUT — a made-up picture, not NASA data</span>}
           <svg
+            ref={picture}
             viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
             role="img"
             aria-label={
@@ -404,6 +164,10 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                 ? 'Test picture for the scan: three coloured dots and a grey block on black.'
                 : `${scene.source.title}, with the scan line${region ? ` on ${labelOf(target)}, ${region.name}` : ''}.`
             }
+            aria-describedby={hintId}
+            onPointerDown={onPressStart}
+            onPointerUp={onPressEnd}
+            onPointerCancel={() => (press.current = null)}
           >
             <defs>
               {/* Soft edge of the dimmed, not-yet-played part, and the glow behind the line. */}
@@ -503,36 +267,38 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                 </>
               )}
             </g>
+
+            {/* The place explained in "Why the scan sounds like this": the cell's own outline and four
+                ticks pointing at it, black under white. It never moves. */}
+            {showPlace && explained && placement && score && (
+              <g className="pick-mark" data-column={explained.column} data-band={explained.band}>
+                {(['under', 'over'] as const).map((layer) => (
+                  <g key={layer} className={layer}>
+                    <path d={cellOutline(explained, score.grid, placement)} />
+                    {cellTicks(explained, score.grid, placement, unit * 0.9, unit * 3.2).map(([x1, y1, x2, y2], i) => (
+                      <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />
+                    ))}
+                  </g>
+                ))}
+              </g>
+            )}
           </svg>
           {!loaded?.isTest && <span className="credit">Visualization: {scene.source.credit}</span>}
+          <p className="scan-pick-hint" id={hintId}>
+            Click or tap a place on the picture to see why it sounds as it does, or use the column slider in “Why the scan sounds like this”.
+          </p>
+          {/* Plain text, not announced: it is there when someone reads on from the picture. */}
+          {showPlace && explained && score && (
+            <p className="scan-pick">
+              <span>{explainPick(explained, score, why)}</span>
+              <button type="button" onClick={() => document.getElementById(bandSentenceId)?.focus()}>
+                Read why
+              </button>
+            </p>
+          )}
         </div>
 
-        <div className="scan-side">
-          {/* The low note and the twelve held notes, low to high: how loud each is right now. A bar
-              flashes when its band is struck. It repeats in shapes what the sound and the text say. */}
-          <div className="notes" aria-hidden="true">
-            <span className="note-bar root" ref={rootBar}>
-              <i />
-              <b ref={rootName}>{noteName(ROOT_NOTES[0])}</b>
-            </span>
-            {Array.from({ length: bands }, (_, band) => (
-              <span key={band} className="note-bar" ref={(el) => void (bars.current[band] = el)} style={{ '--length': 1 - band * 0.035 } as React.CSSProperties}>
-                <i />
-                <b>{noteName(bandNote(band))}</b>
-              </span>
-            ))}
-          </div>
-          <span className="readout" aria-hidden="true">
-            <span ref={readout}>line at the start</span>
-            {' · last chime: '}
-            <span ref={lastChime}>none yet</span>
-          </span>
-
-          <details className="scan-legend-box">
-            <summary>What the marks mean</summary>
-            <Legend sound={sound} order={order} radar={!!region} />
-          </details>
-
+        <ScanSide scan={scan}>
           {region && loaded && !loaded.isTest && (
             <div className="scan-mini">
               <svg viewBox={`0 0 ${frame.width} ${frame.height}`} role="img" aria-label={`Where ${labelOf(target)} is on the whole picture.`}>
@@ -542,10 +308,10 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                   <circle className="ring" cx={region.center_px[0]} cy={region.center_px[1]} r={region.radius_px} />
                 </g>
               </svg>
-              <span>Where {labelOf(target)} is on the whole picture: {region.name}.</span>
+              <span>Where {labelOf(target)} is on the whole picture: {region.name}.{worldMap && ` ${groundNote(region, frame)}`}</span>
             </div>
           )}
-        </div>
+        </ScanSide>
       </figure>
 
       <details className="scan-how">
@@ -591,87 +357,21 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
         </ul>
       </details>
 
-      {score && <ScanExplanation score={score} ctx={why} playing={state === 'playing'} getColumn={liveColumn} lastStruck={lastStruck} />}
+      {score && (
+        <ScanExplanation
+          score={score}
+          ctx={why}
+          playing={state === 'playing'}
+          getColumn={liveColumn}
+          lastStruck={lastStruck}
+          view={whyView}
+          onChange={changeWhy}
+          bandSentenceId={bandSentenceId}
+        />
+      )}
     </div>
   );
 });
-
-/** What every mark and bar means, with the same shapes as on the picture. Real text: read by screen readers. */
-function Legend({ sound, order, radar }: { sound: ScanSoundDef; order: string; radar: boolean }) {
-  return (
-    <ul className="scan-legend" aria-label="What the marks and bars mean">
-      <li className="legend-group"><strong>From the picture</strong></li>
-      <li>
-        <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
-          <rect width="15" height="22" fill="#666" />
-          <rect x="15" width="15" height="22" fill="#2a2a2a" />
-          <line x1="15" y1="0" x2="15" y2="22" stroke="#fff" strokeWidth="2.5" />
-        </svg>
-        <span><strong>The line.</strong> You hear what is under it. Behind it the picture is bright; the dimmed part is still to come.</span>
-      </li>
-      <li>
-        <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
-          <path d="M15 1C21 6 21 8 15 11C9 14 23 17 15 21C7 17 21 14 15 11C9 8 9 6 15 1Z" fill="#fff" fillOpacity="0.85" />
-          <line x1="15" y1="0" x2="15" y2="22" stroke="#fff" strokeWidth="1.5" />
-        </svg>
-        <span><strong>White shape on the line.</strong> Wider where that band is louder.</span>
-      </li>
-      <li>
-        <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
-          <circle cx="15" cy="11" r="5" fill="#fff" stroke="#000" strokeWidth="1.5" />
-        </svg>
-        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.</span>
-      </li>
-      <li>
-        <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
-          <rect x="10.5" y="6.5" width="9" height="9" transform="rotate(45 15 11)" fill="#fff" stroke="#000" strokeWidth="1.5" />
-        </svg>
-        <span><strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly yellow-green, green or blue.</span>
-      </li>
-      <li>
-        <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
-          <circle cx="15" cy="11" r="8.5" fill="none" stroke="#fff" strokeWidth="1.5" strokeOpacity="0.7" />
-          <circle cx="15" cy="11" r="2.5" fill="#fff" />
-        </svg>
-        <span><strong>Ring.</strong> Spreads from a mark at the moment its note sounds. The mark stays until the sweep ends.</span>
-      </li>
-      {radar && (
-        <li>
-          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
-            <circle cx="15" cy="11" r="3.5" fill="none" stroke="#fff" strokeWidth="1" strokeOpacity="0.6" />
-            <circle cx="15" cy="11" r="6.5" fill="none" stroke="#fff" strokeWidth="1" strokeOpacity="0.6" />
-            <circle cx="15" cy="11" r="9.5" fill="none" stroke="#fff" strokeWidth="1.5" />
-          </svg>
-          <span><strong>Thin rings.</strong> Every third band. Further from the centre is a higher note.</span>
-        </li>
-      )}
-      <li>
-        <svg className="glyph light" viewBox="0 0 30 22" aria-hidden="true">
-          <rect x="3" y="3" width="6" height="16" className="g-track" />
-          <rect x="3" y="12" width="6" height="7" className="g-ink" />
-          <rect x="12" y="5" width="6" height="14" className="g-signal" />
-          <rect x="21" y="7" width="6" height="12" className="g-track" />
-          <rect x="21" y="15" width="6" height="4" className="g-ink" />
-        </svg>
-        <span>
-          <strong>Bars: the 12 held notes ({sound.heldName}),</strong> from {order}, low to high. The filled part is how loud each is
-          now. A bar flashes orange when a note is struck in its band.
-        </span>
-      </li>
-      <li className="legend-group"><strong>Fixed by us, not from the picture</strong></li>
-      <li>
-        <svg className="glyph light" viewBox="0 0 30 22" aria-hidden="true">
-          <rect x="6" y="3" width="18" height="16" className="g-track" />
-          <rect x="6" y="10" width="18" height="9" className="g-ink" />
-        </svg>
-        <span>
-          <strong>First bar: the low note.</strong> It steps C, A, F, G by the clock. That is decoration, not data: the picture sets
-          only how loud it is.
-        </span>
-      </li>
-    </ul>
-  );
-}
 
 /** The glow behind the radar line. Drawn with the line pointing east; the group it sits in is turned. */
 function RadarTrail({ region }: { region: Region }) {
@@ -751,27 +451,4 @@ function profilePath(
 /** ", 2007-03-25 12:00 UTC" for "2007-03-25T12:00Z": the time of the still's frame, as the scene file gives it. */
 function stillTime(iso?: string): string {
   return iso ? `, ${iso.replace('T', ' ').replace('Z', ' UTC')}` : '';
-}
-
-/** "143° W": where the line is on the map. The NASA frame runs from 180° W at the left edge to 180° E. */
-function longitude(position: number): string {
-  const lon = position * 360 - 180;
-  const rounded = Math.round(Math.abs(lon));
-  return rounded === 0 || rounded === 180 ? `${rounded}°` : `${rounded}° ${lon < 0 ? 'W' : 'E'}`;
-}
-
-/** Centre of a chime's cell on the picture, in frame pixels. */
-function chimePosition(
-  chime: Chime,
-  columns: number,
-  bands: number,
-  frame: { width: number; height: number },
-  region?: { center_px: [number, number]; radius_px: number },
-): [number, number] {
-  if (!region) {
-    return [((chime.column + 0.5) / columns) * frame.width, frame.height - ((chime.band + 0.5) / bands) * frame.height];
-  }
-  const angle = (2 * Math.PI * (chime.column + 0.5)) / columns;
-  const radius = (region.radius_px * (chime.band + 0.5)) / bands;
-  return [region.center_px[0] + radius * Math.cos(angle), region.center_px[1] - radius * Math.sin(angle)];
 }

@@ -141,7 +141,8 @@ browser.** Test on the demo machine before relying on it.
 ## D9. Play along: a picture scan and new instruments, kept apart from the Earth voice
 
 **Design choice**, after **Verified** NASA examples. Owner: Dev A, 15 Nov. Code:
-`web/src/audio/scanScore.ts`, `scanPlayer.ts`, `instruments.ts`, `components/PictureScan.tsx`.
+`web/src/audio/scanScore.ts`, `scanPlayer.ts`, `instruments.ts`, `components/PictureScan.tsx`, and
+`web/src/scan/` (what every view of the scan shares: picture, score, player, drawing loop, controls, legend).
 Rule, settings, measurements and limits: `mapping_spec.md`, "Play along: the picture scan".
 
 **What:** the "Play along" section has two extras. "Play the picture" sweeps a line over the
@@ -205,8 +206,55 @@ was measured there, and how that became its pitch, loudness and instrument (`sca
 (`scanChoices.ts`); rules for reading the picture are kept apart from decoration, in the fold-out and in
 the legend. **Design choice:** a fold-out, not an always-open panel, to keep Dev B's shorter Play
 along view; and not a live region, so a screen reader is not interrupted by a sweep that makes
-about two notes a second (a radar turn, up to five). **Not decided:** whether the explanation should also be reachable by
-clicking the picture, and how the fixed choices should read to someone who has not seen the spec.
+about two notes a second (a radar turn, up to five). **Not decided:** how the fixed choices should
+read to someone who has not seen the spec.
+
+**Clicking the picture (Dev A, 15 Nov):** a click or tap on the scan's picture opens "Why the scan
+sounds like this" on the place under the pointer: its column, and its band as the one explained in
+full, as if they had been chosen with the fold-out's slider and band list. It makes no sound and does
+not move the scan. The slider stays the complete keyboard route; the click is a shortcut.
+**Design choices**, the four open questions decided by Developer A:
+- *While the scan plays,* a click pins the place: the fold-out stops following the line and the scan
+  plays on unchanged. A "Follow the line while the scan plays" checkbox pins and unpins from the
+  keyboard, and any place chosen (click, slider or buttons) unticks it.
+- *The radar's locator map* is not clickable: a radar cell is under a pixel there.
+- *Focus* is never moved by a click. A line under the picture names the place in the table's words,
+  and its "Read why" button moves focus to the full sentence when pressed. No live region.
+- *Where no note is struck* at the place, that line names the nearest struck note in the same band,
+  so a click on the middle of a spot of colour finds the note the spot made.
+
+Pointer events, so mouse, touch and pen work alike; nothing happens on hover. The place is outlined
+on the picture, black under white with four ticks, which is one more overlay on the NASA image:
+**Student B to review** against `DESIGN.md`. Code: `web/src/audio/scanPick.ts` (which cell is under
+a point), `components/PictureScan.tsx`, `components/ScanExplanation.tsx`. The geometry and its tests
+are in `mapping_spec.md`, "Explaining a note".
+
+**Fixed with it:** on a phone the open fold-out made the whole page scroll sideways (656 pixels wide
+in a 390-pixel window, measured 15 Nov; its table is 640 wide, and on the radar the band list was
+408). A tap on the picture now opens the fold-out, so this would be met often. The table now scrolls
+in its own box and the band list fits; a browser test checks the page width on a phone.
+
+**The scan on the globe (Dev A, 15 Nov):** the Globe tab plays the same scan, drawn round the 3D
+globe (`web/src/scan/ScanGlobe.tsx`; the drawing is in Student A's `web/src/globe/`). Same pixels,
+same score, same player and sound as Play along: a vertical line on the flat map is a meridian. The
+rule and the drawing are in `mapping_spec.md`, "On the globe". Decided by Developer A:
+- **Where:** the Globe tab only, not `globe.html` (Student A's region-picking tool), because Stop,
+  Esc, the page's speed and "changing view stops the sound" live in the app. When Play along and
+  Globe move into Listen (`page_plan.md`, P4), the globe drawing takes the shared scan state as it is.
+- **The circle stays the flat-map circle**, shown on the globe as the oval it is on the ground, with
+  its ground shape in words under the radar. A true ground circle waits for L7.
+- **Turn with the line is on** each time a scan starts; turning the globe yourself turns it off. Named
+  so it is not taken for the fold-out's "Follow the line while the scan plays" (from #64), which
+  moves the explanation, not the globe.
+- **Built for the ocean picture and the TEST INPUT picture first;** the aerosol and rain pictures
+  join when their own settings are measured (P1a), through one function, `scanRuleOf`.
+
+**Where it leaves `DESIGN.md`, for Student B and Developer B to accept:** the globe turns by itself
+while it follows the line (12° a second at normal speed), which is motion, not a 90 ms step. With
+reduced motion it only cuts, once per 45° step. The scan's settings now also hold the page's speed
+buttons, on Play along and on Globe, so the speed can change while the scan plays (before, it was set
+on Listen only, and changing view stops the sound). **Student A reviews** the shader and the globe
+code; **Developer B** the Globe tab and the shell.
 
 **Not decided here:** the Earth pulse keeps its sound. Changing it is task L1 in
 `idea_tasks.md` and needs the listening check to be run again.

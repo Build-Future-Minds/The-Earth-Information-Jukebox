@@ -108,7 +108,16 @@ interface Files {
   stills: Record<string, { label: string; describe: string }>;
 }
 
-function report(a: Audit, meta: Record<string, string>, files: Files): string {
+/** One scan read on the flat picture (Play along) and on the globe (Globe tab). */
+interface GlobeCheck {
+  scan: string;
+  cells: number;
+  chimes: number;
+  /** Levels, cell means, chimes and left-out peaks all equal, number for number. */
+  same: boolean;
+}
+
+function report(a: Audit, meta: Record<string, string>, files: Files, globe: { renderer: string; checks: GlobeCheck[] }): string {
   const out: string[] = [];
   out.push('# Picture scan: measurements on the NASA pictures', '');
   out.push('Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.', '');
@@ -364,6 +373,17 @@ function report(a: Audit, meta: Record<string, string>, files: Files): string {
     out.push(`Not run: it needs \`${TIF}\` (NASA's frames are downloaded, not committed) and Python with Pillow.`, '');
   }
 
+  out.push('## The globe and the flat picture (ocean)', '');
+  out.push('The Globe tab draws the scan round the globe from the same pixels and the same rule as Play along. Each scan was');
+  out.push(`read in both places in the running app; the globe was drawn by ${globe.renderer}.`, '');
+  out.push(
+    table(
+      ['Scan', 'Cells', 'Chimes', 'Same levels, means, chimes and left-out peaks on the globe'],
+      globe.checks.map((c) => [c.scan, c.cells, c.chimes, c.same ? 'yes, every number' : '**no**']),
+    ),
+    '',
+  );
+
   out.push('## Check on this tool', '');
   out.push('The tool repeats the rule\'s "which cell is this pixel in" to add weights and masks. Largest difference between its levels and the rule\'s, per picture (must be 0):');
   out.push(a.pictures.map((p) => `${p.key} ${p.selfCheck}`).join(', ') + '.', '');
@@ -405,6 +425,37 @@ test('measure the picture scan on the NASA pictures', async ({ page, browser }) 
   // The tool's copy of the cell rule must agree with the rule itself, or its extra numbers mean nothing.
   for (const p of result.pictures) expect(p.selfCheck, `${p.key}: the tool's cells differ from the rule's`).toBe(0);
 
+  // The globe: every scan of the ocean picture read on Play along and on the Globe tab, as a person would choose them.
+  const score = () =>
+    page.evaluate(() => {
+      const s = (window as unknown as { __scanScore: { levels: Float32Array; means: Float32Array; chimes: unknown[]; dropped: unknown[] } }).__scanScore;
+      return { levels: Array.from(s.levels), means: Array.from(s.means), chimes: s.chimes, dropped: s.dropped };
+    });
+  const readAll = async () => {
+    await page.getByText('Scan settings', { exact: true }).click();
+    const choice = page.locator('.scan select').first();
+    const names = await choice.locator('option').allTextContents();
+    const scores = [];
+    for (let index = 0; index < names.length; index++) {
+      await choice.selectOption({ index });
+      await expect(page.getByRole('button', { name: 'Play the picture' })).toBeEnabled();
+      scores.push({ name: names[index], ...(await score()) });
+    }
+    return scores;
+  };
+  const flat = await readAll();
+  await page.goto('/#globe');
+  await page.waitForFunction(() => !!(window as unknown as { __globe?: unknown }).__globe, undefined, { timeout: 15_000 });
+  const renderer = await page.evaluate(() => (window as unknown as { __globe: { renderer: () => string } }).__globe.renderer());
+  const onGlobe = await readAll();
+  const checks: GlobeCheck[] = flat.map((f, i) => {
+    const g = onGlobe[i];
+    const same = g?.name === f.name && JSON.stringify([g.levels, g.means, g.chimes, g.dropped]) === JSON.stringify([f.levels, f.means, f.chimes, f.dropped]);
+    return { scan: f.name, cells: f.levels.length, chimes: f.chimes.length, same };
+  });
+  for (const c of checks) expect(c.same, `${c.scan}: the globe's score differs from the flat picture's`).toBe(true);
+  const globe = { renderer, checks };
+
   const meta = {
     date: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
     browser: `Chromium ${browser.version()}`,
@@ -415,8 +466,8 @@ test('measure the picture scan on the NASA pictures', async ({ page, browser }) 
   mkdirSync(folder, { recursive: true });
   // The bar's colours are long and only feed the check above; the report gives what they show.
   const { bar, ...rest } = result;
-  const json = { meta, barLabelsC: BAR_LABELS_C, files, ...rest, bar: bar && { ...bar, colours: `${bar.colours.length} colours, x ${bar.from} to ${bar.to}` } };
+  const json = { meta, barLabelsC: BAR_LABELS_C, files, ...rest, bar: bar && { ...bar, colours: `${bar.colours.length} colours, x ${bar.from} to ${bar.to}` }, globe };
   writeFileSync(resolve(folder, 'scan_pictures.json'), JSON.stringify(json, null, 1) + '\n');
-  writeFileSync(resolve(folder, 'scan_pictures.md'), report(result, meta, files));
-  console.log(report(result, meta, files));
+  writeFileSync(resolve(folder, 'scan_pictures.md'), report(result, meta, files, globe));
+  console.log(report(result, meta, files, globe));
 });

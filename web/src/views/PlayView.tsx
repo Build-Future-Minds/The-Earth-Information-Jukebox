@@ -22,6 +22,8 @@ interface Props {
   imageUrl: string | null;
   /** The page's speed setting: the picture scan follows it. */
   speed: number;
+  /** Change the page's speed from the scan's settings (the Earth rhythm follows it too). */
+  onSpeed: (speed: number) => void;
   /** Lets the page's Stop and Esc silence the scan. */
   scanRef: Ref<PictureScanHandle>;
   playState: PlayState;
@@ -47,7 +49,7 @@ export function PlayView(p: Props) {
   return (
     <div className="play-grid">
       <div className="play-scan">
-        <PictureScan ref={p.scanRef} scene={p.scene} imageUrl={p.imageUrl} speed={p.speed} />
+        <PictureScan ref={p.scanRef} scene={p.scene} imageUrl={p.imageUrl} speed={p.speed} onSpeed={p.onSpeed} />
       </div>
       <section className="jam" aria-label="Play along with the Earth rhythm" style={p.colour}>
         <h3>Play along with the Earth rhythm</h3>
