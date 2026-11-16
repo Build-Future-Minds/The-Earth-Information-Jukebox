@@ -124,37 +124,51 @@ sweep a line over a picture and turn what it crosses into sound:
 - Chandra's Galactic Center: left to right; "objects located towards the top of the image are
   heard as higher pitches while the intensity of the light controls the volume".
 
-**Our version. Design choices**, the same for every picture and both regions.
+**Our version. Design choices.** The method is the same for every picture and both regions; each
+picture has its own settings (floor, full levels, pixels never read, what each instrument means),
+measured on its own still ("Each picture's own rule", below).
 
 | What the line crosses | What you hear |
 | --- | --- |
 | Where along the line: height on the map, north high (radar: distance from the centre) | Pitch. 12 bands, from C3 up to C6: C3 G3 C4 E4 G4 A4 C5 D5 E5 G5 A5 C6 |
 | How much colour: the mean colour strength of the cell | Loudness of that band's held note. A louder line is also a little brighter in tone |
 | A bright spot: a peak along the line's path | One struck note, an octave above that band's held note |
-| The spot's colour: red side of yellow, or not | Which instrument strikes it: marimba, or bells |
-| The whole line: mean level of the 12 bands | Loudness of one low note |
+| The spot's colour: red side of yellow, or not (the rain picture also: blue side) | Which instrument strikes it: marimba, or bells (rain: or harp, for snow) |
+| The whole line: mean level of the 12 bands that read something | Loudness of one low note |
 | Where the line is, left to right | The sound's place between the left and right speakers |
 
 Colour strength of a pixel is `(largest − smallest of red, green, blue) ÷ 255`. Black sea, grey
-land and white score 0, so they are silent. A pure colour scores 1. It is the same "spread" the
-team's land rule uses. A cell's mean strength `s` becomes a level
-`(s − floor) ÷ (full − floor)`, kept between 0 and 1.
+land and white score 0. A pure colour scores 1. It is the same "spread" the team's land rule uses.
+A cell's mean strength `s` becomes a level `(s − floor) ÷ (full − floor)`, kept between 0 and 1,
+with the picture's own floor and full level.
+
+**The instrument is chosen by what is drawn** (Design choice, 15 Nov). Only the pixels of a cell
+above the picture's floor vote, each weighted by its colour strength. A note is warm (marimba)
+when half or more of that colour has red as its largest channel; otherwise cool (bells). For a
+picture with a third class (rain), the largest of three shares wins: red largest (warm), blue
+largest (a tie with green counts as blue: the harp) or neither (cool); a tie goes to warm, then
+cool. Measured: voting above the floor changes no ocean note; without it, the rain picture's navy
+sea (blue largest) would turn light rain into snow.
+
+**No data** (Design choice, 15 Nov). A cell that reads nothing, because its pixels are masked or
+outside the picture, is no data. It is silent, never a peak, left out of the three-column
+smoothing (its neighbours share the weights) and out of the low note's mean, and a cell next to
+it is compared only with the neighbour that has data. The picture is hatched there, its bar is
+hatched, and every sentence says "no data". It is never written or played as a zero.
 
 | Setting | Whole picture (line) | Region (radar) |
 | --- | --- | --- |
-| Path | Left to right: west to east | From 3 o'clock, anticlockwise |
+| Path | Left to right: west to east on a world map | From 3 o'clock, anticlockwise |
 | Columns × bands | 240 × 12 | 120 × 12 |
 | One sweep at speed 1 | 30 s, the Earth loop's length | 15 s |
-| How a cell is read | Every pixel once | 16 points, 4 along the radius × 4 along the arc |
-| Floor | 12 ÷ 255 | 12 ÷ 255 |
-| Full level | 0.5 | 0.75 |
+| How a cell is read | Every pixel once, except pixels never read | 16 points, 4 along the radius × 4 along the arc |
+| Floor and full level | Each picture's own (below) | Each picture's own (below) |
 
 A chime needs a level of 0.3 or more at its peak, after smoothing over three columns with
 weights 1, 2, 1. Two chimes in one band are at least 6 columns (0.75 s) apart, and one column
 starts at most one chime; the stronger spot wins. A "spot" here is a whole cell: on the map sweep
-1.5° of longitude wide and 15° of latitude tall. The rule leaves many peaks out. **Measured, 15 Nov**,
-on the ocean still: 44 of 112 peaks on the map sweep, 46 of 102 on the Kuroshio radar and 115 of 187
-on the Equatorial Pacific radar (`docs/measurements/scan_pictures.md`).
+1.5° of longitude wide and 15° of latitude tall. The rule leaves many peaks out; each picture's
+section says how many.
 
 **Decoration that carries no data.** Three musical choices are fixed and the picture cannot
 change them. The app says so in "How the picture becomes sound".
@@ -166,7 +180,8 @@ change them. The app says so in "How the picture becomes sound".
   at once, which on the radar is all the time.
 - The instruments. "Scan sound" offers three: Ocean choir (choir, marimba, bells), Music box
   (soft organ, kalimba, music box) and Plain (the first version's instruments). All three play
-  the same score, the same notes at the same times; a browser test checks it.
+  the same score, the same notes at the same times; a browser test checks it. A picture with a
+  third class (rain: snow) strikes its third notes on a harp in all three.
 - Which low note sounds. It steps through the roots of four chords, I, VIm, IV and V in C (the
   notes C2, A1, F2, G2), one every 3.75 s. The same held notes are heard over four roots, as
   four chords, so the scan moves like music. C, A and G are notes of the scale. F is not: under
@@ -191,10 +206,12 @@ the Earth voice. The fold-out "Why the scan sounds like this" (Play along) has f
 - *Explain band.* One band in full, in words, with the arithmetic: level = (mean − floor) ÷ (full −
   floor), and the chime rule's numbers. A peak the chime rule left out says which stronger peak took
   its place and why (too close in the same band, or a stronger peak in the same column).
-- *Fixed by us.* Every fixed choice, with its reason, its evidence and its tag. Choices that change
-  how the picture is read ("rules") are listed apart from choices that carry no data
-  ("decoration"). The list is `web/src/audio/scanChoices.ts`; a test fails if an entry has no reason,
-  no evidence or no tag, and the numbers in an entry are read from the rule so they cannot drift.
+- *Fixed by us, for this picture.* Every fixed choice, with its reason, its evidence and its tag.
+  Choices that change how the picture is read ("rules") are listed apart from choices that carry no
+  data ("decoration"). The list is `scanChoicesFor(picture)` in `web/src/audio/scanChoices.ts`: it
+  quotes only that picture's settings and measured numbers, which a unit test checks against
+  `docs/measurements/scan_pictures.json`. A test fails if an entry has no reason, no evidence or no
+  tag, or if one picture's list names another picture.
 
 The sentences are built from the score and the rule's own constants (`web/src/audio/scanWhy.ts`),
 so they cannot say anything the score does not hold. The score keeps each cell's mean and number
@@ -212,37 +229,106 @@ of the rule. The cell means, the pixels read and the levels agreed to six decima
 both left-out peaks was the same. The Python script was a one-off and is not in the repo; the unit
 tests on made-up pictures are what stays.
 
-**Other pictures.** The level can be measured by colour strength (the default) or by brightness
-(the largest of red, green and blue), for pictures whose data is white or grey on a dark ground.
-A scene chooses one; the code never switches by itself. The ocean picture uses colour, because
-by brightness its grey land would sound (a test shows this).
+**Measure: colour or brightness.** The level can be measured by colour strength (the default) or
+by brightness (the largest of red, green and blue), for pictures whose data is white or grey on a
+dark ground. A picture's rule chooses one; the code never switches by itself. All three pictures
+use colour. By brightness the ocean's grey land would sound (a test shows this); each picture's
+section of the report gives the brightness numbers for the record.
 
-The app's scan plays the ocean picture only, whichever picture is chosen on Listen (Dev B's review
-of #45). The aerosol and rain stills were measured with the same rule on 15 Nov and are **not
-ready**. By colour, the rain picture's empty sea sounds in every cell (it is drawn dark navy, not
-black: mean level 0.141) and its land, a photo, sounds in 61% of land cells. On the aerosol still
-93% of sea cells sound, and its sea-salt circle gives no chime at all. Each picture needs its own
-floor, land rule and legend before the scan may play it, and its numbers are never compared with
-another picture's.
+### Each picture's own rule
+
+Added 15 Nov by Developer A. The scan plays the picture chosen on Listen, with that picture's own
+rule (`web/src/data/sources.ts`, `scan`); the picture choice also shows on Play along. A picture
+whose rule has not been measured is never scanned: the scan keeps one that has a rule, and says so.
+Every number below was measured by `npm run measure` (`docs/measurements/scan_pictures.md`, one
+section per picture). **The numbers of one picture are never compared with another's**: each table
+here is one picture's.
+
+**The procedure, the same for every picture** (Design choice). Floor: the colour strength of the
+commonest colour among the pixels the scan reads, plus 12 grey levels (the tolerance for JPEG
+noise). Full level: the largest cell mean on that scan (the radar: the larger of the two circles),
+rounded up to 0.05, so no cell is clipped. Mask: pixels whose colour is not data. A unit test
+(`web/src/data/scanRules.test.ts`) fails if a picture's settings, or any number the app quotes
+about it, differ from what the report was measured with.
+
+Each rule also states whether the picture is a whole-world map (all three are, by the map checks in
+`assets/source_manifest.json`; it is no longer found by searching a scene's limitations for a
+word), which still it reads, what each instrument means in its own legend, and its limits.
+
+#### Ocean (SVS 3912)
+
+| Setting | Value | Tag and evidence |
+| --- | --- | --- |
+| Still | Frame 23000, 2007-03-25 12:00 UTC | Verified: the still differs from NASA's frame by 6.93 grey levels a channel on average (a JPEG) |
+| Floor | 12 ÷ 255 | Design choice, the one the scan was built with; the procedure gives the same (its commonest colour, grey land, has strength 0). Of 746 cells that are 90% or more grey land or black sea in the uncompressed frame, none sounds; the largest has a mean of 7.67 ÷ 255 |
+| Full level | 0.5 map sweep, 0.75 radar | Design choice, kept. The procedure gives 0.5 and 0.85 (largest cell means 0.463 and 0.80) |
+| Pixels never read | None | Design choice |
+| Instruments | Marimba: lines drawn red or orange (the warm end of NASA's bar). Bells: the rest | Design choice. The switch falls at 74.4% of NASA's bar, 23.8 °C if the bar's scale is even (Unverified) |
+
+#### Aerosols (SVS 5669)
+
+| Setting | Value | Tag and evidence |
+| --- | --- | --- |
+| Still | The one still, 2025-08-19 20:00 UTC, scaled down | Verified: 2.65 grey levels a channel from NASA's PNG on average |
+| Floor | 20 ÷ 255 | Design choice, by the procedure: the commonest colour is the grey-green land, strength 8. Of 194 cells that are 90% or more that colour, none sounds (largest 11.07 ÷ 255) |
+| Full level | 0.45 map sweep, 0.8 radar | Design choice, by the procedure (largest cell means 0.429 and 0.77) |
+| Pixels never read | None: aerosol over land is data | Design choice |
+| Instruments | Marimba: black carbon (smoke from fires), drawn orange-red. Bells: dust (lilac), sea salt (pale grey-teal) and sulfate (green) | Design choice. Measured on NASA's bar: 1 of its 4 swatches (black carbon) is on the warm side. Swatch names read by eye from the bar |
+
+Measured with these settings: the map sweep strikes 36 notes (3 marimba, all black-carbon colour;
+33 bells, 29 sulfate and 4 dust colour); the Vanuatu circle 34, all bells, all sulfate colour; the
+sea-salt circle none (its most colourful cell measures 0.15, so its loudest held note is about a
+tenth of full loudness). Recorded, one turn of the sea-salt circle measures −53.5 LUFS in both
+runs, with a largest sample of −38.0 and −38.6 dBFS: it is nearly silent, not just without struck
+notes. **Accepted by Developer A, 15 Nov, and said in the app:** sea salt is quiet, because NASA
+draws it pale; dust rings the same instrument as sea salt and sulfate. NASA's bar names the orange swatch "Black Carbon"; the scene's
+legend, from the source page, says "smoke from fires".
+
+#### Rain (SVS 4285)
+
+| Setting | Value | Tag and evidence |
+| --- | --- | --- |
+| Still | Frame 0, 2026-11-14 00:00 UTC | Verified: compared with each of the 30 frames, the still is closest to frame 0 (4.48 grey levels a channel; the next closest 7.84) |
+| Pixels never read | Land, which is a satellite photo here (40.21% of the still) | Design choice. `data/imerg/scan_mask.png`, written by `analysis/scan_mask.py`: exactly the land `prepare_scene.py` uses for this picture's regions (the SVS 3912 grey-land outline plus pixels bright and unchanged over the 30 frames, grown by the coast margin). Inside both circles it matches the regions' own masks pixel for pixel |
+| Floor | 30 ÷ 255 | Design choice, by the procedure: the commonest colour read is the navy sea, RGB (2, 5, 20), strength 18.2. Of 1,108 cells that are 90% or more navy, 1 sounds, and 10% of its pixels are drawn rain |
+| Full level | 0.85 map sweep, 0.95 radar | Design choice, by the procedure (largest cell means 0.810 and 0.90) |
+| Instruments | Marimba: rain drawn yellow, orange or red. Bells: rain drawn green or yellow-green. Harp: snow, drawn cyan to purple | Design choice. Measured on NASA's bars: rain steps 4 to 10 of 10 are warm, steps 1 to 3 cool; all 10 snow steps and no rain step are on the blue side |
+
+Both are needed: the mask alone leaves the navy sea sounding almost everywhere (79.4% of cells at
+the ocean's floor), and a floor alone cannot silence a coloured photo of a desert. **The cost**,
+said in the app: no rain is heard over land (no data, not "no rain"), and of the 742 map cells that
+are 10% or more drawn in a rain or snow colour, 510 sound. Measured with these settings: the map
+sweep strikes 16 notes (4 marimba, 7 bells, 5 harp; every harp note is in a snow-coloured cell).
+**Unverified:** which amount of rain a colour step stands for. NASA's bar has no numbers on it;
+the legend's words put yellow at 0.5 to 1 mm an hour.
 
 All instruments are synthesised by our code. A struck note is a few sine tones at the ratios
-of a vibrating bar, `(xₙ / x₁)²`, each fading at its own speed:
+of a vibrating bar, `(xₙ / x₁)²`, or (the harp) of a plucked string, each fading at its own speed:
 
-| Instrument | How the bar is held | Equation for x | Tones |
+| Instrument | How it vibrates | Equation | Tones |
 | --- | --- | --- | --- |
-| Bells (glockenspiel) | Free at both ends | `cos x · cosh x = 1` | 1 : 2.7565 : 5.4039 : 8.9330 |
-| Music box, kalimba | Clamped at one end | `cos x · cosh x = −1` | 1 : 6.2669 : 17.5475 |
-| Marimba | Free, and carved to be in tune | (tuned by the maker) | 1 : 4 : 9.2 |
+| Bells (glockenspiel) | A bar free at both ends | `cos x · cosh x = 1` | 1 : 2.7565 : 5.4039 : 8.9330 |
+| Music box, kalimba | A bar clamped at one end | `cos x · cosh x = −1` | 1 : 6.2669 : 17.5475 |
+| Marimba | A free bar, carved to be in tune | (tuned by the maker) | 1 : 4 : 9.2 |
+| Harp (rain picture: snow) | A string plucked at p = 0.3 of its length | `bₙ = 2h·sin(nπp) ÷ (n²π²·p(1 − p))` | 1 : 2 : 3 … 8, tone n as loud as sin(nπp) ÷ n |
 
 The first two rows were computed on 15 Nov; source S12 gives the free bar as 1 : 2.76 : 5.40 and
-the marimba's 4.0 and 9.2. The marimba has a few milliseconds of soft noise for the mallet, and
+the marimba's 4.0 and 9.2. The harp's row: a string pulled to height h at p and let go starts as a
+triangle, whose Fourier sine coefficients are the bₙ above; the sound comes from the force on the
+bridge, T·∂y/∂x at the string's end, which is nπ·bₙ for tone n, so tone n is as loud as
+sin(nπp) ÷ n compared with the first. A unit test sums the series back into the triangle and checks
+every tone. p = 0.3 (so no tone below the tenth is missing), eight tones and tone n ringing 1 ÷ n
+as long are design choices; nobody has listened yet. A vibraphone was considered first and not
+used: its tuning (1 : 4 : 10) and tremolo rate could not be confirmed from a source we could read. The marimba has a few milliseconds of soft noise for the mallet, and
 the bells a second, quieter copy of the lowest tone 1.3 Hz above it, which gives a slow shimmer.
 The held notes are slightly detuned saw waves through a low-pass filter, with a little vibrato
 at three speeds. The low note is played with its octave and its fifth, and a new low note fades
 in while the old one fades out.
 
-**Measured, 15 Nov**, on `data/preview.jpg` (frame 23000) in Chromium, with the settings above.
-Sound levels come from recordings of the running app at its default volumes.
+**Measured, 15 Nov (the ocean picture)**, on `data/preview.jpg` (frame 23000) in Chromium, with
+the ocean's settings. Sound levels come from recordings of the running app at its default volumes.
+The aerosol and rain pictures' sweeps are recorded in their own sections of
+`docs/measurements/scan_sound.md`.
 
 | Scan | Cells that sound | Chimes in one sweep | Marimba | Bells | Loudness |
 | --- | --- | --- | --- | --- | --- |
@@ -280,6 +366,15 @@ phases.
 Loudness follows the level. On a test picture with levels 0.121, 0.251, 0.502 and 1 in one band
 and the chime rule switched off, that band's tone rose by 6.2, 6.0 and 5.9 dB in the first run
 and 6.5, 6.2 and 6.0 dB in the second. 20·log₁₀ of the level ratios gives 6.3, 6.0 and 6.0 dB.
+Two later runs, with each picture's own rule in place, gave 5.84, 5.68 and 5.34 dB, then 6.18,
+5.77 and 5.65 dB. The tone always rises, but by 5.3 to 6.5 dB a doubling over the four runs.
+**Unverified:** why the runs differ (the code on this path did not change between them).
+
+**The harp's level** (Design choice, measured). One struck C6 at full strength on each
+instrument, alone (`scan_sound.md`, "One struck note on each instrument, alone"): the harp's level
+in each scan sound was set so its note is as loud as that sound's cool instrument. Measured after
+the change: Ocean choir harp −19.4 LUFS and bells −19.6; Music box harp −21.5 and music box −21.6;
+Plain harp −19.6 and bells −19.6. Before it, the harp was 1.8 to 3.2 LU quieter.
 
 Checked in a recording of the map sweep:
 
@@ -288,17 +383,34 @@ Checked in a recording of the map sweep:
 - Left and right: in the first 5 s the left channel is 9.5 dB louder than the right, they cross
   between 15 and 20 s, and in the last 5 s the right is 9.3 dB louder.
 
-**Tests.** `web/src/audio/scanScore.test.ts`: 57 tests on made-up pictures (TEST INPUTS). The
+**Tests.** `web/src/audio/scanScore.test.ts`: 89 tests on made-up pictures (TEST INPUTS). The
 main one is a picture with three dots, which must give exactly three chimes: columns 41, 81 and
 201, bands 1, 8 and 5, marimba for the red dot and bells for the green and blue ones. Black,
 grey and grey with JPEG-sized noise are `missing` and silent. The root steps, the left–right
 position, the note spacing and the brightness measure each have their own tests. Three more say
-exactly which notes clash (none of the held notes with each other; F under E).
-`web/src/audio/instruments.test.ts`: 3 tests solve the two bar equations again and compare the
-answers with the ratios the instruments use. `web/src/audio/scanWhy.test.ts`: 27 tests on made-up
-pictures: each dot explains itself with its place, numbers and instrument; a peak left out names
-the stronger one that took its place, for both reasons; places on a world map, another picture and
-the radar; the whole column; and the list of fixed choices. `web/e2e/scan-why.e2e.ts`: 8 browser
+exactly which notes clash (none of the held notes with each other; F under E). Added 15 Nov for
+each picture's own rule: a floor above a navy ground, a mask (a masked cell is no data; a
+half-masked cell has the mean of what it read; a mask of the wrong size is an error; the radar cuts
+the mask with the circle), the no-data neighbour rule, `resampleMask`, and the three colour classes
+on the colours of NASA's rain and snow bars, including that a navy sea below the floor never turns
+light rain into snow.
+`web/src/audio/instruments.test.ts`: 7 tests. Three solve the two bar equations again and compare
+the answers with the ratios the instruments use; four check the harp: the plucked string's Fourier
+series sums back into its triangle, each tone's loudness, no missing tone, and the fade.
+`web/src/data/scanRules.test.ts`: 18 tests: each picture's settings and every number the app quotes
+about it equal `docs/measurements/scan_pictures.json`; the aerosol and rain settings are what the
+procedure gives; no picture's words name another picture. `analysis/tests/test_scan_mask.py`: 6
+tests on made-up frames for the rain picture's mask. `web/src/audio/scanWhy.test.ts`: 52 tests on
+made-up pictures: each dot explains itself with its place, numbers and instrument; a peak left out
+names the stronger one that took its place, for both reasons; places on a world map, another picture
+and the radar; the whole column; a cell with no data; the third instrument; and each picture's own
+list of fixed choices. `web/e2e/scan-pictures.e2e.ts`: 8 browser tests on made-up pictures read
+with the real rain and aerosol rules (`VITE_DATASET=practice-pictures`, its own Playwright project):
+the rain picture's notes on three instruments, its land never read; changing the picture while the
+scan plays; changing the scan sound while it plays; the radar's no-data cells in the table and the
+bars; reduced motion; the explanation in each picture's own numbers, never announced; the Earth
+rhythm's schedule while the rain picture is scanned; and every picture's notes and Esc.
+`web/e2e/scan-why.e2e.ts`: 8 browser
 tests that do what a person does: open it by keyboard, walk to a column with the arrow keys and
 read its table, follow the line while it plays, change the scan sound while it plays, use the radar,
 and check nothing in it is announced.
@@ -317,20 +429,28 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
 | --- | --- | --- |
 | The method is NASA's: a line or a radar, position to pitch, light to loudness, colour to instrument | Verified | S9 to S11 |
 | The Earth rhythm is unchanged while the scan plays | Verified | Browser test |
-| The line runs west to east and the readout gives its longitude | Verified for the ocean | Map geometry checked by Student A, 14 Nov. The app finds a world map by the word "equirectangular" in a scene's limitations; the aerosol and rain scenes lack the word, so this must be fixed before either is played |
+| The line runs west to east and the readout gives its longitude | Verified for each picture | Each picture's rule states it is a whole-world map (`worldMap`), from the map checks in `assets/source_manifest.json` (Student A: a grid overlay on each). It is no longer found by searching a scene's limitations for a word. A made-up TEST INPUT picture is never a world map |
+| Each picture's settings were measured before they were written | Verified | A unit test compares every rule in `sources.ts`, and every number the app quotes about a picture, with `scan_pictures.json` |
+| Which still each picture plays | Verified | Ocean: frame 23000. Aerosols: the one still. Rain: frame 0, the closest of its 30 frames (each picture's own section of the report) |
 | Pitch is height on the map, in 12 equal bands | Design choice | Limits in "What we do not claim" |
 | Loudness is a cell's mean colour strength | Design choice | Limits in "What we do not claim" |
-| The sound gets louder as the level rises | Verified | On a recorded test picture each doubling of the level raised that band's tone by 5.9 to 6.5 dB over two runs; 6.0 is exact |
-| Black sea and grey land are silent | Verified for the ocean | Of 746 cells that are 90% or more grey land or black sea in the uncompressed frame, none sounds. Largest cell mean 7.67/255; the floor is 12/255 |
+| The sound gets louder as the level rises | Verified | On a recorded test picture each doubling of the level raised that band's tone by 5.3 to 6.5 dB over four runs; 6.0 is exact. Why the runs differ is Unverified |
+| Black sea and grey land are silent (ocean) | Verified | Of 746 cells that are 90% or more grey land or black sea in the uncompressed frame, none sounds. Largest cell mean 7.67/255; the floor is 12/255 |
+| Grey land is silent (aerosols) | Verified | Of 194 cells that are 90% or more the commonest colour (the grey-green land), none sounds at its floor, 20/255 |
+| The navy sea is silent and the land is never read (rain) | Verified, with one exception explained | Of 1,108 cells that are 90% or more navy, 1 sounds: 10% of its pixels are drawn rain. The mask matches the regions' own masks pixel for pixel inside both circles |
+| A cell with nothing read is no data, never a zero | Verified | Unit tests (smoothing, low note, explanation) and browser tests (table, bars, hatch) on made-up pictures |
 | A peak of colour gives one struck note | Design choice | 39% to 61% of peaks are left out |
-| Red and orange strike one instrument, the rest another | Design choice | The switch on NASA's colour bar is measured; what it means in degrees is Unverified |
+| Red and orange strike one instrument, the rest another | Design choice | The switch on each picture's NASA bar is measured; what it means in degrees (ocean) or mm an hour (rain) is Unverified |
+| Snow strikes its own instrument (rain) | Design choice | Measured on NASA's bars: all 10 snow steps and no rain step are on the blue side. In the still, every harp note is in a snow-coloured cell |
+| The harp's tones are a plucked string's | Verified | A unit test sums the plucked string's Fourier series back into its triangle and checks each tone; the pluck point and the fade are design choices |
+| Only what is drawn chooses the instrument | Design choice | Measured: no ocean note changes instrument when pixels below the floor stop voting |
 | The held notes never clash with each other | Verified | A test, with "clash" defined as 1, 6 or 11 semitones apart |
 | The low note never clashes with the held notes | Corrected | It did claim this. F under E is a major seventh |
 | Wide spacing at the bottom is clearer than close spacing | Unverified | No source. To do: derive it from critical bandwidth, with a source someone has read |
 | The bars' tone ratios | Verified | A test solves both equations |
 | The low note's steps and the left–right position carry no data | Verified | Recordings above |
 | Every scan sound plays the same score | Verified by construction | The browser test compares the first chime only |
-| Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop |
+| Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop. Recorded twice more with each picture's own rule, each picture in its own section of `scan_sound.md`: every largest sample below −4 dBFS, and every sample 0 from 0.15 s after Stop |
 | The counts in "Measured, 15 Nov" | Verified again | The tool gives the same: 60.0% and 68 chimes (53, 15); 98% and 56; 100% and 72 |
 | The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | Two more runs differ from them, and from each other, by up to 0.7 |
 | It sounds good, and a region's character can be heard | Unverified | Needs listeners. The third round has had none |
@@ -369,3 +489,14 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
 - The scan has its own clock. Its notes can fall close to an Earth pulse, so run the listening
   check with the scan off.
 - The chime rule leaves out bright spots that are too close together. The choir still plays them.
+- **Aerosols.** The scan reads how strongly the plumes are coloured, not how much aerosol there is.
+  Sea salt is drawn pale grey-teal on NASA's own bar, so it is quiet: the sea-salt circle strikes no
+  note. Dust, sea salt and sulfate ring the same instrument; only black carbon (smoke) strikes the
+  other. A struck note's aerosol type is the colour of NASA's bar its cell is nearest to (measured
+  for every note); a cell can hold more than one.
+- **Rain.** Over land the scan reads nothing, because the land is a photo: no rain is heard there.
+  That is no data, not "no rain". Faint rain at sea can be below the floor: 510 of the 742 map
+  cells that are 10% or more rain or snow colour sound. Snow and light rain no longer share an
+  instrument, but nobody has listened to tell the harp apart yet. The colours describe the drawn
+  picture of satellite estimates, not how much it rains.
+- Each picture's numbers are its own: a louder rain sweep says nothing about the ocean or the air.
