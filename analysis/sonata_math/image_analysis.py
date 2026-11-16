@@ -35,6 +35,14 @@ REASON_FRAME_SIZE_MISMATCH = "frame_size_mismatch"
 
 GRAY_MODES = ("value", "luma")
 
+# The 3x3 Sobel kernel's weights add up to 8 on each side, so this makes a slope of 1 grey level per
+# pixel read as exactly 1 (docs/math_notes.md section 3). The web page "How it's made" shows it.
+SOBEL_SCALE = 1.0 / 8.0
+
+# Rec.601 luma weights for red, green and blue: the "usual" grayscale we do not use (gray_mode
+# "luma"). It makes a pure blue line (0.114) about 8 times fainter than a yellow one (0.299 + 0.587).
+LUMA_RGB = (0.299, 0.587, 0.114)
+
 
 @dataclass(frozen=True)
 class AnalysisParams:
@@ -177,8 +185,9 @@ def to_gray(image: np.ndarray, mode: str = "value") -> np.ndarray:
         bgr = arr[..., :3].astype(np.float64)
         if mode == "value":
             gray = bgr.max(axis=2)
-        else:  # Rec.601 luma, channels are B, G, R
-            gray = 0.114 * bgr[..., 0] + 0.587 * bgr[..., 1] + 0.299 * bgr[..., 2]
+        else:  # Rec.601 luma; OpenCV's channels are B, G, R
+            r, g, b = LUMA_RGB
+            gray = b * bgr[..., 0] + g * bgr[..., 1] + r * bgr[..., 2]
     else:
         raise ValueError(f"Expected a grey or BGR image, got shape {arr.shape}")
     return gray * scale
@@ -206,8 +215,8 @@ def gradients(gray: np.ndarray, blur_sigma: float = 1.0) -> tuple[np.ndarray, np
         g = cv2.GaussianBlur(
             g, (k, k), sigmaX=blur_sigma, sigmaY=blur_sigma, borderType=cv2.BORDER_REFLECT_101
         )
-    gx = cv2.Sobel(g, cv2.CV_64F, 1, 0, ksize=3, scale=0.125, borderType=cv2.BORDER_REFLECT_101)
-    gy = cv2.Sobel(g, cv2.CV_64F, 0, 1, ksize=3, scale=0.125, borderType=cv2.BORDER_REFLECT_101)
+    gx = cv2.Sobel(g, cv2.CV_64F, 1, 0, ksize=3, scale=SOBEL_SCALE, borderType=cv2.BORDER_REFLECT_101)
+    gy = cv2.Sobel(g, cv2.CV_64F, 0, 1, ksize=3, scale=SOBEL_SCALE, borderType=cv2.BORDER_REFLECT_101)
     return gx, gy
 
 

@@ -1,6 +1,7 @@
 """Run every verification experiment, then draw the figures and write the sound previews.
 
     python run_experiments.py
+    python run_experiments.py --tables-only     # skip the figures and the sound previews
 
 Everything used here is a TEST INPUT (synthetic), not NASA data.
 
@@ -10,10 +11,12 @@ Writes
     out/rhythm_*.wav, *.json       two contrasting test rhythms (plain test tones)
     ../docs/figures/math/*.png     the figures used in docs/math_notes.md
     ../docs/science_review.md      its tables are rewritten in place from this run
+    ../docs/measurements/math_checks.json   the same numbers, for the web page "How it's made"
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import platform
 from datetime import date
@@ -25,6 +28,7 @@ import numpy as np
 from sonata_math import experiments, viz
 from sonata_math import synthetic as S
 from sonata_math.audio import render_pulses
+from sonata_math.checks import write_checks
 from sonata_math.image_analysis import AnalysisParams, measure_alignment
 from sonata_math.rhythm import RhythmParams, events_for_steps
 
@@ -32,6 +36,7 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE / "out"
 FIGURES = HERE.parent / "docs" / "figures" / "math"
 REVIEW = HERE.parent / "docs" / "science_review.md"
+CHECKS = HERE.parent / "docs" / "measurements" / "math_checks.json"
 BEATS = 4
 
 
@@ -73,6 +78,10 @@ def contrasting_rhythms() -> list[tuple[str, list[dict], str]]:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--tables-only", action="store_true",
+                        help="write the tables and math_checks.json; skip the figures and the sound previews")
+    args = parser.parse_args()
     OUT.mkdir(exist_ok=True)
     results = experiments.run_all()
     with open(OUT / "verification.json", "w", encoding="utf-8", newline="\n") as handle:
@@ -86,6 +95,9 @@ def main() -> None:
         print(f"  DISAGREES: {name}")
     if REVIEW.is_file():
         print(f"science_review.md: {update_review(results)} tables rewritten from this run")
+    print(f"checks for the web page: {write_checks(results, CHECKS).relative_to(HERE.parent)}")
+    if args.tables_only:
+        return
 
     viz.apply_style()
     lanes = contrasting_rhythms()

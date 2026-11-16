@@ -268,8 +268,10 @@ Then **How we check it**: the unit tests (counts taken from a real test run), th
 `docs/ACCESSIBILITY_LOG.md`; if there are none yet, say "not run yet"). Keep the honesty lines and
 the credits.
 
-Write the formulas in MathML (built into current browsers, no new library), each with a plain-words
-line that a screen reader can read.
+Write the formulas with KaTeX (pinned at exactly 0.19.1, output "htmlAndMathml", so screen readers
+get MathML), each with a plain-words line that a screen reader can read. Changed by Developer A on
+15 Nov, before building: KaTeX draws the same notation as `math_notes.md` in every browser. It is
+a new dependency in Developer B's app, loaded only with How it's made.
 
 **Checks**
 
