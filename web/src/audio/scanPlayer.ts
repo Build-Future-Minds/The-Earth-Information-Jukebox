@@ -39,12 +39,25 @@ export interface ScanLogEntry {
   /** Which sound from the library played it. The score is the same for all of them. */
   sound: ScanSoundId;
 }
+/** Development only: the audio time at which each sweep's first column played, for measurements.
+ *  A sweep with no struck note cannot be timed from its first chime (web/measure/sound.measure.ts). */
+export interface ScanSweepEntry {
+  audioTime: number;
+  shape: ScanScore['shape'];
+  columns: number;
+  seconds: number;
+  speed: number;
+}
 declare global {
   interface Window {
     __scanNotes?: ScanLogEntry[];
+    __scanSweeps?: ScanSweepEntry[];
   }
 }
-if (import.meta.env.DEV && typeof window !== 'undefined') window.__scanNotes = [];
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  window.__scanNotes = [];
+  window.__scanSweeps = [];
+}
 
 /** One fixed loudness setting per kind of scan. A circle is small and full of lines, so its radar
  *  would be much louder than the map sweep; this brings the two closer. Both regions share the
@@ -205,6 +218,7 @@ export class ScanPlayer {
     const column = ((Math.round(tick) % columns) + columns) % columns;
     const columnSeconds = seconds / columns / this.speed;
     const trim = SHAPE_TRIM[score.shape];
+    if (column === 0) window.__scanSweeps?.push({ audioTime: time, shape: score.shape, columns, seconds, speed: this.speed });
 
     // Decoration, not data: the root steps on its timetable, and the sound follows the line across.
     const root = rootNoteAt(score.grid, column);

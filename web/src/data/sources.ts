@@ -11,11 +11,45 @@
 // Never compare numbers between pictures (Dev A, 15 Nov): each is drawn and measured with its own
 // settings. Every comparison helper here takes ONE source, so two pictures can never meet.
 import type { EarthTrack } from '../audio/earthVoice';
+import { LINE_GRID, RADAR_GRID, STRENGTH_FLOOR, type ScanMeasure } from '../audio/scanScore';
 import { OCEAN_LAND, type LandRule } from '../globe/geo';
 import { ACTIVE, type Dataset } from './dataset';
 import type { Features, Region, Scene } from './types';
 
 export type SourceKey = 'ocean' | 'aerosols' | 'imerg' | 'practice';
+
+/**
+ * How the picture scan ("Play along") reads one picture. Every picture has its own: the settings
+ * were measured on that picture's own still by `npm run measure` (web/measure), and its numbers are
+ * never compared with another picture's. The scan plays a picture only when it has one.
+ * The rule itself, the same for every picture, is audio/scanScore.ts.
+ */
+export interface ScanRule {
+  /** 'measured': every setting here was measured on the still (docs/measurements/scan_pictures.md).
+   *  'test input': the made-up practice picture, whose answers the unit tests know. */
+  status: 'measured' | 'test input';
+  /** What counts as light: colour strength, or brightness. */
+  measure: ScanMeasure;
+  /** A cell mean at or below this plays nothing (0–1). */
+  floor: number;
+  /** A cell mean at or above this plays at full level, for the map sweep and the radar. */
+  full: { line: number; radar: number };
+  /** Pixels never read, as a picture the size of the frames (white = never read), and what they
+   *  are, in words for the screen. null: every pixel is read. */
+  mask: { url: string; what: string } | null;
+  /** A whole-world map, 180° W to 180° E and 90° N to 90° S: places are longitudes and latitudes.
+   *  Stated for each picture, from its map check (assets/source_manifest.json). */
+  worldMap: boolean;
+  /** What each instrument means in this picture's own legend. */
+  instruments: { warm: string; cool: string };
+  /** Which still the scan reads, and how we know. */
+  still: { frame: string; time: string | null; how: string };
+  /** Every measured number the app quotes for this picture, exactly as `npm run measure` wrote it
+   *  (docs/measurements/scan_pictures.json, `quoted`). A unit test checks they are the same. */
+  measured: Record<string, number>;
+  /** What the scan cannot tell you about this picture. */
+  limits: string[];
+}
 
 export interface Picture extends Omit<Dataset, 'features'> {
   key: SourceKey;
@@ -30,6 +64,9 @@ export interface Picture extends Omit<Dataset, 'features'> {
   resource: 'eic' | 'challenge' | 'practice';
   /** What flat land looks like (globe land check); null when the land is a photo. */
   landRule: LandRule | null;
+  /** How the picture scan reads this picture; null until it has been measured (the scan does not
+   *  play it). */
+  scan: ScanRule | null;
 }
 
 /** A picture the app can play: it has measurements. */
@@ -55,15 +92,51 @@ const imerg = fromData(
   import.meta.glob<string>('../../../data/imerg/preview.{jpg,jpeg,png,webp}', { eager: true, query: '?url', import: 'default' }),
 );
 
+// ---------- The picture scan's rule for each picture ----------
+
+/** The ocean picture: the settings the scan was built with on 15 Nov. Design choices, each measured
+ *  on this still (docs/measurements/scan_pictures.md, "Ocean"). */
+export const OCEAN_SCAN: ScanRule = {
+  status: 'measured',
+  measure: 'colour',
+  floor: STRENGTH_FLOOR,
+  full: { line: LINE_GRID.fullStrength, radar: RADAR_GRID.fullStrength },
+  mask: null,
+  worldMap: true,
+  instruments: {
+    warm: 'lines drawn red or orange, the warm end of NASA\'s colour bar',
+    cool: 'lines drawn yellow-green, green or blue, the rest of the bar',
+  },
+  still: { frame: 'frame 23000', time: '2007-03-25T12:00Z', how: 'the first of the 30 frames the Earth rhythm plays (data/scene.json)' },
+  measured: {},
+  limits: [
+    'Warm colours are drawn stronger than cold ones, so warm water sounds louder than cold water with the same amount of line.',
+    'The still is a compressed copy of NASA\'s frame, which blurs its finest lines.',
+  ],
+};
+
+/** The practice picture: TEST INPUT, a made-up picture with known answers, read with the ocean's settings. */
+export const PRACTICE_SCAN: ScanRule = {
+  ...OCEAN_SCAN,
+  status: 'test input',
+  worldMap: false,
+  instruments: { warm: 'the red dot', cool: 'the green and blue dots' },
+  still: { frame: 'TEST INPUT', time: null, how: 'made up by the code (audio/scanScore.ts, makeTestPicture), not NASA data' },
+  measured: {},
+  limits: ['A made-up picture with a known answer, for testing. Not NASA data.'],
+};
+
 function pickPictures(): Picture[] {
   if (ACTIVE.origin === 'fixtures/mock/') {
-    return [{ ...ACTIVE, key: 'practice', label: 'Practice', firstLetter: 'A', regionStyle: 'hue', resource: 'practice', landRule: OCEAN_LAND }];
+    return [{ ...ACTIVE, key: 'practice', label: 'Practice', firstLetter: 'A', regionStyle: 'hue', resource: 'practice', landRule: OCEAN_LAND, scan: PRACTICE_SCAN }];
   }
-  const list: Picture[] = [{ ...ACTIVE, key: 'ocean', label: 'Ocean', firstLetter: 'A', regionStyle: 'hue', resource: 'eic', landRule: OCEAN_LAND }];
+  const list: Picture[] = [{ ...ACTIVE, key: 'ocean', label: 'Ocean', firstLetter: 'A', regionStyle: 'hue', resource: 'eic', landRule: OCEAN_LAND, scan: OCEAN_SCAN }];
   // Aerosol land is dull grey-green (same rule as prepare_scene.py).
-  if (aerosols) list.push({ ...aerosols, key: 'aerosols', label: 'Aerosols', firstLetter: 'C', regionStyle: 'neutral', resource: 'challenge', landRule: [30, 95, 12] });
+  // Scan: not measured yet, so the scan does not play this picture.
+  if (aerosols) list.push({ ...aerosols, key: 'aerosols', label: 'Aerosols', firstLetter: 'C', regionStyle: 'neutral', resource: 'challenge', landRule: [30, 95, 12], scan: null });
   // Rain: the land is a satellite photo, so no colour rule finds it (prepare_scene.py uses the ocean outline).
-  if (imerg) list.push({ ...imerg, key: 'imerg', label: 'Rain', firstLetter: 'E', regionStyle: 'neutral', resource: 'eic', landRule: null });
+  // Scan: not measured yet, so the scan does not play this picture.
+  if (imerg) list.push({ ...imerg, key: 'imerg', label: 'Rain', firstLetter: 'E', regionStyle: 'neutral', resource: 'eic', landRule: null, scan: null });
   return list;
 }
 

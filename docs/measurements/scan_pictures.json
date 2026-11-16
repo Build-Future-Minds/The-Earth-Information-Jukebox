@@ -1,46 +1,412 @@
 {
  "meta": {
-  "date": "2026-11-16 00:31 UTC",
+  "date": "2026-11-16 02:09 UTC",
   "browser": "Chromium 159.0.8154.6",
-  "commit": "cdca469",
+  "commit": "1db3619",
   "dirty": "yes"
  },
- "barRangeC": [
-  0,
-  32
- ],
- "floor": 0.047058823529411764,
+ "files": {
+  "ocean": {
+   "frames": [
+    {
+     "file": "assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.png",
+     "url": "/assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.png",
+     "frame": "frame 23000",
+     "time": "2007-03-25T12:00Z"
+    }
+   ],
+   "bars": [
+    {
+     "file": "assets/frames/svs3912/sst_ecco2_cbar.png",
+     "name": "sea surface temperature",
+     "coloured": 100,
+     "stepped": false,
+     "ends": [
+      0,
+      32
+     ],
+     "unit": "°C",
+     "url": "/assets/frames/svs3912/sst_ecco2_cbar.png"
+    }
+   ]
+  },
+  "aerosols": {
+   "frames": [
+    {
+     "file": "assets/frames/svs5669/Aerosols_2025-08-19T20_00_00_3840x2160.png",
+     "url": "/assets/frames/svs5669/Aerosols_2025-08-19T20_00_00_3840x2160.png",
+     "frame": "full-size still",
+     "time": "2025-08-19T20:00Z"
+    }
+   ],
+   "bars": [
+    {
+     "file": "assets/frames/svs5669/Aerosols_cbar.png",
+     "name": "aerosol type",
+     "coloured": 20,
+     "stepped": true,
+     "names": [
+      "black carbon",
+      "dust",
+      "sea salt",
+      "sulfate"
+     ],
+     "url": "/assets/frames/svs5669/Aerosols_cbar.png"
+    }
+   ]
+  },
+  "imerg": {
+   "frames": [
+    {
+     "file": "assets/frames/svs4285/imergert_composite.0.png",
+     "frame": "frame 0",
+     "time": "2026-11-14T00:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.0.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.1.png",
+     "frame": "frame 1",
+     "time": "2026-11-14T01:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.1.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.2.png",
+     "frame": "frame 2",
+     "time": "2026-11-14T02:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.2.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.3.png",
+     "frame": "frame 3",
+     "time": "2026-11-14T03:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.3.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.4.png",
+     "frame": "frame 4",
+     "time": "2026-11-14T04:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.4.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.5.png",
+     "frame": "frame 5",
+     "time": "2026-11-14T05:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.5.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.6.png",
+     "frame": "frame 6",
+     "time": "2026-11-14T06:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.6.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.7.png",
+     "frame": "frame 7",
+     "time": "2026-11-14T07:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.7.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.8.png",
+     "frame": "frame 8",
+     "time": "2026-11-14T08:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.8.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.9.png",
+     "frame": "frame 9",
+     "time": "2026-11-14T09:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.9.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.10.png",
+     "frame": "frame 10",
+     "time": "2026-11-14T10:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.10.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.11.png",
+     "frame": "frame 11",
+     "time": "2026-11-14T11:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.11.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.12.png",
+     "frame": "frame 12",
+     "time": "2026-11-14T12:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.12.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.13.png",
+     "frame": "frame 13",
+     "time": "2026-11-14T13:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.13.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.14.png",
+     "frame": "frame 14",
+     "time": "2026-11-14T14:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.14.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.15.png",
+     "frame": "frame 15",
+     "time": "2026-11-14T15:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.15.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.16.png",
+     "frame": "frame 16",
+     "time": "2026-11-14T16:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.16.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.17.png",
+     "frame": "frame 17",
+     "time": "2026-11-14T17:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.17.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.18.png",
+     "frame": "frame 18",
+     "time": "2026-11-14T18:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.18.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.19.png",
+     "frame": "frame 19",
+     "time": "2026-11-14T19:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.19.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.20.png",
+     "frame": "frame 20",
+     "time": "2026-11-14T20:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.20.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.21.png",
+     "frame": "frame 21",
+     "time": "2026-11-14T21:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.21.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.22.png",
+     "frame": "frame 22",
+     "time": "2026-11-14T22:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.22.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.23.png",
+     "frame": "frame 23",
+     "time": "2026-11-14T23:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.23.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.24.png",
+     "frame": "frame 24",
+     "time": "2026-11-15T00:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.24.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.25.png",
+     "frame": "frame 25",
+     "time": "2026-11-15T01:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.25.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.26.png",
+     "frame": "frame 26",
+     "time": "2026-11-15T02:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.26.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.27.png",
+     "frame": "frame 27",
+     "time": "2026-11-15T03:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.27.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.28.png",
+     "frame": "frame 28",
+     "time": "2026-11-15T04:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.28.png"
+    },
+    {
+     "file": "assets/frames/svs4285/imergert_composite.29.png",
+     "frame": "frame 29",
+     "time": "2026-11-15T05:00Z",
+     "url": "/assets/frames/svs4285/imergert_composite.29.png"
+    }
+   ],
+   "bars": [
+    {
+     "file": "assets/frames/svs4285/rainbarwhite2.png",
+     "name": "rain",
+     "coloured": 60,
+     "stepped": true,
+     "url": "/assets/frames/svs4285/rainbarwhite2.png"
+    },
+    {
+     "file": "assets/frames/svs4285/snowbarwhite2.png",
+     "name": "snow",
+     "coloured": 60,
+     "stepped": true,
+     "url": "/assets/frames/svs4285/snowbarwhite2.png"
+    }
+   ]
+  }
+ },
  "lineGrid": {
   "columns": 240,
   "bands": 12,
   "seconds": 30,
   "fullStrength": 0.5
  },
+ "radarGrid": {
+  "columns": 120,
+  "bands": 12,
+  "seconds": 15,
+  "fullStrength": 0.75
+ },
+ "radarSamples": 4,
  "chimeRule": {
   "minLevel": 0.3,
   "minGap": 6,
   "perColumn": 1
  },
+ "defaultFloor": 0.047058823529411764,
+ "matchCos": 0.9,
  "pictures": [
   {
    "key": "ocean",
+   "label": "Ocean",
    "title": "Global Sea Surface Currents and Temperature",
    "svs": 3912,
    "still": {
     "width": 2048,
-    "height": 1024
+    "height": 1024,
+    "from": {
+     "candidates": [
+      {
+       "frame": "frame 23000",
+       "time": "2007-03-25T12:00Z",
+       "file": "assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.png",
+       "meanDifference": 6.925818920135498
+      }
+     ],
+     "best": {
+      "frame": "frame 23000",
+      "time": "2007-03-25T12:00Z",
+      "file": "assets/frames/svs3912/flat_global_ecco2_2028x1024.23000.png",
+      "meanDifference": 6.925818920135498
+     },
+     "runnerUp": null
+    }
    },
    "frames": {
     "width": 2048,
     "height": 1024
    },
+   "hasRule": true,
+   "settings": {
+    "measure": "colour",
+    "floor": 0.047058823529411764,
+    "full": {
+     "line": 0.5,
+     "radar": 0.75
+    },
+    "mask": null
+   },
+   "procedure": {
+    "measure": "colour",
+    "floor": 0.047058823529411764,
+    "full": {
+     "line": 0.5,
+     "radar": 0.85
+    },
+    "mask": null
+   },
+   "background": {
+    "rgb": [
+     49.1,
+     49.1,
+     49.1
+    ],
+    "spread": 0.00912783912379922,
+    "binShare": 0.21245956420898438,
+    "nearShare": 0.3215446472167969
+   },
+   "quiet": [
+    {
+     "least": 1,
+     "cells": 193,
+     "sounding": 0,
+     "largestMean": 0.0016472868155688047,
+     "soundingCells": []
+    },
+    {
+     "least": 0.98,
+     "cells": 309,
+     "sounding": 0,
+     "largestMean": 0.003055175533518195,
+     "soundingCells": []
+    },
+    {
+     "least": 0.9,
+     "cells": 475,
+     "sounding": 0,
+     "largestMean": 0.018582595512270927,
+     "soundingCells": []
+    }
+   ],
+   "drawn": [
+    {
+     "least": 0.01,
+     "cells": 2624,
+     "sounding": 1727,
+     "soundingAtOceanFloor": 1727
+    },
+    {
+     "least": 0.1,
+     "cells": 2405,
+     "sounding": 1727,
+     "soundingAtOceanFloor": 1727
+    }
+   ],
+   "legendDrawn": [
+    {
+     "least": 0.01,
+     "cells": 2268,
+     "sounding": 1727,
+     "soundingAtOceanFloor": 1727
+    },
+    {
+     "least": 0.1,
+     "cells": 2054,
+     "sounding": 1727,
+     "soundingAtOceanFloor": 1727
+    }
+   ],
+   "greyLand": {
+    "rule": [
+     30,
+     80,
+     12
+    ],
+    "cells": 518,
+    "sounding": 0,
+    "largestMean": 0.018582595512270927,
+    "soundingCells": []
+   },
+   "mask": null,
    "selfCheck": 0,
    "line": {
     "colour": {
      "cells": 2880,
      "sounding": 1727,
      "atFull": 0,
-     "largestCellMean": 0.46302768447819875,
+     "noData": 0,
+     "largestCellMean": 0.463027685880661,
      "peaks": 112,
      "afterSpacing": 75,
      "chimes": 68,
@@ -51,14 +417,66 @@
      "cells": 2880,
      "sounding": 2788,
      "atFull": 2,
-     "largestCellMean": 0.5074740620220408,
+     "noData": 0,
+     "largestCellMean": 0.5074740648269653,
      "peaks": 271,
      "afterSpacing": 174,
      "chimes": 126,
      "warm": 63,
      "cool": 63
+    },
+    "atOceanFloor": {
+     "cells": 2880,
+     "sounding": 1727,
+     "atFull": 0,
+     "noData": 0,
+     "largestCellMean": 0.463027685880661,
+     "peaks": 112,
+     "afterSpacing": 75,
+     "chimes": 68,
+     "warm": 53,
+     "cool": 15
     }
    },
+   "lineColours": {
+    "warm": {
+     "sea surface temperature, 80–90% of the bar": 40,
+     "sea surface temperature, 90–100% of the bar": 11,
+     "sea surface temperature, 70–80% of the bar": 2
+    },
+    "cool": {
+     "sea surface temperature, 20–30% of the bar": 4,
+     "sea surface temperature, 60–70% of the bar": 4,
+     "sea surface temperature, 50–60% of the bar": 3,
+     "sea surface temperature, 30–40% of the bar": 2,
+     "sea surface temperature, 70–80% of the bar": 2
+    }
+   },
+   "pixelColours": {
+    "sea surface temperature, 0–10% of the bar": 0.15151527609196797,
+    "sea surface temperature, 10–20% of the bar": 0.08662258952035527,
+    "sea surface temperature, 20–30% of the bar": 0.07523399497014875,
+    "sea surface temperature, 30–40% of the bar": 0.04917208895046306,
+    "sea surface temperature, 40–50% of the bar": 0.08542422283453804,
+    "sea surface temperature, 50–60% of the bar": 0.03889244607606854,
+    "sea surface temperature, 60–70% of the bar": 0.06240037163755883,
+    "sea surface temperature, 70–80% of the bar": 0.08014154293307954,
+    "sea surface temperature, 80–90% of the bar": 0.20657436708047658,
+    "sea surface temperature, 90–100% of the bar": 0.16305289565884987,
+    "no colour of the bar": 0.0009702042464935441
+   },
+   "classes": [
+    "sea surface temperature, 0–10% of the bar",
+    "sea surface temperature, 10–20% of the bar",
+    "sea surface temperature, 20–30% of the bar",
+    "sea surface temperature, 30–40% of the bar",
+    "sea surface temperature, 40–50% of the bar",
+    "sea surface temperature, 50–60% of the bar",
+    "sea surface temperature, 60–70% of the bar",
+    "sea surface temperature, 70–80% of the bar",
+    "sea surface temperature, 80–90% of the bar",
+    "sea surface temperature, 90–100% of the bar"
+   ],
    "regions": [
     {
      "id": "kuroshio_eddies",
@@ -74,12 +492,38 @@
       "cells": 1440,
       "sounding": 1416,
       "atFull": 0,
-      "largestCellMean": 0.7428921468117657,
+      "noData": 0,
+      "largestCellMean": 0.7428921461105347,
       "peaks": 102,
       "afterSpacing": 83,
       "chimes": 56,
       "warm": 11,
       "cool": 45
+     },
+     "radarAtOceanFloor": {
+      "cells": 1440,
+      "sounding": 1416,
+      "atFull": 0,
+      "noData": 0,
+      "largestCellMean": 0.7428921461105347,
+      "peaks": 102,
+      "afterSpacing": 83,
+      "chimes": 56,
+      "warm": 11,
+      "cool": 45
+     },
+     "colours": {
+      "warm": {
+       "sea surface temperature, 70–80% of the bar": 8,
+       "sea surface temperature, 80–90% of the bar": 3
+      },
+      "cool": {
+       "sea surface temperature, 50–60% of the bar": 20,
+       "sea surface temperature, 30–40% of the bar": 4,
+       "sea surface temperature, 60–70% of the bar": 15,
+       "sea surface temperature, 40–50% of the bar": 2,
+       "sea surface temperature, 70–80% of the bar": 4
+      }
      }
     },
     {
@@ -96,55 +540,503 @@
       "cells": 1440,
       "sounding": 1438,
       "atFull": 3,
-      "largestCellMean": 0.8004901871961705,
+      "noData": 0,
+      "largestCellMean": 0.8004902005195618,
       "peaks": 187,
       "afterSpacing": 125,
       "chimes": 72,
       "warm": 72,
       "cool": 0
+     },
+     "radarAtOceanFloor": {
+      "cells": 1440,
+      "sounding": 1438,
+      "atFull": 3,
+      "noData": 0,
+      "largestCellMean": 0.8004902005195618,
+      "peaks": 187,
+      "afterSpacing": 125,
+      "chimes": 72,
+      "warm": 72,
+      "cool": 0
+     },
+     "colours": {
+      "warm": {
+       "sea surface temperature, 80–90% of the bar": 71,
+       "sea surface temperature, 70–80% of the bar": 1
+      },
+      "cool": {}
      }
     }
    ],
-   "landSea": null,
-   "landLeftOut": null
+   "latitude": {
+    "bands": [
+     {
+      "band": 0,
+      "south": -90,
+      "north": -75,
+      "groundShare": 0.017037086855465844,
+      "columnsWithData": 240,
+      "meanLevel": 0,
+      "meanChange": 0,
+      "largestChange": 0
+     },
+     {
+      "band": 1,
+      "south": -75,
+      "north": -60,
+      "groundShare": 0.04995021125231486,
+      "columnsWithData": 240,
+      "meanLevel": 0.02336879318318097,
+      "meanChange": 0.007795493485658275,
+      "largestChange": 0.028827834874391556
+     },
+     {
+      "band": 2,
+      "south": -60,
+      "north": -45,
+      "groundShare": 0.07945931129894557,
+      "columnsWithData": 240,
+      "meanLevel": 0.21988042139758665,
+      "meanChange": 0.006386691487083832,
+      "largestChange": 0.026703745126724243
+     },
+     {
+      "band": 3,
+      "south": -45,
+      "north": -30,
+      "groundShare": 0.10355339059327376,
+      "columnsWithData": 240,
+      "meanLevel": 0.21892956116159137,
+      "meanChange": 0.005245109525276348,
+      "largestChange": 0.0201948881149292
+     },
+     {
+      "band": 4,
+      "south": -30,
+      "north": -15,
+      "groundShare": 0.1205904774487396,
+      "columnsWithData": 240,
+      "meanLevel": 0.23752968437426414,
+      "meanChange": 0.0018587577894019585,
+      "largestChange": 0.014470100402832031
+     },
+     {
+      "band": 5,
+      "south": -15,
+      "north": 0,
+      "groundShare": 0.12940952255126037,
+      "columnsWithData": 240,
+      "meanLevel": 0.3499867614436274,
+      "meanChange": 0.0013727159200546642,
+      "largestChange": 0.004392683506011963
+     },
+     {
+      "band": 6,
+      "south": 0,
+      "north": 15,
+      "groundShare": 0.12940952255126037,
+      "columnsWithData": 240,
+      "meanLevel": 0.41906473142638184,
+      "meanChange": 0.0011457553676639993,
+      "largestChange": 0.004472494125366211
+     },
+     {
+      "band": 7,
+      "south": 15,
+      "north": 30,
+      "groundShare": 0.1205904774487396,
+      "columnsWithData": 240,
+      "meanLevel": 0.19651864845242623,
+      "meanChange": 0.002402588173329908,
+      "largestChange": 0.011657893657684326
+     },
+     {
+      "band": 8,
+      "south": 30,
+      "north": 45,
+      "groundShare": 0.10355339059327376,
+      "columnsWithData": 240,
+      "meanLevel": 0.11831216570280959,
+      "meanChange": 0.002975439459745151,
+      "largestChange": 0.02386268973350525
+     },
+     {
+      "band": 9,
+      "south": 45,
+      "north": 60,
+      "groundShare": 0.07945931129894557,
+      "columnsWithData": 240,
+      "meanLevel": 0.03972704994860881,
+      "meanChange": 0.002118835855314198,
+      "largestChange": 0.015962138772010803
+     },
+     {
+      "band": 10,
+      "south": 60,
+      "north": 75,
+      "groundShare": 0.04995021125231486,
+      "columnsWithData": 240,
+      "meanLevel": 0.009334176737320376,
+      "meanChange": 0.0019368041930041121,
+      "largestChange": 0.032315200194716454
+     },
+     {
+      "band": 11,
+      "south": 75,
+      "north": 90,
+      "groundShare": 0.017037086855465844,
+      "columnsWithData": 240,
+      "meanLevel": 0.027921641918025368,
+      "meanChange": 0.01028463946155777,
+      "largestChange": 0.1295960694551468
+     }
+    ],
+    "chimes": 68,
+    "chimesWeighted": 70
+   },
+   "bars": [
+    {
+     "file": "assets/frames/svs3912/sst_ecco2_cbar.png",
+     "name": "sea surface temperature",
+     "width": 310,
+     "height": 95,
+     "row": 28,
+     "from": 14,
+     "to": 291,
+     "colouredThreshold": 100,
+     "colouredPixels": 278,
+     "warmAtStart": false,
+     "warmAtEnd": true,
+     "switches": [
+      {
+       "at": 0.7436823104693141,
+       "from": [
+        251,
+        252,
+        33
+       ],
+       "to": [
+        251,
+        250,
+        33
+       ]
+      }
+     ],
+     "strength": [
+      0.4666666666666667,
+      0.6431372549019608,
+      0.5333333333333333,
+      0.6745098039215687,
+      0.7647058823529411,
+      0.7254901960784313,
+      0.8352941176470589,
+      0.8666666666666667,
+      0.8627450980392157,
+      0.8666666666666667,
+      0.9019607843137255
+     ],
+     "steps": [],
+     "names": null,
+     "ends": [
+      0,
+      32
+     ],
+     "unit": "°C"
+    }
+   ],
+   "barsMissing": [],
+   "frame": {
+    "frame": "frame 23000",
+    "width": 2048,
+    "height": 1024,
+    "levels": {
+     "meanChange": 0.0431629963650999,
+     "largestChange": 0.1520688533782959
+    },
+    "sounding": {
+     "still": 1727,
+     "frame": 1816
+    },
+    "chimes": {
+     "still": 68,
+     "frame": 84,
+     "samePlaceAndInstrument": 49
+    },
+    "largestCellMean": 0.5068685412406921,
+    "regions": [
+     {
+      "id": "kuroshio_eddies",
+      "still": 56,
+      "frame": 75,
+      "samePlaceAndInstrument": 32
+     },
+     {
+      "id": "equator_pacific",
+      "still": 72,
+      "frame": 81,
+      "samePlaceAndInstrument": 33
+     }
+    ],
+    "pixels": 2097152,
+    "meanDifference": 6.925818920135498,
+    "land": 701569,
+    "landOver": 11084,
+    "sea": 561994,
+    "seaOver": 201539,
+    "quietCells": [
+     {
+      "least": 1,
+      "cells": 235,
+      "sounding": 0,
+      "largestMean": 0.003055175533518195,
+      "soundingCells": []
+     },
+     {
+      "least": 0.98,
+      "cells": 434,
+      "sounding": 0,
+      "largestMean": 0.01068044826388359,
+      "soundingCells": []
+     },
+     {
+      "least": 0.9,
+      "cells": 746,
+      "sounding": 0,
+      "largestMean": 0.030063437297940254,
+      "soundingCells": []
+     }
+    ],
+    "exactQuiet90Cells": 746,
+    "exactQuiet90Sounding": 0,
+    "exactQuiet90Largest255": 7.67
+   },
+   "quoted": {
+    "floor255": 12,
+    "backgroundSpread": 0,
+    "backgroundNearPct": 32.2,
+    "quiet90Cells": 475,
+    "quiet90Sounding": 0,
+    "quiet90Largest255": 4.74,
+    "largestLineMean": 0.463,
+    "largestRadarMean": 0.8,
+    "fullLine": 0.5,
+    "fullRadar": 0.75,
+    "lineSoundingPct": 60,
+    "lineNoData": 0,
+    "linePeaks": 112,
+    "lineChimes": 68,
+    "lineLeftOut": 44,
+    "lineWarm": 53,
+    "lineCool": 15,
+    "radar0Peaks": 102,
+    "radar0Chimes": 56,
+    "radar0LeftOut": 46,
+    "radar0Warm": 11,
+    "radar0Cool": 45,
+    "radar0LargestMean": 0.74,
+    "radar0SoundingPct": 98,
+    "radar1Peaks": 187,
+    "radar1Chimes": 72,
+    "radar1LeftOut": 115,
+    "radar1Warm": 72,
+    "radar1Cool": 0,
+    "radar1LargestMean": 0.8,
+    "radar1SoundingPct": 100,
+    "greyLand90Cells": 518,
+    "greyLand90Sounding": 0,
+    "bar0Switches": 1,
+    "bar0SwitchPct": 74.4,
+    "bar0SwitchValue": 23.8,
+    "bar0Steps": 0,
+    "exactQuiet90Cells": 746,
+    "exactQuiet90Sounding": 0,
+    "exactQuiet90Largest255": 7.67
+   }
   },
   {
    "key": "aerosols",
+   "label": "Aerosols",
    "title": "GEOS Aerosols (2025)",
    "svs": 5669,
    "still": {
     "width": 2048,
-    "height": 1152
+    "height": 1152,
+    "from": {
+     "candidates": [
+      {
+       "frame": "full-size still",
+       "time": "2025-08-19T20:00Z",
+       "file": "assets/frames/svs5669/Aerosols_2025-08-19T20_00_00_3840x2160.png",
+       "meanDifference": 2.6502004552770546
+      }
+     ],
+     "best": {
+      "frame": "full-size still",
+      "time": "2025-08-19T20:00Z",
+      "file": "assets/frames/svs5669/Aerosols_2025-08-19T20_00_00_3840x2160.png",
+      "meanDifference": 2.6502004552770546
+     },
+     "runnerUp": null
+    }
    },
    "frames": {
     "width": 3840,
     "height": 2160
    },
+   "hasRule": false,
+   "settings": {
+    "measure": "colour",
+    "floor": 0.0784313725490196,
+    "full": {
+     "line": 0.45,
+     "radar": 0.8
+    },
+    "mask": null
+   },
+   "procedure": {
+    "measure": "colour",
+    "floor": 0.0784313725490196,
+    "full": {
+     "line": 0.45,
+     "radar": 0.8
+    },
+    "mask": null
+   },
+   "background": {
+    "rgb": [
+     62,
+     69.1,
+     61.1
+    ],
+    "spread": 7.971246734804211,
+    "binShare": 0.06506729125976562,
+    "nearShare": 0.12849850124782985
+   },
+   "quiet": [
+    {
+     "least": 1,
+     "cells": 179,
+     "sounding": 0,
+     "largestMean": 0.0434027761220932,
+     "soundingCells": []
+    },
+    {
+     "least": 0.98,
+     "cells": 183,
+     "sounding": 0,
+     "largestMean": 0.0434027761220932,
+     "soundingCells": []
+    },
+    {
+     "least": 0.9,
+     "cells": 194,
+     "sounding": 0,
+     "largestMean": 0.0434027761220932,
+     "soundingCells": []
+    }
+   ],
+   "drawn": [
+    {
+     "least": 0.01,
+     "cells": 2698,
+     "sounding": 1583,
+     "soundingAtOceanFloor": 2413
+    },
+    {
+     "least": 0.1,
+     "cells": 2686,
+     "sounding": 1583,
+     "soundingAtOceanFloor": 2413
+    }
+   ],
+   "legendDrawn": [
+    {
+     "least": 0.01,
+     "cells": 2466,
+     "sounding": 1583,
+     "soundingAtOceanFloor": 2365
+    },
+    {
+     "least": 0.1,
+     "cells": 2221,
+     "sounding": 1581,
+     "soundingAtOceanFloor": 2184
+    }
+   ],
+   "greyLand": {
+    "rule": [
+     30,
+     95,
+     12
+    ],
+    "cells": 201,
+    "sounding": 0,
+    "largestMean": 0.04250635579228401,
+    "soundingCells": []
+   },
+   "mask": null,
    "selfCheck": 0,
    "line": {
     "colour": {
      "cells": 2880,
-     "sounding": 2413,
+     "sounding": 1583,
      "atFull": 0,
-     "largestCellMean": 0.42893064197371983,
-     "peaks": 53,
-     "afterSpacing": 47,
-     "chimes": 41,
+     "noData": 0,
+     "largestCellMean": 0.4289306402206421,
+     "peaks": 47,
+     "afterSpacing": 42,
+     "chimes": 36,
      "warm": 3,
-     "cool": 38
+     "cool": 33
     },
     "brightness": {
      "cells": 2880,
-     "sounding": 2860,
-     "atFull": 88,
-     "largestCellMean": 0.775181538217208,
-     "peaks": 210,
-     "afterSpacing": 165,
-     "chimes": 122,
-     "warm": 7,
-     "cool": 115
+     "sounding": 2731,
+     "atFull": 125,
+     "noData": 0,
+     "largestCellMean": 0.7751815319061279,
+     "peaks": 191,
+     "afterSpacing": 151,
+     "chimes": 110,
+     "warm": 6,
+     "cool": 104
+    },
+    "atOceanFloor": {
+     "cells": 2880,
+     "sounding": 2413,
+     "atFull": 0,
+     "noData": 0,
+     "largestCellMean": 0.4289306402206421,
+     "peaks": 62,
+     "afterSpacing": 55,
+     "chimes": 49,
+     "warm": 3,
+     "cool": 46
     }
    },
+   "lineColours": {
+    "warm": {
+     "black carbon": 3
+    },
+    "cool": {
+     "sulfate": 29,
+     "dust": 4
+    }
+   },
+   "pixelColours": {
+    "black carbon": 0.033323815652974036,
+    "dust": 0.060226329842224306,
+    "sea salt": 0.3772760756843555,
+    "sulfate": 0.5008355568603828,
+    "no colour of the bar": 0.028338221960063335
+   },
+   "classes": [
+    "black carbon",
+    "dust",
+    "sea salt",
+    "sulfate"
+   ],
    "regions": [
     {
      "id": "aerosol_streaks_vanuatu",
@@ -158,14 +1050,33 @@
      "groundRatio": 1.0626384794260553,
      "radar": {
       "cells": 1440,
+      "sounding": 1338,
+      "atFull": 0,
+      "noData": 0,
+      "largestCellMean": 0.7727941274642944,
+      "peaks": 55,
+      "afterSpacing": 55,
+      "chimes": 34,
+      "warm": 0,
+      "cool": 34
+     },
+     "radarAtOceanFloor": {
+      "cells": 1440,
       "sounding": 1439,
-      "atFull": 8,
-      "largestCellMean": 0.7727941323729122,
-      "peaks": 60,
-      "afterSpacing": 59,
+      "atFull": 0,
+      "noData": 0,
+      "largestCellMean": 0.7727941274642944,
+      "peaks": 58,
+      "afterSpacing": 58,
       "chimes": 37,
       "warm": 0,
       "cool": 37
+     },
+     "colours": {
+      "warm": {},
+      "cool": {
+       "sulfate": 34
+      }
      }
     },
     {
@@ -180,77 +1091,729 @@
      "groundRatio": 1.077738201354925,
      "radar": {
       "cells": 1440,
-      "sounding": 1437,
+      "sounding": 1139,
       "atFull": 0,
-      "largestCellMean": 0.14705882072448728,
+      "noData": 0,
+      "largestCellMean": 0.14705882966518402,
       "peaks": 0,
       "afterSpacing": 0,
       "chimes": 0,
       "warm": 0,
       "cool": 0
+     },
+     "radarAtOceanFloor": {
+      "cells": 1440,
+      "sounding": 1437,
+      "atFull": 0,
+      "noData": 0,
+      "largestCellMean": 0.14705882966518402,
+      "peaks": 0,
+      "afterSpacing": 0,
+      "chimes": 0,
+      "warm": 0,
+      "cool": 0
+     },
+     "colours": {
+      "warm": {},
+      "cool": {}
      }
     }
    ],
-   "landSea": {
-    "land": {
-     "cells": 518,
-     "sounding": 306,
-     "meanLevel": 0.11017170296280741,
-     "meanStrength": 0.09015400532710618,
-     "largestStrength": 0.42893064633260736
-    },
-    "sea": {
-     "cells": 1487,
-     "sounding": 1389,
-     "meanLevel": 0.1250504329375498,
-     "meanStrength": 0.10277444765796484,
-     "largestStrength": 0.3615400326797391
-    }
+   "latitude": {
+    "bands": [
+     {
+      "band": 0,
+      "south": -90,
+      "north": -75,
+      "groundShare": 0.017037086855465844,
+      "columnsWithData": 240,
+      "meanLevel": 0,
+      "meanChange": 0,
+      "largestChange": 0
+     },
+     {
+      "band": 1,
+      "south": -75,
+      "north": -60,
+      "groundShare": 0.04995021125231486,
+      "columnsWithData": 240,
+      "meanLevel": 0.0014679325870626295,
+      "meanChange": 0.0003361131151905283,
+      "largestChange": 0.019983725622296333
+     },
+     {
+      "band": 2,
+      "south": -60,
+      "north": -45,
+      "groundShare": 0.07945931129894557,
+      "columnsWithData": 240,
+      "meanLevel": 0.07703895090659595,
+      "meanChange": 0.004176876665223972,
+      "largestChange": 0.0474507212638855
+     },
+     {
+      "band": 3,
+      "south": -45,
+      "north": -30,
+      "groundShare": 0.10355339059327376,
+      "columnsWithData": 240,
+      "meanLevel": 0.047494771604791215,
+      "meanChange": 0.0029238645843785585,
+      "largestChange": 0.02219356596469879
+     },
+     {
+      "band": 4,
+      "south": -30,
+      "north": -15,
+      "groundShare": 0.1205904774487396,
+      "columnsWithData": 240,
+      "meanLevel": 0.06803799567096576,
+      "meanChange": 0.0018263265513572453,
+      "largestChange": 0.021048784255981445
+     },
+     {
+      "band": 5,
+      "south": -15,
+      "north": 0,
+      "groundShare": 0.12940952255126037,
+      "columnsWithData": 240,
+      "meanLevel": 0.17047442371840588,
+      "meanChange": 0.0008204405778087676,
+      "largestChange": 0.00513458251953125
+     },
+     {
+      "band": 6,
+      "south": 0,
+      "north": 15,
+      "groundShare": 0.12940952255126037,
+      "columnsWithData": 240,
+      "meanLevel": 0.13103109032381327,
+      "meanChange": 0.0006037079971671725,
+      "largestChange": 0.0032417476177215576
+     },
+     {
+      "band": 7,
+      "south": 15,
+      "north": 30,
+      "groundShare": 0.1205904774487396,
+      "columnsWithData": 240,
+      "meanLevel": 0.1940438374595639,
+      "meanChange": 0.0024142445052954525,
+      "largestChange": 0.007978975772857666
+     },
+     {
+      "band": 8,
+      "south": 30,
+      "north": 45,
+      "groundShare": 0.10355339059327376,
+      "columnsWithData": 240,
+      "meanLevel": 0.15012312051209545,
+      "meanChange": 0.004336144622842161,
+      "largestChange": 0.019865095615386963
+     },
+     {
+      "band": 9,
+      "south": 45,
+      "north": 60,
+      "groundShare": 0.07945931129894557,
+      "columnsWithData": 240,
+      "meanLevel": 0.1495170661257968,
+      "meanChange": 0.00675248021131362,
+      "largestChange": 0.03296598792076111
+     },
+     {
+      "band": 10,
+      "south": 60,
+      "north": 75,
+      "groundShare": 0.04995021125231486,
+      "columnsWithData": 240,
+      "meanLevel": 0.09030895909042252,
+      "meanChange": 0.012773350905627012,
+      "largestChange": 0.08011749386787415
+     },
+     {
+      "band": 11,
+      "south": 75,
+      "north": 90,
+      "groundShare": 0.017037086855465844,
+      "columnsWithData": 240,
+      "meanLevel": 0.016040927475993765,
+      "meanChange": 0.013730959491022076,
+      "largestChange": 0.16995105147361755
+     }
+    ],
+    "chimes": 36,
+    "chimesWeighted": 39
    },
-   "landLeftOut": {
-    "sounding": 2332,
-    "nothingRead": 253,
-    "chimes": 43,
-    "warm": 2
+   "bars": [
+    {
+     "file": "assets/frames/svs5669/Aerosols_cbar.png",
+     "name": "aerosol type",
+     "width": 1500,
+     "height": 300,
+     "row": 162,
+     "from": 212,
+     "to": 1282,
+     "colouredThreshold": 20,
+     "colouredPixels": 720,
+     "warmAtStart": true,
+     "warmAtEnd": false,
+     "switches": [
+      {
+       "at": 0.2757009345794392,
+       "from": [
+        149,
+        70,
+        53
+       ],
+       "to": [
+        146,
+        118,
+        166
+       ]
+      }
+     ],
+     "strength": [
+      0.4117647058823529,
+      0.5529411764705883,
+      0,
+      0.25882352941176473,
+      0.25882352941176473,
+      0,
+      0.1450980392156863,
+      0.1450980392156863,
+      0,
+      0.6588235294117647,
+      0.12156862745098039
+     ],
+     "steps": [
+      {
+       "from": 213,
+       "to": 390,
+       "rgb": [
+        210,
+        94,
+        69
+       ],
+       "warm": true,
+       "strength": 0.553,
+       "name": "black carbon"
+      },
+      {
+       "from": 508,
+       "to": 685,
+       "rgb": [
+        193,
+        154,
+        220
+       ],
+       "warm": false,
+       "strength": 0.259,
+       "name": "dust"
+      },
+      {
+       "from": 810,
+       "to": 987,
+       "rgb": [
+        133,
+        170,
+        169
+       ],
+       "warm": false,
+       "strength": 0.145,
+       "name": "sea salt"
+      },
+      {
+       "from": 1103,
+       "to": 1281,
+       "rgb": [
+        83,
+        220,
+        52
+       ],
+       "warm": false,
+       "strength": 0.659,
+       "name": "sulfate"
+      }
+     ],
+     "names": [
+      "black carbon",
+      "dust",
+      "sea salt",
+      "sulfate"
+     ],
+     "ends": null,
+     "unit": null
+    }
+   ],
+   "barsMissing": [],
+   "frame": {
+    "frame": "full-size still",
+    "width": 3840,
+    "height": 2160,
+    "levels": {
+     "meanChange": 0.0019983966102573606,
+     "largestChange": 0.04602938890457153
+    },
+    "sounding": {
+     "still": 1583,
+     "frame": 1590
+    },
+    "chimes": {
+     "still": 36,
+     "frame": 37,
+     "samePlaceAndInstrument": 35
+    },
+    "largestCellMean": 0.43272602558135986,
+    "regions": [
+     {
+      "id": "aerosol_streaks_vanuatu",
+      "still": 34,
+      "frame": 39,
+      "samePlaceAndInstrument": 6
+     },
+     {
+      "id": "aerosol_cells_se_pacific",
+      "still": 0,
+      "frame": 0,
+      "samePlaceAndInstrument": 0
+     }
+    ]
+   },
+   "quoted": {
+    "floor255": 20,
+    "backgroundSpread": 8,
+    "backgroundNearPct": 12.8,
+    "quiet90Cells": 194,
+    "quiet90Sounding": 0,
+    "quiet90Largest255": 11.07,
+    "largestLineMean": 0.429,
+    "largestRadarMean": 0.77,
+    "fullLine": 0.45,
+    "fullRadar": 0.8,
+    "lineSoundingPct": 55,
+    "lineNoData": 0,
+    "linePeaks": 47,
+    "lineChimes": 36,
+    "lineLeftOut": 11,
+    "lineWarm": 3,
+    "lineCool": 33,
+    "radar0Peaks": 55,
+    "radar0Chimes": 34,
+    "radar0LeftOut": 21,
+    "radar0Warm": 0,
+    "radar0Cool": 34,
+    "radar0LargestMean": 0.77,
+    "radar0SoundingPct": 93,
+    "radar1Peaks": 0,
+    "radar1Chimes": 0,
+    "radar1LeftOut": 0,
+    "radar1Warm": 0,
+    "radar1Cool": 0,
+    "radar1LargestMean": 0.15,
+    "radar1SoundingPct": 79,
+    "greyLand90Cells": 201,
+    "greyLand90Sounding": 0,
+    "bar0Switches": 1,
+    "bar0SwitchPct": 27.6,
+    "bar0SwitchStep": 2,
+    "bar0Steps": 4
    }
   },
   {
    "key": "imerg",
+   "label": "Rain",
    "title": "Near Real-Time Global Precipitation from the Global Precipitation Measurement Constellation",
    "svs": 4285,
    "still": {
     "width": 2048,
-    "height": 1024
+    "height": 1024,
+    "from": {
+     "candidates": [
+      {
+       "frame": "frame 0",
+       "time": "2026-11-14T00:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.0.png",
+       "meanDifference": 4.475774923960368
+      },
+      {
+       "frame": "frame 1",
+       "time": "2026-11-14T01:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.1.png",
+       "meanDifference": 7.843390464782715
+      },
+      {
+       "frame": "frame 2",
+       "time": "2026-11-14T02:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.2.png",
+       "meanDifference": 9.485411167144775
+      },
+      {
+       "frame": "frame 3",
+       "time": "2026-11-14T03:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.3.png",
+       "meanDifference": 10.655818621317545
+      },
+      {
+       "frame": "frame 4",
+       "time": "2026-11-14T04:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.4.png",
+       "meanDifference": 11.555981159210205
+      },
+      {
+       "frame": "frame 5",
+       "time": "2026-11-14T05:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.5.png",
+       "meanDifference": 12.24207067489624
+      },
+      {
+       "frame": "frame 6",
+       "time": "2026-11-14T06:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.6.png",
+       "meanDifference": 12.784738063812256
+      },
+      {
+       "frame": "frame 7",
+       "time": "2026-11-14T07:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.7.png",
+       "meanDifference": 13.313450972239176
+      },
+      {
+       "frame": "frame 8",
+       "time": "2026-11-14T08:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.8.png",
+       "meanDifference": 13.750593344370523
+      },
+      {
+       "frame": "frame 9",
+       "time": "2026-11-14T09:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.9.png",
+       "meanDifference": 14.044797579447428
+      },
+      {
+       "frame": "frame 10",
+       "time": "2026-11-14T10:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.10.png",
+       "meanDifference": 14.382723649342855
+      },
+      {
+       "frame": "frame 26",
+       "time": "2026-11-15T02:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.26.png",
+       "meanDifference": 14.540088812510172
+      },
+      {
+       "frame": "frame 25",
+       "time": "2026-11-15T01:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.25.png",
+       "meanDifference": 14.541606903076172
+      },
+      {
+       "frame": "frame 27",
+       "time": "2026-11-15T03:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.27.png",
+       "meanDifference": 14.559163252512613
+      },
+      {
+       "frame": "frame 11",
+       "time": "2026-11-14T11:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.11.png",
+       "meanDifference": 14.592669328053793
+      },
+      {
+       "frame": "frame 24",
+       "time": "2026-11-15T00:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.24.png",
+       "meanDifference": 14.630545775095621
+      },
+      {
+       "frame": "frame 28",
+       "time": "2026-11-15T04:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.28.png",
+       "meanDifference": 14.667673587799072
+      },
+      {
+       "frame": "frame 12",
+       "time": "2026-11-14T12:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.12.png",
+       "meanDifference": 14.675884882609049
+      },
+      {
+       "frame": "frame 23",
+       "time": "2026-11-14T23:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.23.png",
+       "meanDifference": 14.679494222005209
+      },
+      {
+       "frame": "frame 22",
+       "time": "2026-11-14T22:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.22.png",
+       "meanDifference": 14.68607759475708
+      },
+      {
+       "frame": "frame 21",
+       "time": "2026-11-14T21:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.21.png",
+       "meanDifference": 14.736363252003988
+      },
+      {
+       "frame": "frame 29",
+       "time": "2026-11-15T05:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.29.png",
+       "meanDifference": 14.747798760732016
+      },
+      {
+       "frame": "frame 20",
+       "time": "2026-11-14T20:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.20.png",
+       "meanDifference": 14.819077968597412
+      },
+      {
+       "frame": "frame 19",
+       "time": "2026-11-14T19:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.19.png",
+       "meanDifference": 14.872808456420898
+      },
+      {
+       "frame": "frame 15",
+       "time": "2026-11-14T15:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.15.png",
+       "meanDifference": 14.892123858133951
+      },
+      {
+       "frame": "frame 13",
+       "time": "2026-11-14T13:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.13.png",
+       "meanDifference": 14.903132756551107
+      },
+      {
+       "frame": "frame 18",
+       "time": "2026-11-14T18:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.18.png",
+       "meanDifference": 14.906972408294678
+      },
+      {
+       "frame": "frame 14",
+       "time": "2026-11-14T14:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.14.png",
+       "meanDifference": 14.946515719095865
+      },
+      {
+       "frame": "frame 16",
+       "time": "2026-11-14T16:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.16.png",
+       "meanDifference": 14.972479502360025
+      },
+      {
+       "frame": "frame 17",
+       "time": "2026-11-14T17:00Z",
+       "file": "assets/frames/svs4285/imergert_composite.17.png",
+       "meanDifference": 14.98181184132894
+      }
+     ],
+     "best": {
+      "frame": "frame 0",
+      "time": "2026-11-14T00:00Z",
+      "file": "assets/frames/svs4285/imergert_composite.0.png",
+      "meanDifference": 4.475774923960368
+     },
+     "runnerUp": {
+      "frame": "frame 1",
+      "meanDifference": 7.843390464782715
+     }
+    }
    },
    "frames": {
     "width": 3600,
     "height": 1800
    },
+   "hasRule": false,
+   "settings": {
+    "measure": "colour",
+    "floor": 0.11764705882352941,
+    "full": {
+     "line": 0.85,
+     "radar": 0.95
+    },
+    "mask": "data/imerg/scan_mask.png"
+   },
+   "procedure": {
+    "measure": "colour",
+    "floor": 0.11764705882352941,
+    "full": {
+     "line": 0.85,
+     "radar": 0.95
+    },
+    "mask": "data/imerg/scan_mask.png"
+   },
+   "background": {
+    "rgb": [
+     1.9,
+     5.1,
+     20.1
+    ],
+    "spread": 18.19989652327527,
+    "binShare": 0.5133431755154584,
+    "nearShare": 0.8173373946292313
+   },
+   "quiet": [
+    {
+     "least": 1,
+     "cells": 510,
+     "sounding": 0,
+     "largestMean": 0.08484848588705063,
+     "soundingCells": []
+    },
+    {
+     "least": 0.98,
+     "cells": 680,
+     "sounding": 0,
+     "largestMean": 0.08484848588705063,
+     "soundingCells": []
+    },
+    {
+     "least": 0.9,
+     "cells": 1108,
+     "sounding": 1,
+     "largestMean": 0.131727933883667,
+     "soundingCells": [
+      {
+       "column": 73,
+       "band": 11,
+       "mean": 0.131727933883667,
+       "level": 0.019226906821131706,
+       "nearCommonest": 0.9,
+       "legendColour": 0.1
+      }
+     ]
+    }
+   ],
+   "drawn": [
+    {
+     "least": 0.01,
+     "cells": 1719,
+     "sounding": 511,
+     "soundingAtOceanFloor": 1673
+    },
+    {
+     "least": 0.1,
+     "cells": 1227,
+     "sounding": 510,
+     "soundingAtOceanFloor": 1186
+    }
+   ],
+   "legendDrawn": [
+    {
+     "least": 0.01,
+     "cells": 1352,
+     "sounding": 511,
+     "soundingAtOceanFloor": 1349
+    },
+    {
+     "least": 0.1,
+     "cells": 742,
+     "sounding": 510,
+     "soundingAtOceanFloor": 742
+    }
+   ],
+   "greyLand": null,
+   "mask": {
+    "file": "data/imerg/scan_mask.png",
+    "share": 0.4021477699279785,
+    "nothingRead": 545
+   },
    "selfCheck": 0,
    "line": {
     "colour": {
      "cells": 2880,
-     "sounding": 2559,
-     "atFull": 5,
-     "largestCellMean": 0.6221196967012741,
-     "peaks": 89,
-     "afterSpacing": 73,
-     "chimes": 62,
-     "warm": 15,
-     "cool": 47
+     "sounding": 511,
+     "atFull": 0,
+     "noData": 545,
+     "largestCellMean": 0.8104575276374817,
+     "peaks": 18,
+     "afterSpacing": 17,
+     "chimes": 16,
+     "warm": 2,
+     "cool": 14
     },
     "brightness": {
      "cells": 2880,
-     "sounding": 2880,
-     "atFull": 471,
-     "largestCellMean": 0.9763996594092426,
-     "peaks": 176,
-     "afterSpacing": 138,
-     "chimes": 106,
-     "warm": 28,
-     "cool": 78
+     "sounding": 703,
+     "atFull": 3,
+     "noData": 545,
+     "largestCellMean": 0.8826628923416138,
+     "peaks": 26,
+     "afterSpacing": 24,
+     "chimes": 22,
+     "warm": 3,
+     "cool": 19
+    },
+    "atOceanFloor": {
+     "cells": 2880,
+     "sounding": 2286,
+     "atFull": 0,
+     "noData": 545,
+     "largestCellMean": 0.8104575276374817,
+     "peaks": 26,
+     "afterSpacing": 23,
+     "chimes": 21,
+     "warm": 3,
+     "cool": 18
     }
    },
+   "lineColours": {
+    "warm": {
+     "rain step 6 of 10": 2
+    },
+    "cool": {
+     "rain step 3 of 10": 2,
+     "snow step 6 of 10": 3,
+     "rain step 4 of 10": 3,
+     "rain step 2 of 10": 4,
+     "snow step 4 of 10": 2
+    }
+   },
+   "pixelColours": {
+    "rain step 1 of 10": 0.25141656347330105,
+    "rain step 2 of 10": 0.2265450861195542,
+    "rain step 3 of 10": 0.1273068407820181,
+    "rain step 4 of 10": 0.05627228038575556,
+    "rain step 5 of 10": 0.028458853990768883,
+    "rain step 6 of 10": 0.01520507336110173,
+    "rain step 7 of 10": 0.005808848362039851,
+    "rain step 10 of 10": 0.0020638673120942624,
+    "snow step 1 of 10": 0.04196029869788735,
+    "snow step 2 of 10": 0.04176516942474389,
+    "snow step 3 of 10": 0.04390408645727795,
+    "snow step 4 of 10": 0.044286840031520884,
+    "snow step 5 of 10": 0.04876730834177643,
+    "snow step 6 of 10": 0.04380652182070622,
+    "snow step 7 of 10": 0.013351345266238884,
+    "snow step 8 of 10": 0.007587526736462907,
+    "snow step 9 of 10": 0.0014934894367518482
+   },
+   "classes": [
+    "rain step 1 of 10",
+    "rain step 2 of 10",
+    "rain step 3 of 10",
+    "rain step 4 of 10",
+    "rain step 5 of 10",
+    "rain step 6 of 10",
+    "rain step 7 of 10",
+    "rain step 8 of 10",
+    "rain step 9 of 10",
+    "rain step 10 of 10",
+    "snow step 1 of 10",
+    "snow step 2 of 10",
+    "snow step 3 of 10",
+    "snow step 4 of 10",
+    "snow step 5 of 10",
+    "snow step 6 of 10",
+    "snow step 7 of 10",
+    "snow step 8 of 10",
+    "snow step 9 of 10",
+    "snow step 10 of 10"
+   ],
    "regions": [
     {
      "id": "imerg_band_south_pacific",
@@ -264,14 +1827,40 @@
      "groundRatio": 0.953716950748227,
      "radar": {
       "cells": 1440,
+      "sounding": 587,
+      "atFull": 0,
+      "noData": 0,
+      "largestCellMean": 0.9046568870544434,
+      "peaks": 50,
+      "afterSpacing": 43,
+      "chimes": 31,
+      "warm": 4,
+      "cool": 27
+     },
+     "radarAtOceanFloor": {
+      "cells": 1440,
       "sounding": 1420,
-      "atFull": 64,
-      "largestCellMean": 0.9046568414744209,
-      "peaks": 64,
-      "afterSpacing": 51,
-      "chimes": 39,
-      "warm": 1,
-      "cool": 38
+      "atFull": 0,
+      "noData": 0,
+      "largestCellMean": 0.9046568870544434,
+      "peaks": 58,
+      "afterSpacing": 49,
+      "chimes": 37,
+      "warm": 4,
+      "cool": 33
+     },
+     "colours": {
+      "warm": {
+       "rain step 4 of 10": 2,
+       "rain step 5 of 10": 2
+      },
+      "cool": {
+       "rain step 3 of 10": 7,
+       "rain step 2 of 10": 11,
+       "rain step 1 of 10": 5,
+       "rain step 4 of 10": 2,
+       "rain step 5 of 10": 2
+      }
      }
     },
     {
@@ -286,226 +1875,560 @@
      "groundRatio": 1,
      "radar": {
       "cells": 1440,
-      "sounding": 1416,
-      "atFull": 16,
-      "largestCellMean": 0.8987744920393999,
-      "peaks": 15,
+      "sounding": 121,
+      "atFull": 0,
+      "noData": 2,
+      "largestCellMean": 0.8987745046615601,
+      "peaks": 11,
+      "afterSpacing": 8,
+      "chimes": 7,
+      "warm": 2,
+      "cool": 5
+     },
+     "radarAtOceanFloor": {
+      "cells": 1440,
+      "sounding": 1414,
+      "atFull": 0,
+      "noData": 2,
+      "largestCellMean": 0.8987745046615601,
+      "peaks": 13,
       "afterSpacing": 9,
       "chimes": 8,
       "warm": 2,
       "cool": 6
+     },
+     "colours": {
+      "warm": {
+       "rain step 4 of 10": 1,
+       "rain step 5 of 10": 1
+      },
+      "cool": {
+       "rain step 3 of 10": 4,
+       "rain step 2 of 10": 1
+      }
      }
     }
    ],
-   "landSea": {
-    "land": {
-     "cells": 518,
-     "sounding": 315,
-     "meanLevel": 0.1671284297571075,
-     "meanStrength": 0.10776956845969922,
-     "largestStrength": 0.622119697552224
-    },
-    "sea": {
-     "cells": 1489,
-     "sounding": 1489,
-     "meanLevel": 0.14058175818435473,
-     "meanStrength": 0.11081229580611499,
-     "largestStrength": 0.5762482900136797
-    }
+   "latitude": {
+    "bands": [
+     {
+      "band": 0,
+      "south": -90,
+      "north": -75,
+      "groundShare": 0.017037086855465844,
+      "columnsWithData": 48,
+      "meanLevel": 0,
+      "meanChange": 0,
+      "largestChange": 0
+     },
+     {
+      "band": 1,
+      "south": -75,
+      "north": -60,
+      "groundShare": 0.04995021125231486,
+      "columnsWithData": 240,
+      "meanLevel": 0.07805052535065139,
+      "meanChange": 0.007660054988809862,
+      "largestChange": 0.05926330387592316
+     },
+     {
+      "band": 2,
+      "south": -60,
+      "north": -45,
+      "groundShare": 0.07945931129894557,
+      "columnsWithData": 240,
+      "meanLevel": 0.039276688425646474,
+      "meanChange": 0.004097271846573373,
+      "largestChange": 0.04489654302597046
+     },
+     {
+      "band": 3,
+      "south": -45,
+      "north": -30,
+      "groundShare": 0.10355339059327376,
+      "columnsWithData": 236,
+      "meanLevel": 0.028227610653167652,
+      "meanChange": 0.0015707957598783265,
+      "largestChange": 0.026608526706695557
+     },
+     {
+      "band": 4,
+      "south": -30,
+      "north": -15,
+      "groundShare": 0.1205904774487396,
+      "columnsWithData": 205,
+      "meanLevel": 0.007555344340777616,
+      "meanChange": 0.0004810363190566621,
+      "largestChange": 0.010946035385131836
+     },
+     {
+      "band": 5,
+      "south": -15,
+      "north": 0,
+      "groundShare": 0.12940952255126037,
+      "columnsWithData": 205,
+      "meanLevel": 0.03410731957220577,
+      "meanChange": 0.0003100438415968688,
+      "largestChange": 0.0028582364320755005
+     },
+     {
+      "band": 6,
+      "south": 0,
+      "north": 15,
+      "groundShare": 0.12940952255126037,
+      "columnsWithData": 218,
+      "meanLevel": 0.02504346574925809,
+      "meanChange": 0.00023677175674467868,
+      "largestChange": 0.00411638617515564
+     },
+     {
+      "band": 7,
+      "south": 15,
+      "north": 30,
+      "groundShare": 0.1205904774487396,
+      "columnsWithData": 194,
+      "meanLevel": 0.01564839166305844,
+      "meanChange": 0.0006579610833552541,
+      "largestChange": 0.011368095874786377
+     },
+     {
+      "band": 8,
+      "south": 30,
+      "north": 45,
+      "groundShare": 0.10355339059327376,
+      "columnsWithData": 173,
+      "meanLevel": 0.028585212793055856,
+      "meanChange": 0.0019747281280168565,
+      "largestChange": 0.01852169632911682
+     },
+     {
+      "band": 9,
+      "south": 45,
+      "north": 60,
+      "groundShare": 0.07945931129894557,
+      "columnsWithData": 138,
+      "meanLevel": 0.04168281873917558,
+      "meanChange": 0.0031030861816058555,
+      "largestChange": 0.02904510498046875
+     },
+     {
+      "band": 10,
+      "south": 60,
+      "north": 75,
+      "groundShare": 0.04995021125231486,
+      "columnsWithData": 198,
+      "meanLevel": 0.023108591531512724,
+      "meanChange": 0.0024847287528576667,
+      "largestChange": 0.06525444984436035
+     },
+     {
+      "band": 11,
+      "south": 75,
+      "north": 90,
+      "groundShare": 0.017037086855465844,
+      "columnsWithData": 240,
+      "meanLevel": 0.003422374320992579,
+      "meanChange": 0.011687552731018513,
+      "largestChange": 0.29543229937553406
+     }
+    ],
+    "chimes": 16,
+    "chimesWeighted": 17
    },
-   "landLeftOut": {
-    "sounding": 2498,
-    "nothingRead": 253,
-    "chimes": 55,
-    "warm": 10
+   "bars": [
+    {
+     "file": "assets/frames/svs4285/rainbarwhite2.png",
+     "name": "rain",
+     "width": 440,
+     "height": 90,
+     "row": 36,
+     "from": 40,
+     "to": 416,
+     "colouredThreshold": 60,
+     "colouredPixels": 374,
+     "warmAtStart": false,
+     "warmAtEnd": true,
+     "switches": [
+      {
+       "at": 0.2872340425531915,
+       "from": [
+        180,
+        231,
+        0
+       ],
+       "to": [
+        255,
+        251,
+        0
+       ]
+      }
+     ],
+     "strength": [
+      0.7019607843137254,
+      0.8274509803921568,
+      0.9058823529411765,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0.7843137254901961,
+      0.5686274509803921,
+      0.5686274509803921
+     ],
+     "steps": [
+      {
+       "from": 40,
+       "to": 75,
+       "rgb": [
+        0,
+        179,
+        48
+       ],
+       "warm": false,
+       "strength": 0.702,
+       "name": "rain step 1 of 10"
+      },
+      {
+       "from": 76,
+       "to": 111,
+       "rgb": [
+        96,
+        211,
+        0
+       ],
+       "warm": false,
+       "strength": 0.827,
+       "name": "rain step 2 of 10"
+      },
+      {
+       "from": 112,
+       "to": 147,
+       "rgb": [
+        180,
+        231,
+        0
+       ],
+       "warm": false,
+       "strength": 0.906,
+       "name": "rain step 3 of 10"
+      },
+      {
+       "from": 148,
+       "to": 183,
+       "rgb": [
+        255,
+        251,
+        0
+       ],
+       "warm": true,
+       "strength": 1,
+       "name": "rain step 4 of 10"
+      },
+      {
+       "from": 184,
+       "to": 219,
+       "rgb": [
+        255,
+        196,
+        0
+       ],
+       "warm": true,
+       "strength": 1,
+       "name": "rain step 5 of 10"
+      },
+      {
+       "from": 220,
+       "to": 255,
+       "rgb": [
+        255,
+        147,
+        0
+       ],
+       "warm": true,
+       "strength": 1,
+       "name": "rain step 6 of 10"
+      },
+      {
+       "from": 256,
+       "to": 291,
+       "rgb": [
+        255,
+        73,
+        0
+       ],
+       "warm": true,
+       "strength": 1,
+       "name": "rain step 7 of 10"
+      },
+      {
+       "from": 292,
+       "to": 327,
+       "rgb": [
+        255,
+        0,
+        0
+       ],
+       "warm": true,
+       "strength": 1,
+       "name": "rain step 8 of 10"
+      },
+      {
+       "from": 328,
+       "to": 363,
+       "rgb": [
+        200,
+        0,
+        0
+       ],
+       "warm": true,
+       "strength": 0.784,
+       "name": "rain step 9 of 10"
+      },
+      {
+       "from": 364,
+       "to": 416,
+       "rgb": [
+        145,
+        0,
+        0
+       ],
+       "warm": true,
+       "strength": 0.569,
+       "name": "rain step 10 of 10"
+      }
+     ],
+     "names": null,
+     "ends": null,
+     "unit": null
+    },
+    {
+     "file": "assets/frames/svs4285/snowbarwhite2.png",
+     "name": "snow",
+     "width": 440,
+     "height": 90,
+     "row": 36,
+     "from": 40,
+     "to": 416,
+     "colouredThreshold": 60,
+     "colouredPixels": 374,
+     "warmAtStart": false,
+     "warmAtEnd": false,
+     "switches": [],
+     "strength": [
+      0.7294117647058823,
+      0.7137254901960784,
+      0.6980392156862745,
+      0.6901960784313725,
+      0.6823529411764706,
+      0.6784313725490196,
+      0.7254901960784313,
+      0.6666666666666666,
+      0.6039215686274509,
+      0.5333333333333333,
+      0.5333333333333333
+     ],
+     "steps": [
+      {
+       "from": 40,
+       "to": 75,
+       "rgb": [
+        69,
+        255,
+        255
+       ],
+       "warm": false,
+       "strength": 0.729,
+       "name": "snow step 1 of 10"
+      },
+      {
+       "from": 76,
+       "to": 111,
+       "rgb": [
+        73,
+        221,
+        255
+       ],
+       "warm": false,
+       "strength": 0.714,
+       "name": "snow step 2 of 10"
+      },
+      {
+       "from": 112,
+       "to": 147,
+       "rgb": [
+        77,
+        187,
+        255
+       ],
+       "warm": false,
+       "strength": 0.698,
+       "name": "snow step 3 of 10"
+      },
+      {
+       "from": 148,
+       "to": 183,
+       "rgb": [
+        79,
+        154,
+        255
+       ],
+       "warm": false,
+       "strength": 0.69,
+       "name": "snow step 4 of 10"
+      },
+      {
+       "from": 184,
+       "to": 219,
+       "rgb": [
+        81,
+        122,
+        255
+       ],
+       "warm": false,
+       "strength": 0.682,
+       "name": "snow step 5 of 10"
+      },
+      {
+       "from": 220,
+       "to": 255,
+       "rgb": [
+        82,
+        93,
+        255
+       ],
+       "warm": false,
+       "strength": 0.678,
+       "name": "snow step 6 of 10"
+      },
+      {
+       "from": 256,
+       "to": 291,
+       "rgb": [
+        83,
+        70,
+        255
+       ],
+       "warm": false,
+       "strength": 0.725,
+       "name": "snow step 7 of 10"
+      },
+      {
+       "from": 292,
+       "to": 327,
+       "rgb": [
+        90,
+        47,
+        217
+       ],
+       "warm": false,
+       "strength": 0.667,
+       "name": "snow step 8 of 10"
+      },
+      {
+       "from": 328,
+       "to": 363,
+       "rgb": [
+        115,
+        33,
+        187
+       ],
+       "warm": false,
+       "strength": 0.604,
+       "name": "snow step 9 of 10"
+      },
+      {
+       "from": 364,
+       "to": 416,
+       "rgb": [
+        140,
+        20,
+        156
+       ],
+       "warm": false,
+       "strength": 0.533,
+       "name": "snow step 10 of 10"
+      }
+     ],
+     "names": null,
+     "ends": null,
+     "unit": null
+    }
+   ],
+   "barsMissing": [],
+   "frame": {
+    "frame": "frame 0",
+    "width": 3600,
+    "height": 1800,
+    "levels": {
+     "meanChange": 0.01267692766430616,
+     "largestChange": 0.32590973377227783
+    },
+    "sounding": {
+     "still": 511,
+     "frame": 694
+    },
+    "chimes": {
+     "still": 16,
+     "frame": 22,
+     "samePlaceAndInstrument": 13
+    },
+    "largestCellMean": 0.9206971526145935,
+    "regions": [
+     {
+      "id": "imerg_band_south_pacific",
+      "still": 31,
+      "frame": 43,
+      "samePlaceAndInstrument": 13
+     },
+     {
+      "id": "imerg_showers_equator",
+      "still": 7,
+      "frame": 12,
+      "samePlaceAndInstrument": 4
+     }
+    ]
+   },
+   "quoted": {
+    "floor255": 30,
+    "backgroundSpread": 18.2,
+    "backgroundNearPct": 81.7,
+    "quiet90Cells": 1108,
+    "quiet90Sounding": 1,
+    "quiet90Largest255": 33.59,
+    "largestLineMean": 0.81,
+    "largestRadarMean": 0.9,
+    "fullLine": 0.85,
+    "fullRadar": 0.95,
+    "lineSoundingPct": 17.7,
+    "lineNoData": 545,
+    "linePeaks": 18,
+    "lineChimes": 16,
+    "lineLeftOut": 2,
+    "lineWarm": 2,
+    "lineCool": 14,
+    "radar0Peaks": 50,
+    "radar0Chimes": 31,
+    "radar0LeftOut": 19,
+    "radar0Warm": 4,
+    "radar0Cool": 27,
+    "radar0LargestMean": 0.9,
+    "radar0SoundingPct": 41,
+    "radar1Peaks": 11,
+    "radar1Chimes": 7,
+    "radar1LeftOut": 4,
+    "radar1Warm": 2,
+    "radar1Cool": 5,
+    "radar1LargestMean": 0.9,
+    "radar1SoundingPct": 8,
+    "maskPct": 40.21,
+    "bar0Switches": 1,
+    "bar0SwitchPct": 28.7,
+    "bar0SwitchStep": 4,
+    "bar0Steps": 10,
+    "bar1Switches": 0,
+    "bar1Steps": 10
    }
   }
- ],
- "latitude": {
-  "bands": [
-   {
-    "band": 0,
-    "south": -90,
-    "north": -75,
-    "groundShare": 0.017037086855465844,
-    "meanLevel": 0,
-    "meanChange": 0,
-    "largestChange": 0
-   },
-   {
-    "band": 1,
-    "south": -75,
-    "north": -60,
-    "groundShare": 0.04995021125231486,
-    "meanLevel": 0.02336879318318097,
-    "meanChange": 0.007795493485658275,
-    "largestChange": 0.028827834874391556
-   },
-   {
-    "band": 2,
-    "south": -60,
-    "north": -45,
-    "groundShare": 0.07945931129894557,
-    "meanLevel": 0.21988042139758665,
-    "meanChange": 0.006386691487083832,
-    "largestChange": 0.026703745126724243
-   },
-   {
-    "band": 3,
-    "south": -45,
-    "north": -30,
-    "groundShare": 0.10355339059327376,
-    "meanLevel": 0.21892956116159137,
-    "meanChange": 0.005245109525276348,
-    "largestChange": 0.0201948881149292
-   },
-   {
-    "band": 4,
-    "south": -30,
-    "north": -15,
-    "groundShare": 0.1205904774487396,
-    "meanLevel": 0.23752968437426414,
-    "meanChange": 0.0018587577894019585,
-    "largestChange": 0.014470100402832031
-   },
-   {
-    "band": 5,
-    "south": -15,
-    "north": 0,
-    "groundShare": 0.12940952255126037,
-    "meanLevel": 0.3499867614436274,
-    "meanChange": 0.0013727159200546642,
-    "largestChange": 0.004392683506011963
-   },
-   {
-    "band": 6,
-    "south": 0,
-    "north": 15,
-    "groundShare": 0.12940952255126037,
-    "meanLevel": 0.41906473142638184,
-    "meanChange": 0.0011457553676639993,
-    "largestChange": 0.004472494125366211
-   },
-   {
-    "band": 7,
-    "south": 15,
-    "north": 30,
-    "groundShare": 0.1205904774487396,
-    "meanLevel": 0.19651864845242623,
-    "meanChange": 0.002402588173329908,
-    "largestChange": 0.011657893657684326
-   },
-   {
-    "band": 8,
-    "south": 30,
-    "north": 45,
-    "groundShare": 0.10355339059327376,
-    "meanLevel": 0.11831216570280959,
-    "meanChange": 0.002975439459745151,
-    "largestChange": 0.02386268973350525
-   },
-   {
-    "band": 9,
-    "south": 45,
-    "north": 60,
-    "groundShare": 0.07945931129894557,
-    "meanLevel": 0.03972704994860881,
-    "meanChange": 0.002118835855314198,
-    "largestChange": 0.015962138772010803
-   },
-   {
-    "band": 10,
-    "south": 60,
-    "north": 75,
-    "groundShare": 0.04995021125231486,
-    "meanLevel": 0.009334176737320376,
-    "meanChange": 0.0019368041930041121,
-    "largestChange": 0.032315200194716454
-   },
-   {
-    "band": 11,
-    "south": 75,
-    "north": 90,
-    "groundShare": 0.017037086855465844,
-    "meanLevel": 0.027921641918025368,
-    "meanChange": 0.01028463946155777,
-    "largestChange": 0.1295960694551468
-   }
-  ],
-  "chimes": 68,
-  "chimesWeighted": 70
- },
- "bar": {
-  "width": 310,
-  "height": 95,
-  "row": 28,
-  "from": 14,
-  "to": 291,
-  "warmAtColdEnd": false,
-  "warmAtWarmEnd": true,
-  "switches": [
-   0.7436823104693141
-  ],
-  "strength": [
-   0.4666666666666667,
-   0.6431372549019608,
-   0.5333333333333333,
-   0.6745098039215687,
-   0.7647058823529411,
-   0.7254901960784313,
-   0.8352941176470589,
-   0.8666666666666667,
-   0.8627450980392157,
-   0.8666666666666667,
-   0.9019607843137255
-  ]
- },
- "lossless": {
-  "pixels": 2097152,
-  "meanDifference": 6.925818920135498,
-  "land": 701569,
-  "landOver": 11084,
-  "sea": 561994,
-  "seaOver": 201539,
-  "quietCells": [
-   {
-    "least": 1,
-    "cells": 235,
-    "sounding": 0,
-    "meanLevel": 0,
-    "meanStrength": 0.00014608329190938434,
-    "largestStrength": 0.0030551755585955256
-   },
-   {
-    "least": 0.98,
-    "cells": 434,
-    "sounding": 0,
-    "meanLevel": 0,
-    "meanStrength": 0.00033861813410182313,
-    "largestStrength": 0.01068044788975021
-   },
-   {
-    "least": 0.9,
-    "cells": 746,
-    "sounding": 0,
-    "meanLevel": 0,
-    "meanStrength": 0.002891126348463839,
-    "largestStrength": 0.03006343713956163
-   }
-  ],
-  "levels": {
-   "meanChange": 0.0431629963650999,
-   "largestChange": 0.1520688533782959
-  },
-  "sounding": {
-   "still": 1727,
-   "lossless": 1816
-  },
-  "chimes": {
-   "still": 68,
-   "lossless": 84,
-   "samePlaceAndInstrument": 49
-  },
-  "largestCellMean": 0.5068685202037586
- }
+ ]
 }
