@@ -1,58 +1,58 @@
-/* Earth Sonata app, styled with the "Tide Table" design system (DESIGN.md).
-   Hairline rules, 4px corners, no shadows, type weight carries the data.
-   "Tide Table" world: a tide table printed on a sea chart. Two themes: light (almanac white,
-   navy ink, tide-blue actions) and dark, the night edition (deep navy, inks lifted). Signal red-orange means "live or focused" only. Region A is violet and
-   Region B rose: both off the NASA picture's blue-to-red temperature scale, so a region colour
-   is never read as warm or cold. */
+/* Earth Sonata app, styled with the "Pulse Catalogue" design system (DESIGN.md).
+   A record catalogue: each picture is an entry, each region a side. White sleeve with black ink
+   (light) or matte black sleeve with white ink (dark); square corners; boxed controls joined by
+   1px rules; letterspaced caps for labels; Geist, with Geist Mono for numbers. Colour appears only
+   on what is live or chosen, and then it is the playing side's colour (--live): the needle, the end
+   block on the current tab and on Play. Region A is violet and Region B rose, both off the NASA
+   picture's blue-to-red temperature scale, and a region colour never travels without its letter. */
 :root {
-  /* Light */
-  --signal: oklch(0.55 0.18 33);
-  --on-signal: oklch(0.99 0 0);
-  --ink: oklch(0.26 0.05 260);
-  --ink-2: oklch(0.46 0.04 255);
-  --paper: oklch(0.972 0.004 230);
-  --rule: oklch(0.87 0.015 245);
-  --rule-2: oklch(0.94 0.008 240);
-  --action: oklch(0.48 0.13 255);
-  --action-hover: oklch(0.42 0.13 255);
-  --on-action: oklch(0.99 0 0);
-  --region-a: oklch(0.47 0.15 300);
-  --region-b: oklch(0.52 0.17 5);
+  /* Light: the white sleeve */
+  --ink: oklch(0.15 0 0);
+  --ink-2: oklch(0.42 0 0);
+  --paper: oklch(0.975 0 0);
+  --rule: oklch(0.82 0 0);
+  --rule-2: oklch(0.93 0 0);
+  /* "Signal" is ink here: focus, the chosen picture, a chime flash, a held key. Colour is kept for the side. */
+  --signal: var(--ink);
+  --on-signal: var(--paper);
+  --action: var(--ink);
+  --action-hover: oklch(0.3 0 0);
+  --on-action: var(--paper);
+  --region-a: oklch(0.52 0.2 295);
+  --region-b: oklch(0.53 0.19 5);
   --on-region: oklch(0.99 0 0);
-  --well: oklch(0.20 0.03 262);
+  --live: var(--ink);
+  --well: oklch(0.15 0 0);
   --white: #ffffff;
   --black: #000000;
 
-  --font: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, 'Segoe UI', sans-serif;
-  --mono: 'Atkinson Hyperlegible Mono Variable', 'Atkinson Hyperlegible Mono', ui-monospace, Consolas, monospace;
+  --font: 'Geist Variable', 'Geist', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+  --caps: 0.16em; /* letterspacing for uppercase labels */
 
   --xs: 10px;
   --sm: 16px;
   --md: 22px;
   --lg: 28px;
   --xl: 40px;
-  --r: 4px;
-  --r-key: 3px;
+  --r: 0px;
+  --r-key: 0px;
   --snap: 180ms steps(2, jump-end); /* two 90 ms steps, no easing */
 
   color-scheme: light;
 }
-/* Dark: the night edition. Chosen with the header switch; with no choice, follows the system. */
+/* Dark: the matte black sleeve. Chosen with the header switch; with no choice, follows the system. */
 :root[data-theme='dark'] {
-  --signal: oklch(0.72 0.17 42);
-  --on-signal: oklch(0.17 0.03 262);
-  --ink: oklch(0.95 0.01 250);
-  --ink-2: oklch(0.78 0.03 255);
-  --paper: oklch(0.17 0.03 262);
-  --rule: oklch(0.34 0.035 262);
-  --rule-2: oklch(0.225 0.035 262);
-  --action: oklch(0.74 0.11 250);
-  --action-hover: oklch(0.80 0.10 250);
-  --on-action: oklch(0.17 0.03 262);
-  --region-a: oklch(0.77 0.11 300);
-  --region-b: oklch(0.79 0.11 0);
-  --on-region: oklch(0.17 0.03 262);
-  --well: oklch(0.12 0.02 262);
+  --ink: oklch(0.96 0 0);
+  --ink-2: oklch(0.72 0 0);
+  --paper: oklch(0.15 0 0);
+  --rule: oklch(0.34 0 0);
+  --rule-2: oklch(0.22 0 0);
+  --action-hover: oklch(0.85 0 0);
+  --region-a: oklch(0.73 0.16 295);
+  --region-b: oklch(0.76 0.14 5);
+  --on-region: oklch(0.15 0 0);
+  --well: oklch(0.09 0 0);
   color-scheme: dark;
 }
 
@@ -66,7 +66,7 @@ body {
   color: var(--ink);
   transition: background-color var(--snap), color var(--snap);
   caret-color: var(--signal);
-  font: 400 18px/1.5 var(--font);
+  font: 400 17px/1.55 var(--font);
 }
 /* Layout (DESIGN.md): a fixed 400px rail with a 1px rule on its right, and a fluid main column.
    Rail padding 32px 28px, main 32px 40px 40px. Below 960px the rail stacks on top, 16px gutter. */
@@ -96,31 +96,32 @@ body {
   .rail { padding-block: 24px var(--md); border-bottom: 1px solid var(--rule); }
   .stage { padding-block: var(--md) var(--xl); }
 }
-h1 { font-size: 1.9rem; font-weight: 750; line-height: 1.1; letter-spacing: -0.015em; margin: 0; text-wrap: balance; }
-h2 { font-size: 1.05rem; font-weight: 700; line-height: 1.3; margin: 0 0 var(--xs); }
+h1 { font-size: 1.9rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font-size: 1.05rem; font-weight: 600; line-height: 1.3; margin: 0 0 var(--xs); }
 header { display: grid; gap: var(--xs); }
 /* The theme switch sits under the controls, so Start stays the first keyboard stop. */
 .rail > .theme-switch { justify-self: start; }
 /* Light / Dark switch: two joined buttons, the chosen one filled in ink. */
-.theme-switch { display: inline-flex; flex: none; gap: 2px; background: var(--ink); border: 2px solid var(--ink); border-radius: var(--r); overflow: hidden; }
-.theme-switch button { border: 0; border-radius: 0; min-height: 40px; font-size: 0.9rem; gap: 6px; padding: 0 12px; background: var(--paper); }
+.theme-switch { display: inline-flex; flex: none; gap: 0; border: 1px solid var(--rule); }
+.theme-switch button { border: 0; border-radius: 0; min-height: 40px; font: 500 0.72rem/1 var(--font); text-transform: uppercase; letter-spacing: var(--caps); gap: 7px; padding: 0 12px; background: var(--paper); color: var(--ink-2); }
+.theme-switch button + button { border-left: 1px solid var(--rule); }
 .theme-switch button[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
-.theme-switch button:focus-visible { outline-offset: -6px; }
+.theme-switch button:focus-visible { outline: 2px solid currentColor; outline-offset: -5px; }
 .theme-switch svg { width: 16px; height: 16px; }
 .lede, .muted { color: var(--ink-2); margin: 0; max-width: 65ch; }
 p { margin: 0; }
-a { color: var(--ink); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-a:hover { text-decoration-color: var(--signal); }
+a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
 
-/* Focus: the global signal ring (DESIGN.md "Buttons"). */
-:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+/* Focus: a 2px ink ring, offset 3px (DESIGN.md "Buttons"). */
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* Practice data notice: ink, not the signal (signal means live/chosen only). */
 .practice-banner {
   background: var(--ink);
   color: var(--paper);
-  font: 600 0.95rem/1.5 var(--mono);
-  letter-spacing: 0.04em;
+  font: 500 0.85rem/1.5 var(--mono);
+  letter-spacing: 0.08em;
   text-align: center;
   padding: var(--xs) var(--sm);
 }
@@ -164,21 +165,22 @@ figcaption strong { color: var(--ink); }
 .box[data-region] .ring { pointer-events: all; }
 .box .ring { fill: none; stroke: var(--region, var(--white)); stroke-width: 5; }
 .box .tab { fill: var(--region, var(--white)); stroke: var(--black); stroke-width: 3; }
-.box text { fill: var(--on-region); font: 700 30px var(--font); }
+.box text { fill: var(--on-region); font: 600 30px var(--mono); }
 .box.active .ring-outline { stroke-width: 16; }
 .box.active .ring { stroke-width: 9; }
 .box.active .tab { stroke-width: 5; }
 .box * { transition: fill var(--snap), stroke var(--snap); }
-.map-tag { position: absolute; transform: translate(-50%, calc(-100% - 6px)); display: inline-flex; align-items: center;
-           gap: 6px; padding: 2px 8px 2px 2px; border-radius: 999px; background: var(--region); color: var(--on-region);
-           font: 700 0.8rem/1 var(--font); box-shadow: 0 0 0 2px var(--black); pointer-events: none; white-space: nowrap; }
-.map-tag b { display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%;
-             background: var(--on-region); color: var(--region); font-weight: 800; }
-.map-tag.active { box-shadow: 0 0 0 3px var(--black); }
+.map-tag { position: absolute; transform: translate(-50%, calc(-100% - 8px)); display: inline-flex; align-items: center;
+           gap: 7px; padding: 0 8px 0 0; background: oklch(0.1 0 0 / 0.82); color: var(--white);
+           font: 500 0.72rem/1 var(--font); text-transform: uppercase; letter-spacing: 0.12em;
+           box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.5); pointer-events: none; white-space: nowrap; }
+.map-tag b { display: inline-grid; place-items: center; width: 1.7em; height: 1.7em;
+             background: var(--region); color: var(--on-region); font: 600 0.8rem/1 var(--mono); letter-spacing: 0; }
+.map-tag.active { box-shadow: inset 0 0 0 2px var(--region); }
 @media (max-width: 640px) { .map-tag { padding: 2px; } .map-tag > span { display: none; } }
 
 /* Status sentence, then the live readout. */
-.status { font-size: 1.35rem; font-weight: 650; line-height: 1.3; max-width: 46ch; text-wrap: balance; }
+.status { font-size: 1.35rem; font-weight: 450; line-height: 1.3; max-width: 46ch; text-wrap: balance; }
 .now-playing {
   display: flex;
   flex-wrap: wrap;
@@ -199,7 +201,7 @@ figcaption strong { color: var(--ink); }
 
 /* Missing information: stated plainly in ink, no red: missing is not an error. */
 .missing {
-  border: 2px solid var(--ink);
+  border: 1px solid var(--ink);
   border-radius: var(--r);
   padding: var(--xs) var(--sm);
   font-weight: 650;
@@ -209,7 +211,7 @@ figcaption strong { color: var(--ink); }
 .controls { display: grid; gap: var(--sm); border-top: 1px solid var(--rule); padding-top: var(--sm); }
 .row { display: flex; flex-wrap: wrap; gap: var(--xs) var(--sm); align-items: center; }
 fieldset { border: 0; border-top: 1px solid var(--rule); border-radius: 0; margin: 0; padding: var(--xs) 0 0; }
-legend { font-weight: 600; font-size: 0.95rem; padding: 0 var(--xs) 0 0; }
+legend { font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: var(--caps); color: var(--ink-2); padding: 0 var(--xs) 0 0; }
 .region-choice { display: inline-flex; gap: 8px; align-items: center; min-height: 44px; font-weight: 600; }
 .controls .row { align-items: flex-end; }
 /* Range: a label row above, name left and a mono readout right (DESIGN.md "Inputs"). */
@@ -218,15 +220,15 @@ label.range { display: inline-grid; gap: 2px; min-width: 160px; }
 .readout { font: 400 0.9rem/1.5 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
 input[type='radio'], input[type='checkbox'] { width: 22px; height: 22px; accent-color: var(--action); margin: 0; }
 /* A region's letter badge: its colour, used wherever that region is named. */
-.region-badge { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; border-radius: 50%; flex: none;
-                background: var(--region); color: var(--on-region); font: 800 0.8rem/1 var(--font); }
+.region-badge { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; flex: none;
+                background: var(--region); color: var(--on-region); font: 600 0.8rem/1 var(--mono); }
 label { font-weight: 600; font-size: 0.95rem; }
 
 button {
-  font: 700 1rem/1 var(--font);
+  font: 600 0.95rem/1 var(--font);
   min-height: 48px;
   padding: 0 var(--sm);
-  border: 2px solid var(--ink);
+  border: 1px solid var(--ink);
   border-radius: var(--r);
   background: transparent;
   color: var(--ink);
@@ -237,14 +239,16 @@ button {
   transition: background-color var(--snap), color var(--snap);
 }
 button:hover { background: var(--rule-2); }
-button.primary { background: var(--action); border-color: var(--action); color: var(--on-action); }
+/* Primary: filled in ink, with an end block in the playing side's colour (the catalogue's "active" mark). */
+button.primary { position: relative; background: var(--action); border-color: var(--action); color: var(--on-action); padding-right: calc(var(--sm) + 8px); }
+button.primary::after { content: ""; position: absolute; top: -1px; right: -1px; bottom: -1px; width: 8px; background: var(--live); }
 button.primary:hover { background: var(--action-hover); border-color: var(--action-hover); }
 button[aria-expanded='true'] { background: var(--ink); color: var(--paper); }
 
 /* Key caps take their button's text colour, so they invert on filled buttons. */
 kbd {
-  font: 600 0.8rem/1.4 var(--mono);
-  border: 1.5px solid currentColor;
+  font: 500 0.8rem/1.4 var(--mono);
+  border: 1px solid currentColor;
   border-radius: var(--r-key);
   padding: 0 5px;
 }
@@ -253,7 +257,7 @@ select {
   font: 600 0.95rem var(--font);
   color: var(--ink);
   background: var(--paper);
-  border: 2px solid var(--ink);
+  border: 1px solid var(--ink);
   border-radius: var(--r);
   min-height: 44px;
   padding: 0 var(--xs);
@@ -398,7 +402,7 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 .scan-test { font: 600 0.85rem/1.5 var(--mono); color: var(--ink-2); }
 .scan-status { font-size: 1.05rem; font-weight: 650; line-height: 1.3; margin: 0; }
 .pad {
-  border: 2px solid var(--ink);
+  border: 1px solid var(--ink);
   border-radius: var(--r);
   padding: 14px var(--sm);
   display: grid;
@@ -406,7 +410,7 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
   cursor: pointer;
   background: transparent;
 }
-.pad.active { border-color: var(--signal); }
+.pad.active { box-shadow: inset 0 0 0 1px var(--ink); }
 .pad-hint { color: var(--ink-2); font: 400 0.9rem/1.5 var(--font); }
 .pad-keys { display: flex; flex-wrap: wrap; gap: var(--xs); }
 .pad-keys kbd {
@@ -418,7 +422,7 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
   min-height: 48px;
   display: inline-grid;
   place-items: center;
-  border-width: 2px;
+  border-width: 1px;
   border-radius: var(--r);
   transition: background-color var(--snap);
 }
@@ -432,20 +436,23 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 .track-head { display: flex; justify-content: space-between; gap: 12px; font: 400 0.85rem var(--font);
               color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .track-hint { font-size: 0.85rem; color: var(--ink-2); max-width: 70ch; }
-.track-lane { position: relative; height: 64px; margin-top: 8px; border-bottom: 1px solid var(--ink-2);
+.track-lane { position: relative; height: 64px; margin-top: 8px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--ink);
               cursor: ew-resize; touch-action: none; user-select: none; -webkit-user-select: none; }
 .track-lane.idle { cursor: default; }
 .track-lane svg { display: block; width: 100%; height: 100%; }
-.track .note { opacity: 0.16; }
+.track .note { opacity: 0.4; }
 .track .note.played { opacity: 1; }
-.track .note.live { stroke: var(--ink); stroke-width: 2px; vector-effect: non-scaling-stroke; }
-.playline { position: absolute; top: -6px; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: var(--signal); }
-.playline::before { content: ""; position: absolute; top: -4px; left: 50%; width: 14px; height: 14px;
-                    transform: translateX(-50%); background: var(--signal); border-radius: var(--r-key); }
-.dot { position: absolute; top: 50%; left: 0; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%;
-       background: var(--signal); border: 2px solid var(--paper); box-sizing: content-box; }
-.dot, .playline { pointer-events: none; }
-.track-lane.idle .dot, .track-lane.idle .playline { display: none; }
+.track .note.live { stroke: var(--region, var(--ink)); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+/* The needle: a 2px line in the playing side's colour, a square cap on top and a dot at the foot.
+   It runs on the audio clock; the part of the loop already played is washed in the same colour. */
+.playline { position: absolute; top: -8px; bottom: -5px; left: 0; width: 2px; margin-left: -1px; background: var(--region, var(--ink)); }
+.playline::before { content: ""; position: absolute; top: 0; left: 50%; width: 11px; height: 11px;
+                    transform: translateX(-50%); background: var(--region, var(--ink)); }
+.dot { position: absolute; bottom: -5px; left: 0; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%;
+       background: var(--region, var(--ink)); }
+.played-wash { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: color-mix(in oklch, var(--region, var(--ink)) 12%, transparent); }
+.dot, .playline, .played-wash { pointer-events: none; }
+.track-lane.idle .dot, .track-lane.idle .playline, .track-lane.idle .played-wash { display: none; }
 
 /* Shared marks for the lane and the plot (DESIGN.md, tide curves and rhythm rows). */
 svg .beat { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -461,21 +468,21 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
 .intro p { color: var(--ink-2); font-size: 0.95rem; }
 .key { display: flex; gap: 14px; }
 .key figure { margin: 0; display: grid; gap: 4px; font-size: 0.8rem; color: var(--ink-2); }
-.key svg { display: block; width: 150px; height: 64px; background: var(--well); border-radius: var(--r); }
+.key svg { display: block; width: 150px; height: 64px; background: var(--well); }
 
 /* Region close-ups: the patch columns with giant numerals. */
 .closeups { display: grid; gap: var(--sm); }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--lg); }
 .patch { margin: 0; min-width: 0; }
 .patch canvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: var(--r); background: var(--well); }
-.numeral { display: block; font: 500 clamp(4.5rem, 10vw, 9rem)/0.78 var(--font); letter-spacing: -0.04em;
+.numeral { display: block; font: 300 clamp(4.5rem, 10vw, 9rem)/0.78 var(--font); letter-spacing: -0.04em;
            margin: -0.32em 0 0 0.06em; position: relative; color: var(--region, var(--ink));
            -webkit-text-stroke: 0.06em var(--paper); paint-order: stroke fill; transition: font-weight var(--snap); }
 .patch-readout { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 10px 0 12px;
                  font: 400 0.9rem/1.5 var(--mono); color: var(--ink-2); }
-.patch-readout .value { font: 500 2.6rem/1 var(--font); color: var(--ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.patch-readout .value { font: 300 2.6rem/1 var(--font); color: var(--ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .patch-readout .value small { font: 400 0.9rem var(--mono); color: var(--ink-2); margin-left: 8px; letter-spacing: 0; }
-.hear { width: 100%; justify-content: space-between; border-color: var(--ink-2); font-weight: 600; }
+.hear { width: 100%; justify-content: space-between; border-color: var(--ink); font-weight: 600; }
 .hear[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .where { font-size: 0.9rem; color: var(--ink-2); margin: 8px 0 0; }
 
@@ -483,9 +490,10 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
 .plot { border-top: 1px solid var(--rule); padding-top: var(--sm); display: grid; gap: 6px; }
 .plot p { color: var(--ink-2); font-size: 0.95rem; max-width: 70ch; }
 .plot-row { display: grid; grid-template-columns: 5.5rem 1fr 4.5rem; align-items: center; gap: 12px; height: 56px; }
-.plot-row b { font-weight: 650; color: var(--region, var(--ink)); white-space: nowrap; }
+.plot-row b { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.plot-row.current b { color: var(--region, var(--ink)); }
 .nw { white-space: nowrap; }
-.plot-row.current b { box-shadow: inset 0 -3px 0 var(--signal); justify-self: start; }
+.plot-row.current b { box-shadow: inset 0 -3px 0 var(--region, var(--ink)); justify-self: start; }
 .plot-row svg { display: block; width: 100%; height: 40px; }
 .plot-split { font: 400 0.9rem var(--mono); color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.9rem; color: var(--ink-2); margin-top: 4px; }
@@ -504,10 +512,10 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
 /* Tide table: ruled columns, numbers in mono, the playing region's row marked by weight. */
 .tide-table { border-collapse: collapse; width: 100%; max-width: 760px; font-size: 0.95rem; margin: 2px 0 var(--sm); }
 .tide-table th, .tide-table td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); font-weight: 400; }
-.tide-table thead th { font-weight: 600; font-size: 0.85rem; color: var(--ink-2); border-bottom-color: var(--ink); }
+.tide-table thead th { font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-2); border-bottom-color: var(--ink); }
 .tide-table tbody th { display: flex; align-items: center; gap: 8px; }
 .tide-table .num { white-space: nowrap; text-align: right; font: 400 0.95rem var(--mono); font-variant-numeric: tabular-nums; }
-.tide-table thead .num { font: 600 0.85rem var(--font); white-space: normal; }
+.tide-table thead .num { font: 500 0.72rem var(--font); white-space: normal; }
 .tide-table tr.current th { font-weight: 700; }
 /* Tide curves: alignment over the model frames, one curve per region. */
 .tide { margin: 0 0 var(--sm); max-width: 760px; }
@@ -516,7 +524,7 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
 .tide-axis { fill: var(--ink-2); font: 400 12px var(--mono); }
 .tide-curve { fill: none; stroke: var(--region); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
 .tide-end { fill: var(--region); font: 700 14px var(--mono); }
-.tide-now { stroke: var(--signal); stroke-width: 2; }
+.tide-now { stroke: var(--ink); stroke-width: 2; }
 .tide figcaption { font-size: 0.85rem; margin-top: 8px; }
 @media (max-width: 640px) {
   .tide-table { font-size: 0.85rem; }
@@ -531,12 +539,12 @@ svg .missing-beat { fill: var(--rule-2); stroke: var(--ink-2); stroke-width: 1; 
 .practice-text { flex: 1 1 32ch; min-width: 0; display: grid; gap: var(--xs); max-width: 68ch; justify-items: start; }
 .practice-preview { display: flex; align-items: center; gap: 12px; }
 .practice-preview figure { margin: 0; display: grid; gap: 4px; font-size: 0.8rem; color: var(--ink-2); }
-.practice-preview svg { display: block; width: 120px; height: 52px; background: var(--well); border-radius: var(--r); }
+.practice-preview svg { display: block; width: 120px; height: 52px; background: var(--well); }
 .practice-q { font: 300 2.6rem/1 var(--font); color: var(--ink-2); }
 /* A link that looks like a DESIGN.md button. */
 .button-link {
   display: inline-flex; align-items: center; gap: var(--xs); min-height: 48px; padding: 0 var(--sm);
-  border: 2px solid var(--ink); border-radius: var(--r); font: 700 1rem/1 var(--font); text-decoration: none; color: var(--ink);
+  border: 1px solid var(--ink); border-radius: var(--r); font: 600 0.95rem/1 var(--font); text-decoration: none; color: var(--ink);
   transition: background-color var(--snap);
 }
 .button-link:hover { background: var(--rule-2); }
@@ -561,7 +569,7 @@ footer ul { margin: 0; padding-left: 1.2rem; color: var(--ink-2); }
 .icon-row { gap: var(--xs); }
 .icon-button { display: inline-grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; min-width: 64px; padding: 6px 10px; }
 .icon-button svg { display: block; }
-.icon-label { font-size: 0.85rem; font-weight: 700; line-height: 1; }
+.icon-label { font-size: 0.7rem; font-weight: 500; line-height: 1; text-transform: uppercase; letter-spacing: 0.12em; }
 .sound-settings { display: grid; gap: var(--sm); }
 .sound-settings[hidden] { display: none; }
 button.speed { min-width: 56px; font-family: var(--mono); }
@@ -569,42 +577,45 @@ button.speed[aria-pressed='true'] { background: var(--ink); color: var(--paper);
 
 /* Picture choice (the jukebox): thumbnail plus one word; the chosen one has the signal underline. */
 .source-choice { border: 0; padding: 0; margin: 0; display: grid; gap: var(--xs); }
-.source-choice legend { font-weight: 600; font-size: 0.95rem; padding: 0; margin-bottom: var(--xs); }
+.source-choice legend { padding: 0; margin-bottom: var(--xs); }
 .source-option { display: grid; justify-items: center; gap: 4px; cursor: pointer; padding: 4px; border-bottom: 3px solid transparent; }
 .source-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.source-option:has(input:focus-visible) { outline: 3px solid var(--signal); outline-offset: 3px; }
-.source-option.current { border-bottom-color: var(--signal); }
-.source-thumb { width: 88px; height: 50px; border-radius: var(--r, 4px); background: var(--well) center / cover no-repeat; border: 1px solid var(--ink); }
-.source-label { font-weight: 700; font-size: 0.85rem; }
-.source-option.current .source-label { font-weight: 800; }
+.source-option:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 3px; }
+.source-option.current { border-bottom-color: var(--ink); }
+.source-thumb { width: 88px; height: 50px; background: var(--well) center / cover no-repeat; border: 1px solid var(--ink); }
+.source-label { font-weight: 450; font-size: 0.85rem; color: var(--ink-2); }
+.source-option.current .source-label { font-weight: 600; color: var(--ink); }
 /* Region choice thumbnail: the region's real circle, cropped from the picture. */
 .region-thumb { display: inline-block; width: 44px; height: 44px; border-radius: 50%; background-repeat: no-repeat;
-  outline: 3px solid var(--region, var(--ink)); flex: none; }
+  outline: 1px solid var(--ink); flex: none; }
+.region-choice:has(input:checked) .region-thumb { outline: 3px solid var(--region, var(--ink)); }
 
 /* ---- Layout after Dev B saw it live: top bar with tabs, one main column, a player bar ---- */
 .topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: var(--md);
   padding: 10px 24px; background: var(--paper); border-bottom: 1px solid var(--rule); }
 .brand { display: grid; gap: 2px; min-width: 0; }
-.brand h1 { font-size: 1.3rem; line-height: 1.1; margin: 0; }
-.brand .lede { font-size: 0.9rem; }
+.brand h1 { font-size: 0.95rem; font-weight: 600; line-height: 1.1; margin: 0; text-transform: uppercase; letter-spacing: 0.32em; white-space: nowrap; }
+.brand .lede { font-size: 0.85rem; }
 .topbar .theme-switch { margin-left: auto; }
 .stage { max-width: 1240px; margin: 0 auto; width: 100%; padding: 14px 24px 24px; gap: 12px; }
 .stage > * { max-width: none; }
 
 /* Tabs: a joined strip of buttons; the current one is filled in ink, so it reads as "you are here". */
-.page-links ul { list-style: none; margin: 0; padding: 0; display: flex; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; }
-.page-links li + li { border-left: 2px solid var(--ink); }
-.page-links a { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; color: var(--ink);
-  text-decoration: none; font-weight: 700; white-space: nowrap; }
-.page-links a:hover { background: var(--rule-2); }
-.page-links a[aria-current='page'] { background: var(--ink); color: var(--paper); }
+.page-links ul { list-style: none; margin: 0; padding: 0; display: flex; border: 1px solid var(--rule); }
+.page-links li + li { border-left: 1px solid var(--rule); }
+.page-links a { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 11px 14px; color: var(--ink-2);
+  text-decoration: none; font: 500 0.72rem/1 var(--font); text-transform: uppercase; letter-spacing: var(--caps); white-space: nowrap; }
+.page-links a svg { width: 16px; height: 16px; }
+.page-links a:hover { background: var(--rule-2); color: var(--ink); }
+.page-links a[aria-current='page'] { background: var(--ink); color: var(--paper); padding-right: 22px; }
+.page-links a[aria-current='page']::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 7px; background: var(--live); }
 
 /* The view heading is the focus target on a view change; visually hidden (the tab shows the view). */
 .view-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .pickers { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sm) var(--lg); }
 .region-group { border: 0; padding: 0; margin: 0; }
-.region-group legend { font-weight: 600; font-size: 0.95rem; padding: 0; margin-bottom: 6px; }
+.region-group legend { padding: 0; margin-bottom: 6px; }
 .region-choice { display: inline-flex; align-items: center; gap: 8px; }
 .status { font-size: 1.05rem; margin: 0; }
 
@@ -613,7 +624,7 @@ figure.scene { max-width: min(100%, calc((100svh - 510px) * var(--aspect, 2) + 4
 figure.scene figcaption { font-size: 0.85rem; }
 
 /* Player bar: one framed strip like a music player, the timeline in the middle. */
-.player { border: 2px solid var(--ink); border-radius: 10px; padding: 8px 10px; background: var(--paper); display: grid; gap: 8px; }
+.player { border: 1px solid var(--ink); padding: 10px 12px 12px; background: var(--paper); display: grid; gap: 8px; }
 .player-row { display: flex; align-items: center; gap: 10px; }
 .player-buttons { display: flex; gap: 6px; flex: none; }
 .player-track { flex: 1; min-width: 0; }
@@ -621,7 +632,7 @@ figure.scene figcaption { font-size: 0.85rem; }
 .player-track .track-hint, .player-track .track-head { font-size: 0.75rem; margin: 0; }
 .player .icon-button { min-height: 52px; min-width: 56px; }
 .player .icon-button.primary { min-width: 64px; }
-.key-hint { font: 600 0.65rem/1 var(--mono); color: inherit; opacity: 0.75; border: 0; padding: 0; background: none; }
+.key-hint { font: 500 0.7rem/1 var(--mono); color: inherit; opacity: 0.75; border: 0; padding: 0; background: none; }
 
 @media (max-width: 1560px) { .brand .lede { display: none; } }
 @media (max-width: 900px) {
@@ -631,10 +642,10 @@ figure.scene figcaption { font-size: 0.85rem; }
 @media (max-width: 640px) {
   .topbar { padding: 8px 16px; }
   .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
-    border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
+    border-top: 1px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(6, 1fr); }
   .page-links li + li { border-left: 1px solid var(--rule); }
-  .page-links a { flex-direction: column; gap: 2px; padding: 8px 1px; font-size: 0.66rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
+  .page-links a { flex-direction: column; gap: 4px; padding: 9px 1px; font-size: 0.6rem; letter-spacing: 0.06em; white-space: normal; text-align: center; justify-content: center; width: 100%; }
   body { padding-bottom: 72px; }
   .stage { padding: 10px 16px 16px; }
   .player { position: sticky; bottom: 72px; z-index: 15; }
@@ -657,10 +668,10 @@ figure.scene figcaption { font-size: 0.85rem; }
 .track-legend .swatch.lo { background: var(--region, var(--ink)); height: 14px; }
 .track-legend .swatch.hi { background: var(--ink-2); height: 9px; }
 .track-lane { position: relative; }
-.track-days { position: absolute; left: 0; right: 0; bottom: -16px; height: 14px; pointer-events: none; }
+.track-days { position: absolute; left: 0; right: 0; bottom: -19px; height: 14px; pointer-events: none; }
 .track-days .day { position: absolute; transform: translateX(-2px); font: 400 0.68rem/1 var(--mono); color: var(--ink-2); white-space: nowrap; }
-.track-days .day.current { font-weight: 700; color: var(--ink); }
-.track:has(.track-days) { padding-bottom: 16px; }
+.track-days .day.current { font-weight: 600; color: var(--ink); }
+.track:has(.track-days) { padding-bottom: 19px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* ---- Compare (Student B's numerals): two region cards side by side, then the tide table and curves ---- */
@@ -669,9 +680,10 @@ figure.scene figcaption { font-size: 0.85rem; }
 .patch-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .patch-head .region-badge { background: var(--region, var(--ink)); color: var(--on-region, var(--paper)); }
 .patch-body { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: var(--sm); align-items: center; }
-.patch-body canvas { width: 180px; height: 180px; border-radius: 4px; background: var(--well); }
+.patch-body canvas { width: 180px; height: 180px; background: var(--well); }
 .patch-info { display: grid; gap: 6px; align-content: center; justify-items: start; }
-.patch .numeral { font-size: clamp(3rem, 6vw, 4.6rem); line-height: 0.9; color: var(--region, var(--ink)); position: static; }
+.patch .numeral { font-size: clamp(3rem, 6vw, 4.6rem); line-height: 0.9; color: var(--ink); position: static; }
+.patch.current .numeral { color: var(--region, var(--ink)); }
 .patch .numeral.missing { font-size: 1.6rem; color: var(--ink-2); }
 .patch-word { font-size: 0.9rem; color: var(--ink-2); }
 .numeral-key { margin: 6px 0 0; font: 400 0.8rem/1.2 var(--mono); color: var(--ink-2); }
@@ -689,9 +701,9 @@ figure.scene figcaption { font-size: 0.85rem; }
 }
 
 /* Now chip: the region badge and one word (Ready / Playing / Paused). Playing gets the live signal dot. */
-.now-chip { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.85rem; color: var(--ink); }
+.now-chip { display: inline-flex; align-items: center; gap: 7px; font: 500 0.72rem/1 var(--font); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink); }
 .now-chip .region-badge { background: var(--region, var(--ink)); color: var(--on-region, var(--paper)); }
-.now-chip.playing::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); }
+.now-chip.playing::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--region, var(--live)); }
 .track-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sm); }
 .track-time { font: 400 0.75rem/1 var(--mono); color: var(--ink-2); }
 
@@ -699,11 +711,11 @@ figure.scene figcaption { font-size: 0.85rem; }
 .how-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--lg); counter-reset: step; }
 .how-strip li { display: grid; gap: 4px; align-content: start; counter-increment: step; }
 .how-strip li b::before { content: counter(step); display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; margin-right: 8px;
-  border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8rem; }
-.how-strip li b { font-size: 1.05rem; }
+  background: var(--ink); color: var(--paper); font: 500 0.75rem/1 var(--mono); }
+.how-strip li b { font-size: 1.05rem; font-weight: 600; }
 .how-strip li > span { color: var(--ink-2); padding-left: 2em; }
 .how-art { height: 150px; display: flex; align-items: center; justify-content: center; gap: var(--sm); background: var(--well);
-  border-radius: 6px; padding: var(--sm); margin-bottom: 8px; }
+  border: 1px solid var(--ink); padding: var(--sm); margin-bottom: 8px; }
 .how-thumb { position: relative; display: block; width: 100%; height: 100%; background: var(--well) center / 100% 100% no-repeat; }
 .how-thumb i { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--black); }
 .how-art.how-ticks figure { margin: 0; display: grid; justify-items: center; gap: 4px; color: var(--white); font-size: 0.85rem; }
@@ -727,7 +739,7 @@ figure.scene figcaption { font-size: 0.85rem; }
 /* Explain as a picture (Student B): crop → beat for both regions, the playing one at full strength. */
 .explanation { display: grid; gap: 8px; }
 .explanation h2 { font-size: 1rem; margin: 0; }
-.explain-line { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.explain-line { margin: 0; font-size: 1.05rem; font-weight: 500; }
 .explain-picture { display: flex; flex-wrap: wrap; gap: var(--md); }
 .explain-row { display: inline-flex; align-items: center; gap: 8px; opacity: 0.55; }
 .explain-row.playing { opacity: 1; }
@@ -739,8 +751,8 @@ figure.scene figcaption { font-size: 0.85rem; }
 .explain-arrow { color: var(--ink-2); }
 
 /* Step marks on Listen (1 Picture · 2 Region · 3 Play): a real sequence a skimmer can follow. */
-.step-mark { display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; margin-right: 6px; border-radius: 50%;
-  background: var(--ink); color: var(--paper); font: 700 0.75rem/1 var(--font); vertical-align: 1px; }
+.step-mark { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; margin-right: 8px;
+  background: var(--ink); color: var(--paper); font: 500 0.72rem/1 var(--mono); letter-spacing: 0; vertical-align: 1px; }
 .icon-button { position: relative; }
 .step-mark.corner { position: absolute; top: -8px; left: -8px; margin: 0; background: var(--ink); color: var(--paper); box-shadow: 0 0 0 2px var(--paper); }
 
@@ -756,8 +768,8 @@ figure.scene figcaption { font-size: 0.85rem; }
 .game-card { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--md); border-top: 1px solid var(--rule); padding-top: 10px; flex-wrap: wrap; }
 .game-card p { margin: 0; flex: 1; min-width: 14rem; }
 .game-art { display: flex; align-items: center; gap: 6px; }
-.game-art svg { width: 70px; background: var(--well); border-radius: 4px; }
-.game-q { font-size: 1.6rem; font-weight: 800; color: var(--ink-2); }
+.game-art svg { width: 70px; background: var(--well); }
+.game-q { font-size: 1.6rem; font-weight: 300; color: var(--ink-2); }
 .scan-settings summary, .scan-legend-box summary { cursor: pointer; font-weight: 600; color: var(--ink); }
 @media (max-width: 900px) { .play-grid { grid-template-columns: 1fr; } .play-scan { grid-row: auto; } }
 
@@ -767,10 +779,29 @@ figure.scene figcaption { font-size: 0.85rem; }
    overflowed): below 1024px the tabs move to the fixed bottom bar; the player bar sticks above them. */
 @media (max-width: 1023px) {
   .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
-    border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
+    border-top: 1px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(6, 1fr); }
   .page-links li + li { border-left: 1px solid var(--rule); }
-  .page-links a { flex-direction: column; gap: 2px; padding: 8px 1px; font-size: 0.72rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
+  .page-links a { flex-direction: column; gap: 4px; padding: 9px 1px; font-size: 0.64rem; letter-spacing: 0.08em; white-space: normal; text-align: center; justify-content: center; width: 100%; }
   body { padding-bottom: 72px; }
   .player { position: sticky; bottom: 72px; z-index: 15; }
+}
+
+/* Pulse plot (PulsePlot.tsx): the sleeve's stacked pulse lines on the black well, with a needle in
+   the side's colour that sweeps each beat while that side plays. Ready for Compare (page plan P2). */
+.pulse-plot { position: relative; border: 1px solid var(--ink); background: var(--well); aspect-ratio: 2 / 1; width: 100%; max-width: 100%; }
+.pulse-plot canvas { display: block; width: 100%; height: 100%; }
+.pulse-needle { position: absolute; top: 3%; bottom: 3%; left: 0; width: 2px; margin-left: -1px; background: var(--region, var(--white));
+  box-shadow: 0 0 0 1px oklch(0.1 0 0 / 0.6); pointer-events: none; }
+
+/* The picture scan plays the whole picture, not a side: its Play carries no side colour. */
+.play-scan button.primary { padding-right: var(--sm); }
+.play-scan button.primary::after { content: none; }
+@media (max-width: 640px) {
+  /* The loop starts mid-day, so the first date label sits on top of the second: drop it. */
+  .track-days .day:first-child { display: none; }
+}
+@media (max-width: 1023px) {
+  .page-links a { font-size: 0.68rem; letter-spacing: 0.04em; }
+  .page-links a:focus-visible { outline-color: currentColor; outline-offset: -4px; }
 }

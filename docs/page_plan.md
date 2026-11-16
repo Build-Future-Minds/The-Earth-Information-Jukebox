@@ -39,8 +39,9 @@ aerosol type). Not before it is measured.
 
 - One branch per task (`role/short-task`), a pull request, one teammate reviews. `main` always runs.
 - Roles, not names, in files, commits and screenshots.
-- Follow `DESIGN.md` (Tide Table): hairline rules, no boxes or shadows, the red-orange signal only for
-  live, chosen or focused, a region colour never without its letter, keyboard first.
+- Follow `DESIGN.md` (Pulse Catalogue, chosen by the team on 15 Nov; it replaced Tide Table): square
+  corners, 1px rules and boxed controls, letterspaced caps for labels, colour only on what is live or
+  chosen (the playing side's colour), a region colour never without its letter, keyboard first.
 - Follow `PRODUCT.md`: no sound before a press; Stop and Esc silence everything; the NASA credit
   wherever a NASA picture appears; no images, music or video made by a generative AI model; never
   invent counts, testimonials or accessibility claims.

@@ -1,70 +1,78 @@
 ---
-name: Tide Table
-description: A tide table printed on a sea chart. Navy ink on almanac white (or the night edition), hairline rules, one live red-orange, violet and rose for the two regions.
+name: Pulse Catalogue
+description: A record catalogue. Each NASA picture is an entry and each region a side. White sleeve with black ink (or the matte black sleeve), square boxed controls joined by 1px rules, letterspaced caps, and colour only for the side that is playing.
 colors:
-  signal: "oklch(0.55 0.18 33)"
-  on-signal: "oklch(0.99 0 0)"
-  ink: "oklch(0.26 0.05 260)"
-  ink-2: "oklch(0.46 0.04 255)"
-  paper: "oklch(0.972 0.004 230)"
-  rule: "oklch(0.87 0.015 245)"
-  rule-2: "oklch(0.94 0.008 240)"
-  action: "oklch(0.48 0.13 255)"
-  action-hover: "oklch(0.42 0.13 255)"
-  on-action: "oklch(0.99 0 0)"
-  region-a: "oklch(0.47 0.15 300)"
-  region-b: "oklch(0.52 0.17 5)"
+  region-a: "oklch(0.52 0.2 295)"
+  region-b: "oklch(0.53 0.19 5)"
   on-region: "oklch(0.99 0 0)"
-  well: "oklch(0.20 0.03 262)"
+  ink: "oklch(0.15 0 0)"
+  ink-2: "oklch(0.42 0 0)"
+  paper: "oklch(0.975 0 0)"
+  rule: "oklch(0.82 0 0)"
+  rule-2: "oklch(0.93 0 0)"
+  signal: "oklch(0.15 0 0)"
+  on-signal: "oklch(0.975 0 0)"
+  action: "oklch(0.15 0 0)"
+  action-hover: "oklch(0.3 0 0)"
+  on-action: "oklch(0.975 0 0)"
+  well: "oklch(0.15 0 0)"
+  white: "#ffffff"
+  black: "#000000"
 typography:
   numeral:
-    fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
     fontSize: "clamp(4.5rem, 10vw, 9rem)"
-    fontWeight: 500
+    fontWeight: 300
     lineHeight: 0.78
     letterSpacing: "-0.04em"
     fontVariation: "wght 200..800, driven by the alignment value"
   value:
-    fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
     fontSize: "2.6rem"
     fontWeight: 500
     lineHeight: 1
     letterSpacing: "-0.02em"
-  headline:
-    fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
-    fontSize: "1.9rem"
-    fontWeight: 750
+    fontVariation: "wght 200..800, driven by the alignment value"
+  brand:
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
+    fontSize: "0.95rem"
+    fontWeight: 600
     lineHeight: 1.1
-    letterSpacing: "-0.015em"
+    letterSpacing: "0.32em"
   title:
-    fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
     fontSize: "1.05rem"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 1.3
   status:
-    fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
-    fontSize: "1.35rem"
-    fontWeight: 650
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
+    fontSize: "1.05rem"
+    fontWeight: 450
     lineHeight: 1.3
   body:
-    fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
-    fontSize: "18px"
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
+    fontSize: "17px"
     fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.55
   label:
-    fontFamily: "Atkinson Hyperlegible Next Variable, Atkinson Hyperlegible Next, system-ui, Segoe UI, sans-serif"
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
     fontSize: "0.95rem"
     fontWeight: 600
     lineHeight: 1.5
+  caps:
+    fontFamily: "Geist Variable, Geist, Helvetica Neue, Arial, sans-serif"
+    fontSize: "0.72rem"
+    fontWeight: 500
+    lineHeight: 1
+    letterSpacing: "0.16em"
   readout:
-    fontFamily: "Atkinson Hyperlegible Mono Variable, Atkinson Hyperlegible Mono, ui-monospace, Consolas, monospace"
+    fontFamily: "Geist Mono Variable, Geist Mono, ui-monospace, Menlo, Consolas, monospace"
     fontSize: "0.9rem"
     fontWeight: 400
     lineHeight: 1.5
+    fontFeature: "tnum"
 rounded:
-  key: "3px"
-  base: "4px"
-  pill: "999px"
+  none: "0px"
 spacing:
   xs: "10px"
   sm: "16px"
@@ -76,7 +84,7 @@ components:
     backgroundColor: "transparent"
     textColor: "{colors.ink}"
     typography: "{typography.label}"
-    rounded: "{rounded.base}"
+    rounded: "{rounded.none}"
     padding: "0 16px"
     height: "48px"
   button-hover:
@@ -84,208 +92,230 @@ components:
   button-primary:
     backgroundColor: "{colors.action}"
     textColor: "{colors.on-action}"
-    rounded: "{rounded.base}"
-    padding: "0 16px"
+    rounded: "{rounded.none}"
+    padding: "0 24px 0 16px"
     height: "48px"
   button-primary-hover:
     backgroundColor: "{colors.action-hover}"
   button-pressed:
     backgroundColor: "{colors.ink}"
     textColor: "{colors.paper}"
+  tab:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.caps}"
+    rounded: "{rounded.none}"
+    padding: "11px 14px"
+  tab-current:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.paper}"
+    padding: "11px 22px 11px 14px"
   region-badge-a:
     backgroundColor: "{colors.region-a}"
     textColor: "{colors.on-region}"
-    rounded: "{rounded.pill}"
-    size: "1.5em"
+    rounded: "{rounded.none}"
+    size: "1.6em"
   region-badge-b:
     backgroundColor: "{colors.region-b}"
     textColor: "{colors.on-region}"
-    rounded: "{rounded.pill}"
-    size: "1.5em"
+    rounded: "{rounded.none}"
+    size: "1.6em"
   chart-well:
     backgroundColor: "{colors.well}"
-    rounded: "{rounded.base}"
+    rounded: "{rounded.none}"
   key-cap:
     textColor: "{colors.ink}"
     typography: "{typography.readout}"
-    rounded: "{rounded.key}"
+    rounded: "{rounded.none}"
 ---
 
-# Design System: Tide Table
+# Design System: Pulse Catalogue
 
-Scope: the main app (`web/`) and the listening game (`tools/listening_game.html`). They share one world: the same tokens (the game names its two slots `--patch-1` and `--patch-2`, the same values as `--region-a` and `--region-b`), the same graticule, the same theme switch, and one saved theme choice (`localStorage` key `es-theme`).
+Scope: the main app (`web/`, styles in `web/src/styles.css`, fonts loaded in `web/src/main.tsx`). This file governs the visual world only. Page layouts are owned per page in `docs/page_plan.md`. The listening game (`tools/listening_game.html`) still uses the Tide Table tokens until its own redesign (`docs/page_plan.md`, P5). It shares the saved theme choice (`localStorage` key `es-theme`) with the app.
 
 ## Overview
 
-**Creative North Star: "The Tide Table on the Chart"**
+**Creative North Star: "The Record Catalogue"**
 
-Earth Sonata reads like a tide table printed on a sea chart. The NASA picture sits inside a chart frame with latitude and longitude ticks, and each region's numbers are set in ruled columns. Structure is 1px hairline rules, never boxes, cards or side stripes. Corners are 4px, nothing casts a shadow, and depth comes from rules, ink and the dark well behind the picture.
+Earth Sonata reads like a record catalogue. Each NASA picture is a catalogue entry and each region is a side. Controls are square boxes joined by 1px rules, like a catalogue index. Labels are letterspaced caps. The rhythm is drawn as hairline pulse lines from the real alignment numbers. Nothing casts a shadow and no corner is rounded.
 
-Two editions of one print. Light is almanac white with navy ink and tide-blue actions. Dark is the night edition: deep navy ground with the same inks lifted. The theme follows the saved choice, else the system setting, and is set before first paint so there is no flash. One red-orange, the signal, is the only loud colour and it means live, chosen or focused, nothing else.
+Two sleeves of one record. Light is a white sleeve with black ink and grey hairlines, with no hue at all. Dark is a matte black sleeve with white ink. The theme follows the saved choice, else the system setting, and is set before first paint so there is no flash. The NASA picture always sits on a black well in both themes.
+
+Colour is held back for the side. It appears only on what is live or chosen, and then it is the playing side's colour: Side A violet or Side B rose. Everything else, including focus, is ink.
 
 The system is keyboard-first. The Tab order follows the screen: the six tabs, the theme switch, the picture choice (when there is more than one picture), the region choice, then Play. Colour is never the only cue: every region mark carries its letter.
 
 **Key Characteristics:**
-- One face, Atkinson Hyperlegible Next. Atkinson Hyperlegible Mono only for numbers, coordinates and readouts.
-- Signal red-orange is live, chosen or focused only.
-- Region A violet, Region B rose, both off the NASA picture's blue-to-red temperature scale, so a region colour is never read as warm or cold.
-- Hairline rules for structure; no boxes, no side stripes.
-- Type weight carries data: the giant numeral and the live value run weight 200 to 800 with alignment.
-- A missing frame breaks a tide curve and is never drawn as zero.
+- One face, Geist. Geist Mono only for numbers, coordinates, key caps and readouts.
+- Colour is the side: the needle, the played wash, and the end block on the current tab and on the primary buttons.
+- Region A violet, Region B rose, both off the NASA picture's blue-to-red temperature scale.
+- Square corners and 1px borders everywhere. No shadows, no cards.
+- Letterspaced uppercase labels for tabs, the theme switch, legends, icon-button labels, table headers and map tags.
+- Type weight carries data: the numeral and the live value run weight 200 to 800 with alignment.
+- A missing frame is a break or a dashed flat line, never zero.
 
 ## Colors
 
-A two-ink print: navy ink on cool almanac white, one blue for actions, one red-orange for live, and two off-scale hues for the regions.
+A one-ink print with no hue, plus two side colours that appear only when a side is live or chosen.
 
 ### Primary
-- **Tide Blue** (frontmatter `action`; hover `action-hover`): every primary action (Play, the game's primary links) and the accent on checkbox and radio controls. In dark it lifts to a pale blue with navy text.
-
-### Secondary
-- **High-Water Signal** (`signal`): the playhead and playing marker, the focus ring, the active melody pad border and held key, the current region's underline, the live position line across the tide curves, text selection and caret. Never an error colour, never decoration. Dark lifts it to a lighter orange (oklch 0.72 0.17 42).
-
-### Tertiary
-- **Region A Violet** (`region-a`) and **Region B Rose** (`region-b`): the region's rings, tab, map tag, letter badge, numeral, tide curve and first-pulse marks. Dark lifts both (violet oklch 0.77 0.11 300, rose oklch 0.79 0.11 0). Always paired with the region letter.
+- **Side A Violet** (`region-a`) and **Side B Rose** (`region-b`): the region's rings and tab on the picture, its letter badge, its map tag badge, its numeral, its tide curve, its first-pulse marks, and the needle, needle cap, needle dot and played wash on the beat lane. The playing side's colour is also set as `--live` on the top bar and the main column. Dark lifts both (violet oklch 0.73 0.16 295, rose oklch 0.76 0.14 5) and turns `on-region` dark (oklch 0.15 0 0), so letters stay readable on the lighter fill.
 
 ### Neutral
-- **Navy Ink** (`ink`): text, neatlines, button outlines, table header rule, the chosen state of toggles.
-- **Slate Ink** (`ink-2`): secondary text, graticule labels, second-pulse marks, the range track.
-- **Almanac White** (`paper`): the ground.
-- **Hairline** (`rule`) and **Faint Hairline** (`rule-2`): section rules, table rules, tide gridlines; rule-2 is also the button hover fill and the missing-frame fill.
-- **Chart Well** (`well`): the dark panel behind the NASA picture, close-up canvases and legend swatches. Deep navy in both themes (darker still in night).
+- **Sleeve Ink** (`ink`): text, borders on buttons, selects and the player bar, the table header rule, the chosen state of tabs, toggles and speed buttons. Dark: oklch 0.96 0 0.
+- **Grey Ink** (`ink-2`): secondary text, unchosen tab and switch labels, graticule labels, second-pulse marks, the range track. Dark: oklch 0.72 0 0.
+- **White Sleeve** (`paper`): the ground. Dark: the matte black sleeve, oklch 0.15 0 0.
+- **Hairline** (`rule`) and **Faint Hairline** (`rule-2`): section rules, table rules, tab and switch frames and dividers; rule-2 is also the hover fill, the empty note bar and the missing-beat fill. Dark: oklch 0.34 0 0 and 0.22 0 0.
+- **Black Well** (`well`): the ground behind the NASA picture, the close-up canvases, the pulse plot and the legend glyphs. Black in both themes (oklch 0.09 0 0 in dark).
+- **Picture White and Black** (`white`, `black`): marks drawn over the NASA picture only (ring outlines, the scan needle, compass letters, map tag text). They never change with the theme.
+- **Signal** (`signal`) and **Action** (`action`): aliases of ink in the code (`--signal: var(--ink)`, `--action: var(--ink)`). They flip with the theme. `action-hover` is oklch 0.3 0 0 in light and 0.85 0 0 in dark.
 
 Dark values live in `:root[data-theme='dark']` in `web/src/styles.css`; the sidecar carries them.
 
 ### Named Rules
-**The Live Only Rule.** Signal red-orange appears only on something live, chosen or focused. If it is decoration, it is wrong.
-**The Off-Scale Rule.** A region colour must not be a colour the picture itself uses for data. On the ocean picture (blue-to-red temperature) the regions are violet and rose, never blue, red, orange or yellow. Pictures whose own colours include those hues get neutral regions: the aerosol picture (regions C and D; blue sea salt, pink dust, orange-red smoke, green sulfates) and the rain picture (regions E and F; a blue-to-red rain scale). Neutral means an ink ring inside a white outline and an ink badge with a paper letter, in both themes.
-**The Letter Rule.** A region colour never travels alone; its letter badge or end label goes with it.
+**The Colour Is the Side Rule.** Colour appears only on what is live or chosen, and it is always the playing side's colour, set as `--live` from the chosen region. It marks the needle, the played wash, and an end block on the current tab (7px) and on the primary buttons (8px). On pictures with neutral regions `--live` is ink, so no colour appears. A new surface does not get a colour of its own.
+**The Signal Is Ink Rule.** The marks that used to be red-orange are ink now: the focus ring (2px ink, offset 3px), the chosen picture's underline, the chime flash on a note bar, the held melody key, the tide curves' playing line, text selection and the caret.
+**The Off-Scale Rule.** A region colour must not be a colour the picture itself uses for data. On the ocean picture (blue-to-red temperature) the regions are violet and rose, never blue, red, orange or yellow. Pictures whose own colours include those hues get neutral regions: the aerosol picture (regions C and D; blue sea salt, pink dust, orange-red smoke, green sulfates) and the rain picture (regions E and F; a blue-to-red rain scale). Neutral means an ink ring inside a white outline and an ink badge with an `on-region` letter, in both themes.
+**The Letter Rule.** A region colour never travels alone; its letter badge or end label goes with it. The end blocks on the current tab and on Play only repeat the side that the now chip and the region choice already name with its letter.
 
 ## Typography
 
-**Display and Body Font:** Atkinson Hyperlegible Next (variable, with system-ui, Segoe UI, sans-serif)
-**Label/Mono Font:** Atkinson Hyperlegible Mono (with ui-monospace, Consolas, monospace), for numbers only
+**Display and Body Font:** Geist (variable, with Helvetica Neue, Arial, sans-serif)
+**Label/Mono Font:** Geist Mono (variable, with ui-monospace, Menlo, Consolas, monospace), for numbers only
 
-**Character:** One highly legible humanist face, large and plain. The weight axis is a data channel, not decoration.
+Both are bundled with `@fontsource-variable` so the app works offline.
+
+**Character:** A plain grotesque set small and spaced out for labels, large and light for numbers. The weight axis is a data channel, not decoration.
 
 ### Hierarchy
-- **Numeral** (500 default, 200 to 800 driven, clamp(4.5rem, 10vw, 9rem), 0.78): the giant alignment number under each region's patch, in the region colour with a paper-coloured stroke behind it.
-- **Value** (500, 2.6rem, 1): the live alignment readout; its weight follows alignment (200 = every which way, 800 = all one way). Mobile 1.9rem.
-- **Headline** (750, 1.9rem, 1.1): page title; 1.6rem on mobile.
-- **Title** (700, 1.05rem, 1.3): section headings.
-- **Status** (650, 1.35rem, 1.3, max 46ch): the sentence about what is playing.
-- **Body** (400, 18px, 1.5): prose capped at 65 to 70ch.
-- **Label** (600, 0.95rem): form labels, legends, table headers (0.85rem).
-- **Readout** (mono 400, 0.9rem, tabular numerals): range values, table numbers, graticule labels (0.75rem), tide axis, key caps (600, 0.8rem).
+- **Numeral** (300 default, 200 to 800 driven, clamp(4.5rem, 10vw, 9rem), 0.78): the giant alignment number, in the region colour with a paper-coloured stroke behind it. On Compare it is clamp(3rem, 6vw, 4.6rem) at 0.9.
+- **Value** (500 default, 200 to 800 driven, 2.6rem, 1): the live alignment readout. Mobile 1.9rem.
+- **Brand** (600, 0.95rem, uppercase, 0.32em tracking): EARTH SONATA in the top bar.
+- **Title** (600, 1.05rem, 1.3): section headings.
+- **Status** (450, 1.05rem, 1.3, max 46ch): the sentence about what is playing.
+- **Body** (400, 17px, 1.55): prose capped at 65 to 70ch.
+- **Label** (600, 0.95rem): form labels and button text.
+- **Caps** (500, 0.72rem, uppercase, 0.16em `--caps`): tabs, theme switch, legends. Icon-button labels (0.7rem), table headers, map tags and the now chip use the same caps at 0.12em.
+- **Readout** (mono 400, 0.9rem, tabular numerals): range values, table numbers, graticule labels (0.75rem), tide axis, beat-lane dates (0.68rem), key caps (500, 0.8rem), region letters (600, 0.8rem).
 
 ### Named Rules
-**The Weight Is the Value Rule.** Alignment 0 maps to weight 200 and alignment 1 to 800, so the numeral's weight still carries alignment. Do not flatten it to one weight.
-**The Numbers in Mono Rule.** Coordinates, table cells, axes and readouts use the mono face with tabular figures. Words never do.
+**The Weight Is the Value Rule.** Alignment 0 maps to weight 200 and alignment 1 to 800 (`weightFor` in `NowPlaying.tsx`, used by the live value and the Compare numerals). Do not flatten it to one weight.
+**The Numbers in Mono Rule.** Coordinates, table cells, axes, dates, region letters and readouts use Geist Mono with tabular figures. Words never do.
+**The Caps Label Rule.** Labels that name a control or a column are uppercase and letterspaced (0.12em to 0.16em) at 0.6rem to 0.72rem, weight 500. Headings, prose and button words in the body are not.
 
 ## Layout
 
-A sticky top bar (10px 24px padding, 1px rule under it) holds the title on the left (the title line shows from 1560px up), the six tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding). On Listen, the picture choice and region choice sit in one row above the picture; the picture is capped to the screen height so the whole view fits a 1440 x 900 screen; the player bar sits right under the picture. Below 900px the title line hides. Below 1024px the tabs move to a fixed bottom bar (six equal cells, icon over word), the player bar sticks just above it, and the chart margin tightens.
+A sticky top bar (10px 24px padding, 1px rule under it) holds the brand on the left (its title line shows from 1560px up), the tabs, and the theme switch on the right. Below it, one main column capped at 1240px (14px 24px 24px padding, 12px gaps). Below 1024px the tabs move to a fixed bottom bar of six equal cells, icon over word, with a 1px ink rule on top, and the player bar sticks just above it. At 640px and under the gutters drop to 16px and the chart margin tightens. Where each page puts its parts is set in `docs/page_plan.md`, not here.
 
-Spacing scale: 10, 16, 22, 28, 40px. Sections are separated by a 1px top rule with 16px padding, not by gaps alone. The NASA picture sits in a chart frame (1px ink neatline, margin 22px top and 44px left) with ticks every 10 degrees, labelled every 30, and the credit directly under it.
+Spacing scale: 10, 16, 22, 28, 40px. Sections are separated by a 1px top rule with 10 to 16px padding, not by gaps alone. The NASA picture sits in a chart frame (1px ink neatline, margin 22px top and 44px left) with ticks every 10 degrees, labelled every 30, and the credit directly under it.
 
 ## Elevation & Depth
 
-Flat. There are no drop shadows. Depth is the dark chart well behind the picture and the ink neatline around it. The only box-shadow uses are a black 2px ring around the map tag (an outline so it reads on any part of the picture) and an inset 3px signal underline marking the current region's name; both are outlines, not elevation.
+Flat. There are no drop shadows. Depth is the black well behind the picture and the 1px ink frame around it. Every box-shadow in the code is an outline, never elevation: a 1px inset white ring on the map tag (2px in the region colour when active), a 3px inset underline in the region colour under the current rhythm row's name, a 1px inset ink ring on the active melody pad, a 3px ink ring on a chiming note bar, a 1px dark halo on the pulse plot needle, and a 2px paper ring around a corner step mark.
 
 ### Named Rules
-**The No Shadow Rule.** Nothing floats. A new surface gets a hairline rule or a neatline, not a shadow.
+**The No Shadow Rule.** Nothing floats. A new surface gets a hairline rule or a 1px frame, not a shadow.
 
 ## Shapes
 
-4px corners on buttons, inputs, pads, thumbs, wells and the missing-information box (3px on key caps). Region badges and map tags are circles or pills. The graticule is square ticks (7px major, 4px minor). Outlines are 2px ink on controls, 1px on structure. Picture region rings are drawn in the region colour inside a black outline so they read on any part of the image; the live region's ring and tab are heavier.
+Square corners everywhere (`--r: 0`, `--r-key: 0`): buttons, inputs, tabs, the player bar, wells, region badges, map tags, step marks, key caps and range thumbs. Borders are 1px: ink on controls and frames, hairline on tab and switch strips and on section rules. Joined controls share their 1px dividers. Circles appear only where the thing is a circle: the region rings on the picture, the region choice thumbnail (a 44px crop of the real ring with a 1px ink outline, 3px in the region colour when chosen), the needle's foot dot, the now chip's playing dot, tide dots and chime ripples. The graticule is square ticks (7px major, 4px minor). Picture region rings are drawn in the region colour inside a black outline so they read on any part of the image; the live region's ring and tab are heavier.
 
 ## Components
 
 ### Buttons
-Plain, bordered, confident.
-- **Shape:** 4px corners, 2px ink border, 48px minimum height, 0 16px padding, 700 weight.
-- **Primary:** tide-blue fill, near-white text (Play; also the game's primary links).
-- **Hover:** faint hairline fill; primary deepens.
+Square, boxed, plain.
+- **Shape:** square corners, 1px ink border, 48px minimum height, 0 16px padding, Label type.
+- **Primary:** ink fill, paper text, and an 8px end block in `--live` on the right edge (Play and Pause; also the primary button links).
+- **Hover:** faint hairline fill; primary goes to `action-hover`.
 - **Pressed / expanded:** ink fill, paper text.
-- **Focus:** a 3px signal outline offset 3px, global to every focusable element.
+- **Focus:** a 2px ink ring offset 3px, global to every focusable element.
 - **Motion:** two 90 ms steps, no easing (`--snap`), none under reduced motion.
 
 ### Icon button
 A line icon over a one-word label. Team rule (15 Nov): more buttons, less text.
-- **Shape:** the Buttons border, corners, hover, pressed and focus states; 56px minimum height, 64px minimum width, 6px 10px padding.
+- **Shape:** the Buttons border, corners, hover, pressed and focus states; 56px minimum height, 64px minimum width, 6px 10px padding (52px by 56px in the player bar).
 - **Icon:** 20px, 2px stroke in `currentColor`, round caps, decorative (`aria-hidden`).
-- **Label:** one word under the icon, 0.85rem, weight 700. The word is the button's accessible name: Play, Pause, Stop, Replay, Explain, Sound.
-- **Primary:** Play uses the tide-blue fill.
+- **Label:** one word under the icon in caps (0.7rem, 500, 0.12em). The word is the button's accessible name: Play, Pause, Stop, Replay, Explain, Sound.
+- **Primary:** Play and Pause, with the side's end block.
 - **Stop** carries `aria-keyshortcuts="Escape"`; Esc stops from anywhere.
 
 ### Page links (tabs)
-Six tabs in the top bar: Listen, Compare, How it's made, Play along, Globe (five views) and Game (opens the listening game page, which links back), each a 20px line icon and a word. They are one joined strip with a 2px ink frame and 2px ink dividers, 8px corners; the current tab is filled in ink with paper text and carries `aria-current="page"`; hover fills with the faint hairline. On phones the strip becomes a fixed bottom bar of four equal cells, icon over word.
+Six tabs in the top bar: five views and Game (opens the listening game page, which links back), each a 16px line icon and a caps word in grey ink. They are one joined strip with a 1px hairline frame and 1px hairline dividers. The current tab is filled in ink with paper text, carries `aria-current="page"`, and has a 7px `--live` end block. Hover fills with the faint hairline and turns the word ink. Below 1024px the strip becomes the fixed bottom bar.
 
 ### Player bar
-One framed strip under the picture, like a music player: 2px ink frame, 10px corners, 8px 10px padding. Left: Play (tide blue) / Pause, Stop with a small visible "Esc" hint (hidden from screen readers; `aria-keyshortcuts` says it), Replay. Middle: the beat timeline, taking the free width. Right: Explain and Sound. On phones it sticks above the tabs and the timeline takes its own row.
+One framed strip under the picture, like a music player: 1px ink frame, square corners, 10px 12px 12px padding, paper ground. Left: Play / Pause, Stop with a small "Esc" hint in mono (hidden from screen readers; `aria-keyshortcuts` says it), Replay. Middle: the beat lane, taking the free width. Right: Explain and Sound. On phones it sticks above the tabs, the lane takes its own row and the five buttons share one row.
 
 ### Sound settings
 One Sound icon button shows and hides the speed buttons (½× ¾× 1× 1¼×, mono, the chosen one pressed in ink) and a Volume slider. No decibel numbers on screen; screen readers hear a percentage.
 
 ### Theme switch
-Two joined buttons (Light, Dark) with 16px line icons, 2px ink frame, the chosen one filled in ink. 40px minimum height. Sits at the right of the top bar, after the tabs in Tab order.
+Two joined buttons (Light, Dark) with 16px line icons and caps words, a 1px hairline frame and divider, the chosen one filled in ink. 40px minimum height. Sits at the right of the top bar, after the tabs in Tab order.
 
 ### Inputs / Fields
-- **Range:** 2px slate track, 18px square ink thumb, signal thumb on focus; label row above with the name left and a mono readout right.
-- **Select:** 2px ink border, 4px corners, 44px height.
-- **Radio and checkbox:** 22px, tide-blue accent, 44px hit row.
+- **Range:** 2px grey track, 18px square ink thumb (ink on focus too); label row above with the name left and a mono readout right.
+- **Select:** 1px ink border, square, 44px height.
+- **Radio and checkbox:** 22px, ink accent, 44px hit row.
+
+### Picture choice
+A 88 by 50px thumbnail with a 1px ink frame and one word under it. The chosen one has a 3px ink underline and its word turns ink at 600.
 
 ### Region badge and map tag
-A circle in the region colour holding the region letter, used wherever the region is named (choice, table row, map tag). The map tag is a pill with the badge inside and a black ring.
+A square in the region colour holding the region letter in mono, used wherever the region is named (choice, table row, close-up, now chip, map tag). The map tag is a square dark tag (black at 82%) with the badge inside and the region name in white caps, ringed by a 1px inset white line; the active region's tag is ringed 2px in its own colour.
+
+### Now chip
+The region badge and one caps word (Ready, Playing, Paused). Playing adds an 8px round dot in the region colour.
+
+### Beat lane and needle (signature)
+Notes as 4px bars on a 64px lane with a hairline top and an ink baseline: first pulse in the region colour, second pulse in grey and shorter, missing beats a dashed box (faint fill, 3 3 dash in grey). Notes not yet played sit at 16% opacity; a note just played gets a 2px stroke in the region colour. The needle is a 2px line in the side's colour with an 11px square cap on top and a 9px dot at the foot, running on the audio clock. The part of the loop already played is washed in the same colour at 12%. Dates sit under the lane in mono, the current one in ink at 600.
+
+### Pulse plot (signature)
+One hairline per model frame, stacked like a record sleeve's pulsar plot, on the black well inside a 1px ink frame at 2:1. Each line is one beat: a peak at the first pulse and a lower peak where the second pulse lands. Lines are white at 92% and 1.1px; while the side plays, the sounding beat's line turns the side's colour at 2.6px and a 2px needle in the side's colour sweeps across the beat. A missing frame is a dashed flat line with no peaks. Ready for Compare (`docs/page_plan.md`, P2); the page owner places it and puts the region's letter beside it.
 
 ### Tide table
-Ruled columns, hairline row rules, header rule in ink, numbers right-aligned in mono, region row names with badge, the playing region's row marked by weight 700.
+Ruled columns, hairline row rules, caps headers in grey with an ink rule under them, numbers right-aligned in mono, region row names with badge, the playing region's row marked by weight 700.
 
-### Tide curves (signature)
-Alignment over the model frames, one 3px rounded curve per region on a 0, 0.5, 1 hairline grid, mono axis labels, each curve named at its right end by letter and last value, a 2px signal line for the playing position. A missing frame lifts the pen: the curve breaks and is never drawn as zero.
+### Tide curves
+Alignment over the model frames, one 3px rounded curve per region on a 0, 0.5, 1 hairline grid, mono axis labels, each curve named at its right end by letter and last value, a 2px ink line for the playing position. A missing frame lifts the pen: the curve breaks and is never drawn as zero.
 
 ### Chart frame and graticule
-The NASA picture inside a 1px ink neatline with ticks and mono labels outside it.
+The NASA picture inside a 1px ink neatline on the black well, with ticks and mono labels outside it.
 
-### Beat lane and rhythm rows
-Notes as 4px bars: first pulse in the region colour, second pulse in slate and shorter, missing beats a dashed hatched box. The live lane has a signal playhead with a square cap and a signal dot.
+### Scan overlay and note bars
+Marks drawn over the NASA picture are black and white only. Note bars fill with ink to show loudness and flash ink with a 3px ink ring when their band chimes.
 
 ### Melody pad
-A 2px ink-bordered pad of 48px key caps; the active pad border and the held key turn signal.
+A 1px ink-bordered pad of 48px square key caps; the active pad gains a 1px inset ink ring and the held key fills with ink.
+
+### Step marks
+A square ink block with a mono numeral in paper, used only for the real sequence on Listen (1 Picture, 2 Region, 3 Play).
 
 ### Practice and missing states
-Hairline sections, not cards. Missing information is a 2px ink box stated plainly, never red.
+Hairline sections, not cards. Missing information is a 1px ink box stated plainly at weight 650, never red. Practice data is an ink band across the top.
 
 ### One-moment pictures
-A picture with a single frame (aerosols) has one value per region. Its tide curve is one 4px dot per region labelled "one moment", never an empty line. Its beat timeline repeats one beat as a steady rhythm, with its one date under it.
-
-## Views
-
-The app has five views, one per tab, plus the Game tab, which opens the listening game page. Changing view stops all sound, moves focus to the view's heading, and changes the tab title to "<view> · Earth Sonata".
-- **Listen (home):** the picture and region choices in one row (step marks 1 Picture, 2 Region, 3 Play), the picture in its chart frame with the credit under it, the player bar (with the beat timeline), and the Explain picture when opened. Fits one desktop screen.
-- **Compare:** for the chosen picture only, its two regions side by side: close-up with ticks, the giant numeral, the value, a Play/Stop toggle and the region's rhythm row; then the tide table and curves.
-- **How it's made:** the three-picture strip (picture, ticks, pulses), the rule in one line, the three honesty lines, and a credit block for each picture.
-- **Play along:** Play the picture (the scan, its settings and legend folded away), one panel with the Earth rhythm's Play and Stop, a now chip and the melody keys, and a one-line game card.
-- **Globe:** the chosen picture on a large globe, with a Play/Stop toggle per region.
-
-State is shown, not narrated: a now chip (region badge plus Ready, Playing or Paused) in the player; the status sentence is for screen readers only. The missing-information message sits at the top of the main column on every view.
+A picture with a single frame (aerosols) has one value per region. Its tide curve is one dot per region labelled "one moment", never an empty line. Its beat lane repeats one beat as a steady rhythm, with its one date under it.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use hairline rules (1px `rule`) to separate sections and table rows.
-- **Do** reserve signal for live, chosen and focused.
+- **Do** use 1px borders and hairline rules (`rule`) to separate sections, join controls and rule tables.
+- **Do** keep every corner square.
+- **Do** show colour only on what is live or chosen, as the playing side's colour through `--live` or `--region`.
+- **Do** use ink for focus, selection, the chosen picture, the chime flash and the held key.
 - **Do** pair every region colour with its letter.
-- **Do** set coordinates, table cells and readouts in the mono face with tabular figures.
+- **Do** set labels for controls and columns in letterspaced caps.
+- **Do** set coordinates, table cells and readouts in Geist Mono with tabular figures.
 - **Do** let font weight (200 to 800) carry alignment on the numeral and live value.
-- **Do** draw a missing frame as a break or hatched gap.
-- **Do** give both themes the same structure; only the inks lift.
+- **Do** draw a missing frame as a break, a dashed box or a dashed flat line.
+- **Do** give both themes the same structure; only the inks flip.
 - **Do** keep the Tab order the same as the screen order: tabs, theme, picture, region, then Play.
 
 ### Don't:
-- **Don't** put content in boxes, cards or floating panels, or add side stripes.
-- **Don't** add drop shadows.
+- **Don't** round corners or add drop shadows.
+- **Don't** put content in cards or floating panels, or add edge stripes. The only edge block is the `--live` end block on the current tab and the primary buttons.
+- **Don't** add a hue to the neutrals or give a surface a colour that is not the side's.
 - **Don't** colour a region blue, red, orange or yellow.
-- **Don't** use signal for decoration, errors or missing data.
+- **Don't** use a side colour for decoration, errors or missing data.
 - **Don't** draw a missing frame as zero.
 - **Don't** add a second text face or use the mono face for prose.
 - **Don't** let colour be the only cue for a region or a state.
