@@ -54,6 +54,8 @@ interface PlayerProps {
   onVolume: (db: number) => void;
   /** The beat timeline, shown inside the bar like a music player's progress line. */
   children?: ReactNode;
+  /** Step number for Play on Listen; decoration, hidden from screen readers. */
+  step?: number;
 }
 
 /** One framed bar under the picture: Play, Stop, Replay, the timeline, Explain and Sound. */
@@ -67,7 +69,7 @@ export function PlayerBar(p: PlayerProps) {
           {playing ? (
             <IconButton icon={PauseIcon} label="Pause" onClick={p.onPause} primary />
           ) : (
-            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary />
+            <IconButton icon={PlayIcon} label="Play" onClick={p.onStart} primary step={p.step} />
           )}
           <IconButton icon={StopIcon} label="Stop" onClick={p.onStop} keyshortcuts="Escape" hint="Esc" />
           <IconButton icon={ReplayIcon} label="Replay" onClick={p.onReplay} />
@@ -113,13 +115,15 @@ interface RegionProps {
   /** The picture, for a round crop of each region. */
   imageUrl?: string | null;
   frame?: { width: number; height: number };
+  /** Step number on Listen (1 Picture · 2 Region · 3 Play); decoration, hidden from screen readers. */
+  step?: number;
 }
 
 /** Which region to hear: a round crop of each circle, its letter and short name. Arrow keys or 1/2. */
 export function RegionChoice(p: RegionProps) {
   return (
     <fieldset className="region-group">
-      <legend>Region</legend>
+      <legend>{p.step && <span className="step-mark" aria-hidden="true">{p.step}</span>}Region</legend>
       <div className="row">
         {p.regions.map((r) => (
           <label key={r.id} className="region-choice">

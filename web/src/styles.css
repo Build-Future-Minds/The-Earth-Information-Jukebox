@@ -567,7 +567,7 @@ button.speed[aria-pressed='true'] { background: var(--ink); color: var(--paper);
 /* Tabs: a joined strip of buttons; the current one is filled in ink, so it reads as "you are here". */
 .page-links ul { list-style: none; margin: 0; padding: 0; display: flex; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; }
 .page-links li + li { border-left: 2px solid var(--ink); }
-.page-links a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; color: var(--ink);
+.page-links a { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; color: var(--ink);
   text-decoration: none; font-weight: 700; white-space: nowrap; }
 .page-links a:hover { background: var(--rule-2); }
 .page-links a[aria-current='page'] { background: var(--ink); color: var(--paper); }
@@ -596,8 +596,8 @@ figure.scene figcaption { font-size: 0.85rem; }
 .player .icon-button.primary { min-width: 64px; }
 .key-hint { font: 600 0.65rem/1 var(--mono); color: inherit; opacity: 0.75; border: 0; padding: 0; background: none; }
 
+@media (max-width: 1560px) { .brand .lede { display: none; } }
 @media (max-width: 900px) {
-  .brand .lede { display: none; }
   .page-links a { padding: 10px 12px; }
 }
 /* Phones: tabs in a fixed bottom bar, like an app; the player bar sticks just above them. */
@@ -605,9 +605,9 @@ figure.scene figcaption { font-size: 0.85rem; }
   .topbar { padding: 8px 16px; }
   .page-links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--paper);
     border-top: 2px solid var(--ink); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .page-links ul { border: 0; border-radius: 0; display: grid; grid-template-columns: repeat(6, 1fr); }
   .page-links li + li { border-left: 1px solid var(--rule); }
-  .page-links a { flex-direction: column; gap: 2px; padding: 8px 2px; font-size: 0.72rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
+  .page-links a { flex-direction: column; gap: 2px; padding: 8px 1px; font-size: 0.66rem; white-space: normal; text-align: center; justify-content: center; width: 100%; }
   body { padding-bottom: 72px; }
   .stage { padding: 10px 16px 16px; }
   .player { position: sticky; bottom: 72px; z-index: 15; }
@@ -660,3 +660,78 @@ figure.scene figcaption { font-size: 0.85rem; }
   .patch-body { grid-template-columns: 120px minmax(0, 1fr); }
   .patch-body canvas { width: 120px; height: 120px; }
 }
+
+/* Now chip: the region badge and one word (Ready / Playing / Paused). Playing gets the live signal dot. */
+.now-chip { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.85rem; color: var(--ink); }
+.now-chip .region-badge { background: var(--region, var(--ink)); color: var(--on-region, var(--paper)); }
+.now-chip.playing::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); }
+.track-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sm); }
+.track-time { font: 400 0.75rem/1 var(--mono); color: var(--ink-2); }
+
+/* ---- How it's made: three pictures in a row (Student B), then the rule, honesty lines and credits ---- */
+.how-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--lg); counter-reset: step; }
+.how-strip li { display: grid; gap: 4px; align-content: start; counter-increment: step; }
+.how-strip li b::before { content: counter(step); display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; margin-right: 8px;
+  border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8rem; }
+.how-strip li b { font-size: 1.05rem; }
+.how-strip li > span { color: var(--ink-2); padding-left: 2em; }
+.how-art { height: 150px; display: flex; align-items: center; justify-content: center; gap: var(--sm); background: var(--well);
+  border-radius: 6px; padding: var(--sm); margin-bottom: 8px; }
+.how-thumb { position: relative; display: block; width: 100%; height: 100%; background: var(--well) center / 100% 100% no-repeat; }
+.how-thumb i { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--black); }
+.how-art.how-ticks figure { margin: 0; display: grid; justify-items: center; gap: 4px; color: var(--white); font-size: 0.85rem; }
+.how-ticks svg { width: 120px; }
+.how-beats { flex-direction: column; gap: 6px; }
+.how-beats .beat-picture { width: 150px; }
+.beat-row { display: flex; align-items: center; gap: 10px; color: var(--white); font-size: 0.85rem; }
+.beat-picture .bp-base, .beat-picture .bp-edge { stroke: var(--rule); stroke-width: 1; }
+.beat-picture .bp-mid { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 3 3; }
+.beat-picture .bp-lo { fill: var(--region, var(--white)); }
+.beat-picture .bp-hi { fill: var(--rule); }
+.beat-picture .bp-label { fill: var(--rule); font: 400 9px var(--mono); }
+.how-rule { margin: var(--sm) 0 0; font-size: 1.05rem; }
+.how-honest { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.how-honest li::before { content: "—"; margin-right: 8px; color: var(--ink-2); }
+.how-credits { border-top: 1px solid var(--rule); padding-top: 10px; display: grid; gap: 4px; font-size: 0.85rem; color: var(--ink-2); }
+.how-credits p { margin: 0; }
+.how-credits a { color: var(--ink); }
+@media (max-width: 760px) { .how-strip { grid-template-columns: 1fr; } .how-art { height: 120px; } }
+
+/* Explain as a picture (Student B): crop → beat for both regions, the playing one at full strength. */
+.explanation { display: grid; gap: 8px; }
+.explanation h2 { font-size: 1rem; margin: 0; }
+.explain-line { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.explain-picture { display: flex; flex-wrap: wrap; gap: var(--md); }
+.explain-row { display: inline-flex; align-items: center; gap: 8px; opacity: 0.55; }
+.explain-row.playing { opacity: 1; }
+.explain-row .region-badge { background: var(--region, var(--ink)); color: var(--on-region, var(--paper)); }
+.explain-row .beat-picture { width: 150px; }
+.explain-row .bp-lo { fill: var(--region, var(--ink)); }
+.explain-row .bp-hi { fill: var(--ink-2); }
+.explain-row .bp-base, .explain-row .bp-edge, .explain-row .bp-mid { stroke: var(--ink-2); }
+.explain-arrow { color: var(--ink-2); }
+
+/* Step marks on Listen (1 Picture · 2 Region · 3 Play): a real sequence a skimmer can follow. */
+.step-mark { display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; margin-right: 6px; border-radius: 50%;
+  background: var(--ink); color: var(--paper); font: 700 0.75rem/1 var(--font); vertical-align: 1px; }
+.icon-button { position: relative; }
+.step-mark.corner { position: absolute; top: -8px; left: -8px; margin: 0; background: var(--ink); color: var(--paper); box-shadow: 0 0 0 2px var(--paper); }
+
+/* ---- Play along: the scan first, then playing along, the globe and the game ---- */
+.play-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--md); align-items: start; }
+.play-scan { grid-row: span 2; min-width: 0; }
+.jam, .globe-panel { display: grid; gap: 10px; border-top: 1px solid var(--rule); padding-top: 10px; min-width: 0; }
+.jam h3, .globe-panel h3 { margin: 0; font-size: 1.05rem; }
+.jam .icon-row { align-items: center; }
+.jam .melody h2, .jam .melody > p { display: none; }
+.globe-section { display: grid; gap: 8px; }
+.globe-section .globe-well { width: min(100%, calc(100svh - 370px)); max-height: none; margin-inline: auto; }
+.game-card { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--md); border-top: 1px solid var(--rule); padding-top: 10px; flex-wrap: wrap; }
+.game-card p { margin: 0; flex: 1; min-width: 14rem; }
+.game-art { display: flex; align-items: center; gap: 6px; }
+.game-art svg { width: 70px; background: var(--well); border-radius: 4px; }
+.game-q { font-size: 1.6rem; font-weight: 800; color: var(--ink-2); }
+.scan-settings summary, .scan-legend-box summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+@media (max-width: 900px) { .play-grid { grid-template-columns: 1fr; } .play-scan { grid-row: auto; } }
+
+.how-art figcaption { color: var(--white); }

@@ -1,15 +1,16 @@
-// The app's four views, picked by the URL hash (#listen, #compare, #how, #play), so the back button
+// The app's five views, picked by the URL hash (#listen, #compare, #how, #play, #globe), so the back button
 // and shared links work on GitHub Pages without a server or a routing library. Anything unknown
 // shows Listen, the home view.
 import { useEffect, useState } from 'react';
 
-export type View = 'listen' | 'compare' | 'how' | 'play';
+export type View = 'listen' | 'compare' | 'how' | 'play' | 'globe';
 
 export const VIEWS: { key: View; label: string }[] = [
   { key: 'listen', label: 'Listen' },
   { key: 'compare', label: 'Compare' },
   { key: 'how', label: "How it's made" },
   { key: 'play', label: 'Play along' },
+  { key: 'globe', label: 'Globe' },
 ];
 
 export function viewFromHash(hash: string): View {

@@ -58,7 +58,7 @@ for (const view of ['listen', 'play'] as const) {
 
 test('Tab order on Listen follows the screen: tabs, theme, region, then Play; Enter starts', async ({ page }) => {
   await openApp(page);
-  for (const name of ['Listen', 'Compare', "How it's made", 'Play along']) {
+  for (const name of ['Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'Game']) {
     await page.keyboard.press('Tab');
     await expect(pages(page).getByRole('link', { name })).toBeFocused();
   }

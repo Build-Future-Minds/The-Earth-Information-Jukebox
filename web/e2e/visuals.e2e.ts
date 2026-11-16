@@ -59,7 +59,7 @@ test('both rhythms are drawn on one time line, from the same rule as the sound',
 
 test('the explainer and close-ups are present; Listen picks a region and plays it', async ({ page }) => {
   await openApp(page, 'how');
-  await expect(page.getByRole('heading', { name: 'What you are looking at' })).toBeVisible();
+  await expect(page.getByRole('list', { name: 'How a picture becomes a rhythm' })).toContainText('Which way the lines run');
   await openApp(page, 'compare');
   await expect(page.locator('.patch')).toHaveCount(2);
   await page.getByRole('button', { name: 'Listen to Region B' }).click();
@@ -67,13 +67,12 @@ test('the explainer and close-ups are present; Listen picks a region and plays i
   await expect(page.getByRole('button', { name: 'Stop Region B' })).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('Play along links to Student B\'s listening game, labelled as a separate practice tool', async ({ page }) => {
+test('Play along links to Student B\'s listening game as a one-line card, with no quiz link', async ({ page }) => {
   await openApp(page, 'play');
-  const section = page.getByRole('region', { name: 'Practice: test your ear' });
-  await expect(section).toBeVisible();
-  await expect(section).toContainText('A separate practice tool');
-  const game = section.getByRole('link', { name: /Open the listening game/ });
+  const card = page.getByRole('region', { name: 'Test your ear' });
+  await expect(card).toBeVisible();
+  const game = card.getByRole('link', { name: 'Play the listening game' });
   await expect(game).toHaveAttribute('href', 'tools/listening_game.html');
   await expect(game).not.toHaveAttribute('target', '_blank');
-  await expect(section.getByRole('link', { name: 'quiz player' })).toHaveAttribute('href', 'tools/listening_quiz_player.html');
+  await expect(page.getByRole('link', { name: /quiz/i })).toHaveCount(0);
 });

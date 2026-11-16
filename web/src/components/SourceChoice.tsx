@@ -12,7 +12,7 @@ export function SourceChoice({ sources, current, onChoose }: Props) {
   if (sources.length < 2) return null;
   return (
     <fieldset className="source-choice">
-      <legend>Picture</legend>
+      <legend><span className="step-mark" aria-hidden="true">1</span>Picture</legend>
       <div className="row">
         {sources.map((s) => (
           <label key={s.key} className={s.key === current ? 'source-option current' : 'source-option'}>

@@ -12,12 +12,13 @@ import { ThemeSwitch } from './components/ThemeSwitch';
 import { stepAtSameMoment } from './components/RhythmExplanation';
 import { SourceChoice } from './components/SourceChoice';
 import { selectSource } from './data/selection';
-import { otherRegionOf, sourceByKey, SOURCES, type SourceKey } from './data/sources';
+import { otherRegionOf, PICTURES, sourceByKey, SOURCES, type SourceKey } from './data/sources';
 import { useView, VIEWS } from './views';
 import { CompareView } from './views/CompareView';
 import { HowView } from './views/HowView';
 import { ListenView } from './views/ListenView';
 import { PlayView } from './views/PlayView';
+import { GlobeTab } from './views/GlobeView';
 
 
 export function App() {
@@ -183,11 +184,12 @@ export function App() {
         {/* Focus target on a view change, announced by screen readers; the tab already shows it. */}
         <h2 className="view-title" tabIndex={-1} ref={headingRef}>{viewLabel}</h2>
 
-        {(view === 'listen' || view === 'compare') && (
+        {(view === 'listen' || view === 'compare' || view === 'globe') && (
           <div className="pickers">
             <SourceChoice sources={SOURCES} current={sourceKey} onChoose={chooseSource} />
             {view === 'listen' && (
               <RegionChoice
+                step={SOURCES.length > 1 ? 2 : 1}
                 regions={scene.regions}
                 regionId={regionId}
                 onRegion={setRegionId}
@@ -200,7 +202,7 @@ export function App() {
         )}
 
         {/* In the shell, on every view: sound can start on Listen, Compare and Play along. */}
-        <p className="status" role="status">{status}</p>
+        <p className="status sr-only" role="status">{status}</p>
         {missing && playState !== 'stopped' && (
           <p className="missing" role="alert">
             Missing information for {label}: {missing}. The Earth voice is quiet until usable detail returns.
@@ -219,8 +221,16 @@ export function App() {
             explaining={explaining}
             explanationRef={explanationRef}
             other={other}
+            explainRows={[
+              { region: scene.regions.find((r) => r.id === regionId)!, step: sounding?.step ?? null, playing: true },
+              ...(otherRegion ? [{ region: otherRegion, step: other?.step ?? null, playing: false }] : []),
+            ].map((row) => {
+              const l = regionLabel(scene.regions, row.region.id, look.firstLetter);
+              return { ...row, label: l, letter: l.replace('Region ', ''), colour: regionStyle(scene.regions, row.region.id, look) };
+            })}
             player={
               <PlayerBar
+                step={SOURCES.length > 1 ? 3 : 2}
                 playState={playState}
                 explaining={explaining}
                 speed={speed}
@@ -265,7 +275,8 @@ export function App() {
               look={look}
             />
           )}
-          {view === 'how' && <HowView scene={scene} />}
+          {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} />}
+          {view === 'how' && <HowView source={source} pictures={PICTURES} />}
           {view === 'play' && (
             <PlayView
               scene={scanPicture.scene}
@@ -290,6 +301,8 @@ export function App() {
                 setMelodyDb(db);
                 melody.current?.setVolume(db);
               }}
+              regionLetter={label.replace('Region ', '')}
+              colour={regionStyle(scene.regions, regionId, look)}
             />
           )}
       </main>

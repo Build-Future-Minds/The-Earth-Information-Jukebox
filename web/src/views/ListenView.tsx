@@ -3,7 +3,7 @@
 import type { ReactNode, RefObject } from 'react';
 import type { TrackStep } from '../audio/earthVoice';
 import type { RegionLook } from '../components/ExploreControls';
-import { RhythmExplanation, type OtherRegion } from '../components/RhythmExplanation';
+import { RhythmExplanation, type ExplainRow, type OtherRegion } from '../components/RhythmExplanation';
 import { SceneView } from '../components/SceneView';
 import type { Scene } from '../data/types';
 
@@ -18,6 +18,7 @@ interface Props {
   explaining: boolean;
   explanationRef: RefObject<HTMLElement | null>;
   other: OtherRegion | null;
+  explainRows: ExplainRow[];
   player: ReactNode;
 }
 
@@ -26,7 +27,8 @@ export function ListenView(p: Props) {
     <>
       <SceneView scene={p.scene} imageUrl={p.imageUrl} regionId={p.regionId} look={p.look} onSelect={p.onSelect} />
       {p.player}
-      {p.explaining && <RhythmExplanation ref={p.explanationRef} step={p.sounding} regionLabel={p.label} other={p.other} />}
+      {p.explaining && <RhythmExplanation ref={p.explanationRef} step={p.sounding} regionLabel={p.label} other={p.other}
+          rows={p.explainRows} imageUrl={p.imageUrl} frame={p.scene.frames} />}
     </>
   );
 }
