@@ -1,0 +1,1535 @@
+{
+ "schema_version": "0.1",
+ "note": "TEST INPUTS (synthetic images), not NASA data. Written by analysis/run_experiments.py; do not edit by hand.",
+ "generated_by": "analysis/run_experiments.py",
+ "run": {
+  "date": "2026-11-15",
+  "python": "3.14.7",
+  "numpy": "2.5.4",
+  "opencv": "5.0.0"
+ },
+ "settings": {
+  "analysis": {
+   "gradient_threshold": 12.0,
+   "min_usable_fraction": 0.05,
+   "gray_mode": "value",
+   "blur_sigma": 1.0,
+   "weight_power": 2,
+   "epsilon": 1e-12,
+   "sobel_scale": 0.125,
+   "luma_rgb": [
+    0.299,
+    0.587,
+    0.114
+   ],
+   "blur_radius_px": 4,
+   "support_radius_px": 5
+  },
+  "rhythm": {
+   "beat_seconds": 1.0,
+   "long_fraction_at_zero": 0.75,
+   "long_fraction_at_one": 0.5,
+   "note_seconds": 0.08
+  }
+ },
+ "experiments": {
+  "spec_cases": {
+   "id": "spec_cases",
+   "title": "Named test cases",
+   "expected": "See the 'expected' column; the rule is long_fraction = 0.75 - 0.25 * alignment.",
+   "columns": [
+    "case",
+    "expected",
+    "status",
+    "alignment",
+    "reason_code",
+    "usable_fraction",
+    "long_fraction",
+    "agrees"
+   ],
+   "rows": [
+    [
+     "Aligned: parallel horizontal lines",
+     "near 1; even pulses",
+     "ok",
+     1.0,
+     "-",
+     0.45,
+     0.5,
+     "yes"
+    ],
+    [
+     "Aligned: parallel diagonal lines (45 deg)",
+     "near 1; even pulses",
+     "ok",
+     1.0,
+     "-",
+     0.408,
+     0.5,
+     "yes"
+    ],
+    [
+     "Aligned: parallel short dashes (40 px)",
+     "high, below 1: dash ends are edges too",
+     "ok",
+     0.9209,
+     "-",
+     0.422,
+     0.5198,
+     "yes"
+    ],
+    [
+     "Mixed: horizontal and vertical lines, equal areas",
+     "near 0; strong long-short",
+     "ok",
+     0.0,
+     "-",
+     0.474,
+     0.75,
+     "yes"
+    ],
+    [
+     "Mixed: dashes at random angles",
+     "near 0 (about 0.89/sqrt(n)); strong long-short",
+     "ok",
+     0.0892,
+     "-",
+     0.422,
+     0.7277,
+     "yes"
+    ],
+    [
+     "Reversed: parallel lines turned 180 deg",
+     "same as aligned (1.0000)",
+     "ok",
+     1.0,
+     "-",
+     0.45,
+     0.5,
+     "yes"
+    ],
+    [
+     "Blank image",
+     "missing with a reason; no pulses",
+     "missing",
+     null,
+     "too_few_edges",
+     0.0,
+     null,
+     "yes"
+    ],
+    [
+     "Masked: everything excluded",
+     "missing with a reason; no pulses",
+     "missing",
+     null,
+     "all_masked",
+     0.0,
+     null,
+     "yes"
+    ],
+    [
+     "Masked: right half excluded",
+     "same as aligned; fewer pixels vote",
+     "ok",
+     1.0,
+     "-",
+     0.216,
+     0.5,
+     "yes"
+    ],
+    [
+     "Repeated: same image again",
+     "identical (1.0000)",
+     "ok",
+     1.0,
+     "-",
+     0.45,
+     0.5,
+     "yes"
+    ],
+    [
+     "Noise added to parallel lines (sigma 20)",
+     "slightly below 1",
+     "ok",
+     0.9921,
+     "-",
+     0.449,
+     0.502,
+     "yes"
+    ],
+    [
+     "Noise added to random dashes (sigma 20)",
+     "still near 0",
+     "ok",
+     0.0903,
+     "-",
+     0.424,
+     0.7274,
+     "yes"
+    ],
+    [
+     "Noise only (sigma 20), no lines",
+     "missing: noise is below the edge threshold",
+     "missing",
+     null,
+     "too_few_edges",
+     0.0,
+     null,
+     "yes"
+    ]
+   ]
+  },
+  "two_families": {
+   "id": "two_families",
+   "title": "Two equal families of parallel lines, delta degrees apart",
+   "expected": "alignment = |cos(delta)|",
+   "columns": [
+    "delta_deg",
+    "predicted",
+    "observed",
+    "difference"
+   ],
+   "rows": [
+    [
+     0,
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     15,
+     0.9659,
+     0.9666,
+     0.0007
+    ],
+    [
+     30,
+     0.866,
+     0.8674,
+     0.0014
+    ],
+    [
+     45,
+     0.7071,
+     0.7071,
+     0.0
+    ],
+    [
+     60,
+     0.5,
+     0.4976,
+     -0.0024
+    ],
+    [
+     75,
+     0.2588,
+     0.2562,
+     -0.0026
+    ],
+    [
+     90,
+     0.0,
+     0.005,
+     0.005
+    ]
+   ]
+  },
+  "energy_share": {
+   "id": "energy_share",
+   "title": "Horizontal lines above, vertical lines below, in unequal shares",
+   "expected": "alignment = |2f - 1|, where f is the horizontal share of the voting area",
+   "columns": [
+    "share of rows",
+    "f (voting area)",
+    "predicted",
+    "observed",
+    "difference"
+   ],
+   "rows": [
+    [
+     0.5,
+     0.5,
+     0.0,
+     0.005,
+     0.005
+    ],
+    [
+     0.6,
+     0.6091,
+     0.2182,
+     0.215,
+     -0.0032
+    ],
+    [
+     0.75,
+     0.7727,
+     0.5455,
+     0.5483,
+     0.0028
+    ],
+    [
+     0.9,
+     0.9364,
+     0.8727,
+     0.8725,
+     -0.0002
+    ]
+   ]
+  },
+  "spread_law": {
+   "id": "spread_law",
+   "title": "40 px dashes whose angles are normally spread (mean of 8 images)",
+   "expected": "alignment = k * exp(-2 s^2), s in radians; k < 1 is the dash-end factor, so observed / observed(s=0) should equal exp(-2 s^2)",
+   "columns": [
+    "spread_deg",
+    "exp(-2s^2)",
+    "observed_mean",
+    "observed_sd",
+    "observed / observed(0)"
+   ],
+   "rows": [
+    [
+     0,
+     1.0,
+     0.923,
+     0.0029,
+     1.0
+    ],
+    [
+     5,
+     0.9849,
+     0.9089,
+     0.0031,
+     0.9847
+    ],
+    [
+     10,
+     0.9409,
+     0.8672,
+     0.0074,
+     0.9395
+    ],
+    [
+     15,
+     0.8719,
+     0.8041,
+     0.0125,
+     0.8712
+    ],
+    [
+     20,
+     0.7837,
+     0.7241,
+     0.0201,
+     0.7845
+    ],
+    [
+     30,
+     0.5779,
+     0.5386,
+     0.0361,
+     0.5835
+    ],
+    [
+     45,
+     0.2912,
+     0.2789,
+     0.0459,
+     0.3022
+    ],
+    [
+     60,
+     0.1116,
+     0.1266,
+     0.0443,
+     0.1372
+    ]
+   ]
+  },
+  "dash_length": {
+   "id": "dash_length",
+   "title": "Perfectly parallel dashes of different lengths",
+   "expected": "rises toward 1 as dashes get longer: each dash end is an edge across the line direction",
+   "columns": [
+    "dash_length_px",
+    "observed_mean",
+    "observed_sd"
+   ],
+   "rows": [
+    [
+     20,
+     0.8486,
+     0.0027
+    ],
+    [
+     40,
+     0.9246,
+     0.0032
+    ],
+    [
+     80,
+     0.9628,
+     0.0015
+    ],
+    [
+     160,
+     0.9798,
+     0.001
+    ],
+    [
+     600,
+     0.9947,
+     0.0016
+    ]
+   ]
+  },
+  "random_floor": {
+   "id": "random_floor",
+   "title": "Random dashes: how far from 0 does chance leave the score?",
+   "expected": "mean about 0.886 / sqrt(n) for n independent dashes (about 174 in view here)",
+   "columns": [
+    "images",
+    "observed_mean",
+    "observed_sd",
+    "observed_max",
+    "0.886/sqrt(n)"
+   ],
+   "rows": [
+    [
+     30,
+     0.0652,
+     0.0348,
+     0.1326,
+     0.0672
+    ]
+   ]
+  },
+  "noise_formula": {
+   "id": "noise_formula",
+   "title": "Noise on smooth stripes, threshold and blur switched off",
+   "expected": "alignment = E / (E + 2 N (12/64) sigma^2)",
+   "columns": [
+    "noise_sigma",
+    "predicted",
+    "observed",
+    "difference"
+   ],
+   "rows": [
+    [
+     2,
+     0.9944,
+     0.9944,
+     0.0
+    ],
+    [
+     5,
+     0.966,
+     0.9661,
+     0.0001
+    ],
+    [
+     10,
+     0.8765,
+     0.8768,
+     0.0003
+    ],
+    [
+     20,
+     0.6395,
+     0.6401,
+     0.0007
+    ],
+    [
+     40,
+     0.3072,
+     0.3071,
+     -0.0001
+    ]
+   ]
+  },
+  "blur": {
+   "id": "blur",
+   "title": "Blur before differentiating (sigma in pixels; 1.0 is the default)",
+   "expected": "a light blur barely moves a clean picture and makes noise alone fall below the edge threshold",
+   "columns": [
+    "blur_sigma",
+    "dashes, 20 deg spread",
+    "usable",
+    "same + noise sigma 20",
+    "noise sigma 20 alone"
+   ],
+   "rows": [
+    [
+     0.0,
+     0.7091,
+     0.417,
+     0.6797,
+     0.0091
+    ],
+    [
+     0.5,
+     0.7043,
+     0.425,
+     0.6861,
+     0.0136
+    ],
+    [
+     1.0,
+     0.681,
+     0.465,
+     0.6734,
+     null
+    ],
+    [
+     1.5,
+     0.6713,
+     0.441,
+     0.6658,
+     null
+    ],
+    [
+     2.0,
+     0.695,
+     0.336,
+     0.6918,
+     null
+    ]
+   ]
+  },
+  "rotation": {
+   "id": "rotation",
+   "title": "Rotating the picture (resampled, measured inside a disc)",
+   "expected": "unchanged: the score depends on eigenvalues, which rotation does not alter. The last column redraws dashes at each angle instead of resampling (mean of 6).",
+   "columns": [
+    "rotation_deg",
+    "parallel lines",
+    "dashes, 20 deg spread",
+    "dashes, random",
+    "redrawn 20 deg spread"
+   ],
+   "rows": [
+    [
+     0,
+     1.0,
+     0.6906,
+     0.0303,
+     0.7123
+    ],
+    [
+     15,
+     0.9998,
+     0.6769,
+     0.0319,
+     0.7048
+    ],
+    [
+     30,
+     0.9998,
+     0.6592,
+     0.0306,
+     0.6822
+    ],
+    [
+     45,
+     1.0,
+     0.6506,
+     0.0281,
+     0.6732
+    ],
+    [
+     60,
+     0.9998,
+     0.6604,
+     0.0281,
+     0.6839
+    ],
+    [
+     75,
+     0.9998,
+     0.6779,
+     0.028,
+     0.7037
+    ],
+    [
+     90,
+     1.0,
+     0.6906,
+     0.0303,
+     0.7129
+    ],
+    [
+     120,
+     0.9998,
+     0.6592,
+     0.0306,
+     0.6856
+    ],
+    [
+     150,
+     0.9998,
+     0.6604,
+     0.0281,
+     0.6808
+    ],
+    [
+     180,
+     1.0,
+     0.6906,
+     0.0303,
+     0.7123
+    ]
+   ]
+  },
+  "contrast": {
+   "id": "contrast",
+   "title": "Scaling the contrast (1.0 = lines 200 grey levels above the background)",
+   "expected": "unchanged while edges are well above the threshold; missing (never 0) once they are not",
+   "columns": [
+    "contrast_factor",
+    "parallel lines",
+    "usable (parallel lines)",
+    "dashes, 20 deg spread",
+    "usable (dashes, 20 deg spread)",
+    "dashes, random",
+    "usable (dashes, random)"
+   ],
+   "rows": [
+    [
+     1.0,
+     1.0,
+     0.45,
+     0.681,
+     0.465,
+     0.0771,
+     0.457
+    ],
+    [
+     0.75,
+     1.0,
+     0.45,
+     0.6842,
+     0.423,
+     0.0775,
+     0.416
+    ],
+    [
+     0.5,
+     1.0,
+     0.338,
+     0.6966,
+     0.34,
+     0.0789,
+     0.335
+    ],
+    [
+     0.35,
+     1.0,
+     0.225,
+     0.7281,
+     0.236,
+     0.0846,
+     0.236
+    ],
+    [
+     0.25,
+     1.0,
+     0.113,
+     0.7977,
+     0.091,
+     0.1105,
+     0.077
+    ],
+    [
+     0.15,
+     null,
+     0.0,
+     null,
+     0.0,
+     null,
+     0.0
+    ],
+    [
+     0.1,
+     null,
+     0.0,
+     null,
+     0.0,
+     null,
+     0.0
+    ]
+   ]
+  },
+  "crop": {
+   "id": "crop",
+   "title": "Crop size: 12 boxes at random positions in one large field of dashes",
+   "expected": "same mean for a uniform field, but more scatter and an upward drift for small boxes (fewer independent dashes leave a larger chance vote: about 0.886/sqrt(n) for n dashes in the box)",
+   "columns": [
+    "box_px",
+    "20 deg spread mean",
+    "sd",
+    "missing",
+    "random mean",
+    "sd ",
+    "missing ",
+    "dashes in box (about)",
+    "0.886/sqrt(n)"
+   ],
+   "rows": [
+    [
+     512,
+     0.7221,
+     0.0,
+     0,
+     0.0217,
+     0.0,
+     0,
+     897.6,
+     0.0296
+    ],
+    [
+     256,
+     0.723,
+     0.0123,
+     0,
+     0.0545,
+     0.0273,
+     0,
+     224.4,
+     0.0592
+    ],
+    [
+     128,
+     0.7275,
+     0.0348,
+     0,
+     0.1035,
+     0.0737,
+     0,
+     56.1,
+     0.1183
+    ],
+    [
+     64,
+     0.7066,
+     0.0536,
+     0,
+     0.2297,
+     0.1095,
+     0,
+     14.0,
+     0.2366
+    ],
+    [
+     32,
+     0.7824,
+     0.1064,
+     0,
+     0.4448,
+     0.2469,
+     0,
+     3.5,
+     0.4733
+    ]
+   ]
+  },
+  "noise": {
+   "id": "noise",
+   "title": "Adding Gaussian noise (sigma in grey levels, default settings)",
+   "expected": "aligned lines fall slowly; random stays near 0; noise alone is missing until it is strong enough to pass the edge threshold, where it reads as a low score",
+   "columns": [
+    "noise_sigma",
+    "parallel lines",
+    "dashes, 20 deg spread",
+    "dashes, random",
+    "no lines (flat grey)"
+   ],
+   "rows": [
+    [
+     0,
+     1.0,
+     0.681,
+     0.0771,
+     null
+    ],
+    [
+     5,
+     0.9994,
+     0.6808,
+     0.0767,
+     null
+    ],
+    [
+     10,
+     0.9978,
+     0.6796,
+     0.0762,
+     null
+    ],
+    [
+     20,
+     0.9921,
+     0.6746,
+     0.0749,
+     null
+    ],
+    [
+     40,
+     0.9695,
+     0.6544,
+     0.0719,
+     0.0275
+    ],
+    [
+     80,
+     0.8386,
+     0.55,
+     0.0588,
+     0.0111
+    ]
+   ]
+  },
+  "jpeg": {
+   "id": "jpeg",
+   "title": "JPEG compression of the test images",
+   "expected": "small changes at normal quality; block edges may add horizontal/vertical votes at very low quality",
+   "columns": [
+    "jpeg_quality",
+    "parallel lines, 30 deg",
+    "dashes, 20 deg spread",
+    "dashes, random",
+    "blank"
+   ],
+   "rows": [
+    [
+     "uncompressed",
+     0.9998,
+     0.681,
+     0.0771,
+     null
+    ],
+    [
+     95,
+     0.9998,
+     0.6809,
+     0.0771,
+     null
+    ],
+    [
+     75,
+     0.9996,
+     0.681,
+     0.0772,
+     null
+    ],
+    [
+     50,
+     0.9992,
+     0.6809,
+     0.0768,
+     null
+    ],
+    [
+     25,
+     0.9981,
+     0.6817,
+     0.0778,
+     null
+    ],
+    [
+     10,
+     0.9937,
+     0.6824,
+     0.0827,
+     null
+    ],
+    [
+     5,
+     0.9791,
+     0.6775,
+     0.0852,
+     null
+    ]
+   ]
+  },
+  "motion_blur": {
+   "id": "motion_blur",
+   "title": "Horizontal camera smear on random dashes",
+   "expected": "rises: smearing removes edges across the motion, so lines along the motion dominate",
+   "columns": [
+    "smear_px",
+    "alignment",
+    "dominant_angle_deg"
+   ],
+   "rows": [
+    [
+     1,
+     0.0771,
+     177.9
+    ],
+    [
+     3,
+     0.2087,
+     178.5
+    ],
+    [
+     5,
+     0.3867,
+     178.8
+    ],
+    [
+     9,
+     0.6536,
+     179.2
+    ],
+    [
+     15,
+     0.8701,
+     179.6
+    ],
+    [
+     25,
+     0.9508,
+     179.9
+    ]
+   ]
+  },
+  "zoom": {
+   "id": "zoom",
+   "title": "Zooming the picture inside a fixed box",
+   "expected": "not constant: zoom changes line width and how many dashes are in view",
+   "columns": [
+    "zoom_factor",
+    "dashes, 20 deg spread",
+    "dashes, random"
+   ],
+   "rows": [
+    [
+     0.5,
+     0.6541,
+     0.0801
+    ],
+    [
+     0.75,
+     0.6864,
+     0.0127
+    ],
+    [
+     1.0,
+     0.681,
+     0.0771
+    ],
+    [
+     1.5,
+     0.6509,
+     0.2034
+    ],
+    [
+     2.0,
+     0.6711,
+     0.2136
+    ],
+    [
+     3.0,
+     0.6962,
+     0.3214
+    ]
+   ]
+  },
+  "legend": {
+   "id": "legend",
+   "title": "A colour bar and label drawn into the picture",
+   "expected": "the legend's own straight edges change the score; with the legend masked the result equals the clean picture measured with the same mask",
+   "columns": [
+    "picture",
+    "clean",
+    "with legend",
+    "legend masked",
+    "clean, same mask"
+   ],
+   "rows": [
+    [
+     "dashes, 20 deg spread around 60 deg",
+     0.6511,
+     0.5734,
+     0.6557,
+     0.6557
+    ],
+    [
+     "dashes, random",
+     0.0771,
+     0.0884,
+     0.0672,
+     0.0672
+    ]
+   ]
+  },
+  "colour": {
+   "id": "colour",
+   "title": "The same line drawing painted in different colours",
+   "expected": "'value' (max of R, G, B) treats pure hues alike; 'luma' makes blue lines too faint to count",
+   "columns": [
+    "line colour",
+    "value mode",
+    "usable (value)",
+    "luma mode",
+    "usable (luma)"
+   ],
+   "rows": [
+    [
+     "white",
+     0.6798,
+     0.494,
+     0.6798,
+     0.494
+    ],
+    [
+     "yellow",
+     0.6798,
+     0.494,
+     0.6804,
+     0.48
+    ],
+    [
+     "green",
+     0.6798,
+     0.494,
+     0.6844,
+     0.422
+    ],
+    [
+     "red",
+     0.6798,
+     0.494,
+     0.7141,
+     0.268
+    ],
+    [
+     "blue",
+     0.6798,
+     0.494,
+     null,
+     0.0
+    ],
+    [
+     "dark blue",
+     0.6881,
+     0.394,
+     null,
+     0.0
+    ]
+   ]
+  },
+  "weighting": {
+   "id": "weighting",
+   "title": "Weighting each pixel by m^2 (structure tensor) or by m (spec first draft)",
+   "expected": "the same ordering of pictures; m-weighting gives a little more say to weak edges such as dash ends",
+   "columns": [
+    "picture",
+    "weight m^2",
+    "weight m",
+    "difference"
+   ],
+   "rows": [
+    [
+     "parallel lines, 30 deg",
+     0.9998,
+     0.9997,
+     -0.0001
+    ],
+    [
+     "two families 45 deg apart",
+     0.7071,
+     0.7071,
+     0.0
+    ],
+    [
+     "parallel dashes, 20 px",
+     0.8475,
+     0.8052,
+     -0.0423
+    ],
+    [
+     "parallel dashes, 40 px",
+     0.9209,
+     0.8957,
+     -0.0252
+    ],
+    [
+     "dashes, 20 deg spread",
+     0.681,
+     0.6429,
+     -0.0381
+    ],
+    [
+     "dashes, random",
+     0.0771,
+     0.0703,
+     -0.0068
+    ]
+   ]
+  },
+  "sequence": {
+   "id": "sequence",
+   "title": "Two regions over 24 frames, smoothing alpha = 0.3",
+   "expected": "'steady' stays high; 'drifting' falls as its lines spread from 5 to 60 degrees; frames 10-11 are blank there and must be missing, with smoothing starting again at frame 12",
+   "columns": [
+    "region",
+    "frame",
+    "status",
+    "alignment_raw",
+    "alignment",
+    "long_fraction"
+   ],
+   "rows": [
+    [
+     "steady",
+     0,
+     "ok",
+     0.8852,
+     0.8852,
+     0.5287
+    ],
+    [
+     "steady",
+     1,
+     "ok",
+     0.8601,
+     0.8777,
+     0.5306
+    ],
+    [
+     "steady",
+     2,
+     "ok",
+     0.8731,
+     0.8763,
+     0.5309
+    ],
+    [
+     "steady",
+     3,
+     "ok",
+     0.8818,
+     0.878,
+     0.5305
+    ],
+    [
+     "steady",
+     4,
+     "ok",
+     0.8715,
+     0.876,
+     0.531
+    ],
+    [
+     "steady",
+     5,
+     "ok",
+     0.8601,
+     0.8712,
+     0.5322
+    ],
+    [
+     "steady",
+     6,
+     "ok",
+     0.8725,
+     0.8716,
+     0.5321
+    ],
+    [
+     "steady",
+     7,
+     "ok",
+     0.8813,
+     0.8745,
+     0.5314
+    ],
+    [
+     "steady",
+     8,
+     "ok",
+     0.8794,
+     0.876,
+     0.531
+    ],
+    [
+     "steady",
+     9,
+     "ok",
+     0.8772,
+     0.8763,
+     0.5309
+    ],
+    [
+     "steady",
+     10,
+     "ok",
+     0.8793,
+     0.8772,
+     0.5307
+    ],
+    [
+     "steady",
+     11,
+     "ok",
+     0.8734,
+     0.8761,
+     0.531
+    ],
+    [
+     "steady",
+     12,
+     "ok",
+     0.8767,
+     0.8763,
+     0.5309
+    ],
+    [
+     "steady",
+     13,
+     "ok",
+     0.8693,
+     0.8742,
+     0.5314
+    ],
+    [
+     "steady",
+     14,
+     "ok",
+     0.8803,
+     0.876,
+     0.531
+    ],
+    [
+     "steady",
+     15,
+     "ok",
+     0.8828,
+     0.8781,
+     0.5305
+    ],
+    [
+     "steady",
+     16,
+     "ok",
+     0.8751,
+     0.8772,
+     0.5307
+    ],
+    [
+     "steady",
+     17,
+     "ok",
+     0.8702,
+     0.8751,
+     0.5312
+    ],
+    [
+     "steady",
+     18,
+     "ok",
+     0.8767,
+     0.8755,
+     0.5311
+    ],
+    [
+     "steady",
+     19,
+     "ok",
+     0.8738,
+     0.875,
+     0.5312
+    ],
+    [
+     "steady",
+     20,
+     "ok",
+     0.8735,
+     0.8746,
+     0.5313
+    ],
+    [
+     "steady",
+     21,
+     "ok",
+     0.8819,
+     0.8768,
+     0.5308
+    ],
+    [
+     "steady",
+     22,
+     "ok",
+     0.8753,
+     0.8763,
+     0.5309
+    ],
+    [
+     "steady",
+     23,
+     "ok",
+     0.8901,
+     0.8805,
+     0.5299
+    ],
+    [
+     "drifting",
+     0,
+     "ok",
+     0.9009,
+     0.9009,
+     0.5248
+    ],
+    [
+     "drifting",
+     1,
+     "ok",
+     0.8739,
+     0.8928,
+     0.5268
+    ],
+    [
+     "drifting",
+     2,
+     "ok",
+     0.8647,
+     0.8844,
+     0.5289
+    ],
+    [
+     "drifting",
+     3,
+     "ok",
+     0.7888,
+     0.8557,
+     0.5361
+    ],
+    [
+     "drifting",
+     4,
+     "ok",
+     0.7986,
+     0.8386,
+     0.5403
+    ],
+    [
+     "drifting",
+     5,
+     "ok",
+     0.716,
+     0.8018,
+     0.5495
+    ],
+    [
+     "drifting",
+     6,
+     "ok",
+     0.7201,
+     0.7773,
+     0.5557
+    ],
+    [
+     "drifting",
+     7,
+     "ok",
+     0.658,
+     0.7415,
+     0.5646
+    ],
+    [
+     "drifting",
+     8,
+     "ok",
+     0.5416,
+     0.6815,
+     0.5796
+    ],
+    [
+     "drifting",
+     9,
+     "ok",
+     0.5448,
+     0.6405,
+     0.5899
+    ],
+    [
+     "drifting",
+     10,
+     "missing",
+     null,
+     null,
+     null
+    ],
+    [
+     "drifting",
+     11,
+     "missing",
+     null,
+     null,
+     null
+    ],
+    [
+     "drifting",
+     12,
+     "ok",
+     0.4527,
+     0.4527,
+     0.6368
+    ],
+    [
+     "drifting",
+     13,
+     "ok",
+     0.3694,
+     0.4277,
+     0.6431
+    ],
+    [
+     "drifting",
+     14,
+     "ok",
+     0.3755,
+     0.412,
+     0.647
+    ],
+    [
+     "drifting",
+     15,
+     "ok",
+     0.2979,
+     0.3778,
+     0.6555
+    ],
+    [
+     "drifting",
+     16,
+     "ok",
+     0.3049,
+     0.3559,
+     0.661
+    ],
+    [
+     "drifting",
+     17,
+     "ok",
+     0.1987,
+     0.3088,
+     0.6728
+    ],
+    [
+     "drifting",
+     18,
+     "ok",
+     0.2502,
+     0.2912,
+     0.6772
+    ],
+    [
+     "drifting",
+     19,
+     "ok",
+     0.2098,
+     0.2668,
+     0.6833
+    ],
+    [
+     "drifting",
+     20,
+     "ok",
+     0.1059,
+     0.2185,
+     0.6954
+    ],
+    [
+     "drifting",
+     21,
+     "ok",
+     0.1705,
+     0.2041,
+     0.699
+    ],
+    [
+     "drifting",
+     22,
+     "ok",
+     0.1367,
+     0.1839,
+     0.704
+    ],
+    [
+     "drifting",
+     23,
+     "ok",
+     0.1429,
+     0.1716,
+     0.7071
+    ]
+   ]
+  },
+  "mapping_table": {
+   "id": "mapping",
+   "title": "The rhythm rule at a 1 s beat",
+   "expected": "long gap + short gap = one beat for every alignment (fixed tempo)",
+   "columns": [
+    "alignment",
+    "long_fraction",
+    "long_gap_s",
+    "short_gap_s",
+    "sum_s",
+    "long : short"
+   ],
+   "rows": [
+    [
+     0.0,
+     0.75,
+     0.75,
+     0.25,
+     1.0,
+     3.0
+    ],
+    [
+     0.25,
+     0.6875,
+     0.6875,
+     0.3125,
+     1.0,
+     2.2
+    ],
+    [
+     0.3333,
+     0.6667,
+     0.6667,
+     0.3333,
+     1.0,
+     2.0
+    ],
+    [
+     0.5,
+     0.625,
+     0.625,
+     0.375,
+     1.0,
+     1.667
+    ],
+    [
+     0.75,
+     0.5625,
+     0.5625,
+     0.4375,
+     1.0,
+     1.286
+    ],
+    [
+     1.0,
+     0.5,
+     0.5,
+     0.5,
+     1.0,
+     1.0
+    ]
+   ]
+  }
+ }
+}

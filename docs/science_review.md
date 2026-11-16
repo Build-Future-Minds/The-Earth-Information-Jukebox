@@ -9,7 +9,7 @@ frames: section 9 compares the draft circles, section 10 is the approved pair th
 that script after changing any setting.
 
 <!-- table:environment -->
-Last run: 2026-11-14 with Python 3.14.7, numpy 2.5.4, OpenCV 5.0.0.
+Last run: 2026-11-15 with Python 3.14.7, numpy 2.5.4, OpenCV 5.0.0.
 <!-- /table:environment -->
 
 Settings for every table unless it says otherwise: grayscale = max(R, G, B), Gaussian blur σ = 1 px,
@@ -178,15 +178,15 @@ Expected: unchanged while edges are well above the threshold; missing (never 0) 
 <!-- table:crop -->
 ### Crop size: 12 boxes at random positions in one large field of dashes
 
-Expected: same mean for a uniform field, but more scatter and an upward drift for small boxes (fewer independent dashes leave a larger chance vote)
+Expected: same mean for a uniform field, but more scatter and an upward drift for small boxes (fewer independent dashes leave a larger chance vote: about 0.886/sqrt(n) for n dashes in the box)
 
-| box_px | 20 deg spread mean | sd | missing | random mean | sd  | missing  |
-| --- | --- | --- | --- | --- | --- | --- |
-| 512 | 0.7221 | 0.0 | 0 | 0.0217 | 0.0 | 0 |
-| 256 | 0.723 | 0.0123 | 0 | 0.0545 | 0.0273 | 0 |
-| 128 | 0.7275 | 0.0348 | 0 | 0.1035 | 0.0737 | 0 |
-| 64 | 0.7066 | 0.0536 | 0 | 0.2297 | 0.1095 | 0 |
-| 32 | 0.7824 | 0.1064 | 0 | 0.4448 | 0.2469 | 0 |
+| box_px | 20 deg spread mean | sd | missing | random mean | sd  | missing  | dashes in box (about) | 0.886/sqrt(n) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 512 | 0.7221 | 0.0 | 0 | 0.0217 | 0.0 | 0 | 897.6 | 0.0296 |
+| 256 | 0.723 | 0.0123 | 0 | 0.0545 | 0.0273 | 0 | 224.4 | 0.0592 |
+| 128 | 0.7275 | 0.0348 | 0 | 0.1035 | 0.0737 | 0 | 56.1 | 0.1183 |
+| 64 | 0.7066 | 0.0536 | 0 | 0.2297 | 0.1095 | 0 | 14.0 | 0.2366 |
+| 32 | 0.7824 | 0.1064 | 0 | 0.4448 | 0.2469 | 0 | 3.5 | 0.4733 |
 <!-- /table:crop -->
 
 <!-- table:noise -->

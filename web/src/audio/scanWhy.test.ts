@@ -268,10 +268,10 @@ describe('the fixed choices', () => {
     expect(decoration).toEqual(expect.arrayContaining(['scale', 'bar-tones', 'low-note', 'pan', 'scan-sound']));
   });
 
-  it('an unverified choice says what is missing', () => {
-    const unverified = SCAN_CHOICES.filter((c) => c.tag === 'Unverified');
-    expect(unverified.length).toBeGreaterThan(0);
-    for (const c of unverified) expect(c.evidence.toLowerCase()).toMatch(/unverified|no source|not been/);
+  it('what is not known is said: an unverified choice says what is missing, and the spacing says nobody has listened', () => {
+    for (const c of SCAN_CHOICES.filter((c) => c.tag === 'Unverified')) expect(c.evidence.toLowerCase()).toMatch(/unverified|no source|not been/);
+    // The spacing's reason has a source now (S13), but nobody has listened to hear whether it is clearer.
+    expect(SCAN_CHOICES.find((c) => c.id === 'pitch-spacing')!.evidence).toContain('Unverified: that the new spacing sounds clearer');
   });
 
   it("the numbers in a choice are the rule's own numbers", () => {

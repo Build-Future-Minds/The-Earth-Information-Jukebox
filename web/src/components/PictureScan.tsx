@@ -335,14 +335,14 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
             <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is
             struck on one instrument. Where it is not (yellow-green, green and blue), it is struck on another.
             {loaded && !loaded.isTest && (
-              <> On NASA's colour bar for this picture the switch falls at about 24 °C, if the bar's scale is even. We measured the bar, not the sea.</>
+              <> On NASA's colour bar for this picture the switch falls at about 23.6 °C, and the picture's lines use the bar's hues. We measured the bar and the picture's colours, not the sea.</>
             )}
           </li>
           {loaded && !loaded.isTest && (
             <li>
-              <strong>What the scan cannot tell you.</strong> Warm colours are drawn stronger than cold ones, so warm water
-              sounds louder than cold water with the same amount of line. The still is a compressed copy of NASA's frame,
-              which blurs its finest lines.
+              <strong>What the scan cannot tell you.</strong> Lines of some colours are drawn paler than others (light blue
+              the most), so the same amount of line sounds a little quieter in those colours. The still is a
+              compressed copy of NASA's frame, which blurs its finest lines.
             </li>
           )}
           <li><strong>Left and right.</strong> The sound sits where the line is: it travels from the left speaker to the right with the line.</li>

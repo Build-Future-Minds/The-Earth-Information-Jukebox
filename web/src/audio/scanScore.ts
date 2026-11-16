@@ -85,9 +85,10 @@ export function brightness(r: number, g: number, b: number): number {
  */
 export type ScanMeasure = 'colour' | 'brightness';
 
-/** Red side of yellow (red, orange): red is the largest channel. Measured on NASA's colour bar for
- *  the ocean picture, the answer switches at 74.4% of the bar's length, which is 23.8 °C if the
- *  bar's scale is even (docs/measurements/scan_pictures.md). A rule about pixels, not degrees. */
+/** Red side of yellow (red, orange): red is the largest channel. It depends on a colour's hue only.
+ *  On NASA's colour bar for the ocean picture the answer switches at 23.6 °C (the bar's printed
+ *  labels lie on one straight line), and the picture's lines use the bar's hues
+ *  (docs/measurements/scan_pictures.md). A rule about pixels, not degrees. */
 export function isWarm(r: number, g: number, b: number): boolean {
   return r >= g && r >= b;
 }

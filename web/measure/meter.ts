@@ -143,3 +143,66 @@ export function bandDb(x: ArrayLike<number>, sampleRate: number, lowHz: number, 
   }
   return 10 * Math.log10((2 * total) / (n * windowPower));
 }
+
+/**
+ * The same as `bandDb` for several bands at once, fast enough for a whole recording: one Fourier
+ * transform (radix 2, the signal padded with zeros to the next power of two) instead of one sum per
+ * frequency. Padding makes the frequency steps finer, so the sum over a band is divided by the
+ * padded length; a unit test checks that it gives bandDb's answer.
+ */
+export function bandLevels(x: ArrayLike<number>, sampleRate: number, bands: [number, number][]): number[] {
+  const n = x.length;
+  if (n < 2) return bands.map(() => -Infinity);
+  let size = 1;
+  while (size < n) size *= 2;
+  const re = new Float64Array(size);
+  const im = new Float64Array(size);
+  let windowPower = 0;
+  for (let i = 0; i < n; i++) {
+    const w = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (n - 1));
+    re[i] = w * x[i];
+    windowPower += w * w;
+  }
+  fft(re, im);
+  return bands.map(([low, high]) => {
+    let total = 0;
+    for (let bin = Math.ceil((low * size) / sampleRate); bin <= Math.floor((high * size) / sampleRate); bin++) total += re[bin] * re[bin] + im[bin] * im[bin];
+    return 10 * Math.log10((2 * total) / (size * windowPower));
+  });
+}
+
+/** Fourier transform in place (radix 2; the length must be a power of two). */
+function fft(re: Float64Array, im: Float64Array): void {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) {
+      [re[i], re[j]] = [re[j], re[i]];
+      [im[i], im[j]] = [im[j], im[i]];
+    }
+  }
+  for (let length = 2; length <= n; length *= 2) {
+    const angle = (-2 * Math.PI) / length;
+    const wr = Math.cos(angle);
+    const wi = Math.sin(angle);
+    for (let start = 0; start < n; start += length) {
+      let cr = 1;
+      let ci = 0;
+      for (let k = 0; k < length / 2; k++) {
+        const a = start + k;
+        const b = a + length / 2;
+        const tr = re[b] * cr - im[b] * ci;
+        const ti = re[b] * ci + im[b] * cr;
+        re[b] = re[a] - tr;
+        im[b] = im[a] - ti;
+        re[a] += tr;
+        im[a] += ti;
+        const next = cr * wr - ci * wi;
+        ci = cr * wi + ci * wr;
+        cr = next;
+      }
+    }
+  }
+}
