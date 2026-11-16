@@ -2,7 +2,7 @@
 // the app sends to the speakers, and measures it with meter.ts. The dev server serves this file;
 // it is never part of the built app. Nothing here changes what the app plays.
 import * as Tone from 'tone';
-import { ScanChoir, scanSound, type ScanSoundId } from '../src/audio/instruments';
+import { BarInstrument, SCAN_SOUNDS, ScanChoir, scanSound, type ScanSoundId } from '../src/audio/instruments';
 import { ScanPlayer } from '../src/audio/scanPlayer';
 import { CHIME_RULE, LINE_GRID, STRENGTH_FLOOR, bandNote, buildScanScore, type Pixels } from '../src/audio/scanScore';
 import { bandDb, bandLevels, cut, integratedLoudness, peakDb, rmsDb, type Stereo } from './meter';
@@ -200,4 +200,36 @@ export async function levelSteps(targets = [0.125, 0.25, 0.5, 1], secondsEach = 
   });
   player.dispose();
   return { band, note: Tone.Frequency(bandNote(band), 'midi').toNote(), hz, secondsEach, chimes: score.chimes.length, steps };
+}
+
+/**
+ * One struck note on each instrument of each scan sound, alone, at full strength: how loud each is
+ * at the level its sound gives it. The scan's volume, left–right position and room are the same for
+ * all three instruments of a sound, so they are left out here.
+ */
+export async function strikeEach(note = 84) {
+  await startTap();
+  await Tone.start();
+  const wait = (ms: number) => new Promise((done) => setTimeout(done, ms));
+  const strikes = [];
+  for (const def of SCAN_SOUNDS) {
+    const instruments = [
+      { colour: 'warm', name: def.warmName, model: def.warm, level: def.warmLevel },
+      { colour: 'cool', name: def.coolName, model: def.cool, level: def.coolLevel },
+      { colour: 'blue', name: def.blueName, model: def.blue, level: def.blueLevel },
+    ];
+    for (const i of instruments) {
+      const instrument = new BarInstrument(i.model, i.level);
+      instrument.output.toDestination();
+      clearTap();
+      const at = Tone.immediate() + 0.15;
+      instrument.strike(note, at, 1);
+      await wait(2700);
+      const m = measureBetween(at, at + 2.4);
+      strikes.push({ sound: def.label, colour: i.colour, name: i.name, level: i.level, lufs: m.lufs, peakDb: m.peakDb });
+      instrument.dispose();
+      await wait(300);
+    }
+  }
+  return { note: Tone.Frequency(note, 'midi').toNote(), strikes };
 }

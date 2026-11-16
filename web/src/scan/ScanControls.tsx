@@ -34,7 +34,7 @@ interface SettingsProps {
 
 /** Settings folded away (UI pass, 15 Nov): one clear start, the rest on request. */
 export function ScanSettings({ scan, speed, onSpeed }: SettingsProps) {
-  const { target, setTarget, across, regions, loaded, scene, soundId, setSoundId, volumeDb, setVolumeDb } = scan;
+  const { target, setTarget, across, regions, loaded, scene, picture, soundId, setSoundId, volumeDb, setVolumeDb } = scan;
   return (
     <details className="scan-settings">
       <summary>Scan settings</summary>
@@ -44,7 +44,7 @@ export function ScanSettings({ scan, speed, onSpeed }: SettingsProps) {
           <select value={target} onChange={(e) => setTarget(e.target.value)}>
             <option value="map">Whole picture: a line, {across}</option>
             {regions.map((r) => (
-              <option key={r.id} value={r.id}>{loaded?.isTest ? 'Test circle' : regionLabel(scene.regions, r.id)}: a radar turn</option>
+              <option key={r.id} value={r.id}>{loaded?.isTest ? 'Test circle' : regionLabel(scene.regions, r.id, picture.firstLetter)}: a radar turn</option>
             ))}
           </select>
         </label>

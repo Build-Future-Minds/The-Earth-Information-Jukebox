@@ -91,6 +91,8 @@ export const NASA = nasaJson as unknown as {
 };
 
 interface ScanCounts { cells: number; sounding: number; peaks: number; afterSpacing: number; chimes: number; warm: number; cool: number; largestCellMean: number }
+// One section per picture (scan_pictures.json, `npm run measure`): never read a number of one
+// picture as another's. This page is about the ocean picture, so it reads only the ocean's.
 export const SCAN = scanPicturesJson as unknown as {
   meta: { date: string; browser: string; commit: string };
   pictures: {
@@ -99,26 +101,34 @@ export const SCAN = scanPicturesJson as unknown as {
     svs: number;
     line: { colour: ScanCounts };
     regions: { id: string; name: string; radar: ScanCounts }[];
+    /** Every measured number the app quotes for this picture, as `npm run measure` wrote it. */
+    quoted: Record<string, number>;
   }[];
-  lossless: { quietCells: { least: number; cells: number; sounding: number; largestStrength: number }[] };
-  /**
-   * NASA's colour bar for the ocean picture: where the warm/cool switch falls, as a share of its
-   * length and as the first pixel past it; and the straight line x = a + b · T through the centres of
-   * its four printed labels, with the largest distance of a label from that line in pixels.
-   */
-  bar: { switches: number[]; switchPixels: number[]; labels: { byInk: { a: number; b: number; largest: number } } };
 };
 export const OCEAN_SCAN = SCAN.pictures.find((p) => p.key === 'ocean')!;
-/** The warm/cool switch in °C on NASA's colour bar: its edge read through the labels' line (the same sum as web/measure/pictures.measure.ts). */
-export const BAR_SWITCH_C = (SCAN.bar.switchPixels[0] - 0.5 - SCAN.bar.labels.byInk.a) / SCAN.bar.labels.byInk.b;
-/** How far the bar's printed labels sit from one straight line, at most, in °C. */
-export const BAR_LABELS_OFF_C = SCAN.bar.labels.byInk.largest / SCAN.bar.labels.byInk.b;
+/** The warm/cool switch in °C on NASA's colour bar: its edge read through the line the bar's four printed labels lie on (web/measure/audit.ts). */
+export const BAR_SWITCH_C = OCEAN_SCAN.quoted.bar0SwitchValue;
+/** How far the bar's printed labels sit from that straight line, at most, in °C. */
+export const BAR_LABELS_OFF_C = OCEAN_SCAN.quoted.bar0LabelsOffC;
+
+/** The ocean's grey land and black sea, measured on NASA's uncompressed frame: the cells that are 90% or more of either. */
+export const EXACT_QUIET = {
+  least: 0.9,
+  cells: OCEAN_SCAN.quoted.exactQuiet90Cells,
+  sounding: OCEAN_SCAN.quoted.exactQuiet90Sounding,
+  /** The largest mean colour strength among them, 0 to 1 (the report gives it in 255ths). */
+  largestStrength: OCEAN_SCAN.quoted.exactQuiet90Largest255 / 255,
+};
+/** Where the warm and cool instruments switch along NASA's ocean colour bar, as a share of its length. */
+export const BAR_SWITCH = OCEAN_SCAN.quoted.bar0SwitchPct / 100;
 
 export const SOUND = scanSoundJson as unknown as {
   meta: { date: string };
   steps: { band: number; note: string; steps: { level: number; toneDb: number }[] };
-  sweeps: { name: string; firstSixth: { leftMinusRightDb: number }; lastSixth: { leftMinusRightDb: number } }[];
+  pictures: { label: string; sweeps: { name: string; firstSixth: { leftMinusRightDb: number }; lastSixth: { leftMinusRightDb: number } }[] }[];
 };
+/** The ocean picture's sweeps (one section per picture in scan_sound.json). */
+export const OCEAN_SWEEPS = SOUND.pictures.find((p) => p.label === 'Ocean')!.sweeps;
 
 export interface SuiteCount { command: string; total: number; passed: number; failed: number; skipped: number }
 export const COUNTS = countsJson as unknown as {

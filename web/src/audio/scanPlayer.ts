@@ -32,6 +32,8 @@ export interface ScanLogEntry {
   column: number;
   band: number;
   warm: boolean;
+  /** Which instrument struck it: warm, cool or (a picture with a third class) blue. */
+  colour: Chime['colour'];
   note: number;
   /** The root note sounding under this chime (decoration: scanScore.ts, rootNoteAt). */
   root: number;
@@ -40,12 +42,25 @@ export interface ScanLogEntry {
   /** Which sound from the library played it. The score is the same for all of them. */
   sound: ScanSoundId;
 }
+/** Development only: the audio time at which each sweep's first column played, for measurements.
+ *  A sweep with no struck note cannot be timed from its first chime (web/measure/sound.measure.ts). */
+export interface ScanSweepEntry {
+  audioTime: number;
+  shape: ScanScore['shape'];
+  columns: number;
+  seconds: number;
+  speed: number;
+}
 declare global {
   interface Window {
     __scanNotes?: ScanLogEntry[];
+    __scanSweeps?: ScanSweepEntry[];
   }
 }
-if (import.meta.env.DEV && typeof window !== 'undefined') window.__scanNotes = [];
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  window.__scanNotes = [];
+  window.__scanSweeps = [];
+}
 
 /** One fixed loudness setting per kind of scan. A circle is small and full of lines, so its radar
  *  would be much louder than the map sweep; this brings the two closer. Both regions share the
@@ -65,6 +80,7 @@ interface Rig {
   bass: ScanBass;
   warm: BarInstrument;
   cool: BarInstrument;
+  blue: BarInstrument;
 }
 
 export class ScanPlayer {
@@ -167,6 +183,7 @@ export class ScanPlayer {
     old.bass.silence();
     old.warm.damp();
     old.cool.damp();
+    old.blue.damp();
     setTimeout(() => disposeRig(old), 400);
   }
 
@@ -200,8 +217,9 @@ export class ScanPlayer {
     const bass = createScanBass(def);
     const warm = new BarInstrument(def.warm, def.warmLevel);
     const cool = new BarInstrument(def.cool, def.coolLevel);
-    for (const source of [choir, bass, warm, cool]) source.output.connect(volume);
-    return { def, room, panner, volume, choir, bass, warm, cool };
+    const blue = new BarInstrument(def.blue, def.blueLevel);
+    for (const source of [choir, bass, warm, cool, blue]) source.output.connect(volume);
+    return { def, room, panner, volume, choir, bass, warm, cool, blue };
   }
 
   /** One column of the score, at exact audio time `time`. */
@@ -213,6 +231,7 @@ export class ScanPlayer {
     const column = ((Math.round(tick) % columns) + columns) % columns;
     const columnSeconds = seconds / columns / this.speed;
     const trim = SHAPE_TRIM[score.shape];
+    if (column === 0) window.__scanSweeps?.push({ audioTime: time, shape: score.shape, columns, seconds, speed: this.speed });
 
     // Decoration, not data: the root steps on its timetable, and the sound follows the line across.
     const root = rootNoteAt(score.grid, column);
@@ -230,8 +249,8 @@ export class ScanPlayer {
 
     for (const chime of this.chimesByColumn.get(column) ?? []) {
       const note = chimeNote(chime);
-      (chime.warm ? rig.warm : rig.cool).strike(note, time, chimeVelocity(chime.level));
-      window.__scanNotes?.push({ audioTime: time, column, band: chime.band, warm: chime.warm, note, root, pan, sound: rig.def.id });
+      rig[chime.colour].strike(note, time, chimeVelocity(chime.level));
+      window.__scanNotes?.push({ audioTime: time, column, band: chime.band, warm: chime.warm, colour: chime.colour, note, root, pan, sound: rig.def.id });
       this.due.push({ time, chime, generation: this.generation });
     }
   }
@@ -268,6 +287,7 @@ export class ScanPlayer {
       this.rig.bass.silence();
       this.rig.warm.damp();
       this.rig.cool.damp();
+      this.rig.blue.damp();
       this.rig.room.close();
     }
     this.setState(next);
@@ -286,6 +306,7 @@ function disposeRig(rig: Rig): void {
   rig.bass.dispose();
   rig.warm.dispose();
   rig.cool.dispose();
+  rig.blue.dispose();
   rig.volume.dispose();
   rig.panner.dispose();
   rig.room.dispose();

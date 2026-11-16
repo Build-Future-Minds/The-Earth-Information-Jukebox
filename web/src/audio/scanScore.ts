@@ -93,15 +93,44 @@ export function isWarm(r: number, g: number, b: number): boolean {
   return r >= g && r >= b;
 }
 
+/** Blue side: blue is the largest channel (a tie with green counts as blue) and red is not. Used
+ *  only by a picture whose own legend gives blue colours their own meaning (the rain picture: snow,
+ *  drawn cyan to purple). Design choice; where it falls on NASA's bars is measured
+ *  (docs/measurements/scan_pictures.md). */
+export function isBlue(r: number, g: number, b: number): boolean {
+  return !isWarm(r, g, b) && b >= g;
+}
+
+/** Which instrument strikes a note: `warm` (red side of yellow), `cool` (the rest) and, for a
+ *  picture with a third class, `blue`. */
+export type ChimeColour = 'warm' | 'cool' | 'blue';
+
+/** The instrument for a cell, from the shares of its drawn colour. Two classes: warm when half or
+ *  more of the colour is warm. Three classes: the largest share wins; a tie goes to warm, then cool. */
+export function chimeColour(warmShare: number, blueShare: number | null): ChimeColour {
+  if (blueShare === null) return warmShare >= 0.5 ? 'warm' : 'cool';
+  const coolShare = 1 - warmShare - blueShare;
+  if (warmShare >= coolShare && warmShare >= blueShare) return 'warm';
+  return blueShare > coolShare ? 'blue' : 'cool';
+}
+
 /** A cell's mean colour strength at or below this plays nothing. 12 grey levels: the tolerance the
- *  team's land rule already allows for JPEG noise on grey land. Design choice. */
+ *  team's land rule already allows for JPEG noise on grey land. Design choice. It is the ocean
+ *  picture's floor and the default; another picture sets its own (data/sources.ts, `scan.floor`). */
 export const STRENGTH_FLOOR = 12 / 255;
 
 /** Mean colour strength of a cell → level 0 to 1: a straight line from the floor to the grid's full level. */
-export function levelOf(meanStrength: number, fullStrength: number): number {
-  const x = (meanStrength - STRENGTH_FLOOR) / (fullStrength - STRENGTH_FLOOR);
+export function levelOf(meanStrength: number, fullStrength: number, floor: number = STRENGTH_FLOOR): number {
+  const x = (meanStrength - floor) / (fullStrength - floor);
   return Math.min(1, Math.max(0, x));
 }
+
+/**
+ * Pixels the scan never reads: one number per pixel, row by row, the picture's size; anything but 0
+ * means "never read". For a picture whose parts carry no data (the rain picture's land is a photo).
+ * A cell that reads nothing is "no data": silent, never a peak, and never counted as a zero.
+ */
+export type ScanMask = ArrayLike<number>;
 
 /** When a bright spot becomes a struck note. Design choices that keep the chimes few enough to hear one by one. */
 export interface ChimeRule {
@@ -120,14 +149,22 @@ export interface Chime {
   band: number;
   /** 0–1, the smoothed level at the peak: sets how hard the note is struck. */
   level: number;
-  /** true: marimba (red side of yellow). false: bells (yellow-green, green, blue). */
+  /** true: the warm instrument (red side of yellow). Always `colour === 'warm'`. */
   warm: boolean;
+  /** Which instrument strikes it (see chimeColour). */
+  colour: ChimeColour;
 }
 
 export interface ScanOptions {
   grid?: ScanGrid;
   rule?: ChimeRule;
   measure?: ScanMeasure;
+  /** A cell mean at or below this plays nothing. Default STRENGTH_FLOOR (the ocean picture's). */
+  floor?: number;
+  /** Pixels never read, the picture's size (see ScanMask). Default: every pixel is read. */
+  mask?: ScanMask | null;
+  /** A third instrument for colours on the blue side (isBlue). Default: two classes, warm and cool. */
+  blueClass?: boolean;
 }
 
 /** A peak the chime rule found and left out, with the reason and the chime that took its place. */
@@ -147,22 +184,59 @@ export interface ScanScore {
   shape: ScanShape['kind'];
   grid: ScanGrid;
   measure: ScanMeasure;
+  /** The floor this score was made with: a cell mean at or below it plays nothing. */
+  floor: number;
   /** `means[column * bands + band]`, 0–1: the mean of the measure (colour strength or brightness)
    *  over the pixels the cell read, before the floor and the full level turn it into a level. */
   means: Float32Array;
-  /** `reads[column * bands + band]`: how many pixels (or radar sample points) the cell read. */
+  /** `reads[column * bands + band]`: how many pixels (or radar sample points) the cell read.
+   *  0 is "no data": the cell is silent, is never a peak, and is not a zero (see `hasData`). */
   reads: Uint32Array;
   /** `levels[column * bands + band]`, 0–1: how loud that band's held note is in that column. */
   levels: Float32Array;
-  /** `warmShare[column * bands + band]`, 0–1: share of the cell's colour that is on the red side of yellow. */
+  /** `warmShare[column * bands + band]`, 0–1: share of the cell's drawn colour (pixels above the
+   *  floor, weighted by colour strength) that is on the red side of yellow. */
   warmShare: Float32Array;
+  /** Whether the blue side has its own instrument in this score. */
+  blueClass: boolean;
+  /** The same share for the blue side (isBlue); all 0 when `blueClass` is false. */
+  blueShare: Float32Array;
   /** Sorted by column, then band. */
   chimes: Chime[];
   /** Peaks the chime rule found and left out, sorted by column, then band. */
   dropped: DroppedPeak[];
-  /** `missing`: no cell has any colour, so the scan stays silent and says why. Never an invented sound. */
+  /** `missing`: no cell has any colour (or no cell read anything), so the scan stays silent and
+   *  says why. Never an invented sound. */
   status: 'ok' | 'missing';
   reason: string | null;
+}
+
+/** Did this cell read anything? A cell that read nothing is "no data", never a zero. */
+export function hasData(score: Pick<ScanScore, 'reads'>, cell: number): boolean {
+  return score.reads[cell] > 0;
+}
+
+/** A mask from a black-and-white picture (white = never read): a pixel is masked when its red
+ *  channel is above half. */
+export function maskFromPixels(pixels: Pixels): Uint8Array {
+  const out = new Uint8Array(pixels.width * pixels.height);
+  for (let p = 0; p < out.length; p++) out[p] = pixels.data[p * 4] > 127 ? 1 : 0;
+  return out;
+}
+
+/** Read a mask the size of a picture onto a picture of another size, nearest pixel. Both are
+ *  whole-picture maps of the same scene, so pixel (x, y) of one stands for the same place as
+ *  (x · w₂ ÷ w₁, y · h₂ ÷ h₁) of the other. */
+export function resampleMask(mask: ScanMask, width: number, height: number, toWidth: number, toHeight: number): Uint8Array {
+  if (mask.length !== width * height) throw new Error(`The mask has ${mask.length} pixels, not ${width} × ${height}.`);
+  const out = new Uint8Array(toWidth * toHeight);
+  for (let y = 0; y < toHeight; y++) {
+    const sy = Math.min(height - 1, Math.floor(((y + 0.5) * height) / toHeight));
+    for (let x = 0; x < toWidth; x++) {
+      out[y * toWidth + x] = mask[sy * width + Math.min(width - 1, Math.floor(((x + 0.5) * width) / toWidth))] ? 1 : 0;
+    }
+  }
+  return out;
 }
 
 /** Where the radar reads the picture for one of a cell's sample points (i along the arc, j along the radius). */
@@ -178,21 +252,34 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
   const grid = options.grid ?? (shape.kind === 'line' ? LINE_GRID : RADAR_GRID);
   const rule = options.rule ?? CHIME_RULE;
   const measure = options.measure ?? 'colour';
+  const floor = options.floor ?? STRENGTH_FLOOR;
+  const mask = options.mask ?? null;
   const { columns, bands } = grid;
   const cells = columns * bands;
   const light = new Float64Array(cells); // what sets the level: colour strength or brightness
-  const colour = new Float64Array(cells); // colour strength, for the warm share
+  const colour = new Float64Array(cells); // drawn colour strength, for the instrument's shares
   const warmColour = new Float64Array(cells);
+  const blueColour = new Float64Array(cells);
+  const blueClass = options.blueClass ?? false;
   const count = new Uint32Array(cells);
   const { data, width, height } = pixels;
+  if (mask && mask.length !== width * height) {
+    throw new Error(`The mask has ${mask.length} pixels but the picture has ${width} × ${height}.`);
+  }
 
   const read = (cell: number, x: number, y: number) => {
+    if (mask && mask[y * width + x]) return; // never read: no data here
     const i = (y * width + x) * 4;
     const s = colourStrength(data[i], data[i + 1], data[i + 2]);
     count[cell]++;
     light[cell] += measure === 'colour' ? s : brightness(data[i], data[i + 1], data[i + 2]);
+    // The instrument is chosen by what is drawn: only pixels above the floor vote, weighted by
+    // their colour strength. A background with a colour of its own (the rain picture's navy sea)
+    // never chooses the instrument.
+    if (s <= floor) return;
     colour[cell] += s;
     if (isWarm(data[i], data[i + 1], data[i + 2])) warmColour[cell] += s;
+    else if (blueClass && isBlue(data[i], data[i + 1], data[i + 2])) blueColour[cell] += s;
   };
   if (shape.kind === 'line') {
     // Every pixel is counted once, in the cell it falls in. The bottom row is band 0.
@@ -220,43 +307,91 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
 
   const levels = new Float32Array(cells);
   const warmShare = new Float32Array(cells);
+  const blueShare = new Float32Array(cells);
   const means = new Float32Array(cells);
   let sounding = 0;
+  let withData = 0;
   for (let c = 0; c < cells; c++) {
-    if (count[c] === 0) continue;
+    if (count[c] === 0) continue; // no data: no mean, no level, no warm share
+    withData++;
     means[c] = light[c] / count[c];
-    levels[c] = levelOf(light[c] / count[c], grid.fullStrength);
-    // A cell with no colour at all (grey or white light) has no warm share: it rings bells.
+    levels[c] = levelOf(light[c] / count[c], grid.fullStrength, floor);
+    // A cell with nothing drawn above the floor (or only grey or white light) has no warm share:
+    // it rings the cool instrument. It is silent anyway unless measured by brightness.
     warmShare[c] = colour[c] > 0 ? warmColour[c] / colour[c] : 0;
+    blueShare[c] = colour[c] > 0 ? blueColour[c] / colour[c] : 0;
     if (levels[c] > 0) sounding++;
   }
 
-  const found = sounding > 0 ? findChimesDetailed(levels, warmShare, grid, shape.kind === 'radar', rule) : { chimes: [], dropped: [] };
+  const found =
+    sounding > 0
+      ? findChimesDetailed(levels, warmShare, grid, shape.kind === 'radar', rule, count, blueClass ? blueShare : undefined)
+      : { chimes: [], dropped: [] };
   return {
     shape: shape.kind,
     grid,
     measure,
+    floor,
     means,
     reads: count,
     levels,
     warmShare,
+    blueClass,
+    blueShare,
     chimes: found.chimes,
     dropped: found.dropped,
     status: sounding > 0 ? 'ok' : 'missing',
-    reason: sounding > 0 ? null : measure === 'colour' ? 'no coloured lines under the scan' : 'nothing bright under the scan',
+    reason:
+      sounding > 0
+        ? null
+        : withData === 0
+          ? 'nothing under the scan was read (every pixel is masked or outside the picture)'
+          : measure === 'colour'
+            ? 'no coloured lines under the scan'
+            : 'nothing bright under the scan',
   };
 }
 
-/** A cell's level smoothed over three columns (weights 1, 2, 1): the number the chime rule looks at.
- *  Outside the map sweep's ends the level is 0; the radar is a circle, so its ends are neighbours. */
-export function smoothedLevel(levels: Float32Array, grid: ScanGrid, cyclic: boolean, column: number, band: number): number {
+/** Column offset and weight of the three-column smoothing (1, 2, 1). */
+const SMOOTHING: [number, number][] = [[-1, 1], [0, 2], [1, 1]];
+
+/**
+ * A cell's level smoothed over three columns (weights 1, 2, 1): the number the chime rule looks at.
+ * Outside the map sweep's ends the level is 0; the radar is a circle, so its ends are neighbours.
+ * With `reads`: a neighbour that read nothing (no data) is left out and the cells that have data
+ * share the weights; a cell that read nothing has no smoothed level (0 here, and never a peak).
+ * Where every cell has data this is exactly (before + 2 · here + after) ÷ 4.
+ */
+export function smoothedLevel(
+  levels: Float32Array,
+  grid: ScanGrid,
+  cyclic: boolean,
+  column: number,
+  band: number,
+  reads?: ArrayLike<number>,
+): number {
   const { columns, bands } = grid;
-  const at = (c: number): number => {
+  /** The cell's index, or -1 beyond the map sweep's ends. */
+  const index = (c: number): number => {
     if (cyclic) c = ((c % columns) + columns) % columns;
-    else if (c < 0 || c >= columns) return 0;
-    return levels[c * bands + band];
+    else if (c < 0 || c >= columns) return -1;
+    return c * bands + band;
   };
-  return (at(column - 1) + 2 * at(column) + at(column + 1)) / 4;
+  const here = index(column);
+  if (reads && here >= 0 && reads[here] === 0) return 0;
+  let sum = 0;
+  let weight = 0;
+  for (const [step, w] of SMOOTHING) {
+    const i = index(column + step);
+    if (i < 0) {
+      weight += w; // beyond the ends: a level of 0, as always
+      continue;
+    }
+    if (reads && reads[i] === 0) continue; // no data: left out, not counted as 0
+    sum += w * levels[i];
+    weight += w;
+  }
+  return weight > 0 ? sum / weight : 0;
 }
 
 /**
@@ -265,6 +400,8 @@ export function smoothedLevel(levels: Float32Array, grid: ScanGrid, cyclic: bool
  * as high as the one after, with a level of `minLevel` or more. Peaks closer than `minGap` in one
  * band give way to the stronger one, and a column keeps its `perColumn` strongest. The radar is a
  * circle, so its first and last columns are neighbours.
+ * With `reads` (no data): a cell that read nothing is never a peak, and a cell next to one is
+ * compared only with its neighbour that has data.
  */
 export function findChimes(
   levels: Float32Array,
@@ -272,8 +409,10 @@ export function findChimes(
   grid: ScanGrid,
   cyclic: boolean,
   rule: ChimeRule = CHIME_RULE,
+  reads?: ArrayLike<number>,
+  blueShare?: ArrayLike<number>,
 ): Chime[] {
-  return findChimesDetailed(levels, warmShare, grid, cyclic, rule).chimes;
+  return findChimesDetailed(levels, warmShare, grid, cyclic, rule, reads, blueShare).chimes;
 }
 
 /** The same rule as `findChimes`, and also the peaks it left out, each with its reason and winner.
@@ -284,19 +423,34 @@ export function findChimesDetailed(
   grid: ScanGrid,
   cyclic: boolean,
   rule: ChimeRule = CHIME_RULE,
+  reads?: ArrayLike<number>,
+  /** Shares of the blue side, for a picture with a third instrument; omitted, two classes. */
+  blueShare?: ArrayLike<number>,
 ): { chimes: Chime[]; dropped: DroppedPeak[] } {
   const { columns, bands } = grid;
-  const smooth = (column: number, band: number) => smoothedLevel(levels, grid, cyclic, column, band);
+  const smooth = (column: number, band: number) => smoothedLevel(levels, grid, cyclic, column, band, reads);
+  /** A cell inside the sweep that read nothing. Beyond the map sweep's ends is not "no data". */
+  const noData = (column: number, band: number): boolean => {
+    if (!reads) return false;
+    if (cyclic) column = ((column % columns) + columns) % columns;
+    else if (column < 0 || column >= columns) return false;
+    return reads[column * bands + band] === 0;
+  };
 
   const kept: Chime[] = [];
   const dropped: DroppedPeak[] = [];
   for (let band = 0; band < bands; band++) {
     const peaks: Chime[] = [];
     for (let column = 0; column < columns; column++) {
+      if (noData(column, band)) continue;
       const here = smooth(column, band);
       if (here < rule.minLevel) continue;
-      if (here > smooth(column - 1, band) && here >= smooth(column + 1, band)) {
-        peaks.push({ column, band, level: here, warm: warmShare[column * bands + band] >= 0.5 });
+      const aboveBefore = noData(column - 1, band) || here > smooth(column - 1, band);
+      const notBelowAfter = noData(column + 1, band) || here >= smooth(column + 1, band);
+      if (aboveBefore && notBelowAfter) {
+        const cell = column * bands + band;
+        const colour = chimeColour(warmShare[cell], blueShare ? blueShare[cell] : null);
+        peaks.push({ column, band, level: here, warm: colour === 'warm', colour });
       }
     }
     // Strongest first; an earlier column wins a tie, so the result never depends on sort order.
@@ -372,12 +526,19 @@ export function chimeVelocity(level: number): number {
 }
 
 /** Mean level across the bands of one column, 0–1: the loudness of the low root note ("the whole
- *  line"). Zero when nothing on the line has colour, so an empty picture is silent. */
-export function columnMean(score: ScanScore, column: number): number {
+ *  line"). Zero when nothing on the line has colour, so an empty picture is silent. A band with no
+ *  data is left out (it is not a zero); a column with no data at all is silent. */
+export function columnMean(score: Pick<ScanScore, 'grid' | 'levels' | 'reads'>, column: number): number {
   const { bands } = score.grid;
   let sum = 0;
-  for (let band = 0; band < bands; band++) sum += score.levels[column * bands + band];
-  return sum / bands;
+  let counted = 0;
+  for (let band = 0; band < bands; band++) {
+    const cell = column * bands + band;
+    if (score.reads[cell] === 0) continue;
+    sum += score.levels[cell];
+    counted++;
+  }
+  return counted > 0 ? sum / counted : 0;
 }
 
 /** Seconds into the sweep (speed 1) at which a column starts. */
@@ -427,7 +588,7 @@ export function scanPan(shape: ScanShape['kind'], position: number): number {
 }
 
 /** Copy a rectangle out of a picture (a region's bounding square, for the radar). Parts outside the
- *  picture stay black, which the scan treats as nothing to play. */
+ *  picture stay black; `regionScan` also marks them never read, so they are no data. */
 export function cropPixels(pixels: Pixels, x0: number, y0: number, width: number, height: number): Pixels {
   const data = new Uint8ClampedArray(width * height * 4);
   for (let y = 0; y < height; y++) {
@@ -450,16 +611,37 @@ export function cropPixels(pixels: Pixels, x0: number, y0: number, width: number
  * frames). The still may be smaller than the frames, so everything is scaled by
  * picture width ÷ frame width. The app and the measuring tool (web/measure) both call this, so
  * they read the same pixels.
+ *
+ * `mask` (the picture's size) is cut out with it. Parts of the square outside the picture are never
+ * read either: they are no data, not black. `mask` in the result is null when nothing is masked.
  */
 export function regionScan(
   pixels: Pixels,
   frameWidth: number,
   region: { box_px: [number, number, number, number]; radius_px: number },
-): { crop: Pixels; shape: RadarShape } {
+  mask: ScanMask | null = null,
+): { crop: Pixels; shape: RadarShape; mask: Uint8Array | null } {
   const k = pixels.width / frameWidth;
-  const [x, y, w, h] = region.box_px;
-  const crop = cropPixels(pixels, Math.round(x * k), Math.round(y * k), Math.round(w * k), Math.round(h * k));
-  return { crop, shape: { kind: 'radar', cx: crop.width / 2, cy: crop.height / 2, r: region.radius_px * k } };
+  const [bx, by, bw, bh] = region.box_px;
+  const [x0, y0, w, h] = [Math.round(bx * k), Math.round(by * k), Math.round(bw * k), Math.round(bh * k)];
+  const crop = cropPixels(pixels, x0, y0, w, h);
+  const inside = x0 >= 0 && y0 >= 0 && x0 + w <= pixels.width && y0 + h <= pixels.height;
+  let cropMask: Uint8Array | null = null;
+  if (mask || !inside) {
+    if (mask && mask.length !== pixels.width * pixels.height) {
+      throw new Error(`The mask has ${mask.length} pixels but the picture has ${pixels.width} × ${pixels.height}.`);
+    }
+    cropMask = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const sx = x0 + x;
+        const sy = y0 + y;
+        const outside = sx < 0 || sy < 0 || sx >= pixels.width || sy >= pixels.height;
+        cropMask[y * w + x] = outside || (mask && mask[sy * pixels.width + sx]) ? 1 : 0;
+      }
+    }
+  }
+  return { crop, shape: { kind: 'radar', cx: crop.width / 2, cy: crop.height / 2, r: region.radius_px * k }, mask: cropMask };
 }
 
 // ---------- TEST INPUT picture (not NASA data) ----------

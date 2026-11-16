@@ -59,15 +59,24 @@ export function useScanFrame(scan: Scan, drawView: (moment: ScanMoment) => void)
       const c0 = Math.min(grid.columns - 1, Math.floor(at));
       const c1 = cyclic ? (c0 + 1) % grid.columns : Math.min(grid.columns - 1, c0 + 1);
       const mix = reducedMotion ? 0 : at - c0;
+      // The column the line is mostly in: its cells say which bands have no data right now.
+      const here = mix < 0.5 ? c0 : c1;
       let sounding = 0;
-      let mean = 0;
+      let noData = 0;
+      let sum = 0;
       for (let band = 0; band < grid.bands; band++) {
         const level = score.levels[c0 * grid.bands + band] * (1 - mix) + score.levels[c1 * grid.bands + band] * mix;
-        levels[band] = level;
-        mean += level / grid.bands;
-        if (level > 0) sounding++;
-        side.bars.current[band]?.style.setProperty('--level', level.toFixed(3));
+        const empty = score.reads[here * grid.bands + band] === 0;
+        levels[band] = empty ? 0 : level;
+        if (empty) noData++;
+        else sum += level;
+        if (!empty && level > 0) sounding++;
+        const bar = side.bars.current[band];
+        bar?.style.setProperty('--level', empty ? '0' : level.toFixed(3));
+        bar?.classList.toggle('nodata', empty); // hatched: no data, never a zero
       }
+      // The low note: the mean of the bands that read something (no data is not a zero).
+      const mean = noData < grid.bands ? sum / (grid.bands - noData) : 0;
       side.rootBar.current?.style.setProperty('--level', Math.min(1, mean * 2).toFixed(3));
 
       view.current({ position, levels, grid, region, frame, playing });
@@ -83,7 +92,7 @@ export function useScanFrame(scan: Scan, drawView: (moment: ScanMoment) => void)
             : worldMap
               ? `line at about ${longitude(position)}`
               : `line ${Math.round(position * 100)}% of the way across`;
-          side.readout.current.textContent = `${where} · ${sounding} of ${grid.bands} bands sounding · low note ${root}`;
+          side.readout.current.textContent = `${where} · ${sounding} of ${grid.bands} bands sounding${noData ? ` · ${noData} with no data` : ''} · low note ${root}`;
         }
       }
     };

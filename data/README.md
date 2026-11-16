@@ -8,6 +8,7 @@ Put the approved files here. The app uses them automatically, with no code chang
 | `features.json` | Dev A | `analysis/features.py` |
 | `rhythm_reference.json` (optional) | Dev A | `analysis/features.py --rhythm-out data/rhythm_reference.json`. The app's tests then check that every note the app plays equals the engine's |
 | `preview.jpg` (or `.png`, `.webp`) | Student A | One full frame. It needs the **same aspect ratio** as the frames in `scene.json`, so the region boxes line up. Any resolution; keep it under about 1 MB |
+| `imerg/scan_mask.png` | Dev A | `analysis/scan_mask.py`. The rain picture's land, which the picture scan never reads (it is a photo, not data): white = never read, at the frames' size. The rain picture's scan rule needs it; without it the scan does not play that picture |
 
 - `scene.json` uses schema **0.2**: every region is a circle with `center_px`, `radius_px` and its
   bounding square `box_px` = `[cx − r, cy − r, 2r, 2r]`. Both regions use the same radius. `npm test` checks all three.

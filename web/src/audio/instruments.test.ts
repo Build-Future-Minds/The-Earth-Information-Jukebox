@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('tone', () => ({}));
 
-import { GLOCKENSPIEL, KALIMBA, MARIMBA, MUSIC_BOX } from './instruments';
+import { GLOCKENSPIEL, HARP, HARP_PLUCK, KALIMBA, MARIMBA, MUSIC_BOX, pluckedString } from './instruments';
 
 /** The root of cos x · cosh x = target between lo and hi, by halving the interval. */
 function root(target: number, lo: number, hi: number): number {
@@ -42,5 +42,41 @@ describe('the bars ring at the ratios their equations give', () => {
 
   it('the marimba is tuned by its maker, not by an equation: 1 : 4 : 9.2', () => {
     expect(MARIMBA.partials.map((p) => p.ratio)).toEqual([1, 4, 9.2]);
+  });
+});
+
+describe('the harp: a string plucked at a fraction p of its length', () => {
+  const p = HARP_PLUCK;
+  /** The pluck's shape: a triangle from 0 up to height 1 at x = p, and back down to 0 at x = 1. */
+  const triangle = (x: number) => (x <= p ? x / p : (1 - x) / (1 - p));
+  /** Its Fourier sine coefficients: bₙ = 2·sin(nπp) ÷ (n²π²·p(1 − p)), for height 1. */
+  const b = (n: number) => (2 * Math.sin(n * Math.PI * p)) / (n * n * Math.PI * Math.PI * p * (1 - p));
+
+  it('the coefficients add back up to the triangle the finger makes', () => {
+    for (const x of [0.05, 0.2, 0.3, 0.5, 0.77, 0.95]) {
+      let y = 0;
+      // The tail after N terms is at most 2 ÷ (π²·p(1 − p)·N): under 0.0001 for N = 20 000.
+      for (let n = 1; n <= 20000; n++) y += b(n) * Math.sin(n * Math.PI * x);
+      expect(y).toBeCloseTo(triangle(x), 3);
+    }
+  });
+
+  it('the force on the bridge multiplies tone n by n, so each tone is |sin(nπp)| ÷ n, relative to the first', () => {
+    // The bridge feels T · ∂y/∂x at x = 0; ∂/∂x of bₙ·sin(nπx) at 0 is nπ·bₙ.
+    const bridge = (n: number) => Math.abs(n * Math.PI * b(n));
+    HARP.partials.forEach((partial, k) => {
+      expect(partial.ratio).toBe(k + 1); // harmonic: 1, 2, 3, ...
+      expect(partial.gain).toBeCloseTo(bridge(k + 1) / bridge(1), 12);
+    });
+    expect(pluckedString(p, 8)).toEqual(HARP.partials);
+  });
+
+  it('plucked at 0.3, none of the eight tones is missing; plucked in the middle, every even tone would be', () => {
+    expect(HARP.partials.every((t) => t.gain > 0.01)).toBe(true);
+    pluckedString(0.5, 8).forEach((t) => (t.ratio % 2 === 0 ? expect(t.gain).toBeLessThan(1e-12) : expect(t.gain).toBeGreaterThan(0.1)));
+  });
+
+  it('higher tones fade sooner: tone n rings 1 ÷ n as long as the first', () => {
+    HARP.partials.forEach((t) => expect(t.ring).toBeCloseTo(1 / t.ratio, 12));
   });
 });

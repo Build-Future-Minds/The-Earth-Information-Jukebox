@@ -11,6 +11,8 @@
 // the scan is on. The chime marks, the needle's ends and the compass letters are an SVG layer over
 // the canvas, placed with the same sums the shader uses (geo.ts, projectToScreen).
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type KeyboardEvent } from 'react';
+import type { ChimeColour } from '../audio/scanScore';
+import { starPath } from '../scan/ScanLegend';
 import {
   ZOOM_MAX,
   ZOOM_MIN,
@@ -28,12 +30,13 @@ import { GlobeRenderer } from './globeRenderer';
 
 export { ZOOM_MAX, ZOOM_MIN } from './geo';
 
-/** A mark left by a chime, in frame pixels. */
+/** A mark left by a chime, in frame pixels: round for warm, a diamond for cool, an asterisk for a
+ *  picture's third instrument (as on the flat picture). */
 export interface GlobeMark {
   id: number;
   x: number;
   y: number;
-  warm: boolean;
+  colour: ChimeColour;
 }
 
 /** The picture scan, while it is playing or paused: drawn in place of the spotlight. */
@@ -426,10 +429,15 @@ export const GlobeView = forwardRef<GlobeHandle, Props>(function GlobeView(
           )}
           <g className="traces">
             {scan.marks.map((m) => (
-              <g key={m.id} className={m.warm ? 'trace warm' : 'trace cool'} data-x={m.x} data-y={m.y}>
+              <g key={m.id} className={`trace ${m.colour}`} data-x={m.x} data-y={m.y}>
                 <circle className="ripple" r={24} />
-                {m.warm ? (
+                {m.colour === 'warm' ? (
                   <circle className="chime-dot" r={5} />
+                ) : m.colour === 'blue' ? (
+                  <>
+                    <path className="chime-star-outline" d={starPath(6.5)} />
+                    <path className="chime-star" d={starPath(6.5)} />
+                  </>
                 ) : (
                   <g transform="rotate(45)">
                     <rect className="chime-dot" x={-4.75} y={-4.75} width={9.5} height={9.5} />

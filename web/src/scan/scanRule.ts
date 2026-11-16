@@ -1,24 +1,17 @@
 // Which scan rule a picture has: the one place every view asks.
 //
-// The rule's settings were measured and checked on the ocean picture only. By colour, the aerosol
-// and rain pictures' empty sea and land would sound (docs/mapping_spec.md, "Other pictures"), so
-// they have no rule until each picture's own settings are measured (docs/page_plan.md, P1a). When
-// those settings are kept in data/sources.ts, this function returns them instead, and every view
-// of the scan (the flat picture and the globe) follows.
-import type { ScanMeasure } from '../audio/scanScore';
-import type { Picture } from '../data/sources';
+// Each picture's rule is kept with the picture (data/sources.ts, `scan`): its floor, its full
+// levels, the pixels it never reads, whether it is a world map, and what each instrument means in
+// its legend. Every one was measured on that picture's own still (docs/measurements/scan_pictures.md),
+// because by colour the aerosol and rain pictures' empty sea and land would otherwise sound. A
+// picture with no rule is not scanned by any view: the flat picture and the globe both ask here.
+import type { Picture, ScanRule } from '../data/sources';
 
-export interface PictureScanRule {
-  /** What counts as light in this picture: colour strength or brightness. */
-  measure: ScanMeasure;
+/** The scan rule of a picture, or null if the scan has not been measured on it (it is not played). */
+export function scanRuleOf(picture: Pick<Picture, 'scan'>): ScanRule | null {
+  return picture.scan;
 }
 
-/** The scan rule of a picture, or null if the scan has not been checked on it yet. Practice mode
- *  scans the TEST INPUT picture, which is drawn for the colour rule. */
-export function scanRuleOf(picture: Pick<Picture, 'key'>): PictureScanRule | null {
-  return picture.key === 'ocean' || picture.key === 'practice' ? { measure: 'colour' } : null;
-}
-
-/** Why a picture cannot be scanned yet, for the screen. */
+/** Why a picture cannot be scanned, for the screen. */
 export const NO_SCAN_RULE =
-  'The picture scan has no rule for this picture yet: by colour, its empty sea and its land would sound. Its own settings are still to be measured. Choose Ocean to scan the picture on the globe.';
+  'The picture scan has no measured rule for this picture, so it is not played here: by colour, its empty sea and its land would sound. Choose another picture to scan it on the globe.';

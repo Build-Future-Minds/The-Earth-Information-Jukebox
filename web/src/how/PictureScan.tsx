@@ -2,7 +2,8 @@
 // what it crosses. Sources: docs/mapping_spec.md "Play along: the picture scan",
 // web/src/audio/scanScore.ts, scanChoices.ts and instruments.ts, docs/measurements/.
 import { GLOCKENSPIEL, MARIMBA, MUSIC_BOX } from '../audio/instruments';
-import { SCAN_CHOICES } from '../audio/scanChoices';
+import { scanChoicesFor } from '../audio/scanChoices';
+import { OCEAN_SCAN as OCEAN_RULE } from '../data/sources';
 import {
   BAND_NOTE_NAMES,
   CHIME_RULE,
@@ -19,7 +20,7 @@ import {
   noteName,
 } from '../audio/scanScore';
 import { ChartFigure, LegendItem, Plot } from './charts';
-import { BAR_LABELS_OFF_C, BAR_SWITCH_C, barRoots, OCEAN_SCAN, SCAN, SOUND } from './data';
+import { BAR_LABELS_OFF_C, BAR_SWITCH, BAR_SWITCH_C, barRoots, EXACT_QUIET, OCEAN_SCAN, OCEAN_SWEEPS, SCAN, SOUND } from './data';
 import { Entry, Field, fmt, Formula, M, N, RepoLink, Stage, Table, Tag, TestName } from './parts';
 
 const R = String.raw;
@@ -28,10 +29,10 @@ const FLOOR_LEVELS = Math.round(STRENGTH_FLOOR * 255);
 const PER_SECOND = LINE_GRID.columns / LINE_GRID.seconds;
 const V0 = chimeVelocity(0), V1 = chimeVelocity(1);
 
-const SWEEPS = SOUND.sweeps;
+const SWEEPS = OCEAN_SWEEPS;
 
 export function PictureScan() {
-  const quiet = SCAN.lossless.quietCells.find((q) => q.least === 0.9);
+  const quiet = EXACT_QUIET;
   const levelSteps = SOUND.steps.steps;
   const lineSweep = SWEEPS.find((s) => s.name.startsWith('Whole picture'));
   return (
@@ -72,7 +73,7 @@ export function PictureScan() {
           <Field label="Formula">
             <Formula
               tex={R`s=\frac{\max(R,G,B)-\min(R,G,B)}{255},\qquad \ell=\operatorname{clamp}\!\Big(\frac{\bar s-f}{F-f},\,0,\,1\Big),\qquad f=\frac{${FLOOR_LEVELS}}{255}`}
-              words={<>colour strength is the gap between a pixel’s largest and smallest channel. A cell’s mean strength becomes a level: 0 at the floor, 1 at the full level F ({LINE_GRID.fullStrength} for the map sweep, {RADAR_GRID.fullStrength} for the radar).</>}
+              words={<>colour strength is the gap between a pixel’s largest and smallest channel. A cell’s mean strength becomes a level: 0 at the floor, 1 at the full level F. For the ocean picture F is {LINE_GRID.fullStrength} for the map sweep and {RADAR_GRID.fullStrength} for the radar; each picture has its own floor and full levels.</>}
             />
           </Field>
           <Field label="Why it holds">
@@ -82,11 +83,13 @@ export function PictureScan() {
           </Field>
           <Field label="How we use it">
             The level sets the loudness of the band’s held note and how hard a chime is struck (stage 2.4). Each picture needs its own
-            full level; only the ocean picture has been measured, so the scan plays the ocean picture only.
+            floor and full levels: the aerosol and rain pictures were measured on their own stills, by the same procedure, and play with
+            their own settings (<RepoLink path="docs/measurements/scan_pictures.md">scan_pictures.md</RepoLink>, one section per
+            picture). The numbers on this page are the ocean picture’s.
           </Field>
           <Field label="Check">
-            <p><Tag t="Verified" /> for the ocean picture: of the <N>{quiet?.cells ?? '–'}</N> cells that are {fmt(100 * (quiet?.least ?? NaN), 0)}% or more grey land or black sea,{' '}
-              <N>{quiet?.sounding ?? '–'}</N> sound; the largest mean strength among them is <N>{fmt((quiet?.largestStrength ?? NaN) * 255, 2)}</N> of 255,
+            <p><Tag t="Verified" /> for the ocean picture: of the <N>{quiet.cells}</N> cells that are {fmt(100 * quiet.least, 0)}% or more grey land or black sea,{' '}
+              <N>{quiet.sounding}</N> sound; the largest mean strength among them is <N>{fmt(quiet.largestStrength * 255, 2)}</N> of 255,
               under the floor of {FLOOR_LEVELS} (<RepoLink path="docs/measurements/scan_pictures.md">scan_pictures.md</RepoLink>).
               <Tag t="Verified" /> in a recording of the running app, each doubling of the level adds close to 6 dB:</p>
             <Table
@@ -158,7 +161,7 @@ export function PictureScan() {
           <Field label="Check">
             <Tag t="Verified" /> in a recording of the map sweep: the left speaker is <N>{fmt(lineSweep?.firstSixth.leftMinusRightDb ?? NaN, 1)}</N> dB louder in the
             first sixth and <N>{fmt(-(lineSweep?.lastSixth.leftMinusRightDb ?? NaN), 1)}</N> dB quieter in the last. The warm/cool switch falls at{' '}
-            <N>{fmt(100 * SCAN.bar.switches[0], 1)}%</N> of NASA’s colour bar, at <N>{fmt(BAR_SWITCH_C, 1)}</N> °C: <Tag t="Verified" />, since
+            <N>{fmt(100 * BAR_SWITCH, 1)}%</N> of NASA’s colour bar, at <N>{fmt(BAR_SWITCH_C, 1)}</N> °C: <Tag t="Verified" />, since
             the bar’s four printed labels lie on one straight line within <N>{fmt(BAR_LABELS_OFF_C, 2)}</N> °C. A rule about pixels, not degrees: we
             measured the bar and the picture’s colours, not the sea.
           </Field>
@@ -335,9 +338,10 @@ function BarTonesChart() {
   );
 }
 
-/** scanChoices.ts, the scan's fixed choices: rules (they change what a listener can learn) apart from decoration (no data). */
+/** scanChoices.ts, the scan's fixed choices for the ocean picture: rules (they change what a listener can learn) apart from decoration (no data). */
+const OCEAN_CHOICES = scanChoicesFor({ label: 'Ocean', scan: OCEAN_RULE });
 function FixedChoices() {
-  const group = (kind: 'rule' | 'decoration') => SCAN_CHOICES.filter((c) => c.kind === kind);
+  const group = (kind: 'rule' | 'decoration') => OCEAN_CHOICES.filter((c) => c.kind === kind);
   return (
     <div className="how-choices">
       <h5>Fixed by us</h5>

@@ -134,12 +134,37 @@ export const MUSIC_BOX: BarModel = {
   ringSeconds: (hz) => clamp(2.2 * Math.sqrt(1047 / hz), 0.9, 2.8),
 };
 
+/**
+ * A plucked string, the harp: harmonic tones 1 : 2 : 3 : …, unlike the struck bars above.
+ * An ideal string plucked at a fraction p of its length starts as a triangle, whose Fourier
+ * coefficients are bₙ = 2h·sin(nπp) ÷ (n²π²·p(1 − p)). The sound comes from the force on the bridge,
+ * T·∂y/∂x at the end of the string, which multiplies each by n: tone n is as loud as sin(nπp) ÷ n,
+ * relative to tone 1. `instruments.test.ts` sums the series back into the triangle.
+ * Design choices: p = 0.3 (a little off the middle, so no tone below the tenth is missing), eight
+ * tones, and higher tones fading faster (tone n rings 1 ÷ n as long). Snow, in the rain picture.
+ */
+export const HARP_PLUCK = 0.3;
+export function pluckedString(p: number, tones: number): BarPartial[] {
+  const first = Math.abs(Math.sin(Math.PI * p));
+  return Array.from({ length: tones }, (_, k) => {
+    const n = k + 1;
+    return { ratio: n, gain: Math.abs(Math.sin(n * Math.PI * p)) / (n * first), ring: 1 / n };
+  });
+}
+export const HARP: BarModel = {
+  partials: pluckedString(HARP_PLUCK, 8),
+  ringSeconds: (hz) => clamp(1.8 * Math.sqrt(523 / hz), 0.6, 2.4),
+  knock: 0.05,
+};
+
 /** The first version's marimba and bells (no knock, no shimmer, three tones), kept for comparison. */
 export const FIRST_MARIMBA: BarModel = { partials: MARIMBA.partials, ringSeconds: MARIMBA.ringSeconds };
 export const FIRST_BELLS: BarModel = {
   partials: GLOCKENSPIEL.partials.slice(0, 3),
   ringSeconds: (hz) => clamp(2.4 * Math.sqrt(1047 / hz), 1.0, 3.2),
 };
+/** The harp in the plain set: the same tones, no pluck noise. */
+export const FIRST_HARP: BarModel = { partials: HARP.partials, ringSeconds: HARP.ringSeconds };
 
 /** The ear stops hearing partials above this as pitch; leaving them out also avoids aliasing. */
 const HIGHEST_PARTIAL_HZ = 12000;
@@ -463,9 +488,11 @@ export type ScanSoundId = 'ocean' | 'musicbox' | 'first';
 export interface ScanSoundDef {
   id: ScanSoundId;
   label: string;
-  /** Names for the legend: what the round and the diamond marks are played on, and the held notes. */
+  /** Names for the legend: what the round, the diamond and the asterisk marks are played on, and
+   *  the held notes. The asterisk (blue) is only used by a picture with a third class. */
   warmName: string;
   coolName: string;
+  blueName: string;
   heldName: string;
   choir: ChoirDef;
   bass: 'rich' | 'plain';
@@ -474,9 +501,14 @@ export interface ScanSoundDef {
   /** Red and orange spots, and how loud the instrument is. */
   warm: BarModel;
   warmLevel: number;
-  /** Yellow-green, green and blue spots. */
+  /** Yellow-green, green and blue spots (blue ones only when the picture has no third class). */
   cool: BarModel;
   coolLevel: number;
+  /** Blue-side spots, for a picture whose legend gives them their own meaning (rain: snow). Its
+   *  level is set so one struck note is about as loud as the cool instrument's (measured in
+   *  docs/measurements/scan_sound.md, "One struck note on each instrument, alone"). */
+  blue: BarModel;
+  blueLevel: number;
   room: { wet: number; decay: number };
 }
 
@@ -487,6 +519,7 @@ export const SCAN_SOUNDS: ScanSoundDef[] = [
     label: 'Ocean choir',
     warmName: 'marimba',
     coolName: 'bells',
+    blueName: 'harp',
     heldName: 'choir',
     choir: { wave: 'sawtooth', copies: 3, spread: 14, lowpass: [1100, 2400], vowels: true, vibratoCents: 4, gain: 0.28 },
     bass: 'rich',
@@ -495,6 +528,8 @@ export const SCAN_SOUNDS: ScanSoundDef[] = [
     warmLevel: 0.5,
     cool: GLOCKENSPIEL,
     coolLevel: 0.3,
+    blue: HARP,
+    blueLevel: 0.32,
     room: { wet: 0.36, decay: 5 },
   },
   {
@@ -502,6 +537,7 @@ export const SCAN_SOUNDS: ScanSoundDef[] = [
     label: 'Music box',
     warmName: 'kalimba',
     coolName: 'music box',
+    blueName: 'harp',
     heldName: 'soft organ',
     choir: { wave: 'triangle', copies: 2, spread: 8, lowpass: [1800, 3200], vowels: false, vibratoCents: 3, gain: 0.4 },
     bass: 'rich',
@@ -510,6 +546,8 @@ export const SCAN_SOUNDS: ScanSoundDef[] = [
     warmLevel: 0.42,
     cool: MUSIC_BOX,
     coolLevel: 0.26,
+    blue: HARP,
+    blueLevel: 0.25,
     room: { wet: 0.32, decay: 3.5 },
   },
   {
@@ -517,6 +555,7 @@ export const SCAN_SOUNDS: ScanSoundDef[] = [
     label: 'Plain (first instruments)',
     warmName: 'marimba',
     coolName: 'bells',
+    blueName: 'harp',
     heldName: 'choir',
     choir: { wave: 'sawtooth', copies: 3, spread: 14, lowpass: [1500, 1500], vowels: true, vibratoCents: 0, gain: 0.28 },
     bass: 'plain',
@@ -525,6 +564,8 @@ export const SCAN_SOUNDS: ScanSoundDef[] = [
     warmLevel: 0.5,
     cool: FIRST_BELLS,
     coolLevel: 0.3,
+    blue: FIRST_HARP,
+    blueLevel: 0.31,
     room: { wet: 0.34, decay: 4.5 },
   },
 ];

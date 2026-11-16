@@ -247,7 +247,9 @@ rule and the drawing are in `mapping_spec.md`, "On the globe". Decided by Develo
   so it is not taken for the fold-out's "Follow the line while the scan plays" (from #64), which
   moves the explanation, not the globe.
 - **Built for the ocean picture and the TEST INPUT picture first;** the aerosol and rain pictures
-  join when their own settings are measured (P1a), through one function, `scanRuleOf`.
+  joined when their own settings were measured (P1a, below), through one function, `scanRuleOf`,
+  which now returns the picture's own rule from `data/sources.ts`. The globe does not hatch the
+  pixels a picture never reads; its legend says so.
 
 **Where it leaves `DESIGN.md`, for Student B and Developer B to accept:** the globe turns by itself
 while it follows the line (12° a second at normal speed), which is motion, not a 90 ms step. With
@@ -284,6 +286,38 @@ the held notes' start times change it (`scan_repeat.md`, `scan_timing.md`). The 
 reverb echo from our own seeded noise, then one shared start time for the held notes, on a branch
 of its own, measured and listened to before it merges. **Not decided:** the rules the aerosol and
 rain pictures need before the scan may play them.
+
+**Each picture's own scan rule (15 Nov, Developer A).** Decided after measuring each picture
+(`docs/measurements/scan_pictures.md`); rule and limits in `mapping_spec.md`, "Each picture's own
+rule". Code: `web/src/data/sources.ts` (`scan`), `analysis/scan_mask.py`.
+
+- **One procedure for the settings** (Design choice). Floor: the colour strength of the picture's
+  commonest colour among the pixels read, plus 12 grey levels. Full level: the largest cell mean on
+  that scan, rounded up to 0.05. It gives the ocean exactly its floor and map-sweep full level; the
+  ocean keeps 0.75 for the radar, where the procedure would give 0.85. Aerosols: 20/255, 0.45 and
+  0.8. Rain: 30/255, 0.85 and 0.95. A unit test fails if a setting in `sources.ts` differs from the
+  one the report was measured with.
+- **Aerosols** (Design choice, its limits accepted): no mask, because aerosol over land is data.
+  Sea salt is drawn pale grey-teal on NASA's own bar, so it is quiet: its circle strikes no note.
+  Dust (lilac) rings the same instrument as sea salt and sulfate; only black carbon (smoke) strikes
+  the other. The app says both.
+- **Rain** (Design choice): the land, a satellite photo, is never read (the mask is the land
+  `prepare_scene.py` uses for this source), and the floor sits above the navy sea. Neither alone
+  works: the mask alone leaves the sea sounding, and a floor alone leaves coloured deserts sounding
+  like heavy rain. Cost, stated in the app: no rain is heard over land, and faint rain at sea can be
+  too faint to sound.
+- **No data** (Design choice): a cell that reads nothing is silent, never struck, left out of the
+  smoothing and the low note, and drawn hatched. It is never a zero.
+- **Snow has its own instrument** (Design choice): in the rain picture, colours whose largest
+  channel is blue (every step of NASA's snow bar, no step of its rain bar: measured) strike a third
+  instrument, a plucked string (harp). Its tones are derived from a string plucked at 0.3 of its
+  length and checked by a unit test. A vibraphone was considered first; its tuning and tremolo rate
+  could not be confirmed from a source we could read, so it was not used. The harp's level in each
+  scan sound is set so one struck note is as loud as that sound's cool instrument (recorded).
+- **The instrument is chosen by what is drawn**: only pixels above the floor vote. Measured: no
+  ocean note changes instrument; without it, the rain picture's navy would turn light rain into snow.
+- **The scan follows the picture chosen on Listen** (page plan P1b), and the picture choice also
+  shows on Play along. A picture without a measured rule is never scanned.
 
 ## D10. The Earth voice plays as music: a piano note over a fixed band
 

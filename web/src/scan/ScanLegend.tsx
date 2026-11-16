@@ -3,7 +3,40 @@
 // in words: what comes from the picture, and what is fixed by us.
 import type { ScanSoundDef } from '../audio/instruments';
 
-export function ScanLegend({ sound, order, radar }: { sound: ScanSoundDef; order: string; radar: boolean }) {
+/** An asterisk of three crossing strokes, radius r, centred on (cx, cy): the third instrument's mark. */
+export function starPath(r: number, cx = 0, cy = 0): string {
+  return [90, 30, 150]
+    .map((deg) => {
+      const a = (deg * Math.PI) / 180;
+      const dx = r * Math.cos(a);
+      const dy = r * Math.sin(a);
+      return `M${(cx - dx).toFixed(2)} ${(cy - dy).toFixed(2)}L${(cx + dx).toFixed(2)} ${(cy + dy).toFixed(2)}`;
+    })
+    .join('');
+}
+
+export function ScanLegend({
+  sound,
+  order,
+  radar,
+  instruments = null,
+  third = false,
+  hatched = false,
+  hatchDrawn = true,
+}: {
+  sound: ScanSoundDef;
+  order: string;
+  radar: boolean;
+  /** What each instrument means in this picture's legend (data/sources.ts, `scan.instruments`). */
+  instruments?: { warm: string; cool: string; blue?: string } | null;
+  /** The picture has a third instrument, for colours on the blue side. */
+  third?: boolean;
+  /** Some of the picture's pixels are never read: they are hatched. */
+  hatched?: boolean;
+  /** This view draws that hatch (Play along). The globe does not: it says so instead of describing a hatch. */
+  hatchDrawn?: boolean;
+}) {
+  const here = (meaning: string | undefined) => (instruments && meaning ? <> In this picture: {meaning}.</> : null);
   return (
     <ul className="scan-legend" aria-label="What the marks and bars mean">
       <li className="legend-group"><strong>From the picture</strong></li>
@@ -26,14 +59,42 @@ export function ScanLegend({ sound, order, radar }: { sound: ScanSoundDef; order
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <circle cx="15" cy="11" r="5" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.</span>
+        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.{here(instruments?.warm)}</span>
       </li>
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <rect x="10.5" y="6.5" width="9" height="9" transform="rotate(45 15 11)" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly yellow-green, green or blue.</span>
+        <span>
+          <strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly {third ? 'yellow-green or green' : 'yellow-green, green or blue'}.{here(instruments?.cool)}
+        </span>
       </li>
+      {third && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <path d={starPath(6, 15, 11)} stroke="#000" strokeWidth="4" strokeLinecap="round" />
+            <path d={starPath(6, 15, 11)} stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <span><strong>Asterisk: a {sound.blueName} note.</strong> The line crossed a peak of colour that is mostly blue (cyan to purple).{here(instruments?.blue)}</span>
+        </li>
+      )}
+      {hatched && hatchDrawn && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <path d="M-2 8L8 -2M-2 18L18 -2M4 24L26 2M14 24L32 6M24 24L32 16" stroke="#fff" strokeWidth="2.5" />
+            <path d="M-2 13L13 -2M-2 23L23 -2M9 24L31 2M19 24L32 11" stroke="#000" strokeWidth="2.5" />
+          </svg>
+          <span><strong>Hatched: never read.</strong> No data there: silent, never struck, not a zero.</span>
+        </li>
+      )}
+      {hatched && !hatchDrawn && (
+        <li>
+          <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
+            <rect x="3" y="3" width="24" height="16" fill="none" stroke="#fff" strokeWidth="1.5" strokeDasharray="3 3" />
+          </svg>
+          <span><strong>Never read (not drawn on the globe).</strong> Some of this picture's pixels carry no data: the scan is silent there, never strikes a note, and it is not a zero. Play along hatches them; the globe does not.</span>
+        </li>
+      )}
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <circle cx="15" cy="11" r="8.5" fill="none" stroke="#fff" strokeWidth="1.5" strokeOpacity="0.7" />
