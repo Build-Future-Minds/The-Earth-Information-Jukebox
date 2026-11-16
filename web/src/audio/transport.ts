@@ -9,8 +9,9 @@ import { createEarthSound, DEFAULT_EARTH_SOUND, type EarthProbe, type EarthSound
 export type PlayState = 'stopped' | 'playing' | 'paused';
 
 export interface TransportListener {
-  /** Called at the moment a step starts sounding (or starts being quiet, if missing). */
-  onStep: (step: TrackStep) => void;
+  /** Called at the moment a step starts sounding (or starts being quiet, if missing). `beat` counts
+   *  beats from the start of play, the count the Earth band's chords follow (earthBand.ts, chordAt). */
+  onStep: (step: TrackStep, beat: number) => void;
   onState: (state: PlayState) => void;
 }
 
@@ -217,7 +218,7 @@ export class Transport {
         // (status, explanation) follows the sound that is really playing.
         const gen = this.generation;
         Tone.getDraw().schedule(() => {
-          if (gen === this.generation) this.listener.onStep(item.step);
+          if (gen === this.generation) this.listener.onStep(item.step, beat);
         }, time);
       }
     }, items);
