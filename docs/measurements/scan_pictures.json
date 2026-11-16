@@ -1,0 +1,511 @@
+{
+ "meta": {
+  "date": "2026-11-16 00:31 UTC",
+  "browser": "Chromium 159.0.8154.6",
+  "commit": "cdca469",
+  "dirty": "yes"
+ },
+ "barRangeC": [
+  0,
+  32
+ ],
+ "floor": 0.047058823529411764,
+ "lineGrid": {
+  "columns": 240,
+  "bands": 12,
+  "seconds": 30,
+  "fullStrength": 0.5
+ },
+ "chimeRule": {
+  "minLevel": 0.3,
+  "minGap": 6,
+  "perColumn": 1
+ },
+ "pictures": [
+  {
+   "key": "ocean",
+   "title": "Global Sea Surface Currents and Temperature",
+   "svs": 3912,
+   "still": {
+    "width": 2048,
+    "height": 1024
+   },
+   "frames": {
+    "width": 2048,
+    "height": 1024
+   },
+   "selfCheck": 0,
+   "line": {
+    "colour": {
+     "cells": 2880,
+     "sounding": 1727,
+     "atFull": 0,
+     "largestCellMean": 0.46302768447819875,
+     "peaks": 112,
+     "afterSpacing": 75,
+     "chimes": 68,
+     "warm": 53,
+     "cool": 15
+    },
+    "brightness": {
+     "cells": 2880,
+     "sounding": 2788,
+     "atFull": 2,
+     "largestCellMean": 0.5074740620220408,
+     "peaks": 271,
+     "afterSpacing": 174,
+     "chimes": 126,
+     "warm": 63,
+     "cool": 63
+    }
+   },
+   "regions": [
+    {
+     "id": "kuroshio_eddies",
+     "name": "Kuroshio eddies east of Japan",
+     "lon": 149.0625,
+     "lat": 28.828125,
+     "radiusDegrees": {
+      "eastWest": 10.72265625,
+      "northSouth": 10.72265625
+     },
+     "groundRatio": 0.8760700941954066,
+     "radar": {
+      "cells": 1440,
+      "sounding": 1416,
+      "atFull": 0,
+      "largestCellMean": 0.7428921468117657,
+      "peaks": 102,
+      "afterSpacing": 83,
+      "chimes": 56,
+      "warm": 11,
+      "cool": 45
+     }
+    },
+    {
+     "id": "equator_pacific",
+     "name": "Equatorial Pacific streaks",
+     "lon": -132.36328125,
+     "lat": 1.40625,
+     "radiusDegrees": {
+      "eastWest": 10.72265625,
+      "northSouth": 10.72265625
+     },
+     "groundRatio": 0.9996988186962042,
+     "radar": {
+      "cells": 1440,
+      "sounding": 1438,
+      "atFull": 3,
+      "largestCellMean": 0.8004901871961705,
+      "peaks": 187,
+      "afterSpacing": 125,
+      "chimes": 72,
+      "warm": 72,
+      "cool": 0
+     }
+    }
+   ],
+   "landSea": null,
+   "landLeftOut": null
+  },
+  {
+   "key": "aerosols",
+   "title": "GEOS Aerosols (2025)",
+   "svs": 5669,
+   "still": {
+    "width": 2048,
+    "height": 1152
+   },
+   "frames": {
+    "width": 3840,
+    "height": 2160
+   },
+   "selfCheck": 0,
+   "line": {
+    "colour": {
+     "cells": 2880,
+     "sounding": 2413,
+     "atFull": 0,
+     "largestCellMean": 0.42893064197371983,
+     "peaks": 53,
+     "afterSpacing": 47,
+     "chimes": 41,
+     "warm": 3,
+     "cool": 38
+    },
+    "brightness": {
+     "cells": 2880,
+     "sounding": 2860,
+     "atFull": 88,
+     "largestCellMean": 0.775181538217208,
+     "peaks": 210,
+     "afterSpacing": 165,
+     "chimes": 122,
+     "warm": 7,
+     "cool": 115
+    }
+   },
+   "regions": [
+    {
+     "id": "aerosol_streaks_vanuatu",
+     "name": "Sulfate and sea-salt streaks near Vanuatu",
+     "lon": 167.8125,
+     "lat": -19.16666666666667,
+     "radiusDegrees": {
+      "eastWest": 10.3125,
+      "northSouth": 9.166666666666666
+     },
+     "groundRatio": 1.0626384794260553,
+     "radar": {
+      "cells": 1440,
+      "sounding": 1439,
+      "atFull": 8,
+      "largestCellMean": 0.7727941323729122,
+      "peaks": 60,
+      "afterSpacing": 59,
+      "chimes": 37,
+      "warm": 0,
+      "cool": 37
+     }
+    },
+    {
+     "id": "aerosol_cells_se_pacific",
+     "name": "Sea-salt cells in the southeast Pacific",
+     "lon": -105,
+     "lat": -16.66666666666667,
+     "radiusDegrees": {
+      "eastWest": 10.3125,
+      "northSouth": 9.166666666666666
+     },
+     "groundRatio": 1.077738201354925,
+     "radar": {
+      "cells": 1440,
+      "sounding": 1437,
+      "atFull": 0,
+      "largestCellMean": 0.14705882072448728,
+      "peaks": 0,
+      "afterSpacing": 0,
+      "chimes": 0,
+      "warm": 0,
+      "cool": 0
+     }
+    }
+   ],
+   "landSea": {
+    "land": {
+     "cells": 518,
+     "sounding": 306,
+     "meanLevel": 0.11017170296280741,
+     "meanStrength": 0.09015400532710618,
+     "largestStrength": 0.42893064633260736
+    },
+    "sea": {
+     "cells": 1487,
+     "sounding": 1389,
+     "meanLevel": 0.1250504329375498,
+     "meanStrength": 0.10277444765796484,
+     "largestStrength": 0.3615400326797391
+    }
+   },
+   "landLeftOut": {
+    "sounding": 2332,
+    "nothingRead": 253,
+    "chimes": 43,
+    "warm": 2
+   }
+  },
+  {
+   "key": "imerg",
+   "title": "Near Real-Time Global Precipitation from the Global Precipitation Measurement Constellation",
+   "svs": 4285,
+   "still": {
+    "width": 2048,
+    "height": 1024
+   },
+   "frames": {
+    "width": 3600,
+    "height": 1800
+   },
+   "selfCheck": 0,
+   "line": {
+    "colour": {
+     "cells": 2880,
+     "sounding": 2559,
+     "atFull": 5,
+     "largestCellMean": 0.6221196967012741,
+     "peaks": 89,
+     "afterSpacing": 73,
+     "chimes": 62,
+     "warm": 15,
+     "cool": 47
+    },
+    "brightness": {
+     "cells": 2880,
+     "sounding": 2880,
+     "atFull": 471,
+     "largestCellMean": 0.9763996594092426,
+     "peaks": 176,
+     "afterSpacing": 138,
+     "chimes": 106,
+     "warm": 28,
+     "cool": 78
+    }
+   },
+   "regions": [
+    {
+     "id": "imerg_band_south_pacific",
+     "name": "Long rain band in the South Pacific",
+     "lon": -137.5,
+     "lat": -17.5,
+     "radiusDegrees": {
+      "eastWest": 10,
+      "northSouth": 10
+     },
+     "groundRatio": 0.953716950748227,
+     "radar": {
+      "cells": 1440,
+      "sounding": 1420,
+      "atFull": 64,
+      "largestCellMean": 0.9046568414744209,
+      "peaks": 64,
+      "afterSpacing": 51,
+      "chimes": 39,
+      "warm": 1,
+      "cool": 38
+     }
+    },
+    {
+     "id": "imerg_showers_equator",
+     "name": "Scattered showers on the equator in the central Pacific",
+     "lon": -150,
+     "lat": 0,
+     "radiusDegrees": {
+      "eastWest": 10,
+      "northSouth": 10
+     },
+     "groundRatio": 1,
+     "radar": {
+      "cells": 1440,
+      "sounding": 1416,
+      "atFull": 16,
+      "largestCellMean": 0.8987744920393999,
+      "peaks": 15,
+      "afterSpacing": 9,
+      "chimes": 8,
+      "warm": 2,
+      "cool": 6
+     }
+    }
+   ],
+   "landSea": {
+    "land": {
+     "cells": 518,
+     "sounding": 315,
+     "meanLevel": 0.1671284297571075,
+     "meanStrength": 0.10776956845969922,
+     "largestStrength": 0.622119697552224
+    },
+    "sea": {
+     "cells": 1489,
+     "sounding": 1489,
+     "meanLevel": 0.14058175818435473,
+     "meanStrength": 0.11081229580611499,
+     "largestStrength": 0.5762482900136797
+    }
+   },
+   "landLeftOut": {
+    "sounding": 2498,
+    "nothingRead": 253,
+    "chimes": 55,
+    "warm": 10
+   }
+  }
+ ],
+ "latitude": {
+  "bands": [
+   {
+    "band": 0,
+    "south": -90,
+    "north": -75,
+    "groundShare": 0.017037086855465844,
+    "meanLevel": 0,
+    "meanChange": 0,
+    "largestChange": 0
+   },
+   {
+    "band": 1,
+    "south": -75,
+    "north": -60,
+    "groundShare": 0.04995021125231486,
+    "meanLevel": 0.02336879318318097,
+    "meanChange": 0.007795493485658275,
+    "largestChange": 0.028827834874391556
+   },
+   {
+    "band": 2,
+    "south": -60,
+    "north": -45,
+    "groundShare": 0.07945931129894557,
+    "meanLevel": 0.21988042139758665,
+    "meanChange": 0.006386691487083832,
+    "largestChange": 0.026703745126724243
+   },
+   {
+    "band": 3,
+    "south": -45,
+    "north": -30,
+    "groundShare": 0.10355339059327376,
+    "meanLevel": 0.21892956116159137,
+    "meanChange": 0.005245109525276348,
+    "largestChange": 0.0201948881149292
+   },
+   {
+    "band": 4,
+    "south": -30,
+    "north": -15,
+    "groundShare": 0.1205904774487396,
+    "meanLevel": 0.23752968437426414,
+    "meanChange": 0.0018587577894019585,
+    "largestChange": 0.014470100402832031
+   },
+   {
+    "band": 5,
+    "south": -15,
+    "north": 0,
+    "groundShare": 0.12940952255126037,
+    "meanLevel": 0.3499867614436274,
+    "meanChange": 0.0013727159200546642,
+    "largestChange": 0.004392683506011963
+   },
+   {
+    "band": 6,
+    "south": 0,
+    "north": 15,
+    "groundShare": 0.12940952255126037,
+    "meanLevel": 0.41906473142638184,
+    "meanChange": 0.0011457553676639993,
+    "largestChange": 0.004472494125366211
+   },
+   {
+    "band": 7,
+    "south": 15,
+    "north": 30,
+    "groundShare": 0.1205904774487396,
+    "meanLevel": 0.19651864845242623,
+    "meanChange": 0.002402588173329908,
+    "largestChange": 0.011657893657684326
+   },
+   {
+    "band": 8,
+    "south": 30,
+    "north": 45,
+    "groundShare": 0.10355339059327376,
+    "meanLevel": 0.11831216570280959,
+    "meanChange": 0.002975439459745151,
+    "largestChange": 0.02386268973350525
+   },
+   {
+    "band": 9,
+    "south": 45,
+    "north": 60,
+    "groundShare": 0.07945931129894557,
+    "meanLevel": 0.03972704994860881,
+    "meanChange": 0.002118835855314198,
+    "largestChange": 0.015962138772010803
+   },
+   {
+    "band": 10,
+    "south": 60,
+    "north": 75,
+    "groundShare": 0.04995021125231486,
+    "meanLevel": 0.009334176737320376,
+    "meanChange": 0.0019368041930041121,
+    "largestChange": 0.032315200194716454
+   },
+   {
+    "band": 11,
+    "south": 75,
+    "north": 90,
+    "groundShare": 0.017037086855465844,
+    "meanLevel": 0.027921641918025368,
+    "meanChange": 0.01028463946155777,
+    "largestChange": 0.1295960694551468
+   }
+  ],
+  "chimes": 68,
+  "chimesWeighted": 70
+ },
+ "bar": {
+  "width": 310,
+  "height": 95,
+  "row": 28,
+  "from": 14,
+  "to": 291,
+  "warmAtColdEnd": false,
+  "warmAtWarmEnd": true,
+  "switches": [
+   0.7436823104693141
+  ],
+  "strength": [
+   0.4666666666666667,
+   0.6431372549019608,
+   0.5333333333333333,
+   0.6745098039215687,
+   0.7647058823529411,
+   0.7254901960784313,
+   0.8352941176470589,
+   0.8666666666666667,
+   0.8627450980392157,
+   0.8666666666666667,
+   0.9019607843137255
+  ]
+ },
+ "lossless": {
+  "pixels": 2097152,
+  "meanDifference": 6.925818920135498,
+  "land": 701569,
+  "landOver": 11084,
+  "sea": 561994,
+  "seaOver": 201539,
+  "quietCells": [
+   {
+    "least": 1,
+    "cells": 235,
+    "sounding": 0,
+    "meanLevel": 0,
+    "meanStrength": 0.00014608329190938434,
+    "largestStrength": 0.0030551755585955256
+   },
+   {
+    "least": 0.98,
+    "cells": 434,
+    "sounding": 0,
+    "meanLevel": 0,
+    "meanStrength": 0.00033861813410182313,
+    "largestStrength": 0.01068044788975021
+   },
+   {
+    "least": 0.9,
+    "cells": 746,
+    "sounding": 0,
+    "meanLevel": 0,
+    "meanStrength": 0.002891126348463839,
+    "largestStrength": 0.03006343713956163
+   }
+  ],
+  "levels": {
+   "meanChange": 0.0431629963650999,
+   "largestChange": 0.1520688533782959
+  },
+  "sounding": {
+   "still": 1727,
+   "lossless": 1816
+  },
+  "chimes": {
+   "still": 68,
+   "lossless": 84,
+   "samePlaceAndInstrument": 49
+  },
+  "largestCellMean": 0.5068685202037586
+ }
+}
