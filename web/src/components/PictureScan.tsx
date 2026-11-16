@@ -31,6 +31,7 @@ import {
   type ScanScore,
 } from '../audio/scanScore';
 import { regionLabel } from './ExploreControls';
+import { ScanExplanation } from './ScanExplanation';
 
 export interface PictureScanHandle {
   /** Silence the scan and rewind it (the page's Stop and Esc). */
@@ -123,6 +124,9 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   const [volumeDb, setVolumeDb] = useState(-8);
   const [soundId, setSoundId] = useState<ScanSoundId>(DEFAULT_SCAN_SOUND);
   const [traces, setTraces] = useState<Trace[]>([]);
+  // The note most recently struck, with the names the sound had when it was struck: switching the
+  // scan sound afterwards must not change what the explanation says about a note already played.
+  const [lastStruck, setLastStruck] = useState<{ chime: Chime; names: { held: string; warm: string; cool: string } } | null>(null);
   const player = useRef<ScanPlayer | null>(null);
   const sweep = useRef<SVGGElement>(null);
   const profile = useRef<SVGPathElement>(null);
@@ -161,6 +165,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   const onChime = useCallback(
     (chime: Chime) => {
       if (lastChime.current) lastChime.current.textContent = `${chime.warm ? sound.warmName : sound.coolName} ${noteName(chimeNote(chime))}`;
+      setLastStruck({ chime, names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } });
       // The bar for this band flashes. Restarting the animation needs the class to go and come back.
       const bar = bars.current[chime.band];
       if (bar) {
@@ -197,6 +202,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   useEffect(() => {
     player.current?.setScore(score);
     setTraces([]);
+    setLastStruck(null);
     if (import.meta.env.DEV) window.__scanScore = score;
   }, [score]);
 
@@ -205,7 +211,10 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   useEffect(() => player.current?.setSound(soundId), [soundId]);
   // A stopped scan shows the clean picture: no marks from the last sweep.
   useEffect(() => {
-    if (state === 'stopped') setTraces([]);
+    if (state === 'stopped') {
+      setTraces([]);
+      setLastStruck(null);
+    }
   }, [state]);
 
   useImperativeHandle(ref, () => ({ stop: () => player.current?.stop() }), []);
@@ -311,6 +320,12 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   const unit = view.h / 100;
   const figureClass = ['scene', 'scan-view', region ? 'radar' : 'line', state, reducedMotion ? 'still' : ''].join(' ').trim();
   const order = region ? 'the centre to the rim' : worldMap ? 'south to north' : 'bottom to top';
+  // For "Why the scan sounds like this": the words for what is sounding, and which column the line is on.
+  const why = useMemo(
+    () => ({ geometry: worldMap ? ('world' as const) : ('plain' as const), names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } }),
+    [worldMap, sound],
+  );
+  const liveColumn = useCallback(() => Math.min(columns - 1, Math.floor((player.current?.position() ?? 0) * columns)), [columns]);
 
   return (
     <div className="scan" role="group" aria-labelledby="scan-heading">
@@ -575,6 +590,8 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
           </li>
         </ul>
       </details>
+
+      {score && <ScanExplanation score={score} ctx={why} playing={state === 'playing'} getColumn={liveColumn} lastStruck={lastStruck} />}
     </div>
   );
 });
@@ -583,6 +600,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
 function Legend({ sound, order, radar }: { sound: ScanSoundDef; order: string; radar: boolean }) {
   return (
     <ul className="scan-legend" aria-label="What the marks and bars mean">
+      <li className="legend-group"><strong>From the picture</strong></li>
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <rect width="15" height="22" fill="#666" />
@@ -640,6 +658,7 @@ function Legend({ sound, order, radar }: { sound: ScanSoundDef; order: string; r
           now. A bar flashes orange when a note is struck in its band.
         </span>
       </li>
+      <li className="legend-group"><strong>Fixed by us, not from the picture</strong></li>
       <li>
         <svg className="glyph light" viewBox="0 0 30 22" aria-hidden="true">
           <rect x="6" y="3" width="18" height="16" className="g-track" />

@@ -180,6 +180,38 @@ change them. The app says so in "How the picture becomes sound".
 Note names, the scale and the chord steps are written with Tonal, a music-theory library (MIT),
 so the code says "C major pentatonic" and "I, VIm, IV, V" and a test checks the note names.
 
+**Explaining a note.** The app can say why any note sounds, the way "Explain this rhythm" does for
+the Earth voice. The fold-out "Why the scan sounds like this" (Play along) has four parts:
+
+- *Last struck note.* The place on the picture, what was measured there, and how that became the
+  held note's loudness and the struck note's pitch, instrument and strength.
+- *Look at a column.* While the scan plays this follows the line, a few times a second. Paused or
+  stopped, a slider and two buttons choose a column; this makes no sound and does not move the scan.
+  A table gives every band in that column: place, pixels read, mean, level, held note, struck note.
+- *Explain band.* One band in full, in words, with the arithmetic: level = (mean − floor) ÷ (full −
+  floor), and the chime rule's numbers. A peak the chime rule left out says which stronger peak took
+  its place and why (too close in the same band, or a stronger peak in the same column).
+- *Fixed by us.* Every fixed choice, with its reason, its evidence and its tag. Choices that change
+  how the picture is read ("rules") are listed apart from choices that carry no data
+  ("decoration"). The list is `web/src/audio/scanChoices.ts`; a test fails if an entry has no reason,
+  no evidence or no tag, and the numbers in an entry are read from the rule so they cannot drift.
+
+The sentences are built from the score and the rule's own constants (`web/src/audio/scanWhy.ts`),
+so they cannot say anything the score does not hold. The score keeps each cell's mean and number
+of pixels read, and every peak the rule left out. The fold-out is not a live region: nothing in it
+is announced while the scan plays. A note already played keeps the instrument it had when it
+sounded, even if the scan sound is changed afterwards. On a whole-world map a place is a longitude
+and latitude range and a band's share of the globe's surface (12.9% at the equator, 1.7% at a
+pole); on any other picture it is a share of the way across and up, and no ground is claimed. The
+legend and the fold-out each keep "From the picture" apart from "Fixed by us" in words, not colour.
+
+**Checked on the real picture, 15 Nov.** Five cells of the ocean picture were explained in the running
+app (a struck marimba note, a struck bells note, a peak left out for spacing, a peak left out for
+the column, a silent cell) and recomputed from `data/preview.jpg` in Python with an independent copy
+of the rule. The cell means, the pixels read and the levels agreed to six decimals, and the winner of
+both left-out peaks was the same. The Python script was a one-off and is not in the repo; the unit
+tests on made-up pictures are what stays.
+
 **Other pictures.** The level can be measured by colour strength (the default) or by brightness
 (the largest of red, green and blue), for pictures whose data is white or grey on a dark ground.
 A scene chooses one; the code never switches by itself. The ocean picture uses colour, because
@@ -263,7 +295,13 @@ grey and grey with JPEG-sized noise are `missing` and silent. The root steps, th
 position, the note spacing and the brightness measure each have their own tests. Three more say
 exactly which notes clash (none of the held notes with each other; F under E).
 `web/src/audio/instruments.test.ts`: 3 tests solve the two bar equations again and compare the
-answers with the ratios the instruments use.
+answers with the ratios the instruments use. `web/src/audio/scanWhy.test.ts`: 27 tests on made-up
+pictures: each dot explains itself with its place, numbers and instrument; a peak left out names
+the stronger one that took its place, for both reasons; places on a world map, another picture and
+the radar; the whole column; and the list of fixed choices. `web/e2e/scan-why.e2e.ts`: 8 browser
+tests that do what a person does: open it by keyboard, walk to a column with the arrow keys and
+read its table, follow the line while it plays, change the scan sound while it plays, use the radar,
+and check nothing in it is announced.
 `web/e2e/scan.e2e.ts`: 12 browser tests. They include a radar turn on a test circle, and a check that
 the line keeps moving when another scan is chosen while one is playing (it once stood still while
 the notes played; found by Developer A and fixed on 15 Nov). The two first chimes sound 5.000 s apart within 5 ms (10 s at half speed), over the roots
