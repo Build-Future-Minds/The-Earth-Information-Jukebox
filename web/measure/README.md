@@ -14,6 +14,11 @@ the stills the app plays. Then it records the app's sound. It writes its reports
 
 - `docs/measurements/scan_pictures.md` and `scan_sound.md`: the tables, for people.
 - `docs/measurements/scan_pictures.json` and `scan_sound.json`: the same numbers, for checking.
+- `docs/measurements/earth_sound.md` and `.json` (from `earth.measure.ts` and `earthTap.ts`): the
+  Earth voice's sounds, rendered offline from the app's own code. Whether the band ever strikes
+  inside a beat, how far the second pulse stands above it, and loudness. It also writes
+  `web/test-results/measure/earth_listen.wav` (not in git) to listen to. Run it alone with
+  `npx playwright test -c measure/playwright.config.ts earth.measure.ts`.
 
 It takes about two and a half minutes, because the sound is recorded in real time. Do not edit
 those files by hand. Change the rule or the pictures, then run the command again.

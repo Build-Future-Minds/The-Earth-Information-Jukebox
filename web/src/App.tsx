@@ -4,6 +4,7 @@ import { buildEarthTrack, type TrackStep } from './audio/earthVoice';
 import { Transport, type PlayState } from './audio/transport';
 import { UserVoice, type InputSource } from './audio/userVoice';
 import { DEFAULT_MELODY_INSTRUMENT, type MelodyInstrumentId } from './audio/instruments';
+import { DEFAULT_EARTH_SOUND, type EarthSoundId } from './audio/earthSound';
 import type { PictureScanHandle } from './components/PictureScan';
 import { BeatTrack } from './components/BeatTrack';
 import { PlayerBar, RegionChoice, regionColour, regionLabel, regionStyle } from './components/ExploreControls';
@@ -38,6 +39,8 @@ export function App() {
   const [explaining, setExplaining] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [volumeDb, setVolumeDb] = useState(-6);
+  // What the Earth voice sounds like on every page (Listen, Compare, Globe, Play along); chosen on Listen.
+  const [earthSound, setEarthSound] = useState<EarthSoundId>(DEFAULT_EARTH_SOUND);
   const [melodyDb, setMelodyDb] = useState(-10);
   const [melodyInstrument, setMelodyInstrument] = useState<MelodyInstrumentId>(DEFAULT_MELODY_INSTRUMENT);
   const [heldNotes, setHeldNotes] = useState<ReadonlySet<number>>(new Set());
@@ -263,6 +266,11 @@ export function App() {
                 onVolume={(db) => {
                   setVolumeDb(db);
                   transport.current?.setVolume(db);
+                }}
+                earthSound={earthSound}
+                onEarthSound={(id) => {
+                  setEarthSound(id);
+                  transport.current?.setSound(id);
                 }}
               >
                 <BeatTrack

@@ -1,8 +1,10 @@
 // Transport: start, pause, stop, replay, speed, volume, and timing of the Earth voice.
 // All audio is synthesised locally with Tone.js (bundled). No sound until start() runs from a user press.
+// This file decides when each Earth note sounds; what it sounds like is earthSound.ts.
 
 import * as Tone from 'tone';
 import type { EarthTrack, TrackStep } from './earthVoice';
+import { createEarthSound, DEFAULT_EARTH_SOUND, type EarthProbe, type EarthSound, type EarthSoundId, type Silence } from './earthSound';
 
 export type PlayState = 'stopped' | 'playing' | 'paused';
 
@@ -34,17 +36,24 @@ export interface NoteLogEntry {
 declare global {
   interface Window {
     __earthNotes?: NoteLogEntry[];
-    __earthSynth?: Tone.MembraneSynth;
+    __earthSynth?: EarthProbe;
   }
 }
 if (import.meta.env.DEV) window.__earthNotes = [];
+
+/** Region switch: the old region's queued pulses end; the band plays on (it is the same for both). */
+const SWITCH: Silence = { band: false, echo: false };
+/** Seek: everything queued for the old position ends; the room's echo may ring on. */
+const SEEK: Silence = { band: true, echo: false };
+/** Stop and Pause: silence, echo included. */
+const STOP: Silence = { band: true, echo: true };
 
 export class Transport {
   private state: PlayState = 'stopped';
   private track: EarthTrack | null = null;
   private part: Tone.Part<{ time: Tone.Unit.Time } & PartItem> | null = null;
-  private synth: Tone.MembraneSynth | null = null;
-  private earthVolume: Tone.Volume | null = null;
+  private sound: EarthSound | null = null;
+  private soundId: EarthSoundId = DEFAULT_EARTH_SOUND;
   private volumeDb = -6;
   private speed = 1;
   /** Shared so a double press of Start creates one synth, not two. */
@@ -67,6 +76,7 @@ export class Transport {
     // Something may have changed while the browser was unlocking audio.
     if (!this.track || this.disposed || this.getState() === 'playing') return;
     if (!this.part) this.part = this.buildPart(this.track);
+    this.sound?.open(); // Stop and Pause close the room; let sound through again
     Tone.getTransport().start('+0.05');
     this.setState('playing');
   }
@@ -75,7 +85,7 @@ export class Transport {
     if (this.state !== 'playing') return;
     // Tone.now() is 0.1 s in the future (its lookahead); immediate() is the real "now".
     Tone.getTransport().pause(Tone.immediate());
-    this.silencePending();
+    this.silencePending(STOP);
     this.setState('paused');
   }
 
@@ -84,7 +94,7 @@ export class Transport {
     const transport = Tone.getTransport();
     transport.stop(Tone.immediate());
     transport.position = 0;
-    this.silencePending();
+    this.silencePending(STOP);
     this.setState('stopped');
   }
 
@@ -99,8 +109,8 @@ export class Transport {
     this.track = track;
     this.part?.dispose();
     this.part = null;
-    if (!this.synth) return; // audio not started yet; start() will build the part
-    this.silencePending(); // drop the old region's pulses already queued for the next ~0.1 s
+    if (!this.sound) return; // audio not started yet; start() will build the part
+    this.silencePending(SWITCH); // drop the old region's pulses already queued for the next ~0.1 s
 
     // Region switch keeps the transport position (decision D1 in docs/DECISIONS.md):
     // the new region continues at the same step, i.e. the same source moment, so the
@@ -108,6 +118,20 @@ export class Transport {
     // Both regions share one beat grid (step_seconds), so the switch lands on the beat.
     // Works for playing and paused alike: the transport keeps its position in both.
     this.part = this.buildPart(track);
+  }
+
+  /** Choose what the Earth voice sounds like (earthSound.ts). The notes and their times do not
+   *  change. While playing, the new sound takes over from the next note. */
+  setSound(id: EarthSoundId): void {
+    if (id === this.soundId) return;
+    this.soundId = id;
+    const old = this.sound;
+    if (!old) return; // audio not started yet: initAudio() will build this one
+    old.silence(STOP);
+    setTimeout(() => old.dispose(), 600); // after its notes have faded
+    this.sound = createEarthSound(id, this.volumeDb);
+    if (this.state === 'playing') this.sound.open();
+    if (import.meta.env.DEV) window.__earthSynth = this.sound.probe;
   }
 
   /** Where playback is inside the current region's loop, in track seconds at speed 1, read from
@@ -125,7 +149,7 @@ export class Transport {
   seek(trackSeconds: number): void {
     if (!this.track || this.state === 'stopped') return;
     const t = Math.min(this.track.length, Math.max(0, trackSeconds));
-    this.silencePending(); // drop pulses already queued for the old position
+    this.silencePending(SEEK); // drop pulses already queued for the old position
     Tone.getTransport().ticks = ticksOf(t);
   }
 
@@ -136,38 +160,28 @@ export class Transport {
 
   setVolume(db: number): void {
     this.volumeDb = db;
-    if (this.earthVolume) this.earthVolume.volume.value = db;
+    this.sound?.setVolume(db);
   }
 
   dispose(): void {
     this.disposed = true;
     this.stop();
     this.part?.dispose();
-    this.synth?.dispose();
-    this.earthVolume?.dispose();
+    this.sound?.dispose();
   }
 
   private async initAudio(): Promise<void> {
     await Tone.start();
-    this.earthVolume = new Tone.Volume(this.volumeDb).toDestination();
-    // Fixed timbre: a short drum-like pulse. Carries no data.
-    this.synth = new Tone.MembraneSynth({
-      pitchDecay: 0.01,
-      octaves: 2,
-      envelope: { attack: 0.001, decay: 0.12, sustain: 0, release: 0.05 },
-    }).connect(this.earthVolume);
+    this.sound = createEarthSound(this.soundId, this.volumeDb);
     Tone.getTransport().bpm.value = BASE_BPM * this.speed;
-    if (import.meta.env.DEV) window.__earthSynth = this.synth;
+    if (import.meta.env.DEV) window.__earthSynth = this.sound.probe;
   }
 
   /** Tone schedules notes about 0.1 s ahead. Cancel those so Stop, Pause and a region switch
    *  are silent at once, and ignore screen updates queued for the cancelled sound. */
-  private silencePending(): void {
+  private silencePending(what: Silence): void {
     this.generation++;
-    if (!this.synth) return;
-    const now = Tone.immediate(); // not Tone.now(): that is 0.1 s ahead and would skip the queued pulses
-    this.synth.envelope.cancel(now);
-    this.synth.triggerRelease(now); // short release ramp from wherever the pulse is: no click
+    this.sound?.silence(what);
   }
 
   private buildPart(track: EarthTrack) {
@@ -190,9 +204,15 @@ export class Transport {
     }
     const part = new Tone.Part((time, item) => {
       if (item.kind === 'note') {
-        this.synth?.triggerAttackRelease(Tone.Frequency(item.pitch, 'midi').toFrequency(), item.dur, time, item.vel);
+        this.sound?.note(time, item.pitch, item.dur, item.vel);
         window.__earthNotes?.push({ audioTime: time, region: item.region, longFraction: item.longFraction, pulse: item.pulse, trackTime: item.trackTime });
       } else {
+        // Every step is one beat. The band (if any) plays on beat starts only, missing or not;
+        // the beat is counted from the start of play, so its chords move on across loops.
+        const transport = Tone.getTransport();
+        const beat = Math.round(transport.getTicksAtTime(time) / ticksOf(item.step.dur));
+        const beatSeconds = (item.step.dur * BASE_BPM) / transport.bpm.value;
+        this.sound?.beat(time, beat, beatSeconds, item.step.step.status !== 'ok');
         // Draw runs the callback when the audio actually reaches `time`, so the screen
         // (status, explanation) follows the sound that is really playing.
         const gen = this.generation;

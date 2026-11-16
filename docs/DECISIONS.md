@@ -269,6 +269,34 @@ are not equal shares of the globe. **Design choice:** none of the three is corre
 stated. **Not decided:** whether the app should read an uncompressed still, and the rules the
 aerosol and rain pictures need before the scan may play them.
 
+## D10. The Earth voice plays as music: a piano note over a fixed band
+
+**Design choice.** Owner: Dev A, 15 Nov. Code: `web/src/audio/earthSound.ts`, `earthBand.ts`.
+Rule and limits: `mapping_spec.md`, "The Earth voice as music". Measured: `docs/measurements/earth_sound.md`.
+
+**What:** the Earth voice used to be a short drum hit on E4, dry. It is now, by default, a soft
+piano note on E4 with a quiet bell on the same note, in a small room, over a band that plays the
+listening game's chords (C, Am7, F, Gsus, home to C, two beats each). "Earth sound" on Listen also
+offers the piano alone and the first version's plain pulse.
+
+**Why:** the picture scan, the melody keys and the listening game all sounded like music, and the
+Earth voice, the part the project is about, sounded like a test tone. D4 says tempo, pitch and
+timbre are fixed and carry no data. A fixed piano and a fixed band keep that promise: they are the
+same for every region, picture and alignment, and only when the second pulse falls carries data.
+
+**How the data stays clear:** the band strikes only on beat starts, where the first pulse already
+is, and sits below the Earth note, which is never doubled. Measured on the rendered sound: no
+note starts inside a beat, the second pulse is at least 13.9 dB above the band at the NASA data's
+1 s beat (7.3 dB at the fastest practice speed), and it still jumps at least 16.5 dB (9.8 dB) out
+of the whole sound. The room's echo is made from random noise, so these move by about 1 dB from
+run to run. While information is missing the band only holds its chord, with no strike.
+While a picture scan plays the band fades out, because the scan's own chords run on another clock.
+Each Earth note is held its fixed `dur` and then damped, so how long it rings does not depend on
+the gap after it.
+
+**Not done:** a tune for the pulses (the pitch changing from beat to beat, never with the data).
+That would change D4 and the pitch column of `rhythm_reference.json`, which Dev B agreed on 14 Nov.
+
 ## Sources
 
 | ID | Citation | Link | Status | Used in |

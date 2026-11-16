@@ -6,6 +6,7 @@ import { ExplainIcon, PauseIcon, PlayIcon, ReplayIcon, SoundIcon, StopIcon } fro
 import { thumbCss } from '../data/selection';
 import type { Region } from '../data/types';
 import type { PlayState } from '../audio/transport';
+import { EARTH_SOUNDS, type EarthSoundId } from '../audio/earthSound';
 
 
 export const SPEEDS = [0.5, 0.75, 1, 1.25];
@@ -52,6 +53,9 @@ interface PlayerProps {
   onExplain: () => void;
   onSpeed: (speed: number) => void;
   onVolume: (db: number) => void;
+  /** What the Earth voice sounds like. Only the sound changes, never the notes or their times. */
+  earthSound: EarthSoundId;
+  onEarthSound: (id: EarthSoundId) => void;
   /** The beat timeline, shown inside the bar like a music player's progress line. */
   children?: ReactNode;
   /** Step number for Play on Listen; decoration, hidden from screen readers. */
@@ -101,6 +105,14 @@ export function PlayerBar(p: PlayerProps) {
             onChange={(e) => p.onVolume(Number(e.target.value))}
             aria-valuetext={volumeText(p.volumeDb)}
           />
+        </label>
+        <label>
+          Earth sound{' '}
+          <select value={p.earthSound} onChange={(e) => p.onEarthSound(e.target.value as EarthSoundId)}>
+            {EARTH_SOUNDS.map((s) => (
+              <option key={s.id} value={s.id}>{s.label}</option>
+            ))}
+          </select>
         </label>
       </div>
     </section>

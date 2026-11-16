@@ -16,6 +16,7 @@ import {
   type ScanSoundId,
 } from './instruments';
 import { bandNote, chimeNote, chimeVelocity, columnMean, rootNoteAt, scanPan, type Chime, type ScanScore } from './scanScore';
+import { setScanPlaying } from './scanActivity';
 
 export type ScanState = 'stopped' | 'playing' | 'paused';
 
@@ -275,6 +276,7 @@ export class ScanPlayer {
   private setState(state: ScanState): void {
     if (state === this.state) return;
     this.state = state;
+    setScanPlaying(this, state === 'playing'); // the Earth band steps aside while a scan plays
     this.listener.onState(state);
   }
 }
