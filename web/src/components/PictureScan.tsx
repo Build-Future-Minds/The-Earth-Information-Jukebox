@@ -22,8 +22,10 @@ import {
   chimeNote,
   TEST_CIRCLE,
   makeTestPicture,
+  maskFromPixels,
   noteName,
   regionScan,
+  resampleMask,
   rootNoteAt,
   type Chime,
   type Pixels,
@@ -114,6 +116,13 @@ export function loadPicture(imageUrl: string | null): Promise<Loaded> {
     img.onerror = () => reject(new Error('The picture did not load.'));
     img.src = imageUrl;
   });
+}
+
+/** Read a picture's mask (white = never read) and fit it to a still of `width` × `height`, nearest
+ *  pixel. Exported for the measuring tool, so the app and the tool mask the same pixels. */
+export async function loadMask(url: string, width: number, height: number): Promise<Uint8Array> {
+  const { pixels } = await loadPicture(url);
+  return resampleMask(maskFromPixels(pixels), pixels.width, pixels.height, width, height);
 }
 
 export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, measure = 'colour' }, ref) {
