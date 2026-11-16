@@ -164,10 +164,12 @@ interface RowProps {
   look?: RegionLook;
   /** Seconds the row spans, the same for every row so they share one clock. */
   length: number;
+  /** The beat sounding now (its start in track seconds), marked on the row; null when stopped. */
+  nowT?: number | null;
 }
 
 /** One region's Earth pulses on the shared clock, made by the same code as the sound. */
-export function RhythmRow({ features, regions, regionId, activeRegionId, look = {}, length }: RowProps) {
+export function RhythmRow({ features, regions, regionId, activeRegionId, look = {}, length, nowT = null }: RowProps) {
   const region = regions.find((r) => r.id === regionId)!;
   const track = buildEarthTrack(features, regionId);
   const W = length * U;
@@ -185,6 +187,10 @@ export function RhythmRow({ features, regions, regionId, activeRegionId, look = 
         aria-label={`${label}, ${region.name}: second pulse on average ${split ?? '–'}% of the way through each beat${missing ? `; ${missing} beats missing` : ''}.`}
       >
         <line className="baseline" x1={0} x2={W} y1={ROW_H - 1} y2={ROW_H - 1} />
+        {/* The beat sounding now: washed in the side's colour on the playing row, in ink on the other. */}
+        {nowT !== null && track.steps.some((s) => s.t === nowT) && (
+          <rect className="now-beat" x={nowT * U} y={0} width={track.steps.find((s) => s.t === nowT)!.dur * U} height={ROW_H} />
+        )}
         {track.steps.map((s) => (
           <g key={s.t}>
             <line className="beat" x1={s.t * U} x2={s.t * U} y1={0} y2={ROW_H} />

@@ -45,6 +45,8 @@ export function App() {
   const [target, setTarget] = useState<ScanTarget>('map');
   const [playState, setPlayState] = useState<PlayState>('stopped');
   const [sounding, setSounding] = useState<TrackStep | null>(null);
+  // Beats since Play: the count the Earth band's chords follow, for Compare's "What you hear now".
+  const [soundingBeat, setSoundingBeat] = useState<number | null>(null);
   const [explaining, setExplaining] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [scanDb, setScanDb] = useState(-8);
@@ -66,7 +68,13 @@ export function App() {
   const track = useMemo(() => buildEarthTrack(features, regionId), [features, regionId]);
 
   useEffect(() => {
-    const t = new Transport({ onStep: setSounding, onState: setPlayState });
+    const t = new Transport({
+      onStep: (step, beat) => {
+        setSounding(step);
+        setSoundingBeat(beat);
+      },
+      onState: setPlayState,
+    });
     const m = new UserVoice(setHeldNotes);
     transport.current = t;
     melody.current = m;
@@ -100,6 +108,7 @@ export function App() {
     melody.current?.hush(); // Stop silences everything: the melody and its echo,
     scan.current?.stop(); // and the picture scan
     setSounding(null);
+    setSoundingBeat(null);
   }, []);
   // The page's speed: the Earth rhythm and the picture scan both follow it. Set on Listen, and in the
   // scan's settings on Play along and Globe, so it can change while the scan plays.
@@ -267,6 +276,14 @@ export function App() {
             onListen={listenTo}
             onStop={stop}
             look={look}
+            sounding={sounding}
+            beat={soundingBeat}
+            speed={speed}
+            earthSound={earthSound}
+            onEarthSound={(id) => {
+              setEarthSound(id);
+              transport.current?.setSound(id);
+            }}
           />
         )}
         {view === 'globe' && (

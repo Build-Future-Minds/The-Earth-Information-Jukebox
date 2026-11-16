@@ -15,12 +15,16 @@ test('each region shows its numeral, word, play toggle and rhythm row; one key; 
     await expect(card.getByRole('button', { name: /^Listen to Region [AB]$/ })).toBeVisible();
   }
   await expect(page.getByText('thin = swirly · heavy = lined up')).toHaveCount(1);
-  await expect(page.getByRole('table')).toBeVisible();
+  await expect(page.locator('.tide-table')).toBeVisible();
+  await expect(page.getByRole('table', { name: 'What you hear now, and why' })).toBeVisible();
 });
 
-test('Compare fits one screen at 1440x900', async ({ page }) => {
+// Was "Compare fits one screen at 1440x900". "What you hear now" (Developer A, 16 Nov) adds the numbers
+// behind each beat under the close-ups, so the page now scrolls; the close-ups and the first row of
+// those numbers still share the first screen.
+test('at 1440x900 the close-ups and the first row of "What you hear now" are on the first screen', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openApp(page, 'compare');
-  const [scroll, inner] = await page.evaluate(() => [document.documentElement.scrollHeight, window.innerHeight]);
-  expect(scroll).toBeLessThanOrEqual(inner + 2);
+  const bottom = await page.locator('.now-table tbody tr').first().evaluate((el) => el.getBoundingClientRect().bottom);
+  expect(bottom).toBeLessThanOrEqual(900);
 });

@@ -750,6 +750,73 @@ figure.scene figcaption { font-size: 0.85rem; }
   .patch-body canvas { width: 120px; height: 120px; }
 }
 
+/* The beat sounding now on each rhythm row (Compare): the side's wash on the playing row, ink on the other. */
+.plot-row .now-beat { fill: var(--ink); opacity: 0.08; }
+.plot-row.current .now-beat { fill: var(--region, var(--ink)); opacity: 0.2; }
+
+/* ---- What you hear now (Compare): A | what the row means | B, mirrored so the eye reads across,
+   then what is fixed. Ruled like the tide table; values hug the middle rule from both sides. ---- */
+.now { border-top: 1px solid var(--rule); padding-top: var(--sm); display: grid; gap: var(--sm); }
+.now-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px var(--md); }
+.now-head h2 { font-size: 1.05rem; margin: 0; }
+.now-moment { margin: 0; color: var(--ink-2); font-size: 0.9rem; }
+.now-moment .mono { font: 400 0.85rem var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+.now-sep { margin: 0 0.5em; }
+
+.now-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.now-table th, .now-table td { padding: 14px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; font-weight: 400; text-align: left; }
+.now-table thead th { border-bottom-color: var(--ink); padding: 0 0 10px; vertical-align: bottom; }
+.now-table .side.first { text-align: right; padding-right: var(--lg); }
+.now-table .side:not(.first) { padding-left: var(--lg); }
+.now-table .mid { width: 32%; text-align: center; padding-left: var(--sm); padding-right: var(--sm); border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); }
+.now-table thead .mid { border-left-color: transparent; border-right-color: transparent; }
+.now-table thead .region-badge { background: var(--region, var(--ink)); color: var(--on-region, var(--paper)); vertical-align: top; margin: 0 8px; }
+.now-region { display: inline-block; font-weight: 600; vertical-align: top; text-align: inherit; }
+.now-region-name { display: block; font-weight: 400; font-size: 0.85rem; color: var(--ink-2); }
+.now-table .group, .now-name { font: 500 0.72rem/1.4 var(--font); text-transform: uppercase; letter-spacing: 0.12em; }
+.now-table .group { color: var(--ink-2); }
+.now-table .group span { display: block; font: 400 0.8rem/1.4 var(--font); text-transform: none; letter-spacing: 0; }
+.now-name { display: block; color: var(--ink); }
+.now-meaning { display: block; font-size: 0.85rem; line-height: 1.4; color: var(--ink-2); margin-top: 3px; text-transform: none; letter-spacing: 0; font-weight: 400; }
+.now-value { display: block; font: 300 2.6rem/1 var(--font); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.now-table td[data-current] .now-value { color: var(--region, var(--ink)); }
+.now-word { display: block; font-size: 0.9rem; color: var(--ink-2); margin-top: 4px; }
+.now-calc { display: block; font: 400 0.95rem/1.45 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+.now-calc span { display: inline-block; white-space: nowrap; }
+.now-missing { display: inline-block; border: 1px solid var(--ink); padding: 2px 8px; font-weight: 650; font-size: 0.9rem; color: var(--ink); }
+.now-table .beat-picture { display: block; width: 150px; height: auto; margin-bottom: 6px; }
+.now-table .side.first .beat-picture { margin-left: auto; }
+.now-table .bp-lo { fill: var(--region, var(--ink)); }
+.now-table .bp-hi { fill: var(--ink-2); }
+.now-table .bp-base, .now-table .bp-edge, .now-table .bp-mid { stroke: var(--ink-2); }
+
+.now-fixed { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px var(--md); }
+.now-fixed h3 { grid-column: 1 / -1; margin: 0; font: 500 0.72rem/1.4 var(--font); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-2); }
+.now-fixed-item { display: grid; gap: 4px; align-content: start; border-top: 1px solid var(--rule); padding-top: 10px; }
+.now-fixed-value { color: var(--ink); }
+.now-fixed-value b { font: 500 1.4rem/1.1 var(--mono); margin-right: 6px; }
+.now-sound { display: grid; gap: 6px; justify-items: start; }
+.now-sound .earth-sound-name { font: 500 0.72rem/1.4 var(--font); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink); }
+
+@media (max-width: 640px) {
+  /* P2 on phones: A and B side by side, each row's name above them. Roles keep it a table for screen readers. */
+  .now-table, .now-table thead, .now-table tbody { display: block; }
+  .now-table tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-bottom: 1px solid var(--rule); }
+  .now-table thead tr { border-bottom-color: var(--ink); }
+  .now-table th, .now-table td, .now-table thead th { border: 0; padding: 8px 0; }
+  .now-table .mid { order: -1; grid-column: 1 / -1; width: auto; text-align: left; padding: 12px 0 2px; border: 0; }
+  .now-table thead .mid { display: none; }
+  /* The full region names are in the close-ups just above; here the letter and badge are enough. */
+  .now-table thead .side { white-space: nowrap; }
+  .now-region-name { display: none; }
+  .now-table .side.first { padding-right: var(--sm); }
+  .now-table .side:not(.first) { padding-left: var(--sm); border-left: 1px solid var(--rule); }
+  .now-value { font-size: 1.9rem; }
+  .now-calc { font-size: 0.8rem; }
+  .now-table .beat-picture { width: 120px; }
+  .now-fixed { grid-template-columns: 1fr; }
+}
+
 /* Now chip: the region badge and one word (Ready / Playing / Paused). Playing gets the live signal dot. */
 .now-chip { display: inline-flex; align-items: center; gap: 7px; font: 500 0.72rem/1 var(--font); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink); }
 .now-chip .region-badge { background: var(--region, var(--ink)); color: var(--on-region, var(--paper)); }
