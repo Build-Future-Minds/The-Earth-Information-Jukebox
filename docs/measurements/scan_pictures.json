@@ -1,8 +1,8 @@
 {
  "meta": {
-  "date": "2026-11-16 00:31 UTC",
+  "date": "2026-11-16 02:51 UTC",
   "browser": "Chromium 159.0.8154.6",
-  "commit": "cdca469",
+  "commit": "e9430a7",
   "dirty": "yes"
  },
  "barRangeC": [
@@ -507,5 +507,28 @@
    "samePlaceAndInstrument": 49
   },
   "largestCellMean": 0.5068685202037586
+ },
+ "globe": {
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "checks": [
+   {
+    "scan": "Whole picture: a line, west to east",
+    "cells": 2880,
+    "chimes": 68,
+    "same": true
+   },
+   {
+    "scan": "Region A: a radar turn",
+    "cells": 1440,
+    "chimes": 56,
+    "same": true
+   },
+   {
+    "scan": "Region B: a radar turn",
+    "cells": 1440,
+    "chimes": 72,
+    "same": true
+   }
+  ]
  }
 }

@@ -75,6 +75,12 @@ export function App() {
     setSounding(null);
   }, []);
   const replay = useCallback(() => void transport.current?.replay(), []);
+  // The page's speed: the Earth rhythm and the picture scan both follow it. Set on Listen, and in the
+  // scan's settings on Play along and Globe, so it can change while the scan plays.
+  const changeSpeed = useCallback((s: number) => {
+    setSpeed(s);
+    transport.current?.setSpeed(s);
+  }, []);
   // Melody inputs (keyboard, on-screen keys, later MIDI) all send MIDI note numbers.
   const onMelodyNoteOn = useCallback(
     (note: number, source: InputSource) => void melody.current?.noteOn(note, 0.7, source),
@@ -244,10 +250,7 @@ export function App() {
                 onStop={stop}
                 onReplay={replay}
                 onExplain={() => setExplaining((x) => !x)}
-                onSpeed={(s) => {
-                  setSpeed(s);
-                  transport.current?.setSpeed(s);
-                }}
+                onSpeed={changeSpeed}
                 onVolume={(db) => {
                   setVolumeDb(db);
                   transport.current?.setVolume(db);
@@ -279,13 +282,17 @@ export function App() {
               look={look}
             />
           )}
-          {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop} />}
+          {view === 'globe' && (
+            <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop}
+              speed={speed} onSpeed={changeSpeed} scanRef={scan} />
+          )}
           {view === 'how' && <HowView source={source} pictures={PICTURES} />}
           {view === 'play' && (
             <PlayView
               scene={scanPicture.scene}
               imageUrl={scanPicture.imageUrl}
               speed={speed}
+              onSpeed={changeSpeed}
               scanRef={scan}
               playState={playState}
               onStart={start}

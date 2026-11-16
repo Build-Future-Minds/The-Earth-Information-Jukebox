@@ -257,6 +257,50 @@ of the rule. The cell means, the pixels read and the levels agreed to six decima
 both left-out peaks was the same. The Python script was a one-off and is not in the repo; the unit
 tests on made-up pictures are what stays.
 
+**On the globe (Developer A, 15 Nov).** The Globe tab plays the same scan, drawn round the 3D globe.
+A vertical line on the flat map is a meridian, so the score, the player and the sound are the same:
+both views use one module, `web/src/scan/`, that loads the picture, builds the score and plays it.
+What changes is only the drawing and the turning of the globe.
+
+- *What is drawn.* Everything that wraps the sphere is drawn by the globe's shader, in frame pixels,
+  so the globe shows exactly the cells being played: the part not played yet dimmed, a glow behind
+  the line, the white line with a black edge at a constant width on screen, and the white shape on
+  it; for a radar, the dimmed outside and the sector not reached yet, three range rings, the rim and
+  the part of it passed, and the needle. The chime marks (round for warm, diamond for cool), the
+  needle's ends and the compass letters are an SVG layer placed by the same rotation and scale the
+  shader gets (`projectToScreen` in `web/src/globe/geo.ts`); marks on the far side are hidden. Black
+  and white only, as on the flat picture. **Design choice.**
+- *Turn with the line.* On each time a scan starts: the line sits 20° east of the middle of the globe,
+  so the part already played is in view, and the globe turns with it (12° of longitude a second at
+  normal speed). A radar turns the globe once to face its circle and zooms to it. Dragging the globe,
+  an arrow key or turning to a region turns it off; the button turns it back on. The button is not
+  called "Follow the line": the fold-out's checkbox "Follow the line while the scan plays" moves the
+  explanation with the line, not the globe. With reduced
+  motion the globe never turns: it cuts once per step of the low note (every 45° of longitude), and
+  the line moves once a second as on the flat map. **Design choice.**
+- *The circle stays the flat-map circle.* On the globe it is an oval, the true ground shape of the
+  area the Earth voice measures, and the needle turns unevenly on it: on the Kuroshio circle about 30%
+  faster near east and west than near north and south. The text under the radar gives the circle's
+  ground width over height and the largest gap between equal turns and compass bearings (3.8° on
+  Kuroshio, 0.0° on the Equatorial Pacific), computed from the scene, not typed in. **Derived** from
+  the map geometry (`groundShape`, tested against `docs/measurements/scan_pictures.md`). A true
+  ground circle would read pixels outside the measured area and needs a region-format change; it
+  belongs with task L7.
+- *Which pictures.* The globe scans the picture shown on the globe, with that picture's own rule.
+  Until the aerosol and rain pictures have their own measured settings (`docs/page_plan.md`, P1a),
+  only the ocean picture (and the TEST INPUT picture in practice mode) can be scanned there; the
+  other two say so.
+- *Picking a place.* Not built on the globe: a press on the globe turns it, so a click there does
+  not open "Why the scan sounds like this" on a cell, and the fold-out's words on the Globe tab do not
+  offer it. Its slider, buttons and band list choose a place, as on Play along.
+- *A note that sounds always shows.* Found while testing the globe, 15 Nov: the player told the
+  screen about a chime through Tone's Draw, which drops an update more than 0.25 s late. A page busy
+  for longer than that (in the test, the globe drawn in software while another test run loaded the
+  machine) played the note with no mark, no bar flash and no "last chime". The player now shows every
+  chime once its moment has passed, however late. This changes the screen only, on both views, not
+  the sound. A browser test keeps the page busy for 0.7 s as the red dot sounds: it failed with the
+  old player and needs the mark.
+
 **Other pictures.** The level can be measured by colour strength (the default) or by brightness
 (the largest of red, green and blue), for pictures whose data is white or grey on a dark ground.
 A scene chooses one; the code never switches by itself. The ocean picture uses colour, because
@@ -347,11 +391,26 @@ the radar; the whole column; and the list of fixed choices. `web/e2e/scan-why.e2
 tests that do what a person does: open it by keyboard, walk to a column with the arrow keys and
 read its table, follow the line while it plays, change the scan sound while it plays, use the radar,
 and check nothing in it is announced.
-`web/e2e/scan.e2e.ts`: 12 browser tests. They include a radar turn on a test circle, and a check that
+`web/e2e/scan.e2e.ts`: 13 browser tests. They include a radar turn on a test circle, and a check that
 the line keeps moving when another scan is chosen while one is playing (it once stood still while
 the notes played; found by Developer A and fixed on 15 Nov). The two first chimes sound 5.000 s apart within 5 ms (10 s at half speed), over the roots
-A1 and F2; the line on screen is where the audio clock says; a chime leaves one mark; Esc stops
-the scan and clears the picture; and all five melody sounds let go of their notes.
+A1 and F2; the line on screen is where the audio clock says; a chime leaves one mark, even when the
+page is busy for 0.7 s as it sounds; Esc stops the scan and clears the picture; and all five melody
+sounds let go of their notes.
+
+**Tests of the scan on the globe.** `web/src/globe/geo.test.ts`: the projection against the vertex
+shader's sums and the globe's own mesh (the place faced lands in the middle, places 90° away on the
+edge, further ones hidden), Turn with the line (the 20° offset, the 45° cuts under reduced motion), each approved
+circle's ground shape against `docs/measurements/scan_pictures.md`, and the shading rule.
+`web/src/scan/scanGlobeWords.test.ts`: the sentence under the radar, and which pictures have a rule.
+`web/e2e/globe.e2e.ts`: 13 browser tests in practice mode, on the TEST INPUT picture. The flat
+picture and the globe make the same score, number for number, and the globe plays it by the rule;
+a pixel read back from the GPU is the picture's own grey behind the line, 0.58 of it ahead and white
+on the line; a chime mark sits where the projection says and the GPU draws the dot that made it there;
+Turn with the line keeps the line 20° east of the middle; a drag or an arrow key turns it off while the line
+and the sound go on; changing scan, sound or speed while it plays keeps both going; Esc stops it;
+reduced motion gives cuts only; every control is reached by Tab; the Earth rhythm keeps its schedule.
+In headless Chromium the globe is drawn by SwiftShader (software), and the first test logs it.
 
 **Audit of the scan's claims, 15 Nov.** Every picture number below comes from `npm run measure`
 (in `web/`), which runs the rule in Chromium on the stills the app plays and writes
@@ -375,6 +434,8 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
 | The bars' tone ratios | Verified | A test solves both equations |
 | The low note's steps and the left–right position carry no data | Verified | Recordings above |
 | Every scan sound plays the same score | Verified by construction | The browser test compares the first chime only |
+| The globe plays the same score as the flat picture | Verified | `npm run measure`: the ocean line and both radars, every level, mean and chime equal; a recorded sweep on the globe has the same chimes at the same moments. A browser test does the same on the TEST INPUT picture |
+| The globe draws the scan where the score reads | Verified on the TEST INPUT picture | Pixels read back from the GPU match the rule's copy in TypeScript within 3 grey levels; marks sit on the dot that made them |
 | Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop |
 | The counts in "Measured, 15 Nov" | Verified again | The tool gives the same: 60.0% and 68 chimes (53, 15); 98% and 56; 100% and 72 |
 | The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | Two more runs differ from them, and from each other, by up to 0.7 |
@@ -413,7 +474,12 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
   elsewhere, and gives 70 chimes in place of 68. We keep the unweighted rule.
 - A circle is round on the flat map, not on the ground: Kuroshio is 0.876 times as wide
   east–west as it is tall, the Equatorial Pacific circle 1.000. So equal turns of the radar are
-  not equal compass bearings.
+  not equal compass bearings: a map angle θ points along the ground bearing atan2(sin θ, 0.876 cos θ),
+  at most 3.8° away on Kuroshio, and a 3° column covers 3.4° of bearing near east and west and 2.6°
+  near north and south. Bands are equal map distances too, so on Kuroshio the same ground distance
+  east and north of the centre plays up to 1.5 bands apart. The other approved circles differ by at
+  most 2.1° and 0.9 bands. Derived from the map geometry at each centre; across the Kuroshio circle
+  the ratio itself runs from 0.77 at its north edge to 0.95 at its south edge.
 - The scan has its own clock. Its notes can fall close to an Earth pulse, so run the listening
   check with the scan off.
 - The chime rule leaves out bright spots that are too close together. The choir still plays them.
