@@ -19,3 +19,8 @@ button[aria-pressed='true'] { background: var(--ink); color: var(--paper); borde
 .globe-zoom button:disabled { opacity: 0.45; cursor: default; }
 .globe-zoom .globe-zoom-level { font: 600 0.85rem/1 var(--mono); }
 .globe-source { display: grid; gap: 4px; }
+/* The picture scan over the globe: the chime marks, the needle's ends and the compass letters, placed
+   by the drawing (GlobeView.tsx) with the same sums as the shader. Black and white only, the same marks
+   as the flat picture (styles.css .scan-view .trace), and never in the way of a drag. */
+.globe-marks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; border-radius: var(--r); }
+.globe-scan-side { display: grid; gap: var(--sm); }

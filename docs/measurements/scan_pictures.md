@@ -2,7 +2,7 @@
 
 Written by `npm run measure` (in `web/`). Do not edit by hand: run it again.
 
-Measured 2026-11-16 00:31 UTC in Chromium 159.0.8154.6, on commit cdca469 with uncommitted changes.
+Measured 2026-11-16 02:51 UTC in Chromium 159.0.8154.6, on commit e9430a7 with uncommitted changes.
 The rule is `web/src/audio/scanScore.ts`, run in the browser on the stills the app plays.
 Map sweep: 240 columns × 12 bands. Floor 12/255.
 A chime needs level 0.3, 6 columns from the next in its band, 1 per column.
@@ -117,6 +117,17 @@ Mean difference per colour channel: 6.93 grey levels.
 
 Levels differ by 0.0432 on average and 0.1521 at most.
 49 of the JPEG's 68 chimes are at the same column and band, on the same instrument, as a chime of the uncompressed frame.
+
+## The globe and the flat picture (ocean)
+
+The Globe tab draws the scan round the globe from the same pixels and the same rule as Play along. Each scan was
+read in both places in the running app; the globe was drawn by ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver).
+
+| Scan | Cells | Chimes | Same levels, means, chimes and left-out peaks on the globe |
+| --- | --- | --- | --- |
+| Whole picture: a line, west to east | 2880 | 68 | yes, every number |
+| Region A: a radar turn | 1440 | 56 | yes, every number |
+| Region B: a radar turn | 1440 | 72 | yes, every number |
 
 ## Check on this tool
 

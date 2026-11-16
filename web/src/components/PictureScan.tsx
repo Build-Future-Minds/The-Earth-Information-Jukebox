@@ -22,6 +22,7 @@ import { cellAt, cellOutline, cellTicks, type ScanPlacement } from '../audio/sca
 import { chosenBand, explainPick, whyColumn } from '../audio/scanWhy';
 import { ScanButtons, ScanSettings, ScanStatus } from '../scan/ScanControls';
 import { ScanSide } from '../scan/ScanSide';
+import { groundNote } from '../scan/groundNote';
 import { useScan, type ScanHandle } from '../scan/useScan';
 import { useScanFrame } from '../scan/useScanFrame';
 import { ScanExplanation, WHY_START, type WhyView } from './ScanExplanation';
@@ -34,6 +35,8 @@ interface Props {
   imageUrl: string | null;
   /** The page's speed setting: the scan follows it. */
   speed: number;
+  /** Change the page's speed from the scan's settings (the Earth rhythm follows it too). */
+  onSpeed?: (speed: number) => void;
   /** What counts as light in this picture. Colour suits the ocean picture (grey land is silent). */
   measure?: ScanMeasure;
 }
@@ -52,7 +55,7 @@ const RANGE_RINGS = [3, 6, 9];
 /** A press that moves further than this (CSS pixels) before it lets go is a drag, not a tap: it picks nothing. */
 const TAP_SLOP = 10;
 
-export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, measure = 'colour' }, ref) {
+export const PictureScan = forwardRef<PictureScanHandle, Props>(function PictureScan({ scene, imageUrl, speed, onSpeed, measure = 'colour' }, ref) {
   const scan = useScan({ scene, imageUrl, speed, measure });
   const { loaded, target, state, traces, frame, region, worldMap, score, bands, labelOf, why, liveColumn, lastStruck, reducedMotion } = scan;
   const sweep = useRef<SVGGElement>(null);
@@ -146,7 +149,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
       <p className="muted">A line sweeps the picture and plays the colours it crosses. A rule we chose; the Earth rhythm is unchanged.</p>
 
       <ScanButtons scan={scan} />
-      <ScanSettings scan={scan} />
+      <ScanSettings scan={scan} speed={speed} onSpeed={onSpeed} />
       <ScanStatus scan={scan} />
 
       <figure className={figureClass} style={{ '--aspect': view.w / view.h } as React.CSSProperties}>
@@ -305,7 +308,7 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
                   <circle className="ring" cx={region.center_px[0]} cy={region.center_px[1]} r={region.radius_px} />
                 </g>
               </svg>
-              <span>Where {labelOf(target)} is on the whole picture: {region.name}.</span>
+              <span>Where {labelOf(target)} is on the whole picture: {region.name}.{worldMap && ` ${groundNote(region, frame)}`}</span>
             </div>
           )}
         </ScanSide>
