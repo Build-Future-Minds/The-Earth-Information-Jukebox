@@ -173,7 +173,8 @@ const panFor = (hz: number) => clamp(0.25 * Math.log2(hz / 261.63), -0.45, 0.45)
 const PIANO_PARTIALS = [1, 0.6, 0.35, 0.24, 0.14, 0.1, 0.07, 0.045, 0.03, 0.02, 0.014, 0.01];
 const PIANO_LEVEL = 0.5;
 
-/** The soft knock of a felt hammer: one quiet noise source, opened for a few ms at each strike. */
+/** The soft knock of a felt hammer: one quiet noise source, opened for a few ms at each strike.
+ *  The noise runs only between Play and Stop or Pause (run, rest), not for the life of the page. */
 class Knock {
   private readonly noise: Tone.Noise;
   private readonly felt: Tone.Filter;
@@ -182,7 +183,17 @@ class Knock {
   constructor(destination: Tone.InputNode) {
     this.amp = new Tone.Gain(0).connect(destination);
     this.felt = new Tone.Filter({ type: 'lowpass', frequency: 2000 }).connect(this.amp);
-    this.noise = new Tone.Noise('white').connect(this.felt).start();
+    this.noise = new Tone.Noise('white').connect(this.felt);
+  }
+
+  /** Before play: start the noise (silent until a strike opens it). */
+  run(): void {
+    if (this.noise.state !== 'started') this.noise.start(Tone.immediate());
+  }
+
+  /** Stop and Pause: no strike can come, so the noise stops too. */
+  rest(): void {
+    if (this.noise.state === 'started') this.noise.stop(Tone.immediate());
   }
 
   strike(time: number, hz: number, peak: number): void {
@@ -399,11 +410,18 @@ class MusicalEarthSound implements EarthSound {
       this.band.knock.damp();
       this.lastBeat = NaN;
     }
-    if (what.echo) this.room.close();
+    if (what.echo) {
+      // Stop and Pause: the room's echo ends, and nothing will strike until the next Play.
+      this.room.close();
+      this.pulses.knock.rest();
+      this.band?.knock.rest();
+    }
   }
 
   open(): void {
     this.room.open();
+    this.pulses.knock.run();
+    this.band?.knock.run();
   }
 
   setVolume(db: number): void {
