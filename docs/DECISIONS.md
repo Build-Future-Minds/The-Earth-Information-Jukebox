@@ -176,7 +176,12 @@ right with the line. Neither carries data, and both are named as decoration in t
 starting at C3 to a spacing that is wide at the bottom and close at the top. Low notes a step
 apart blur together, and on the radar every band sounds at once. Struck notes are now one octave
 above their band on either instrument, so pitch says only where a spot is and the instrument
-says only which colour.
+says only which colour. **Source added later the same day [S13, S14]:** Plomp and Levelt found
+tones roughest a quarter of a critical bandwidth apart, and low intervals more dissonant. Measured
+against their bandwidth curve, the first spacing's lowest neighbours were 0.18 and 0.20 of a
+bandwidth apart and the current ones, C3–G3 and G3–C4, are 0.72 and 0.71. A roughness model of the choir gives the
+current spacing about half the first one's (`docs/measurements/scan_spacing.md`). Whether it
+sounds clearer is still **Unverified**: nobody has listened to compare.
 
 **A sound library:** three scan sounds to choose from (Ocean choir, Music box, Plain), all
 synthesised here and all playing the same score. The Plain one is the first version's
@@ -200,7 +205,7 @@ was measured there, and how that became its pitch, loudness and instrument (`sca
 (`scanChoices.ts`); rules for reading the picture are kept apart from decoration, in the fold-out and in
 the legend. **Design choice:** a fold-out, not an always-open panel, to keep Dev B's shorter Play
 along view; and not a live region, so a screen reader is not interrupted by a sweep that makes
-about two notes a second. **Not decided:** whether the explanation should also be reachable by
+about two notes a second (a radar turn, up to five). **Not decided:** whether the explanation should also be reachable by
 clicking the picture, and how the fixed choices should read to someone who has not seen the spec.
 
 **Not decided here:** the Earth pulse keeps its sound. Changing it is task L1 in
@@ -216,10 +221,21 @@ One listener, not a test. The third round was checked by measurement only.
 changed: the app no longer says "bright spot" (a struck note is a peak of colour in a whole cell,
 and 39% to 61% of peaks are left out); the low note F is no longer said to fit the scale (it is a
 major seventh under the held E); and three limits are now written down: warm colours are drawn
-stronger than cold ones, the still is a JPEG that moves single chimes, and equal bands on the map
-are not equal shares of the globe. **Design choice:** none of the three is corrected for; each is
-stated. **Not decided:** whether the app should read an uncompressed still, and the rules the
-aerosol and rain pictures need before the scan may play them.
+stronger than cold ones (**corrected later the same day:** that came from two end pixels of the
+printed colour bar; in the frame the strongest warm and cold lines are equally strong, and light
+blue lines are the palest), the still is a JPEG that moves single chimes, and equal bands on the
+map are not equal shares of the globe. **Design choice:** none of the three is corrected for;
+each is stated.
+
+**Decided by Developer A, 15 Nov, not built yet:** the scan will read a lossless WebP of the
+frame, a file of its own that only the scan loads, and the JPEG stays for everything else (the
+JPEG, a 4:4:4 JPEG at quality 90 and a lossless WebP were measured against the frame in
+`docs/measurements/scan_pictures.md`; the still is Student A's, so this is its own pull request).
+And the scan is to sound the same on every page load: today a reverb made from random noise and
+the held notes' start times change it (`scan_repeat.md`, `scan_timing.md`). The fix is a fixed
+reverb echo from our own seeded noise, then one shared start time for the held notes, on a branch
+of its own, measured and listened to before it merges. **Not decided:** the rules the aerosol and
+rain pictures need before the scan may play them.
 
 ## Sources
 
@@ -237,6 +253,8 @@ aerosol and rain pictures need before the scan may play them.
 | S10 | NASA Scientific Visualization Studio. *Data Sonification: Caldwell 73* (SVS 13786, released 23 Dec 2020). Credit: SYSTEM Sounds (M. Russo, A. Santaguida). | https://svs.gsfc.nasa.gov/13786 | Verified (read 15 Nov) | D9 |
 | S11 | Chandra X-ray Center. *A Universe of Sound: Galactic Center.* | https://chandra.si.edu/sound/gcenter.html | Verified (read 15 Nov) | D9 |
 | S12 | Stanford CCRMA, Music 150 course notes. *Percussion instruments: rectangular bars (the glockenspiel), the marimba, xylophone and vibraphone.* | https://ccrma.stanford.edu/CCRMA/Courses/150/percussion.html | Verified (read 15 Nov) | D9 |
+| S13 | Plomp, R., & Levelt, W. J. M. (1965). Tonal consonance and critical bandwidth. *Journal of the Acoustical Society of America*, 38, 548–560. | https://doi.org/10.1121/1.1909741 (copy read: the Max Planck Institute's record, https://www.mpi.nl/publications/item66382/tonal-consonance-and-critical-bandwidth, which links a scan of the paper) | Read in part by the AI assistant, 15 Nov: pp. 548, 549 and 553–556 of the scan; passages quoted in `web/measure/spacing.ts`. Not yet read by Dev A | D9 |
+| S14 | Sethares, W. A. *Relating Tuning and Timbre* (first in *Experimental Musical Instruments*), and the page of its programs (*dissmeasure*). | https://sethares.engr.wisc.edu/consemi.html and https://sethares.engr.wisc.edu/comprog.html | Read by the AI assistant (a fetching sub-agent), 15 Nov: the formula's constants and the minima at simple ratios quoted. Not yet read by Dev A | D9 |
 
 Software used (Tone.js, React, Vite and others) is listed from `web/package.json` in References.
 It is not repeated here.
@@ -244,3 +262,10 @@ It is not repeated here.
 **How these were checked:** an AI research assistant fetched each source on 14 Nov 2026 and
 quoted the passages. Dev B reviewed the results. S9 to S12 were fetched and quoted the same way
 on 15 Nov for Dev A, who has not yet read them. Logged in `AI_USE.md`.
+
+S13 and S14 (15 Nov, for the note spacing): the scan of S13 has no text layer, so the AI assistant
+took its page images out of the PDF and read them as pictures. The critical-bandwidth values come
+from the paper's Fig. 9, traced pixel by pixel (`web/measure/spacing.ts` says how). S13 takes the
+bandwidth from Zwicker, Flottorp and Stevens (1957), which nobody here has read. Sethares's 1993
+paper in the same journal was found but is also a scan without text, and it was not read, so it
+is not cited.

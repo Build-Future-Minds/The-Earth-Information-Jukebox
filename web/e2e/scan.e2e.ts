@@ -77,23 +77,35 @@ test('what you see follows what you hear: the line shows while playing and a chi
   await expect(view.locator('.trace')).toHaveCount(0);
 });
 
-test('every scan sound plays the same score: same dot, same note, same time', async ({ page }) => {
+/** Seconds of chimes compared, from each sound's first chime. */
+const SAME_SCORE_SECONDS = 10;
+
+test('every scan sound plays the same score: same dots, same notes, same times, for 10 seconds of chimes', async ({ page }) => {
   test.setTimeout(120_000);
-  const firstChime: Record<string, ScanNote & { sound?: string }> = {};
+  // Every chime in the 10 s from the first one, as it was handed to an instrument: where, which
+  // instrument, which note, over which root, where between the speakers, and when after the first.
+  // On the test picture that is the red dot and the green dot, 5 s apart (the blue one is 20 s on).
+  const played: Record<string, (Omit<ScanNote, 'audioTime'> & { after: number })[]> = {};
   for (const [label, id] of [['Ocean choir', 'ocean'], ['Music box', 'musicbox'], ['Plain (first instruments)', 'first']]) {
     await page.getByLabel('Scan sound').selectOption({ label });
     const before = (await scanNotes(page)).length;
     await startScanWithKeyboard(page);
     await page.waitForFunction((n) => ((window as unknown as { __scanNotes?: unknown[] }).__scanNotes?.length ?? 0) > n, before, { timeout: 20_000 });
-    firstChime[id] = (await scanNotes(page))[before];
-    expect((firstChime[id] as { sound?: string }).sound).toBe(id);
+    await page.waitForTimeout((SAME_SCORE_SECONDS + 0.5) * 1000); // chimes are logged when they are scheduled, 0.1 s ahead
+    const notes = (await scanNotes(page)).slice(before) as (ScanNote & { sound?: string })[];
+    expect(notes.every((n) => n.sound === id), `${label}: a chime was played by another sound`).toBe(true);
+    const first = notes[0].audioTime;
+    played[id] = notes
+      .filter((n) => n.audioTime - first <= SAME_SCORE_SECONDS)
+      .map(({ audioTime, column, band, warm, note, root, pan }) => ({ column, band, warm, note, root, pan, after: audioTime - first }));
     await page.keyboard.press('Escape');
     await expect(page.getByText('Scan stopped.')).toBeVisible();
   }
+  expect(played.ocean.length, 'more than one chime is compared').toBeGreaterThanOrEqual(2);
+  const placeAndNote = (list: typeof played.ocean) => list.map(({ after: _after, ...rest }) => rest);
   for (const id of ['musicbox', 'first']) {
-    expect([firstChime[id].column, firstChime[id].band, firstChime[id].warm, firstChime[id].note, firstChime[id].root]).toEqual([
-      firstChime.ocean.column, firstChime.ocean.band, firstChime.ocean.warm, firstChime.ocean.note, firstChime.ocean.root,
-    ]);
+    expect(placeAndNote(played[id]), `${id}: the same chimes as the Ocean choir`).toEqual(placeAndNote(played.ocean));
+    played[id].forEach((n, i) => expect(Math.abs(n.after - played.ocean[i].after), `${id}, chime ${i + 1}: at the same time after the first`).toBeLessThan(0.005));
   }
 });
 

@@ -43,10 +43,10 @@ export const SCAN_CHOICES: ScanChoice[] = [
     kind: 'rule',
     name: 'Which note a band plays',
     what: `The ${BAND_NOTE_NAMES.length} held notes are ${BAND_NOTE_NAMES.join(' ')}: far apart at the bottom (a fifth, then a fourth) and close together at the top.`,
-    why: 'Notes a step apart sound muddy when they are low, and on the radar every band sounds at once. The first version climbed the scale one step at a time from C3 and its three lowest notes blurred together.',
+    why: 'Notes a step apart sound rough when they are low, and on the radar every band sounds at once. The first version climbed the scale one step at a time from C3 and its three lowest notes blurred together.',
     evidence:
-      'Developer A heard the blur in the first listening round, which is one opinion, not a test. No source has been read for the general claim that low notes blur, so the claim is unverified.',
-    tag: 'Unverified',
+      'Plomp and Levelt (1965, source S13) found two tones roughest when they are a quarter of a critical bandwidth apart, and that intervals grow more dissonant below about 500 Hz, which "reflects the musical practice to avoid thirds at low frequencies". Measured on 15 Nov (docs/measurements/scan_spacing.md): the first version\'s lowest neighbours were 0.18 and 0.20 of a critical bandwidth apart, the current ones (C3–G3, G3–C4) 0.72 and 0.71; a roughness model of the choir with all notes at full level gives the current spacing 0.49 of the first\'s. Developer A heard the blur in the first listening round: one opinion, not a test. Unverified: that the new spacing sounds clearer. Nobody has listened to compare.',
+    tag: 'Design choice',
   },
   {
     id: 'floor',
@@ -64,7 +64,8 @@ export const SCAN_CHOICES: ScanChoice[] = [
     name: 'Full level',
     what: `A map-sweep cell with a mean of ${LINE_GRID.fullStrength} plays at full loudness; a radar cell, ${RADAR_GRID.fullStrength}.`,
     why: 'The most colourful map-sweep cell on the ocean picture measures 0.463, so 0.5 is its full level. Thin lines can fill the small radar cells up to about 0.8.',
-    evidence: 'Measured on 15 Nov (docs/measurements/scan_pictures.md). Each picture needs its own full level; only the ocean picture has been measured.',
+    evidence:
+      'Measured on 15 Nov (docs/measurements/scan_pictures.md). Each picture needs its own full level, and it is set only for the ocean picture, the one the scan plays. By colour, the most colourful map-sweep cell of the aerosol still measures 0.429 and of the rain still 0.622.',
     tag: 'Design choice',
   },
   {
@@ -102,7 +103,7 @@ export const SCAN_CHOICES: ScanChoice[] = [
     what: 'If half or more of a cell\'s colour has red as its largest channel (red and orange), the note is struck on the warm instrument. Otherwise (yellow-green, green, blue) it is struck on the cool one.',
     why: 'NASA\'s own sonifications use one instrument for red and orange stars and another for blue.',
     evidence:
-      'On NASA\'s colour bar for the ocean picture the rule switches at 74.4% of the bar\'s length, which is 23.8 °C if the bar\'s scale is even (docs/measurements/scan_pictures.md). Unverified: that the bar\'s scale is even, and that the lines in the frame use the bar\'s colours.',
+      'Measured on 15 Nov (docs/measurements/scan_pictures.md): on NASA\'s colour bar for the ocean picture the rule switches at 23.6 °C; the bar\'s four printed labels lie on one straight line within 0.07 °C. The picture\'s lines use the bar\'s hues: 99.65% of their colour is on the same side of the switch as the bar colour of the same hue. They are not the bar\'s exact colours (they are more saturated), and we measured colours, not the sea.',
     tag: 'Design choice',
   },
   {
@@ -139,7 +140,7 @@ export const SCAN_CHOICES: ScanChoice[] = [
     name: 'Left and right',
     what: `The sound sits where the line is, at most ${PAN_WIDTH} of the way to one speaker: the map sweep travels left to right, the radar swings right, centre, left, centre.`,
     why: 'It repeats what the screen shows, so no fact is given by stereo alone.',
-    evidence: 'Recorded on 15 Nov (docs/measurements/scan_sound.md): the left channel is 9.1 dB louder in the first sixth of the map sweep, the right 9.8 dB louder in the last sixth.',
+    evidence: 'Recorded on 15 Nov (docs/measurements/scan_sound.md): the left channel is 9.0 dB louder in the first sixth of the map sweep, the right 9.9 dB louder in the last sixth.',
     tag: 'Design choice',
   },
   {
@@ -148,7 +149,8 @@ export const SCAN_CHOICES: ScanChoice[] = [
     name: 'Scan sound',
     what: 'Ocean choir, Music box and Plain play the same score: the same notes at the same times. Only the instruments change.',
     why: 'A listener can compare the instruments without the notes changing.',
-    evidence: 'A browser test compares the first chime of the three sounds. It does not yet compare a longer stretch.',
+    evidence:
+      'Every chime in 10 s is compared across the three sounds: where, which instrument, which note, over which root, left or right, and when. A browser test does it on the test picture (two chimes); npm run measure does it on the ocean picture, 21 chimes in the first 10 s of the map sweep, all the same (docs/measurements/scan_sound.md).',
     tag: 'Design choice',
   },
 ];

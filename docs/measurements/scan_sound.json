@@ -1,8 +1,8 @@
 {
  "meta": {
-  "date": "2026-11-16 00:33 UTC",
+  "date": "2026-11-16 03:46 UTC",
   "browser": "Chromium 159.0.8154.6 (headless)",
-  "commit": "cdca469",
+  "commit": "1db3619",
   "dirty": "yes"
  },
  "steps": {
@@ -15,30 +15,30 @@
    {
     "target": 0.125,
     "level": 0.12121212482452393,
-    "toneDb": -45.50940262800967,
-    "levelDb": -43.491328492362214,
-    "lufs": -44.022484784689205
+    "toneDb": -45.08700189164075,
+    "levelDb": -42.88667009351891,
+    "lufs": -43.44015980429099
    },
    {
     "target": 0.25,
     "level": 0.25108224153518677,
-    "toneDb": -38.99144546935277,
-    "levelDb": -37.22919680415257,
-    "lufs": -37.46407345973012
+    "toneDb": -38.97192933412529,
+    "levelDb": -36.925728692252015,
+    "lufs": -37.152341947334996
    },
    {
     "target": 0.5,
     "level": 0.5021644830703735,
-    "toneDb": -32.80782737003071,
-    "levelDb": -30.970763911777873,
-    "lufs": -31.18956728562391
+    "toneDb": -33.077551722091904,
+    "levelDb": -30.971029787596116,
+    "lufs": -31.1720916465295
    },
    {
     "target": 1,
     "level": 1,
-    "toneDb": -26.831204283946136,
-    "levelDb": -24.651981326563753,
-    "lufs": -25.11181157195504
+    "toneDb": -27.53261241205218,
+    "levelDb": -24.953427817334752,
+    "lufs": -25.294090298860066
    }
   ]
  },
@@ -48,29 +48,29 @@
    "measured": {
     "seconds": 30,
     "sampleRate": 48000,
-    "recorded": 1.0000000000009428,
-    "lufs": -24.432091454726812,
-    "peakDb": -7.6475192546468,
-    "levelDb": -24.14530091023766,
-    "leftMinusRightDb": -0.7402424588461081
+    "recorded": 1.0000000000009601,
+    "lufs": -24.861435771375117,
+    "peakDb": -8.851037727408285,
+    "levelDb": -24.512448104933714,
+    "leftMinusRightDb": -0.5808616313377257
    },
    "firstSixth": {
     "seconds": 5,
     "sampleRate": 48000,
     "recorded": 0.9999999999998899,
-    "lufs": -23.11838371870482,
-    "peakDb": -8.464533210036679,
-    "levelDb": -22.807059696739096,
-    "leftMinusRightDb": 9.085136123279774
+    "lufs": -23.52846072197865,
+    "peakDb": -8.851037727408285,
+    "levelDb": -23.228337360396996,
+    "leftMinusRightDb": 9.038051807373968
    },
    "lastSixth": {
     "seconds": 5,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -22.033209009324768,
-    "peakDb": -7.6475192546468,
-    "levelDb": -21.968585684122843,
-    "leftMinusRightDb": -9.790357494589067
+    "lufs": -22.519817898883023,
+    "peakDb": -8.935081853850514,
+    "levelDb": -22.316164242584115,
+    "leftMinusRightDb": -9.946718848533045
    }
   },
   {
@@ -79,28 +79,28 @@
     "seconds": 15,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -24.216740464821246,
-    "peakDb": -8.410111528337506,
-    "levelDb": -24.78483430396674,
-    "leftMinusRightDb": -0.030404189995643094
+    "lufs": -24.817726458602774,
+    "peakDb": -9.829909966119198,
+    "levelDb": -25.257768334216514,
+    "leftMinusRightDb": -0.552371873324482
    },
    "firstSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -23.772689162912247,
-    "peakDb": -11.964234934237153,
-    "levelDb": -24.713433996888078,
-    "leftMinusRightDb": -8.469947781971097
+    "lufs": -24.135675234645355,
+    "peakDb": -12.625917806240023,
+    "levelDb": -25.126684085286044,
+    "leftMinusRightDb": -9.097438840252615
    },
    "lastSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -27.97049016768887,
-    "peakDb": -15.533338771816428,
-    "levelDb": -28.712852305436954,
-    "leftMinusRightDb": -7.883825086722695
+    "lufs": -27.814118495459972,
+    "peakDb": -14.000029018333176,
+    "levelDb": -28.519610956527096,
+    "leftMinusRightDb": -9.032898028044482
    }
   },
   {
@@ -109,28 +109,28 @@
     "seconds": 15,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -21.643542532361987,
-    "peakDb": -6.968096239772609,
-    "levelDb": -21.522889656619817,
-    "leftMinusRightDb": 0.3754287617884984
+    "lufs": -21.867669593659286,
+    "peakDb": -5.375518499016245,
+    "levelDb": -21.620983245986068,
+    "leftMinusRightDb": -0.1277206971497833
    },
    "firstSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -22.805954140322658,
-    "peakDb": -8.977262042122089,
-    "levelDb": -22.362042533982695,
-    "leftMinusRightDb": -9.629221112909612
+    "lufs": -22.802956593720374,
+    "peakDb": -7.255306853678023,
+    "levelDb": -22.189274168902067,
+    "leftMinusRightDb": -10.042920756902731
    },
    "lastSixth": {
     "seconds": 2.5,
     "sampleRate": 48000,
     "recorded": 1.0000000000012221,
-    "lufs": -20.83258475560287,
-    "peakDb": -7.966706627528853,
-    "levelDb": -21.018528611234494,
-    "leftMinusRightDb": -8.50150983543357
+    "lufs": -20.650795062448818,
+    "peakDb": -7.352783646387237,
+    "levelDb": -20.64855965387528,
+    "leftMinusRightDb": -9.676733274525901
    }
   }
  ],
@@ -141,22 +141,22 @@
   "f"
  ],
  "allVoices": {
-  "seconds": 19.989333333333335,
+  "seconds": 20,
   "sampleRate": 48000,
-  "recorded": 0.9994666666678882,
-  "lufs": -20.147681302900185,
-  "peakDb": -5.182201304657189,
-  "levelDb": -19.583789184900912,
-  "leftMinusRightDb": 1.1440748452423826
+  "recorded": 1.0000000000012221,
+  "lufs": -20.671365866954446,
+  "peakDb": -3.149394794180207,
+  "levelDb": -20.088301186973144,
+  "leftMinusRightDb": 1.2142926809386232
  },
  "beforeStop": {
   "seconds": 1.8,
   "sampleRate": 48000,
   "recorded": 1.0000000000012237,
-  "lufs": -20.11201690662113,
-  "peakDb": -6.382485375752976,
-  "levelDb": -19.658250739312457,
-  "leftMinusRightDb": -0.7628011303731164
+  "lufs": -20.387611285495115,
+  "peakDb": -6.756375181066731,
+  "levelDb": -19.964248012489577,
+  "leftMinusRightDb": -0.8017365223996542
  },
  "afterStop": {
   "seconds": 2,
@@ -166,5 +166,25 @@
   "peakDb": null,
   "levelDb": null,
   "leftMinusRightDb": null
- }
+ },
+ "sameScore": [
+  {
+   "sound": "Ocean choir",
+   "chimes": 21,
+   "same": true,
+   "largestTimeDifference": 0
+  },
+  {
+   "sound": "Music box",
+   "chimes": 21,
+   "same": true,
+   "largestTimeDifference": 1.4210854715202004e-14
+  },
+  {
+   "sound": "Plain (first instruments)",
+   "chimes": 21,
+   "same": true,
+   "largestTimeDifference": 1.4210854715202004e-14
+  }
+ ]
 }

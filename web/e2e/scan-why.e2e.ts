@@ -113,7 +113,7 @@ test('changing the scan sound while it plays: the line keeps moving, and a note 
   await openWhyWithKeyboard(page);
   await startScan(page);
   const last = why(page).locator('.why-last');
-  await expect(last).toContainText('marimba G4', { timeout: 10_000 }).catch(() => undefined); // the red dot, 5.1 s in
+  // The red dot, 5.1 s in. The sound must be changed before the green dot sounds at 10.1 s.
   await expect(last).toContainText('played on the marimba', { timeout: 10_000 });
 
   await page.getByLabel('Scan sound').selectOption({ label: 'Music box' });
@@ -149,8 +149,10 @@ test('the fixed choices are listed apart from the picture, each with a reason, e
     await expect(item).toContainText('Evidence:');
     await expect(item).toContainText(/\[(Verified|Design choice|Unverified)\]/);
   }
-  // Honest about what is not known: one choice has no source for its reason.
-  await expect(fixed.getByRole('listitem').filter({ hasText: 'Which note a band plays' })).toContainText('[Unverified]');
+  // Honest about what is not known: the spacing has a source for its reason, but nobody has listened.
+  const spacing = fixed.getByRole('listitem').filter({ hasText: 'Which note a band plays' });
+  await expect(spacing).toContainText('[Design choice]');
+  await expect(spacing).toContainText('Unverified: that the new spacing sounds clearer');
   // The scale and the low note are decoration, listed under that heading.
   const decoration = fixed.locator('h5:has-text("Decoration") + ul');
   await expect(decoration).toContainText('C major pentatonic');
