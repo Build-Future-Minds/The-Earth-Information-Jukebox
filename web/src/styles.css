@@ -365,6 +365,33 @@ input[type='range']:focus-visible::-moz-range-thumb { background: var(--signal);
 .scan-how ul { margin: var(--xs) 0 0; padding-left: 1.2rem; display: grid; gap: 4px; color: var(--ink-2); font-size: 0.95rem; max-width: 70ch; }
 .scan-how strong { color: var(--ink); }
 
+/* Legend groups: what comes from the picture, and what is fixed by us. Words, not colour. */
+.scan-legend li.legend-group { display: block; grid-column: 1 / -1; padding-top: 6px; border-top: 1px solid var(--rule); font-size: 0.85rem; color: var(--ink-2); text-transform: none; }
+.scan-legend li.legend-group:first-child { border-top: 0; padding-top: 0; }
+
+/* Why the scan sounds like this: sentences and a table written from the score; then the fixed choices. */
+.scan-why { margin-top: var(--sm); }
+.scan-why summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.scan-why-body { display: grid; gap: var(--sm); margin-top: var(--xs); max-width: 76ch; }
+.scan-why h4 { margin: 0; font-size: 1.05rem; font-weight: 700; padding-top: var(--xs); border-top: 1px solid var(--rule); }
+.scan-why h5 { margin: var(--xs) 0 2px; font-size: 0.95rem; font-weight: 650; }
+.scan-why p { margin: 0; }
+.scan-why .why-last, .scan-why .why-band { max-width: 70ch; }
+.scan-why .why-controls { align-items: end; }
+.scan-why .why-pick { display: block; margin: var(--xs) 0; }
+.why-table { overflow-x: auto; max-width: 100%; }
+.why-table table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.9rem; }
+.why-table caption { text-align: left; font-weight: 600; color: var(--ink-2); padding-bottom: 4px; }
+.why-table th, .why-table td { text-align: left; padding: 6px 12px 6px 0; border-bottom: 1px solid var(--rule); font-weight: 400; vertical-align: top; }
+.why-table thead th { font-weight: 600; font-size: 0.82rem; color: var(--ink-2); border-bottom-color: var(--ink); }
+.why-table tbody th { font: 600 0.9rem var(--mono); }
+.why-table td:nth-child(2) { white-space: nowrap; }
+.why-table .num { text-align: right; font: 400 0.9rem var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.why-choices { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--xs); }
+.why-choices li { padding-bottom: var(--xs); border-bottom: 1px solid var(--rule-2); font-size: 0.95rem; color: var(--ink); }
+.why-choices .muted { font-size: 0.9rem; }
+.why-tag { font: 600 0.8rem var(--mono); color: var(--ink-2); }
+
 @media (prefers-reduced-motion: reduce) {
   .scan-view .trace .ripple, .scan-view .trace .chime-dot, .note-bar.hit i, .note-bar.hit i::after { animation: none; }
 }

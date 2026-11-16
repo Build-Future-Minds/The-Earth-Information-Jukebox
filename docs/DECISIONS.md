@@ -194,6 +194,15 @@ the region rings and no eased motion. Developer A asked for the scan to be easie
 smoother (15 Nov). **Student B to review**, as the owner of the design rules. With reduced motion
 set, the line moves once a second and nothing fades.
 
+**Explaining the scan (Dev A, 15 Nov):** any note can say why it sounds: where on the picture, what
+was measured there, and how that became its pitch, loudness and instrument (`scanWhy.ts`, shown in
+"Why the scan sounds like this"). The fixed choices are one list with a reason, evidence and tag each
+(`scanChoices.ts`); rules for reading the picture are kept apart from decoration, in the fold-out and in
+the legend. **Design choice:** a fold-out, not an always-open panel, to keep Dev B's shorter Play
+along view; and not a live region, so a screen reader is not interrupted by a sweep that makes
+about two notes a second. **Not decided:** whether the explanation should also be reachable by
+clicking the picture, and how the fixed choices should read to someone who has not seen the spec.
+
 **Not decided here:** the Earth pulse keeps its sound. Changing it is task L1 in
 `idea_tasks.md` and needs the listening check to be run again.
 

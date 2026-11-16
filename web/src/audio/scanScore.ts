@@ -129,16 +129,36 @@ export interface ScanOptions {
   measure?: ScanMeasure;
 }
 
+/** A peak the chime rule found and left out, with the reason and the chime that took its place. */
+export interface DroppedPeak {
+  column: number;
+  band: number;
+  /** The smoothed level at the peak, as for a chime. */
+  level: number;
+  /** `spacing`: a stronger chime in the same band is closer than `minGap` columns.
+   *  `column`: a stronger chime starts in another band in the same column. */
+  reason: 'spacing' | 'column';
+  /** The chime that won. */
+  by: { column: number; band: number };
+}
+
 export interface ScanScore {
   shape: ScanShape['kind'];
   grid: ScanGrid;
   measure: ScanMeasure;
+  /** `means[column * bands + band]`, 0–1: the mean of the measure (colour strength or brightness)
+   *  over the pixels the cell read, before the floor and the full level turn it into a level. */
+  means: Float32Array;
+  /** `reads[column * bands + band]`: how many pixels (or radar sample points) the cell read. */
+  reads: Uint32Array;
   /** `levels[column * bands + band]`, 0–1: how loud that band's held note is in that column. */
   levels: Float32Array;
   /** `warmShare[column * bands + band]`, 0–1: share of the cell's colour that is on the red side of yellow. */
   warmShare: Float32Array;
   /** Sorted by column, then band. */
   chimes: Chime[];
+  /** Peaks the chime rule found and left out, sorted by column, then band. */
+  dropped: DroppedPeak[];
   /** `missing`: no cell has any colour, so the scan stays silent and says why. Never an invented sound. */
   status: 'ok' | 'missing';
   reason: string | null;
@@ -199,30 +219,47 @@ export function buildScanScore(pixels: Pixels, shape: ScanShape, options: ScanOp
 
   const levels = new Float32Array(cells);
   const warmShare = new Float32Array(cells);
+  const means = new Float32Array(cells);
   let sounding = 0;
   for (let c = 0; c < cells; c++) {
     if (count[c] === 0) continue;
+    means[c] = light[c] / count[c];
     levels[c] = levelOf(light[c] / count[c], grid.fullStrength);
     // A cell with no colour at all (grey or white light) has no warm share: it rings bells.
     warmShare[c] = colour[c] > 0 ? warmColour[c] / colour[c] : 0;
     if (levels[c] > 0) sounding++;
   }
 
-  const chimes = sounding > 0 ? findChimes(levels, warmShare, grid, shape.kind === 'radar', rule) : [];
+  const found = sounding > 0 ? findChimesDetailed(levels, warmShare, grid, shape.kind === 'radar', rule) : { chimes: [], dropped: [] };
   return {
     shape: shape.kind,
     grid,
     measure,
+    means,
+    reads: count,
     levels,
     warmShare,
-    chimes,
+    chimes: found.chimes,
+    dropped: found.dropped,
     status: sounding > 0 ? 'ok' : 'missing',
     reason: sounding > 0 ? null : measure === 'colour' ? 'no coloured lines under the scan' : 'nothing bright under the scan',
   };
 }
 
+/** A cell's level smoothed over three columns (weights 1, 2, 1): the number the chime rule looks at.
+ *  Outside the map sweep's ends the level is 0; the radar is a circle, so its ends are neighbours. */
+export function smoothedLevel(levels: Float32Array, grid: ScanGrid, cyclic: boolean, column: number, band: number): number {
+  const { columns, bands } = grid;
+  const at = (c: number): number => {
+    if (cyclic) c = ((c % columns) + columns) % columns;
+    else if (c < 0 || c >= columns) return 0;
+    return levels[c * bands + band];
+  };
+  return (at(column - 1) + 2 * at(column) + at(column + 1)) / 4;
+}
+
 /**
- * Chimes: the moments the line crosses a bright spot. In each band, smooth the level over three
+ * Chimes: the moments the line crosses a peak of colour. In each band, smooth the level over three
  * columns (weights 1, 2, 1), then keep the peaks: columns higher than the one before and at least
  * as high as the one after, with a level of `minLevel` or more. Peaks closer than `minGap` in one
  * band give way to the stronger one, and a column keeps its `perColumn` strongest. The radar is a
@@ -235,15 +272,23 @@ export function findChimes(
   cyclic: boolean,
   rule: ChimeRule = CHIME_RULE,
 ): Chime[] {
+  return findChimesDetailed(levels, warmShare, grid, cyclic, rule).chimes;
+}
+
+/** The same rule as `findChimes`, and also the peaks it left out, each with its reason and winner.
+ *  The chimes are exactly what `findChimes` returns (a test checks it on several pictures). */
+export function findChimesDetailed(
+  levels: Float32Array,
+  warmShare: Float32Array,
+  grid: ScanGrid,
+  cyclic: boolean,
+  rule: ChimeRule = CHIME_RULE,
+): { chimes: Chime[]; dropped: DroppedPeak[] } {
   const { columns, bands } = grid;
-  const at = (column: number, band: number): number => {
-    if (cyclic) column = ((column % columns) + columns) % columns;
-    else if (column < 0 || column >= columns) return 0;
-    return levels[column * bands + band];
-  };
-  const smooth = (column: number, band: number) => (at(column - 1, band) + 2 * at(column, band) + at(column + 1, band)) / 4;
+  const smooth = (column: number, band: number) => smoothedLevel(levels, grid, cyclic, column, band);
 
   const kept: Chime[] = [];
+  const dropped: DroppedPeak[] = [];
   for (let band = 0; band < bands; band++) {
     const peaks: Chime[] = [];
     for (let column = 0; column < columns; column++) {
@@ -257,11 +302,12 @@ export function findChimes(
     peaks.sort((a, b) => b.level - a.level || a.column - b.column);
     const accepted: Chime[] = [];
     for (const p of peaks) {
-      const tooClose = accepted.some((q) => {
+      const winner = accepted.find((q) => {
         const d = Math.abs(p.column - q.column);
         return (cyclic ? Math.min(d, columns - d) : d) < rule.minGap;
       });
-      if (!tooClose) accepted.push(p);
+      if (!winner) accepted.push(p);
+      else dropped.push({ column: p.column, band: p.band, level: p.level, reason: 'spacing', by: { column: winner.column, band: winner.band } });
     }
     kept.push(...accepted);
   }
@@ -272,14 +318,21 @@ export function findChimes(
   for (const group of byColumn.values()) {
     group.sort((a, b) => b.level - a.level || a.band - b.band);
     out.push(...group.slice(0, rule.perColumn));
+    for (const p of group.slice(rule.perColumn)) {
+      dropped.push({ column: p.column, band: p.band, level: p.level, reason: 'column', by: { column: group[0].column, band: group[0].band } });
+    }
   }
-  return out.sort((a, b) => a.column - b.column || a.band - b.band);
+  return {
+    chimes: out.sort((a, b) => a.column - b.column || a.band - b.band),
+    dropped: dropped.sort((a, b) => a.column - b.column || a.band - b.band),
+  };
 }
 
 // ---------- Pitch: fixed choices that carry no data beyond "which band" ----------
 
-/** C major pentatonic (C D E G A): no two notes clash, whatever the picture plays together.
- *  The same scale as the melody keys, so playing along always fits. Design choice. */
+/** C major pentatonic (C D E G A): no two of the held notes clash (no semitone, tritone or major
+ *  seventh between them), whatever the picture plays together. The same scale as the melody keys.
+ *  Design choice. The low root F is not in it (see ROOT_PROGRESSION). */
 export const SCAN_SCALE = 'C major pentatonic';
 /**
  * The held note of each band, low to high. All are notes of the scale, but not every step of it:
