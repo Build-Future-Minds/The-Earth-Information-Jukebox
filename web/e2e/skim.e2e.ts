@@ -85,3 +85,14 @@ test('the Globe and Game tabs: the globe is its own view, the game tab opens the
   await tabs.getByRole('link', { name: 'Game' }).click();
   await expect(page.getByRole('link', { name: /Back to Earth Sonata/ })).toBeVisible();
 });
+
+test('on Globe, the playing region\'s button stops it (no keyboard needed)', async ({ page }) => {
+  await openApp(page, 'globe');
+  await page.getByRole('button', { name: /^Play Region B/ }).click();
+  await expect(page.getByRole('status')).toHaveText(/Playing Region B/);
+  const stopB = page.getByRole('button', { name: 'Stop Region B' });
+  await expect(stopB).toHaveAttribute('aria-pressed', 'true');
+  await stopB.click();
+  await expect(page.getByRole('status')).toHaveText(/Stopped/);
+  await expect(page.getByRole('button', { name: /^Play Region B/ })).toHaveAttribute('aria-pressed', 'false');
+});

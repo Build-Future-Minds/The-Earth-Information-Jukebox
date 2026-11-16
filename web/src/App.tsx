@@ -275,7 +275,7 @@ export function App() {
               look={look}
             />
           )}
-          {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} />}
+          {view === 'globe' && <GlobeTab source={source} regionId={regionId} onPlayRegion={listenTo} playing={playState === 'playing'} onStop={stop} />}
           {view === 'how' && <HowView source={source} pictures={PICTURES} />}
           {view === 'play' && (
             <PlayView
