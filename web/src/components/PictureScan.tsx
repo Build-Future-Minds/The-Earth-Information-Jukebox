@@ -20,16 +20,15 @@ import {
   bandNote,
   buildScanScore,
   chimeNote,
-  cropPixels,
   TEST_CIRCLE,
   makeTestPicture,
   noteName,
+  regionScan,
   rootNoteAt,
   type Chime,
   type Pixels,
   type ScanMeasure,
   type ScanScore,
-  type ScanShape,
 } from '../audio/scanScore';
 import { regionLabel } from './ExploreControls';
 
@@ -88,7 +87,9 @@ const RANGE_RINGS = [3, 6, 9];
 /** Most chime marks kept on the picture (one sweep makes about 70). */
 const MAX_TRACES = 160;
 
-function loadPicture(imageUrl: string | null): Promise<Loaded> {
+/** Read a picture's pixels the way the scan does. Exported for the measuring tool (web/measure),
+ *  so its numbers come from the same pixels the app plays. */
+export function loadPicture(imageUrl: string | null): Promise<Loaded> {
   if (!imageUrl) {
     const pixels = makeTestPicture();
     const canvas = document.createElement('canvas');
@@ -149,10 +150,8 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
   const score = useMemo<ScanScore | null>(() => {
     if (!loaded) return null;
     if (!region) return buildScanScore(loaded.pixels, { kind: 'line' }, { measure });
-    const k = loaded.pixels.width / (loaded.isTest ? loaded.pixels.width : scene.frames.width); // the still may be smaller than the frames
-    const [x, y, w, h] = region.box_px;
-    const crop = cropPixels(loaded.pixels, Math.round(x * k), Math.round(y * k), Math.round(w * k), Math.round(h * k));
-    const shape: ScanShape = { kind: 'radar', cx: crop.width / 2, cy: crop.height / 2, r: region.radius_px * k };
+    // The still may be smaller than the frames the region's pixels are counted in.
+    const { crop, shape } = regionScan(loaded.pixels, loaded.isTest ? loaded.pixels.width : scene.frames.width, region);
     return buildScanScore(crop, shape, { measure });
   }, [loaded, region, scene.frames.width, measure]);
 
@@ -537,10 +536,34 @@ export const PictureScan = forwardRef<PictureScanHandle, Props>(function Picture
       <details className="scan-how">
         <summary>How the picture becomes sound</summary>
         <ul>
+          {loaded && !loaded.isTest && (
+            <li>
+              <strong>Which picture.</strong> One still: {scene.source.title}
+              {stillTime(scene.frames.timestamps?.[0])}. It is the only picture this rule has been checked on, so the scan
+              stays on it whichever picture is chosen on Listen.
+            </li>
+          )}
           <li><strong>Where.</strong> Higher on the picture is a higher note (on the radar: further from the centre). There are 12 bands, on the five notes C, D, E, G and A. Low bands are far apart and high bands close together, as a choir is spaced.</li>
           <li><strong>How much colour.</strong> More colour under the line is louder, and a little brighter in tone. Black sea and grey land are silent. A soft held note sounds for every band the line is crossing.</li>
-          <li><strong>Bright spots.</strong> When the line crosses a spot brighter than what is around it, one note is struck, an octave above that band's held note.</li>
-          <li><strong>Which colour.</strong> Red and orange spots are struck on one instrument, yellow-green, green and blue spots on another.</li>
+          <li>
+            <strong>Peaks of colour.</strong> When a band has more colour under the line than just before and just after, one
+            note is struck, an octave above that band's held note. Peaks that follow each other too closely are left out, so
+            each struck note can be heard.
+          </li>
+          <li>
+            <strong>Which colour.</strong> Where most of that colour is on the red side of yellow (red and orange), the note is
+            struck on one instrument. Where it is not (yellow-green, green and blue), it is struck on another.
+            {loaded && !loaded.isTest && (
+              <> On NASA's colour bar for this picture the switch falls at about 24 °C, if the bar's scale is even. We measured the bar, not the sea.</>
+            )}
+          </li>
+          {loaded && !loaded.isTest && (
+            <li>
+              <strong>What the scan cannot tell you.</strong> Warm colours are drawn stronger than cold ones, so warm water
+              sounds louder than cold water with the same amount of line. The still is a compressed copy of NASA's frame,
+              which blurs its finest lines.
+            </li>
+          )}
           <li><strong>Left and right.</strong> The sound sits where the line is: it travels from the left speaker to the right with the line.</li>
           <li>
             <strong>Decoration, not data.</strong> The scale is fixed. The low note steps through C, A, F and G on a fixed
@@ -579,13 +602,13 @@ function Legend({ sound, order, radar }: { sound: ScanSoundDef; order: string; r
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <circle cx="15" cy="11" r="5" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a bright red or orange spot.</span>
+        <span><strong>Round mark: a {sound.warmName} note.</strong> The line crossed a peak of colour that is mostly red or orange.</span>
       </li>
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
           <rect x="10.5" y="6.5" width="9" height="9" transform="rotate(45 15 11)" fill="#fff" stroke="#000" strokeWidth="1.5" />
         </svg>
-        <span><strong>Diamond: a {sound.coolName} note.</strong> The line crossed a bright yellow-green, green or blue spot.</span>
+        <span><strong>Diamond: a {sound.coolName} note.</strong> The line crossed a peak of colour that is mostly yellow-green, green or blue.</span>
       </li>
       <li>
         <svg className="glyph" viewBox="0 0 30 22" aria-hidden="true">
@@ -704,6 +727,11 @@ function profilePath(
     return d;
   };
   return `M${xy(start, 0)}${side(1, points)}${side(-1, [...points].reverse())}Z`;
+}
+
+/** ", 2007-03-25 12:00 UTC" for "2007-03-25T12:00Z": the time of the still's frame, as the scene file gives it. */
+function stillTime(iso?: string): string {
+  return iso ? `, ${iso.replace('T', ' ').replace('Z', ' UTC')}` : '';
 }
 
 /** "143° W": where the line is on the map. The NASA frame runs from 180° W at the left edge to 180° E. */

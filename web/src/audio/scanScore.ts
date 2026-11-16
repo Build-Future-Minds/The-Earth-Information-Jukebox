@@ -85,7 +85,9 @@ export function brightness(r: number, g: number, b: number): number {
  */
 export type ScanMeasure = 'colour' | 'brightness';
 
-/** Red side of yellow (red, orange): red is the largest channel. NASA's legend puts yellow at about 25 °C. */
+/** Red side of yellow (red, orange): red is the largest channel. Measured on NASA's colour bar for
+ *  the ocean picture, the answer switches at 74.4% of the bar's length, which is 23.8 °C if the
+ *  bar's scale is even (docs/measurements/scan_pictures.md). A rule about pixels, not degrees. */
 export function isWarm(r: number, g: number, b: number): boolean {
   return r >= g && r >= b;
 }
@@ -333,9 +335,10 @@ export function columnTime(grid: ScanGrid, column: number): number {
 
 /**
  * The low root note does not stay on C: it steps through the roots of four chords, I, VIm, IV, V
- * in C (C, A, F, G), changing every 3.75 s. The five scale notes fit over each of these roots, so
- * the same held notes are heard as four different chords and the scan sounds like music that
- * moves instead of one long drone.
+ * in C (C, A, F, G), changing every 3.75 s. The same held notes are heard over four roots, as
+ * four different chords, so the scan sounds like music that moves instead of one long drone.
+ * C, A and G are notes of the scale. F is not: under F the held E is a major seventh above it,
+ * the one sharp interval in the scan (scanScore.test.ts names the two pairs).
  * This is decoration on a fixed timetable. It carries no data: the picture sets only how loud the
  * root is (columnMean), never which note it is. The band notes never change, so a place on the
  * picture always gives the same pitch.
@@ -385,6 +388,24 @@ export function cropPixels(pixels: Pixels, x0: number, y0: number, width: number
     }
   }
   return { data, width, height };
+}
+
+/**
+ * What the radar reads for one region: the region's bounding square cut out of the picture, and the
+ * circle inside it. `frameWidth` is the width the region's pixels are counted in (the scene's
+ * frames). The still may be smaller than the frames, so everything is scaled by
+ * picture width ÷ frame width. The app and the measuring tool (web/measure) both call this, so
+ * they read the same pixels.
+ */
+export function regionScan(
+  pixels: Pixels,
+  frameWidth: number,
+  region: { box_px: [number, number, number, number]; radius_px: number },
+): { crop: Pixels; shape: RadarShape } {
+  const k = pixels.width / frameWidth;
+  const [x, y, w, h] = region.box_px;
+  const crop = cropPixels(pixels, Math.round(x * k), Math.round(y * k), Math.round(w * k), Math.round(h * k));
+  return { crop, shape: { kind: 'radar', cx: crop.width / 2, cy: crop.height / 2, r: region.radius_px * k } };
 }
 
 // ---------- TEST INPUT picture (not NASA data) ----------

@@ -14,6 +14,7 @@ import {
   TEST_CIRCLE,
   brightness,
   noteName,
+  regionScan,
   rootNoteAt,
   scanPan,
   bandNote,
@@ -343,6 +344,25 @@ describe('cropPixels', () => {
   });
 });
 
+describe('regionScan: what the radar reads for a region', () => {
+  it('cuts out the bounding square and puts the circle at its centre', () => {
+    const { crop, shape } = regionScan(makeTestPicture(), 240, TEST_CIRCLE);
+    expect([crop.width, crop.height]).toEqual([110, 110]);
+    expect(shape).toEqual({ kind: 'radar', cx: 55, cy: 55, r: 55 });
+    // The same score as cropping by hand, which is what the app did before this helper.
+    const byHand = buildScanScore(cropPixels(makeTestPicture(), 65, 5, 110, 110), { kind: 'radar', cx: 55, cy: 55, r: 55 });
+    expect(buildScanScore(crop, shape).chimes).toEqual(byHand.chimes);
+  });
+  it('scales the region when the still is smaller than the frames it was drawn on', () => {
+    // Frames twice as wide as the picture: every length halves. 32.5 and 2.5 round up to 33 and 3.
+    const { crop, shape } = regionScan(makeTestPicture(), 480, TEST_CIRCLE);
+    expect([crop.width, crop.height]).toEqual([55, 55]);
+    expect(shape).toEqual({ kind: 'radar', cx: 27.5, cy: 27.5, r: 27.5 });
+    const direct = cropPixels(makeTestPicture(), 33, 3, 55, 55);
+    expect(Array.from(crop.data)).toEqual(Array.from(direct.data));
+  });
+});
+
 describe('notes come from the music library (Tonal)', () => {
   it('the band notes, by name, are all notes of C major pentatonic', async () => {
     expect(SCAN_SCALE).toBe('C major pentatonic');
@@ -367,9 +387,22 @@ describe('decoration that carries no data: the low root steps I, VIm, IV, V', ()
     expect(ROOT_PROGRESSION).toEqual(['I', 'VIm', 'IV', 'V']);
     expect(ROOT_NOTES.map(noteName)).toEqual(['C2', 'A1', 'F2', 'G2']);
   });
-  it('every root is a note of the scale, so it never clashes with the held notes', () => {
-    for (const root of ROOT_NOTES) expect([0, 2, 4, 7, 9, 5]).toContain(root % 12); // F is the one note outside the five
-    expect(ROOT_NOTES.filter((n) => n % 12 === 5)).toHaveLength(1);
+  // "Clash" in these tests: two notes a semitone, a tritone or a major seventh apart (1, 6 or 11
+  // semitones, octaves aside). A stated definition, so the claims below can be checked.
+  const clash = (a: number, b: number) => [1, 6, 11].includes((((a - b) % 12) + 12) % 12);
+  const held = Array.from({ length: 12 }, (_, band) => bandNote(band));
+
+  it('no two held notes clash: the five notes of the scale have no semitone, tritone or major seventh between them', () => {
+    expect([...new Set(held.map((n) => n % 12))].sort((a, b) => a - b)).toEqual([0, 2, 4, 7, 9]); // C D E G A
+    for (const a of held) for (const b of held) expect(clash(a, b), `${noteName(a)} with ${noteName(b)}`).toBe(false);
+  });
+  it('three of the four roots are notes of the scale; F is not', () => {
+    expect(ROOT_NOTES.map((n) => [0, 2, 4, 7, 9].includes(n % 12))).toEqual([true, true, false, true]); // C, A, F, G
+    expect(noteName(ROOT_NOTES[2])).toBe('F2');
+  });
+  it('the one clash in the scan: under the root F, the held E is a major seventh above it', () => {
+    const pairs = ROOT_NOTES.flatMap((root) => held.filter((note) => clash(note, root)).map((note) => `${noteName(root)} with ${noteName(note)}`));
+    expect(pairs).toEqual(['F2 with E4', 'F2 with E5']);
   });
   it('the root changes every 3.75 s: 30 columns at 8 columns a second', () => {
     expect(ROOT_STEP_SECONDS).toBe(3.75);

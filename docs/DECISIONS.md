@@ -200,6 +200,18 @@ set, the line moves once a second and nothing fades.
 **Listening:** Developer A listened to the first two versions on 15 Nov and judged them good.
 One listener, not a test. The third round was checked by measurement only.
 
+**Audit, 15 Nov (Dev A):** every claim the scan makes is listed and tagged in `mapping_spec.md`,
+"Audit of the scan's claims". The picture numbers come from one command, `npm run measure` in
+`web/`, which runs the rule in Chromium on the real stills and records the running app's sound
+(`web/measure/README.md`). What it
+changed: the app no longer says "bright spot" (a struck note is a peak of colour in a whole cell,
+and 39% to 61% of peaks are left out); the low note F is no longer said to fit the scale (it is a
+major seventh under the held E); and three limits are now written down: warm colours are drawn
+stronger than cold ones, the still is a JPEG that moves single chimes, and equal bands on the map
+are not equal shares of the globe. **Design choice:** none of the three is corrected for; each is
+stated. **Not decided:** whether the app should read an uncompressed still, and the rules the
+aerosol and rain pictures need before the scan may play them.
+
 ## Sources
 
 | ID | Citation | Link | Status | Used in |

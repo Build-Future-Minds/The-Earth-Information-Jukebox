@@ -151,7 +151,10 @@ team's land rule uses. A cell's mean strength `s` becomes a level
 
 A chime needs a level of 0.3 or more at its peak, after smoothing over three columns with
 weights 1, 2, 1. Two chimes in one band are at least 6 columns (0.75 s) apart, and one column
-starts at most one chime; the stronger spot wins.
+starts at most one chime; the stronger spot wins. A "spot" here is a whole cell: on the map sweep
+1.5° of longitude wide and 15° of latitude tall. The rule leaves many peaks out. **Measured, 15 Nov**,
+on the ocean still: 44 of 112 peaks on the map sweep, 46 of 102 on the Kuroshio radar and 115 of 187
+on the Equatorial Pacific radar (`docs/measurements/scan_pictures.md`).
 
 **Decoration that carries no data.** Three musical choices are fixed and the picture cannot
 change them. The app says so in "How the picture becomes sound".
@@ -165,9 +168,11 @@ change them. The app says so in "How the picture becomes sound".
   (soft organ, kalimba, music box) and Plain (the first version's instruments). All three play
   the same score, the same notes at the same times; a browser test checks it.
 - Which low note sounds. It steps through the roots of four chords, I, VIm, IV and V in C (the
-  notes C2, A1, F2, G2), one every 3.75 s. The five scale notes fit over each root, so the same
-  held notes are heard as four chords and the scan moves like music. The picture sets only how
-  loud the low note is. The band notes never change: a place always gives the same pitch.
+  notes C2, A1, F2, G2), one every 3.75 s. The same held notes are heard over four roots, as
+  four chords, so the scan moves like music. C, A and G are notes of the scale. F is not: under
+  F the held E is a major seventh above it, the one sharp interval in the scan (a test names the
+  two pairs, F2 with E4 and F2 with E5). The picture sets only how loud the low note is. The band
+  notes never change: a place always gives the same pitch.
 - How far left or right: at most 0.7 of the way to one speaker. The map sweep travels left to
   right with the line; the radar swings right, centre, left, centre. It repeats what the screen
   shows, so no fact is given by stereo alone.
@@ -178,7 +183,15 @@ so the code says "C major pentatonic" and "I, VIm, IV, V" and a test checks the 
 **Other pictures.** The level can be measured by colour strength (the default) or by brightness
 (the largest of red, green and blue), for pictures whose data is white or grey on a dark ground.
 A scene chooses one; the code never switches by itself. The ocean picture uses colour, because
-by brightness its grey land would sound (a test shows this). Only this picture has been tried.
+by brightness its grey land would sound (a test shows this).
+
+The app's scan plays the ocean picture only, whichever picture is chosen on Listen (Dev B's review
+of #45). The aerosol and rain stills were measured with the same rule on 15 Nov and are **not
+ready**. By colour, the rain picture's empty sea sounds in every cell (it is drawn dark navy, not
+black: mean level 0.141) and its land, a photo, sounds in 61% of land cells. On the aerosol still
+93% of sea cells sound, and its sea-salt circle gives no chime at all. Each picture needs its own
+floor, land rule and legend before the scan may play it, and its numbers are never compared with
+another picture's.
 
 All instruments are synthesised by our code. A struck note is a few sine tones at the ratios
 of a vibrating bar, `(xₙ / x₁)²`, each fading at its own speed:
@@ -212,7 +225,29 @@ whole picture the three scan sounds are level with each other: Ocean choir −25
 For comparison the Earth pulse alone is −23.5 LUFS. With the Earth voice, the scan and a
 four-note melody chord together, the loudest peak was −4.4 dBFS, so nothing clipped, and after
 Stop the output was below −84 dB from 0.15 s on. These last two figures were measured with the
-first instruments and not again since.
+first instruments; the next paragraph repeats them with today's.
+
+**Measured again, 15 Nov**, by `npm run measure`, which records the running app in headless
+Chromium (two runs; `docs/measurements/scan_sound.md` holds the latest). Ocean choir, default
+volumes.
+
+| | First run | Second run | The table above |
+| --- | --- | --- | --- |
+| Whole picture, one sweep | −25.1 LUFS | −24.4 LUFS | −25.0 LUFS |
+| Region A, one turn | −24.7 LUFS | −24.2 LUFS | −24.6 LUFS |
+| Region B, one turn | −21.8 LUFS | −21.6 LUFS | −21.4 LUFS |
+| Largest sample in the three sweeps | −6.6 dBFS | −7.0 dBFS | −5.6 dBFS |
+| Earth voice, map sweep and a four-key chord: largest sample | −5.0 dBFS | −5.2 dBFS | −4.4 dBFS (first instruments) |
+| From 0.15 s to 2.15 s after Stop | every sample 0 | every sample 0 | below −84 dB |
+
+So nothing clipped and Stop leaves silence. A loudness on this page is good to about half a
+LUFS, not to the decimal it is written with: the same sweep differed by up to 0.7 between two
+runs. **Unverified:** why. Our guess is that the held notes' detuned copies start at random
+phases.
+
+Loudness follows the level. On a test picture with levels 0.121, 0.251, 0.502 and 1 in one band
+and the chime rule switched off, that band's tone rose by 6.2, 6.0 and 5.9 dB in the first run
+and 6.5, 6.2 and 6.0 dB in the second. 20·log₁₀ of the level ratios gives 6.3, 6.0 and 6.0 dB.
 
 Checked in a recording of the map sweep:
 
@@ -221,16 +256,46 @@ Checked in a recording of the map sweep:
 - Left and right: in the first 5 s the left channel is 9.5 dB louder than the right, they cross
   between 15 and 20 s, and in the last 5 s the right is 9.3 dB louder.
 
-**Tests.** `web/src/audio/scanScore.test.ts`: 53 tests on made-up pictures (TEST INPUTS). The
+**Tests.** `web/src/audio/scanScore.test.ts`: 57 tests on made-up pictures (TEST INPUTS). The
 main one is a picture with three dots, which must give exactly three chimes: columns 41, 81 and
 201, bands 1, 8 and 5, marimba for the red dot and bells for the green and blue ones. Black,
 grey and grey with JPEG-sized noise are `missing` and silent. The root steps, the left–right
-position, the note spacing and the brightness measure each have their own tests.
+position, the note spacing and the brightness measure each have their own tests. Three more say
+exactly which notes clash (none of the held notes with each other; F under E).
+`web/src/audio/instruments.test.ts`: 3 tests solve the two bar equations again and compare the
+answers with the ratios the instruments use.
 `web/e2e/scan.e2e.ts`: 12 browser tests. They include a radar turn on a test circle, and a check that
 the line keeps moving when another scan is chosen while one is playing (it once stood still while
 the notes played; found by Developer A and fixed on 15 Nov). The two first chimes sound 5.000 s apart within 5 ms (10 s at half speed), over the roots
 A1 and F2; the line on screen is where the audio clock says; a chime leaves one mark; Esc stops
 the scan and clears the picture; and all five melody sounds let go of their notes.
+
+**Audit of the scan's claims, 15 Nov.** Every picture number below comes from `npm run measure`
+(in `web/`), which runs the rule in Chromium on the stills the app plays and writes
+`docs/measurements/scan_pictures.md`. The sound numbers come from the same command, which records
+the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
+
+| Claim | Tag | Evidence, or what is still to measure |
+| --- | --- | --- |
+| The method is NASA's: a line or a radar, position to pitch, light to loudness, colour to instrument | Verified | S9 to S11 |
+| The Earth rhythm is unchanged while the scan plays | Verified | Browser test |
+| The line runs west to east and the readout gives its longitude | Verified for the ocean | Map geometry checked by Student A, 14 Nov. The app finds a world map by the word "equirectangular" in a scene's limitations; the aerosol and rain scenes lack the word, so this must be fixed before either is played |
+| Pitch is height on the map, in 12 equal bands | Design choice | Limits in "What we do not claim" |
+| Loudness is a cell's mean colour strength | Design choice | Limits in "What we do not claim" |
+| The sound gets louder as the level rises | Verified | On a recorded test picture each doubling of the level raised that band's tone by 5.9 to 6.5 dB over two runs; 6.0 is exact |
+| Black sea and grey land are silent | Verified for the ocean | Of 746 cells that are 90% or more grey land or black sea in the uncompressed frame, none sounds. Largest cell mean 7.67/255; the floor is 12/255 |
+| A peak of colour gives one struck note | Design choice | 39% to 61% of peaks are left out |
+| Red and orange strike one instrument, the rest another | Design choice | The switch on NASA's colour bar is measured; what it means in degrees is Unverified |
+| The held notes never clash with each other | Verified | A test, with "clash" defined as 1, 6 or 11 semitones apart |
+| The low note never clashes with the held notes | Corrected | It did claim this. F under E is a major seventh |
+| Wide spacing at the bottom is clearer than close spacing | Unverified | No source. To do: derive it from critical bandwidth, with a source someone has read |
+| The bars' tone ratios | Verified | A test solves both equations |
+| The low note's steps and the left–right position carry no data | Verified | Recordings above |
+| Every scan sound plays the same score | Verified by construction | The browser test compares the first chime only |
+| Nothing clips with all three voices, and Stop leaves silence | Verified | Recorded twice with today's instruments: largest sample −5.0 and −5.2 dBFS; every sample 0 from 0.15 s after Stop |
+| The counts in "Measured, 15 Nov" | Verified again | The tool gives the same: 60.0% and 68 chimes (53, 15); 98% and 56; 100% and 72 |
+| The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | Two more runs differ from them, and from each other, by up to 0.7 |
+| It sounds good, and a region's character can be heard | Unverified | Needs listeners. The third round has had none |
 
 **What we do not claim.**
 
@@ -242,11 +307,27 @@ the scan and clears the picture; and all five melody sounds let go of their note
   for something in the picture; the app's explanation and this page say it is not.
 - The scan reads colours in a picture. NASA's legend says the colour shows modelled sea surface
   temperature, but we do not turn colours into degrees. "Red side of yellow" is a rule about
-  pixels, not a temperature we checked.
+  pixels. On NASA's colour bar the rule switches at 74.4% of the bar's length, which is 23.8 °C
+  if the bar's scale is even between its end labels, 0 and 32. We measured the bar, not the sea.
+  **Unverified:** that the bar's scale is even (its labels were read by eye), and that the lines
+  in the frame use exactly the bar's colours.
 - Loudness is how much of a cell is covered by drawn lines and how strongly they are coloured. It
-  is not current speed.
-- Bands are equal steps on the flat map (15° of latitude for the line). Near the poles a cell
-  covers less ground.
+  is not current speed. It is not independent of temperature either: along NASA's colour bar the
+  colour strength rises from 0.47 at the cold end to 0.90 at the warm end, so warm water is
+  louder than cold water with the same amount of line (1.93 times the cell mean).
+- The scan reads a compressed copy. `data/preview.jpg` is a JPEG of frame 23000 with halved
+  colour resolution (4:2:0, read from the file's header), which blurs thin coloured lines.
+  Against the uncompressed frame, levels differ by 0.043 on average and 0.152 at most, 1727
+  cells sound where 1816 would, and 49 of the still's 68 chimes fall on a chime of the
+  uncompressed frame (which has 84). The broad picture holds; single chimes do not.
+- Bands are equal steps on the flat map (15° of latitude for the line). Along a meridian these
+  are equal lengths, but a band's share of the globe's surface is (sin φ₂ − sin φ₁) ÷ 2: 12.9%
+  next to the equator and 1.7% next to a pole. Weighting each pixel by cos(latitude) inside its
+  cell moves a level by at most 0.13 (in the band from 75° N to the pole) and at most 0.033
+  elsewhere, and gives 70 chimes in place of 68. We keep the unweighted rule.
+- A circle is round on the flat map, not on the ground: Kuroshio is 0.876 times as wide
+  east–west as it is tall, the Equatorial Pacific circle 1.000. So equal turns of the radar are
+  not equal compass bearings.
 - The scan has its own clock. Its notes can fall close to an Earth pulse, so run the listening
   check with the scan off.
 - The chime rule leaves out bright spots that are too close together. The choir still plays them.

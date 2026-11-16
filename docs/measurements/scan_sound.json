@@ -1,0 +1,170 @@
+{
+ "meta": {
+  "date": "2026-11-16 00:33 UTC",
+  "browser": "Chromium 159.0.8154.6 (headless)",
+  "commit": "cdca469",
+  "dirty": "yes"
+ },
+ "steps": {
+  "band": 6,
+  "note": "C5",
+  "hz": 523.2511306011972,
+  "secondsEach": 6,
+  "chimes": 0,
+  "steps": [
+   {
+    "target": 0.125,
+    "level": 0.12121212482452393,
+    "toneDb": -45.50940262800967,
+    "levelDb": -43.491328492362214,
+    "lufs": -44.022484784689205
+   },
+   {
+    "target": 0.25,
+    "level": 0.25108224153518677,
+    "toneDb": -38.99144546935277,
+    "levelDb": -37.22919680415257,
+    "lufs": -37.46407345973012
+   },
+   {
+    "target": 0.5,
+    "level": 0.5021644830703735,
+    "toneDb": -32.80782737003071,
+    "levelDb": -30.970763911777873,
+    "lufs": -31.18956728562391
+   },
+   {
+    "target": 1,
+    "level": 1,
+    "toneDb": -26.831204283946136,
+    "levelDb": -24.651981326563753,
+    "lufs": -25.11181157195504
+   }
+  ]
+ },
+ "sweeps": [
+  {
+   "name": "Whole picture: a line, west to east",
+   "measured": {
+    "seconds": 30,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000009428,
+    "lufs": -24.432091454726812,
+    "peakDb": -7.6475192546468,
+    "levelDb": -24.14530091023766,
+    "leftMinusRightDb": -0.7402424588461081
+   },
+   "firstSixth": {
+    "seconds": 5,
+    "sampleRate": 48000,
+    "recorded": 0.9999999999998899,
+    "lufs": -23.11838371870482,
+    "peakDb": -8.464533210036679,
+    "levelDb": -22.807059696739096,
+    "leftMinusRightDb": 9.085136123279774
+   },
+   "lastSixth": {
+    "seconds": 5,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000012221,
+    "lufs": -22.033209009324768,
+    "peakDb": -7.6475192546468,
+    "levelDb": -21.968585684122843,
+    "leftMinusRightDb": -9.790357494589067
+   }
+  },
+  {
+   "name": "Region A: a radar turn",
+   "measured": {
+    "seconds": 15,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000012221,
+    "lufs": -24.216740464821246,
+    "peakDb": -8.410111528337506,
+    "levelDb": -24.78483430396674,
+    "leftMinusRightDb": -0.030404189995643094
+   },
+   "firstSixth": {
+    "seconds": 2.5,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000012221,
+    "lufs": -23.772689162912247,
+    "peakDb": -11.964234934237153,
+    "levelDb": -24.713433996888078,
+    "leftMinusRightDb": -8.469947781971097
+   },
+   "lastSixth": {
+    "seconds": 2.5,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000012221,
+    "lufs": -27.97049016768887,
+    "peakDb": -15.533338771816428,
+    "levelDb": -28.712852305436954,
+    "leftMinusRightDb": -7.883825086722695
+   }
+  },
+  {
+   "name": "Region B: a radar turn",
+   "measured": {
+    "seconds": 15,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000012221,
+    "lufs": -21.643542532361987,
+    "peakDb": -6.968096239772609,
+    "levelDb": -21.522889656619817,
+    "leftMinusRightDb": 0.3754287617884984
+   },
+   "firstSixth": {
+    "seconds": 2.5,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000012221,
+    "lufs": -22.805954140322658,
+    "peakDb": -8.977262042122089,
+    "levelDb": -22.362042533982695,
+    "leftMinusRightDb": -9.629221112909612
+   },
+   "lastSixth": {
+    "seconds": 2.5,
+    "sampleRate": 48000,
+    "recorded": 1.0000000000012221,
+    "lufs": -20.83258475560287,
+    "peakDb": -7.966706627528853,
+    "levelDb": -21.018528611234494,
+    "leftMinusRightDb": -8.50150983543357
+   }
+  }
+ ],
+ "keys": [
+  "a",
+  "s",
+  "d",
+  "f"
+ ],
+ "allVoices": {
+  "seconds": 19.989333333333335,
+  "sampleRate": 48000,
+  "recorded": 0.9994666666678882,
+  "lufs": -20.147681302900185,
+  "peakDb": -5.182201304657189,
+  "levelDb": -19.583789184900912,
+  "leftMinusRightDb": 1.1440748452423826
+ },
+ "beforeStop": {
+  "seconds": 1.8,
+  "sampleRate": 48000,
+  "recorded": 1.0000000000012237,
+  "lufs": -20.11201690662113,
+  "peakDb": -6.382485375752976,
+  "levelDb": -19.658250739312457,
+  "leftMinusRightDb": -0.7628011303731164
+ },
+ "afterStop": {
+  "seconds": 2,
+  "sampleRate": 48000,
+  "recorded": 1.0000000000012221,
+  "lufs": null,
+  "peakDb": null,
+  "levelDb": null,
+  "leftMinusRightDb": null
+ }
+}
