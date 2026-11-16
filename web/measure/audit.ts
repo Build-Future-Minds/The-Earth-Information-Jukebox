@@ -36,7 +36,7 @@ import {
   type ScanMeasure,
   type ScanScore,
 } from '../src/audio/scanScore';
-import { loadMask, loadPicture } from '../src/components/PictureScan';
+import { loadMask, loadPicture } from '../src/scan/loadPicture';
 import { PICTURES, type Picture } from '../src/data/sources';
 import type { LandRule } from '../src/globe/geo';
 

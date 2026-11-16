@@ -230,9 +230,11 @@ the Earth voice. "Why the scan sounds like this" (opened by Explain on Listen, a
 
 - *Last struck note.* The place on the picture, what was measured there, and how that became the
   held note's loudness and the struck note's pitch, instrument and strength.
-- *Look at a column.* While the scan plays this follows the line, a few times a second. Paused or
-  stopped, a slider and two buttons choose a column; this makes no sound and does not move the scan.
-  A table gives every band in that column: place, pixels read, mean, level, held note, struck note.
+- *Look at a column.* While the scan plays this follows the line, a few times a second, until a
+  place is chosen. A slider and two buttons choose a column; choosing one stops the following, and a
+  checkbox, "Follow the line while the scan plays", turns it off and on from the keyboard. None of
+  this makes a sound or moves the scan. A table gives every band in that column: place, pixels read,
+  mean, level, held note, struck note.
 - *Explain band.* One band in full, in words, with the arithmetic: level = (mean − floor) ÷ (full −
   floor), and the chime rule's numbers. A peak the chime rule left out says which stronger peak took
   its place and why (too close in the same band, or a stronger peak in the same column).
@@ -249,6 +251,49 @@ sounded, even if the scan sound is changed afterwards. On a whole-world map a pl
 and latitude range and a band's share of the globe's surface (12.9% at the equator, 1.7% at a
 pole); on any other picture it is a share of the way across and up, and no ground is claimed. The
 legend and the fold-out each keep "From the picture" apart from "Fixed by us" in words, not colour.
+
+**Pick a place on the picture.** A click or tap on the scan's picture opens the fold-out on the cell
+under the pointer: its column, and its band as the one explained in full, exactly as if they had been
+chosen with the slider and the band list. It makes no sound and does not move the scan; while the scan
+plays it stops the following, and the scan plays on. A point outside the picture, or outside the
+radar's circle, does nothing. The slider and the list remain the complete keyboard route: the click
+reaches nothing they cannot.
+
+- *Which cell.* Map sweep: the point is taken to the still's pixel under it, and that pixel to the
+  cell it was counted in, with the same two expressions the score uses. Radar: the bearing from the
+  centre (0° east, anticlockwise) gives the column, and the distance gives the band, so the cell is
+  the ring sector that holds all 16 points the radar read for it (`web/src/audio/scanPick.ts`).
+  **Verified by unit tests** (`scanPick.test.ts`): on the map sweep, counting every pixel's cell gives
+  the score's own pixel counts, cell for cell, at the test picture's size (240 × 120), the ocean
+  frame's (2048 × 1024) and a still smaller than its frame (1000 × 500 in 2048 × 1024), and every point
+  inside a pixel gives that pixel's cell; on the radar, every one of the 16 points read for every cell
+  gives that cell back, for the test circle and both ocean regions; a chime mark's centre gives its own
+  cell back; and the circle the radar reads is the circle drawn, which holds because the still and the
+  frames are both 2048 × 1024 (the test fails if that changes).
+- *What shows.* The cell is outlined on the picture, black under white, with four ticks pointing at it
+  so a column one or two screen pixels wide can be found. It is a shape, not a colour, and it never
+  moves. One line under the picture names the cell in the table's words; where no note is struck
+  there, it also names the nearest struck note in the same band (on the radar, round the circle), so a
+  click on the middle of a spot of colour finds the note the spot made. The outline and the line show
+  whenever the fold-out is open and not following the line, whichever way the place was chosen.
+- *Words, focus and pointers.* **Design choices** (Developer A, 15 Nov): a click never moves focus;
+  the line under the picture is plain text, not a live region, and its "Read why" button moves focus
+  to the band's full sentence when pressed. The picture is described to a screen reader by the same
+  sentence that is on screen: click or tap, or use the column slider. Mouse, touch and pen all send
+  pointer events; a press that moves more than 10 CSS pixels before it lets go is a drag and picks
+  nothing; nothing happens on hover. The radar's locator map is not clickable.
+- *Limit: precision on a phone.* **Measured, 15 Nov**, in Chromium at 390 × 844 pixels: the map
+  picture is 358 CSS pixels wide, so one column is 1.49 pixels; on the radar one column is 8.1 pixels
+  of arc at the rim and 0.34 at the middle of the innermost band. A fingertip covers many columns, so
+  a tap picks the cell under the touch point, the outline shows which, and the buttons step to the one
+  wanted.
+- *Checked on the real picture, 15 Nov.* In the running app with the ocean still, a click on the
+  centre of a struck cell explained exactly that cell (column, band, and its struck note) for two cells
+  of the map sweep, one marimba and one bells, and one cell in each radar circle; a click on the
+  radar's locator map changed nothing. The check script was a one-off and is not in the repo; the
+  browser tests run on the TEST INPUT picture.
+- *Not checked:* a real phone or tablet, a real pen and a real screen reader. The browser tests
+  (`web/e2e/scan-click.e2e.ts`) use Chromium with touch emulation and synthetic pen events.
 
 **Checked on the real picture, 15 Nov.** Five cells of the ocean picture were explained in the running
 app (a struck marimba note, a struck bells note, a peak left out for spacing, a peak left out for
@@ -379,6 +424,9 @@ the running app and writes `docs/measurements/scan_sound.md`. Nobody listened.
 | The counts in "Measured, 15 Nov" | Verified again | The tool gives the same: 60.0% and 68 chimes (53, 15); 98% and 56; 100% and 72 |
 | The loudness figures in "Measured, 15 Nov" | Verified to about half a LUFS | Two more runs differ from them, and from each other, by up to 0.7 |
 | It sounds good, and a region's character can be heard | Unverified | Needs listeners. The third round has had none |
+| A click on the picture explains the cell the scan read there | Verified | Unit tests (`scanPick.test.ts`), and a one-off check in the running app on the ocean still: see "Pick a place on the picture" |
+| A click makes no sound and does not move the scan | Verified | Browser tests, stopped, paused and playing. A click while playing leaves the first two notes with the same columns, instruments, 5 s spacing, low notes and left–right places that `scan.e2e.ts` checks without a click |
+| A click works by mouse, touch and pen | Verified in emulation only | Chromium touch emulation and synthetic pen events. No real phone, tablet or pen tried |
 
 **What we do not claim.**
 

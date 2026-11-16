@@ -5,35 +5,27 @@
 //   - under it, the sound line: every struck note of the scan, by time and pitch, with the playhead.
 //     On the map sweep its x is the picture's x, so the playhead stands under the scan line;
 //   - beside it, the twelve held notes, each next to the band of the picture it reads.
-// Everything is drawn from the same score and the same audio clock as the sound. The score uses the
-// chosen picture's own settings (data/sources.ts, ScanRule), never another picture's.
-// No sound before Play; Stop and Esc (App) silence it; choosing another picture stops it (App).
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react';
-import { scanSound, SCAN_SOUNDS, type ScanSoundId } from '../audio/instruments';
+// The picture, the score, the player and the drawing loop are the ones every view of the scan shares
+// (web/src/scan/), so Listen plays exactly what Play along plays. The score uses the chosen picture's
+// own settings (data/sources.ts, ScanRule), never another picture's.
+// No sound before Play; Stop and Esc (App) silence it; choosing another picture stops it (App, and
+// ListenView gives each picture its own ListenScan, whose player is disposed with it).
+import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react';
+import { SCAN_SOUNDS, type ScanSoundId } from '../audio/instruments';
 import { scanChoicesFor } from '../audio/scanChoices';
-import { ScanPlayer, type ScanState } from '../audio/scanPlayer';
-import { bandNote, noteName, pictureScore, type Chime, type ScanScore } from '../audio/scanScore';
-import {
-  factsOf,
-  regionLetter,
-  scanFrame,
-  scanRegions,
-  targetName,
-  type ScanTarget,
-  type Source,
-} from '../data/sources';
+import type { ScanState } from '../audio/scanPlayer';
+import { bandNote, noteName, type ScanScore } from '../audio/scanScore';
+import { factsOf, regionLetter, scanRegions, targetName, type ScanTarget, type Source } from '../data/sources';
 import type { Region } from '../data/types';
+import { ScanHow, ScanLegend } from '../scan/ScanLegend';
+import { ScanOverlay, drawSweep, viewOf } from '../scan/ScanOverlay';
+import { longitude, useScan, type ScanHandle } from '../scan/useScan';
+import { useScanFrame } from '../scan/useScanFrame';
 import { PlayerBar, regionStyle, type RegionLook } from './ExploreControls';
-import { useScanPicture, useSweepRefs } from './PictureScan';
-import { ScanExplanation } from './ScanExplanation';
-import { ScanHow, ScanLegend } from './ScanLegend';
-import { MAX_TRACES, ScanOverlay, chimePosition, drawSweep, longitude, viewOf, type Trace } from './ScanOverlay';
+import { ScanExplanation, WHY_START, type WhyView } from './ScanExplanation';
 import { Graticule } from './SceneView';
 
-export interface ListenScanHandle {
-  /** Silence the scan and rewind it (the page's Stop and Esc, and a change of picture). */
-  stop: () => void;
-}
+export type ListenScanHandle = ScanHandle;
 
 interface Props {
   picture: Source;
@@ -52,12 +44,6 @@ interface Props {
   onPickRegion: (regionId: string) => void;
 }
 
-declare global {
-  interface Window {
-    __scanScore?: ScanScore | null;
-  }
-}
-
 const WORD: Record<ScanState, string> = { stopped: 'Ready', paused: 'Paused', playing: 'Playing' };
 
 /** "0:13": minutes and seconds. */
@@ -66,148 +52,65 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60))
 export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenScan(p, ref) {
   const { picture, target } = p;
   const rule = picture.scan;
-  const { loaded, mask, error } = useScanPicture(picture.imageUrl, rule);
-  const [state, setState] = useState<ScanState>('stopped');
-  const [traces, setTraces] = useState<Trace[]>([]);
-  // The note most recently struck, with the instrument names it had when it was struck.
-  const [lastStruck, setLastStruck] = useState<{ chime: Chime; names: { held: string; warm: string; cool: string } } | null>(null);
-  const player = useRef<ScanPlayer | null>(null);
-  const sweepRefs = useSweepRefs();
-  const meter = useRef<(HTMLElement | null)[]>([]);
+  const scan = useScan({ scene: picture.scene, imageUrl: picture.imageUrl, speed: p.speed, rule });
+  const { loaded, loadError, state, traces, frame, region, worldMap, score, bands, sound, why, liveColumn, lastStruck, side, setTarget, setVolumeDb, setSoundId } = scan;
+  // Step 2, the volume and the instruments are the page's (App); the shared scan follows them.
+  useEffect(() => setTarget(target), [target, setTarget]);
+  useEffect(() => setVolumeDb(p.volumeDb), [p.volumeDb, setVolumeDb]);
+  useEffect(() => setSoundId(p.soundId), [p.soundId, setSoundId]);
+  useImperativeHandle(ref, () => ({ stop: scan.stop }), [scan.stop]);
+
+  const sweep = useRef<SVGGElement>(null);
+  const profile = useRef<SVGPathElement>(null);
+  const unplayed = useRef<SVGPathElement>(null);
+  const played = useRef<SVGPathElement>(null);
+  const sweepRefs = useMemo(() => ({ sweep, profile, unplayed, played }), []);
   const lane = useRef<HTMLDivElement>(null);
   const whereText = useRef<HTMLSpanElement>(null);
   const timeText = useRef<HTMLSpanElement>(null);
-  const traceId = useRef(0);
-  const reducedMotion = useMemo(() => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, []);
-  const sound = scanSound(p.soundId);
-
-  const test = !picture.imageUrl;
-  const frame = scanFrame(picture);
-  const regions = scanRegions(picture);
-  const region = target === 'map' ? undefined : regions.find((r) => r.id === target);
-  const worldMap = !test && !!rule?.worldMap;
-  const name = targetName(picture, region ? region.id : 'map');
-
-  // The score, with this picture's own settings: the same recipe as `npm run measure`.
-  const score = useMemo<ScanScore | null>(() => {
-    if (!loaded || !rule) return null;
-    if (!region) return pictureScore(loaded.pixels, rule, mask, { kind: 'line' });
-    return pictureScore(loaded.pixels, rule, mask, { kind: 'radar', frameWidth: loaded.isTest ? loaded.pixels.width : picture.scene.frames.width, region });
-  }, [loaded, mask, rule, region, picture.scene.frames.width]);
-  const bands = score?.grid.bands ?? 12;
-  const columns = score?.grid.columns ?? 1;
-  const seconds = score?.grid.seconds ?? 30;
-
-  const onChime = useCallback(
-    (chime: Chime) => {
-      setLastStruck({ chime, names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } });
-      // The band's bar flashes. Restarting the animation needs the class to go and come back.
-      const bar = meter.current[chime.band];
-      if (bar) {
-        bar.classList.remove('hit');
-        void bar.offsetWidth;
-        bar.classList.add('hit');
-      }
-      const [x, y] = chimePosition(chime, columns, bands, frame, region);
-      const id = ++traceId.current;
-      setTraces((t) => [...t.slice(-(MAX_TRACES - 1)), { id, x, y, warm: chime.warm }]);
-    },
-    [columns, bands, frame, region, sound],
-  );
-  const onChimeRef = useRef(onChime);
-  onChimeRef.current = onChime;
-
-  useEffect(() => {
-    const pl = new ScanPlayer({ onState: setState, onChime: (c) => onChimeRef.current(c) });
-    player.current = pl;
-    return () => pl.dispose();
-  }, []);
-  useEffect(() => {
-    player.current?.setScore(score);
-    setTraces([]);
-    setLastStruck(null);
-    if (import.meta.env.DEV) window.__scanScore = score;
-  }, [score]);
-  useEffect(() => player.current?.setSpeed(p.speed), [p.speed]);
-  useEffect(() => player.current?.setVolume(p.volumeDb), [p.volumeDb]);
-  useEffect(() => player.current?.setSound(p.soundId), [p.soundId]);
-  useEffect(() => {
-    if (state === 'stopped') {
-      setTraces([]);
-      setLastStruck(null);
-    }
-  }, [state]);
-  useImperativeHandle(ref, () => ({ stop: () => player.current?.stop() }), []);
-
-  // Draw with the sound: one loop for as long as Listen is open, asking the player where the line
-  // is on every frame (PictureScan.tsx explains why it must not wait for React).
+  const textAt = useRef(0);
   const speedRef = useRef(p.speed);
   speedRef.current = p.speed;
-  const drawFrame = useRef<(now: number) => void>(() => {});
-  const redraw = useRef(true);
-  const drawn = useRef({ position: 0, textAt: 0, levels: new Float32Array(0) });
-  useEffect(() => {
-    redraw.current = true;
-    drawFrame.current = (now: number) => {
-      const pl = player.current;
-      if (!score || !pl) return;
-      const playing = pl.getState() === 'playing';
-      if (!playing && !redraw.current) return;
-      redraw.current = false;
-      const grid = score.grid;
-      const cyclic = score.shape === 'radar';
-      if (drawn.current.levels.length !== grid.bands) drawn.current.levels = new Float32Array(grid.bands);
-      const levels = drawn.current.levels;
 
-      let position = pl.position();
-      if (reducedMotion) position = Math.floor(position * grid.seconds) / grid.seconds;
-      if (position < drawn.current.position - 0.5) setTraces([]);
-      drawn.current.position = position;
+  const test = !!loaded?.isTest || !picture.imageUrl;
+  const regions = scanRegions(picture);
+  const name = targetName(picture, region ? region.id : 'map');
+  const seconds = score?.grid.seconds ?? 30;
 
-      const at = position * grid.columns;
-      const c0 = Math.min(grid.columns - 1, Math.floor(at));
-      const c1 = cyclic ? (c0 + 1) % grid.columns : Math.min(grid.columns - 1, c0 + 1);
-      const mix = reducedMotion ? 0 : at - c0;
-      // Stopped: nothing sounds, so the held notes' bars are empty.
-      const quiet = pl.getState() === 'stopped';
-      for (let band = 0; band < grid.bands; band++) {
-        const level = score.levels[c0 * grid.bands + band] * (1 - mix) + score.levels[c1 * grid.bands + band] * mix;
-        levels[band] = level;
-        meter.current[band]?.style.setProperty('--level', quiet ? '0' : level.toFixed(3));
-      }
-      drawSweep(sweepRefs, frame, region, position, levels);
-      lane.current?.style.setProperty('--pos', position.toFixed(4));
+  // The line, the sound line's playhead and the time, moved every frame by the shared loop (which
+  // also fills the held notes' bars: they are registered in `side.bars`).
+  useScanFrame(scan, ({ position, levels, region: r, frame: f, playing, grid }) => {
+    drawSweep(sweepRefs, f, r, position, levels);
+    lane.current?.style.setProperty('--pos', position.toFixed(4));
+    const now = performance.now();
+    if (now - textAt.current < 240 && playing) return; // a few times a second is enough to read
+    textAt.current = now;
+    const total = grid.seconds / speedRef.current;
+    if (timeText.current) timeText.current.textContent = `${clock(position * total)} / ${clock(total)}`;
+    if (whereText.current) {
+      whereText.current.textContent = !playing && position === 0
+        ? ''
+        : r
+          ? `line at ${Math.round(position * 360)}°`
+          : worldMap
+            ? `line at ${longitude(position)}`
+            : `line ${Math.round(position * 100)}% across`;
+    }
+  });
 
-      if (now - drawn.current.textAt > 240 || !playing) {
-        drawn.current.textAt = now;
-        const total = grid.seconds / speedRef.current;
-        if (timeText.current) timeText.current.textContent = `${clock(position * total)} / ${clock(total)}`;
-        if (whereText.current) {
-          whereText.current.textContent =
-            pl.getState() === 'stopped'
-              ? ''
-              : region
-                ? `line at ${Math.round(position * 360)}°`
-                : worldMap
-                  ? `line at ${longitude(position)}`
-                  : `line ${Math.round(position * 100)}% across`;
-        }
-      }
-    };
-  }, [score, state, region, frame, worldMap, reducedMotion, sweepRefs]);
-  useEffect(() => {
-    redraw.current = true; // the time on screen follows the speed
-  }, [p.speed]);
-  useEffect(() => {
-    let raf = requestAnimationFrame(function tick(now) {
-      drawFrame.current(now);
-      raf = requestAnimationFrame(tick);
-    });
-    return () => cancelAnimationFrame(raf);
-  }, []);
+  // "Why the scan sounds like this", open from the start: Explain is already a choice to read it.
+  const [whyView, setWhyView] = useState<WhyView>({ ...WHY_START, open: true });
+  const changeWhy = useCallback(
+    (change: Partial<WhyView>) =>
+      setWhyView((v) => ((Object.keys(change) as (keyof WhyView)[]).some((k) => v[k] !== change[k]) ? { ...v, ...change } : v)),
+    [],
+  );
+  useEffect(() => changeWhy({ column: 0, pick: null, follow: true }), [score, changeWhy]);
+  const bandSentenceId = useId();
+  const choices = useMemo(() => scanChoicesFor(rule ? factsOf(rule) : undefined), [rule]);
 
   const across = worldMap ? 'west to east' : 'left to right';
-  const fullName = region && !test ? `${name}, ${region.name}` : name.toLowerCase() === 'whole picture' ? 'the whole picture' : name;
+  const fullName = region && !test ? `${name}, ${region.name}` : region ? name : 'the whole picture';
   // One sentence for screen readers, only on real changes (DESIGN.md: state is shown, not narrated).
   const status =
     state === 'playing'
@@ -218,12 +121,6 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
         ? `Paused on ${fullName}.`
         : `Stopped. ${region ? fullName : 'The whole picture'} selected.`;
 
-  const why = useMemo(
-    () => ({ geometry: worldMap ? ('world' as const) : ('plain' as const), names: { held: sound.heldName, warm: sound.warmName, cool: sound.coolName } }),
-    [worldMap, sound],
-  );
-  const choices = useMemo(() => scanChoicesFor(rule ? factsOf(rule) : undefined), [rule]);
-  const liveColumn = useCallback(() => Math.min(columns - 1, Math.floor((player.current?.position() ?? 0) * columns)), [columns]);
   const order = region ? 'the centre to the rim' : worldMap ? 'south to north' : 'bottom to top';
   const letter = region && !test ? regionLetter(picture, region.id) : null;
   const axis = region
@@ -234,10 +131,10 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
       ? ['180°', '120° W', '60° W', '0°', '60° E', '120° E', '180°']
       : ['left edge', 'middle', 'right edge'];
   const aspect = frame.width / frame.height;
-  const figureState = [state, reducedMotion ? 'still' : ''].join(' ').trim();
+  const figureState = [state, scan.reducedMotion ? 'still' : ''].join(' ').trim();
 
   return (
-    <div className={`listen-scan ${region ? 'radar' : 'line'}`} style={{ '--aspect': aspect } as CSSProperties}>
+    <div className={`listen-scan ${region ? 'radar' : 'line'} ${state}`} style={{ '--aspect': aspect } as CSSProperties}>
       <div className="listen-area">
         <div className="listen-axes">
           {region ? (
@@ -284,12 +181,13 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
                   ) : (
                     <rect width={frame.width} height={frame.height} className="frame-placeholder" />
                   )}
-                  {regions.map((r) => (
-                    <g key={r.id} className="box" style={regionStyle(picture.scene.regions, r.id, p.look)} data-region={r.id} onClick={() => p.onPickRegion(r.id)}>
-                      <circle className="ring-outline" cx={r.center_px[0]} cy={r.center_px[1]} r={r.radius_px} />
-                      <circle className="ring" cx={r.center_px[0]} cy={r.center_px[1]} r={r.radius_px} />
-                    </g>
-                  ))}
+                  {loaded &&
+                    regions.map((r) => (
+                      <g key={r.id} className="box" style={regionStyle(picture.scene.regions, r.id, p.look)} data-region={r.id} onClick={() => p.onPickRegion(r.id)}>
+                        <circle className="ring-outline" cx={r.center_px[0]} cy={r.center_px[1]} r={r.radius_px} />
+                        <circle className="ring" cx={r.center_px[0]} cy={r.center_px[1]} r={r.radius_px} />
+                      </g>
+                    ))}
                   <ScanOverlay frame={frame} bands={bands} traces={traces} worldMap={worldMap} refs={sweepRefs} />
                 </svg>
                 {!test && <MapTags picture={picture} regions={regions} frame={frame} look={p.look} />}
@@ -298,10 +196,11 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
             </figure>
           )}
 
-          {/* The y axis: the twelve held notes, highest at the top, each beside the band it reads. */}
+          {/* The y axis: the twelve held notes, highest at the top, each beside the band it reads.
+              Filled by the shared drawing loop through `side.bars`; empty while stopped (styles.css). */}
           <div className="band-meter" aria-hidden="true">
             {Array.from({ length: bands }, (_, i) => bands - 1 - i).map((band) => (
-              <span key={band} className="band" ref={(el) => void (meter.current[band] = el)}>
+              <span key={band} className="band" ref={(el) => void (side.bars.current[band] = el)}>
                 <b>{noteName(bandNote(band))}</b>
                 <i />
               </span>
@@ -318,7 +217,7 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
               </span>
             )}
             <div className="listen-notes" aria-live="polite">
-              {error && <p className="missing">The picture did not load: {error}. The scan stays quiet.</p>}
+              {loadError && <p className="missing">The picture did not load: {loadError}. The scan stays quiet.</p>}
               {!rule && <p className="missing">The scan has not been measured on this picture yet, so it does not play it.</p>}
               {score?.status === 'missing' && <p className="missing">Nothing to play for {fullName}: {score.reason}. The scan stays quiet.</p>}
             </div>
@@ -330,13 +229,13 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
           label="Step 3 of 3: play"
           step={3}
           playState={state}
-          canPlay={score?.status === 'ok'}
+          canPlay={scan.ready}
           explaining={p.explaining}
           speed={p.speed}
           volumeDb={p.volumeDb}
-          onStart={() => void player.current?.start()}
-          onPause={() => player.current?.pause()}
-          onStop={() => player.current?.stop()}
+          onStart={() => void scan.player.current?.start()}
+          onPause={() => scan.player.current?.pause()}
+          onStop={scan.stop}
           onExplain={p.onExplain}
           onSpeed={p.onSpeed}
           onVolume={p.onVolume}
@@ -358,7 +257,7 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
                 <span>{name} · {WORD[state]}</span>
               </span>
               <span className="sl-where" ref={whereText} />
-              <span className="sl-time" ref={timeText}>0:00 / {clock(seconds)}</span>
+              <span className="sl-time" ref={timeText}>0:00 / {clock(seconds / p.speed)}</span>
             </div>
             <div className={state === 'stopped' ? 'sl-lane idle' : 'sl-lane'} ref={lane}>
               <SoundMarks score={score} />
@@ -381,7 +280,17 @@ export const ListenScan = forwardRef<ListenScanHandle, Props>(function ListenSca
           {/* The honesty lines are said once, on How it's made (team rule), not in every explanation. */}
           <h3 id="explain-scan-title">Where each note comes from</h3>
           {score ? (
-            <ScanExplanation score={score} ctx={why} playing={state === 'playing'} getColumn={liveColumn} lastStruck={lastStruck} choices={choices} startOpen />
+            <ScanExplanation
+              score={score}
+              ctx={why}
+              playing={state === 'playing'}
+              getColumn={liveColumn}
+              lastStruck={lastStruck}
+              view={whyView}
+              onChange={changeWhy}
+              bandSentenceId={bandSentenceId}
+              choices={choices}
+            />
           ) : (
             <p className="muted">Nothing to explain yet: the scan has no score for this picture.</p>
           )}

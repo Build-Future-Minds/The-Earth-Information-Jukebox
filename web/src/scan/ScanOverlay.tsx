@@ -1,11 +1,11 @@
-// What the picture scan draws over the NASA image, shared by Listen (ListenScan) and Play along
-// (PictureScan): the moving line or radar needle, the shape that rides it, the dimmed part not
+// What the picture scan draws over the flat NASA image, shared by Listen (components/ListenScan.tsx)
+// and Play along (components/PictureScan.tsx): the moving line or radar needle, the shape that rides it, the dimmed part not
 // played yet, and a mark for every struck note. Black and white only: the image's colours are never
 // changed. The moving parts are set straight on the SVG by `drawSweep`, from the audio clock, on
 // every animation frame; React draws only what changes less often (the marks).
 import type { RefObject } from 'react';
-import type { Chime } from '../audio/scanScore';
 import type { Region } from '../data/types';
+import type { Trace } from './useScan';
 
 /** Widest the shape riding the line gets (each side), as a share of the picture's width or the circle's radius. */
 export const PROFILE_LINE = 0.034;
@@ -18,17 +18,6 @@ export const TRAIL_RADAR_DEGREES = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 6
 export const COMPASS: [string, number, number][] = [['E', 1, 0], ['N', 0, 1], ['W', -1, 0], ['S', 0, -1]];
 /** Thin rings on the radar: every third band. */
 export const RANGE_RINGS = [3, 6, 9];
-/** Most chime marks kept on the picture (one sweep makes about 70). */
-export const MAX_TRACES = 160;
-
-/** A chime that has sounded in this sweep: where it is on the picture. */
-export interface Trace {
-  id: number;
-  x: number;
-  y: number;
-  warm: boolean;
-}
-
 /** The SVG elements that move with the line. */
 export interface SweepRefs {
   sweep: RefObject<SVGGElement | null>;
@@ -250,27 +239,4 @@ export function profilePath(
 /** ", 2007-03-25 12:00 UTC" for "2007-03-25T12:00Z": the time of the still's frame, as the scene file gives it. */
 export function stillTime(iso?: string | null): string {
   return iso ? `, ${iso.replace('T', ' ').replace('Z', ' UTC')}` : '';
-}
-
-/** "143° W": where the line is on the map. The NASA frame runs from 180° W at the left edge to 180° E. */
-export function longitude(position: number): string {
-  const lon = position * 360 - 180;
-  const rounded = Math.round(Math.abs(lon));
-  return rounded === 0 || rounded === 180 ? `${rounded}°` : `${rounded}° ${lon < 0 ? 'W' : 'E'}`;
-}
-
-/** Centre of a chime's cell on the picture, in frame pixels. */
-export function chimePosition(
-  chime: Chime,
-  columns: number,
-  bands: number,
-  frame: { width: number; height: number },
-  region?: { center_px: [number, number]; radius_px: number },
-): [number, number] {
-  if (!region) {
-    return [((chime.column + 0.5) / columns) * frame.width, frame.height - ((chime.band + 0.5) / bands) * frame.height];
-  }
-  const angle = (2 * Math.PI * (chime.column + 0.5)) / columns;
-  const radius = (region.radius_px * (chime.band + 0.5)) / bands;
-  return [region.center_px[0] + radius * Math.cos(angle), region.center_px[1] - radius * Math.sin(angle)];
 }

@@ -1,7 +1,8 @@
-// What the picture scan's marks mean, and how a picture becomes sound, in words. Shared by Listen
-// (the Explain panel) and Play along. Each picture brings its own facts (data/sources.ts, ScanRule):
-// which still is read, what each instrument means in its legend, what is never read, and what the
-// scan cannot tell you about it. Real text, read by screen readers.
+// What the picture scan's marks mean, and how a picture becomes sound, in words. Real text, read by
+// screen readers. Shared by every view that shows the scan (Listen's Explain panel, Play along, the
+// globe). Two groups, kept apart in words: what comes from the picture, and what is fixed by us.
+// Each picture brings its own facts (data/sources.ts, ScanRule): which still is read, what each
+// instrument means in its legend, what is never read, and what the scan cannot tell you about it.
 import type { ScanSoundDef } from '../audio/instruments';
 import type { ScanRule } from '../data/sources';
 import type { Scene } from '../data/types';

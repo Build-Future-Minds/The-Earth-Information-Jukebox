@@ -51,7 +51,9 @@ export function ListenView(p: Props) {
         <PictureList pictures={p.pictures} current={p.picture.key} onChoose={p.onPicture} />
         <HearChoice picture={p.picture} value={p.target} onChange={p.onTarget} look={p.look} speed={p.speed} />
       </div>
+      {/* One per picture: choosing another picture disposes this one's player, so nothing of it sounds. */}
       <ListenScan
+        key={p.picture.key}
         ref={p.scanRef}
         picture={p.picture}
         target={p.target}

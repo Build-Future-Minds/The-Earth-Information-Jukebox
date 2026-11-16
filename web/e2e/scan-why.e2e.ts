@@ -113,7 +113,9 @@ test('changing the scan sound while it plays: the line keeps moving, and a note 
   await openWhyWithKeyboard(page);
   await startScan(page);
   const last = why(page).locator('.why-last');
-  await expect(last).toContainText('marimba G4', { timeout: 10_000 }).catch(() => undefined); // the red dot, 5.1 s in
+  // The red dot, 5.1 s in. (A wait for "marimba G4" used to stand here: the sentence never contains
+  // those two words together, so it always ran out its 10 s and left the sound change racing the
+  // green dot's note at 10.1 s. Removed 15 Nov.)
   await expect(last).toContainText('played on the marimba', { timeout: 10_000 });
 
   await page.getByLabel('Scan sound').selectOption({ label: 'Music box' });

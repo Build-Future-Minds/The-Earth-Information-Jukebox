@@ -53,6 +53,7 @@ and Developer A for the Python list (`requirements.txt`).
 | SVS 4285 | NASA visualization (GPM IMERG precipitation) | https://svs.gsfc.nasa.gov/4285/ | NASA's Scientific Visualization Studio | Third source (30 hourly frames) |
 | Tone.js 15.1.22 | Web Audio library | https://tonejs.github.io | MIT | Synthesising and timing every sound in the app |
 | React 19.3.1 | UI library | https://react.dev | MIT | The app's interface |
+| Tonal 6.5.1 | Music theory library | https://github.com/tonaljs/tonal | MIT | Notes, scales and chords for the app's sound (`web/src/audio/scanScore.ts`) |
 | Atkinson Hyperlegible Next 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next | SIL Open Font License 1.1, © The Atkinson Hyperlegible Next Project Authors | Text in the app and listening game |
 | Atkinson Hyperlegible Mono 5.3.0 | Font (via Fontsource) | https://github.com/googlefonts/atkinson-hyperlegible-next-mono | SIL Open Font License 1.1, © The Atkinson Hyperlegible Mono Project Authors | Numbers and readouts |
 | Google Fonts | Font service | https://fonts.google.com | Google service | Loads the two fonts in the listening game page |

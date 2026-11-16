@@ -6,73 +6,73 @@
 // is made from, so it cannot disagree with what is heard. Two groups, kept apart in words:
 //   "From the picture"  what the picture sets (and the rules we chose for reading it)
 //   "Fixed by us"       choices the picture cannot change
-// It is not a live region: nothing here is announced while the scan plays. It follows the line
-// while the scan plays and holds still when it does not, so every column can be reached by keyboard.
-import { useEffect, useMemo, useState } from 'react';
+// It is not a live region: nothing here is announced while the scan plays. While the scan plays it
+// follows the line, until a place is chosen (with the slider, the buttons or a click on the picture);
+// "Follow the line" brings it back. Every column can be reached by keyboard, playing or not.
+//
+// What it shows (open or not, which column, which band, following or not) is kept by PictureScan, so
+// a click on the picture can choose a place here, and the picture can mark the place explained.
+import { useEffect, useMemo } from 'react';
 import { SCAN_CHOICES, type ScanChoice } from '../audio/scanChoices';
-import { explainBand, explainRoot, placeOf, whyBand, whyColumn, type BandWhy, type ChimeWhy, type WhyContext } from '../audio/scanWhy';
+import { chimeSummary, chosenBand, explainBand, explainRoot, heldSummary, placeOf, whyBand, whyColumn, type WhyContext } from '../audio/scanWhy';
 import type { Chime, ScanScore } from '../audio/scanScore';
+
+/** What the fold-out shows. */
+export interface WhyView {
+  open: boolean;
+  /** The column explained (0-based). */
+  column: number;
+  /** The band explained in full, if the listener chose one; else the fold-out chooses (chosenBand). */
+  pick: number | null;
+  /** While the scan plays, follow the line. Choosing a place turns this off. */
+  follow: boolean;
+}
+export const WHY_START: WhyView = { open: false, column: 0, pick: null, follow: true };
 
 interface Props {
   score: ScanScore;
   ctx: WhyContext;
-  /** The scan is playing: the explanation follows the line. */
+  /** The scan is playing. */
   playing: boolean;
   /** Which column the line is on right now, from the audio clock. */
   getColumn: () => number;
   /** The note most recently struck in this sweep, with the instrument names it had when it sounded, or null. */
   lastStruck: { chime: Chime; names: WhyContext['names'] } | null;
+  view: WhyView;
+  onChange: (change: Partial<WhyView>) => void;
+  /** id for the full sentence about the chosen band, so "Read why" under the picture can move focus to it. */
+  bandSentenceId: string;
   /** The fixed choices, with this picture's own floor, full level and switch (scanChoicesFor). */
   choices?: ScanChoice[];
-  /** Open from the start (Listen's Explain panel, which is already a choice to read it). */
-  startOpen?: boolean;
 }
 
 const FOLLOW_MS = 250;
 
-function chimeCell(c: ChimeWhy): string {
-  if (c.status === 'struck') return `${c.instrument} ${c.name}`;
-  if (c.status === 'left out') return c.reason === 'spacing' ? 'peak, left out: too close to a stronger one' : 'peak, left out: a stronger peak in this column';
-  return c.reason === 'no colour' ? 'none: no colour' : c.reason === 'below level' ? 'none: below the peak level' : 'none: not a peak';
-}
-
-export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, choices = SCAN_CHOICES, startOpen = false }: Props) {
-  const [open, setOpen] = useState(startOpen);
-  const [column, setColumn] = useState(0);
-  const [pick, setPick] = useState<number | null>(null);
+export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, view, onChange, bandSentenceId, choices = SCAN_CHOICES }: Props) {
+  const { open, column, pick, follow } = view;
   const { columns, bands } = score.grid;
+  const following = playing && follow;
 
   // Follow the line while it plays, a few times a second. Not while the fold-out is closed.
   useEffect(() => {
-    if (!open || !playing) return;
-    setColumn(getColumn());
-    const id = window.setInterval(() => setColumn(getColumn()), FOLLOW_MS);
+    if (!open || !following) return;
+    onChange({ column: getColumn() });
+    const id = window.setInterval(() => onChange({ column: getColumn() }), FOLLOW_MS);
     return () => window.clearInterval(id);
-  }, [open, playing, getColumn]);
-
-  // A new score is a new picture or a new scan: start again at its first column.
-  useEffect(() => {
-    setColumn(0);
-    setPick(null);
-  }, [score]);
+  }, [open, following, getColumn, onChange]);
 
   const here = useMemo(() => whyColumn(score, column, ctx), [score, column, ctx]);
-  // The band explained below the table: the one the listener picked, else the loudest struck one,
-  // else the loudest held note, else the lowest band.
-  const bandOf = (list: BandWhy[]) => {
-    if (pick !== null && list[pick]) return list[pick];
-    const struck = list.filter((b) => b.chime.status === 'struck').sort((a, b) => b.level - a.level)[0];
-    return struck ?? [...list].sort((a, b) => b.level - a.level)[0] ?? list[0];
-  };
-  const chosen = bandOf(here.bands);
+  const chosen = chosenBand(here.bands, pick);
   const moment = placeOf(score, here.column, 0, ctx.geometry).across; // where along the sweep this column is
+  // A column chosen with the slider or the buttons is a place chosen: stop following the line.
+  const choose = (c: number) => onChange({ column: Math.min(columns - 1, Math.max(0, c)), follow: false });
 
   const last = lastStruck ? whyBand(score, lastStruck.chime.column, lastStruck.chime.band, { ...ctx, names: lastStruck.names }) : null;
   const rules = choices.filter((c) => c.kind === 'rule');
   const decoration = choices.filter((c) => c.kind === 'decoration');
 
   return (
-    <details className="scan-why" open={open} onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
+    <details className="scan-why" open={open} onToggle={(e) => onChange({ open: (e.currentTarget as HTMLDetailsElement).open })}>
       <summary>Why the scan sounds like this</summary>
       {open && (
         <div className="scan-why-body">
@@ -90,10 +90,10 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, ch
 
             <h5>Look at a column</h5>
             <div className="row why-controls">
-              <button type="button" disabled={playing || column <= 0} onClick={() => setColumn((c) => Math.max(0, c - 1))}>
+              <button type="button" disabled={following || here.column <= 0} onClick={() => choose(here.column - 1)}>
                 Earlier column
               </button>
-              <button type="button" disabled={playing || column >= columns - 1} onClick={() => setColumn((c) => Math.min(columns - 1, c + 1))}>
+              <button type="button" disabled={following || here.column >= columns - 1} onClick={() => choose(here.column + 1)}>
                 Later column
               </button>
               <label className="range">
@@ -107,16 +107,22 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, ch
                   max={columns - 1}
                   step={1}
                   value={here.column}
-                  disabled={playing}
-                  onChange={(e) => setColumn(Number(e.target.value))}
+                  disabled={following}
+                  onChange={(e) => choose(Number(e.target.value))}
                   aria-valuetext={`Column ${here.column + 1} of ${columns}, ${moment}`}
                 />
               </label>
+              <label className="why-follow">
+                <input type="checkbox" checked={follow} onChange={(e) => onChange({ follow: e.target.checked })} />
+                Follow the line while the scan plays
+              </label>
             </div>
             <p className="muted">
-              {playing
-                ? 'Following the line while the scan plays. Pause or stop it to look at another column.'
-                : 'Choose a column with the slider or the two buttons. This does not move the scan or make a sound.'}
+              {following
+                ? 'Following the line while the scan plays. Untick “Follow the line”, or click the picture, to look at another place.'
+                : playing
+                  ? 'Showing the place you chose while the scan plays on. Tick “Follow the line” to follow it again. Choosing a place does not move the scan or make a sound.'
+                  : 'Choose a column with the slider or the two buttons, or click the picture. This does not move the scan or make a sound.'}
             </p>
 
             <div className="why-table" role="region" aria-label="Table of the bands in this column" tabIndex={0}>
@@ -143,8 +149,8 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, ch
                       <td className="num">{b.reads}</td>
                       <td className="num">{b.mean.toFixed(3)}</td>
                       <td className="num">{b.level.toFixed(2)}</td>
-                      <td>{b.level > 0 ? `${b.held.name} at ${Math.round(100 * b.level)}%` : `${b.held.name}, silent`}</td>
-                      <td>{chimeCell(b.chime)}</td>
+                      <td>{heldSummary(b)}</td>
+                      <td>{chimeSummary(b.chime)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -153,7 +159,7 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, ch
 
             <label className="why-pick">
               Explain band{' '}
-              <select value={chosen.band} onChange={(e) => setPick(Number(e.target.value))}>
+              <select value={chosen.band} onChange={(e) => onChange({ pick: Number(e.target.value) })}>
                 {here.bands.map((b) => (
                   <option key={b.band} value={b.band}>
                     {b.band + 1}: {b.held.name}, {b.along}
@@ -161,7 +167,7 @@ export function ScanExplanation({ score, ctx, playing, getColumn, lastStruck, ch
                 ))}
               </select>
             </label>
-            <p className="why-band">{explainBand(chosen)}</p>
+            <p className="why-band" id={bandSentenceId} tabIndex={-1}>{explainBand(chosen)}</p>
 
             <h5>Low note</h5>
             <p>{explainRoot(here.root, here.seconds, bands)}</p>
