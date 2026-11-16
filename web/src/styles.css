@@ -930,7 +930,7 @@ fieldset.step { border: 0; margin: 0; padding: 0; min-width: 0; }
    needle in the side's colour (--live: ink while the whole picture plays). Round = warm, diamond =
    cool: the same shapes as on the picture. */
 .player.axis .player-track { min-width: 0; }
-.sound-line { display: grid; gap: 2px; min-width: 0; container-type: inline-size; }
+.sound-line { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; min-width: 0; container-type: inline-size; }
 /* A narrow sound line keeps the chip and the time on one line; the key and the readout step aside. */
 @container (max-width: 560px) { .sl-key, .sl-where { display: none; } }
 .sl-head { display: flex; align-items: center; gap: 12px; min-height: 20px; }

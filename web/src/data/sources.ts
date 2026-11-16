@@ -14,7 +14,7 @@
 // settings. Every comparison helper here takes ONE source, so two pictures can never meet.
 import type { EarthTrack } from '../audio/earthVoice';
 import type { PictureFacts } from '../audio/scanChoices';
-import { LINE_GRID, RADAR_GRID, STRENGTH_FLOOR, TEST_CIRCLE, TEST_PICTURE_SIZE, type ScanMeasure } from '../audio/scanScore';
+import { LINE_GRID, RADAR_GRID, STRENGTH_FLOOR, TEST_CIRCLE, type ScanMeasure } from '../audio/scanScore';
 import { OCEAN_LAND, type LandRule } from '../globe/geo';
 import { ACTIVE, type Dataset } from './dataset';
 import type { Features, Region, Scene } from './types';
@@ -299,11 +299,6 @@ export type ScanTarget = 'map' | string;
  *  INPUT picture that stands in for a NASA picture in practice mode. */
 export function scanRegions(p: Picture): Region[] {
   return p.imageUrl ? p.scene.regions : [TEST_CIRCLE];
-}
-
-/** The size the scan's picture is laid out in: the scene's frames, or the TEST picture's size. */
-export function scanFrame(p: Picture): { width: number; height: number } {
-  return p.imageUrl ? p.scene.frames : TEST_PICTURE_SIZE;
 }
 
 /** "Region C" (the picture's own letters), or "Test circle" on the TEST picture. */
