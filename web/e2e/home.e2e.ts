@@ -73,7 +73,7 @@ test('a shared #listen link opens Listen directly', async ({ page }) => {
 });
 
 test('every quick link in the app opens its page', async ({ page }) => {
-  for (const [name, hash, tab] of [['Listen', 'listen', 'Listen'], ['Compare', 'compare', 'Compare'], ["How it's made", 'how', "How it's made"]]) {
+  for (const [name, hash, tab] of [['Listen', 'listen', 'Listen'], ['Compare', 'compare', 'Compare'], ["How it's made", 'how', "How it's made"], ['AI use', 'ai', 'AI use']]) {
     await page.goto('/');
     await quick(page).getByRole('link', { name, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`#${hash}$`));

@@ -14,6 +14,7 @@ import { selectSource } from './data/selection';
 import { PICTURES, sourceByKey, SOURCES, type ScanTarget, type SourceKey } from './data/sources';
 import { useView, VIEWS } from './views';
 import { CompareView } from './views/CompareView';
+import { AiUseView } from './views/AiUseView';
 import { HomeView } from './views/HomeView';
 import { HowView } from './views/HowView';
 import { ListenView } from './views/ListenView';
@@ -194,11 +195,11 @@ export function App() {
           : `Playing ${label}.`;
 
   // The playing side's colour (DESIGN.md "Live"): the end block on the current tab and on Play, and
-  // Listen's needle. Pictures with neutral regions (aerosols, rain) use ink, and so do Home, where no
+  // Listen's needle. Pictures with neutral regions (aerosols, rain) use ink, and so do Home and AI use, where no
   // side is chosen, and Listen while it plays the whole picture: no side is playing then.
   const side = view === 'listen' ? (target === 'map' ? null : target) : regionId;
   const live = {
-    ['--live' as string]: look.neutral || view === 'home' || !side ? 'var(--ink)' : regionColour(scene.regions, side),
+    ['--live' as string]: look.neutral || view === 'home' || view === 'ai' || !side ? 'var(--ink)' : regionColour(scene.regions, side),
   } as CSSProperties;
 
   return (
@@ -291,6 +292,7 @@ export function App() {
             speed={speed} onSpeed={changeSpeed} scanRef={scan} />
         )}
         {view === 'how' && <HowView />}
+        {view === 'ai' && <AiUseView />}
         {view === 'play' && (
           <PlayView
             scanPicture={scanPicture}

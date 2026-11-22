@@ -99,12 +99,12 @@ test('on Globe, the playing region\'s button stops it (no keyboard needed)', asy
 });
 
 for (const [w, h] of [[1024, 768], [920, 700], [768, 1024]] as const) {
-  test(`no sideways scroll at ${w}x${h}, and all six tabs are on screen`, async ({ page }) => {
+  test(`no sideways scroll at ${w}x${h}, and all eight tabs are on screen`, async ({ page }) => {
     await page.setViewportSize({ width: w, height: h });
     await openApp(page);
     const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
     expect(sw).toBeLessThanOrEqual(iw);
-    for (const name of ['Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'Game']) {
+    for (const name of ['Home', 'Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'AI use', 'Game']) {
       await expect(page.getByRole('navigation', { name: 'Pages' }).getByRole('link', { name })).toBeInViewport();
     }
   });
