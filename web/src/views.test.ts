@@ -15,6 +15,7 @@ describe('views', () => {
     ['#Compare', 'home'],
     ['#compare?x=1', 'home'],
     ['#globe', 'globe'],
+    ['#ai', 'ai'],
     // A place inside a view: How it's made opened at a section or stage.
     ['#how/s1-5', 'how'],
     ['#how/chain', 'how'],
@@ -22,5 +23,5 @@ describe('views', () => {
   ])('viewFromHash(%j) is %s', (hash, view) => expect(viewFromHash(hash)).toBe(view));
 
   it('labels in order', () =>
-    expect(VIEWS.map((v) => v.label)).toEqual(['Home', 'Listen', 'Compare', "How it's made", 'Play along', 'Globe']));
+    expect(VIEWS.map((v) => v.label)).toEqual(['Home', 'Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'AI use']));
 });

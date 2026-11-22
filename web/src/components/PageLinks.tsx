@@ -2,10 +2,10 @@
 // button and shared links work; the current one is marked for screen readers with aria-current="page".
 import type { ComponentType } from 'react';
 import { GAME_HREF, VIEWS, type View } from '../views';
-import { CompareIcon, GameIcon, GlobeIcon, HomeIcon, HowIcon, ListenIcon, PlayAlongIcon } from './icons';
+import { AiUseIcon, CompareIcon, GameIcon, GlobeIcon, HomeIcon, HowIcon, ListenIcon, PlayAlongIcon } from './icons';
 
 const VIEW_ICON: Record<View, ComponentType> = {
-  home: HomeIcon, listen: ListenIcon, compare: CompareIcon, how: HowIcon, play: PlayAlongIcon, globe: GlobeIcon,
+  home: HomeIcon, listen: ListenIcon, compare: CompareIcon, how: HowIcon, play: PlayAlongIcon, globe: GlobeIcon, ai: AiUseIcon,
 };
 
 export function PageLinks({ current }: { current: View }) {
