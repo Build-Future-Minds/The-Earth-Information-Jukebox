@@ -1,14 +1,17 @@
 // Home, the landing page (docs/page_plan.md, P0): the problem and the idea, the ocean picture with its
-// two circles, the idea in three pictures, how to use the app in five steps, quick links, and what
-// the sound is and is not. Every link here only moves to a page: nothing on Home makes a sound.
+// two circles, the 30-second video, why it matters, the idea in three pictures, how to use the app in
+// five steps, quick links, and what the sound is and is not. Every link here only moves to a page. The
+// only sound on Home is the video's, and only after its own Play is pressed; Esc pauses it.
 // All sentences are drafts for Developer A to check (honesty) before they go to judges.
-import type { ComponentType, RefObject } from 'react';
+import { useEffect, useRef, type ComponentType, type ReactNode, type RefObject } from 'react';
 import { BeatPicture } from '../components/BeatPicture';
 import { regionLabel, regionStyle } from '../components/ExploreControls';
 import { AiUseIcon, ArrowIcon, CompareIcon, ExternalIcon, GameIcon, HowIcon, ListenIcon } from '../components/icons';
 import { Key, agree, scatter } from '../components/LookingAt';
 import { SceneView } from '../components/SceneView';
 import { describesLine, NASA_PAGES, natureLine, type Picture, type Source } from '../data/sources';
+import videoUrl from '../media/earth-sonata-30s.mp4?url';
+import posterUrl from '../media/earth-sonata-30s-poster.jpg?url';
 import { GAME_HREF } from '../views';
 
 interface Props {
@@ -47,12 +50,82 @@ const APP_LINKS: { href: string; label: string; Icon: ComponentType }[] = [
 
 const COUNT_WORD = ['no circles', 'one circle', 'two circles', 'three circles'];
 
+// The public code. The same address as How it's made (how/parts.tsx), kept here so Home does not
+// load How it's made's code (and KaTeX) up front.
+const REPO_URL = 'https://github.com/Build-Future-Minds/The-Earth-Information-Jukebox';
+
+// What the 30-second video shows and says, moment by moment, for anyone who cannot see it or hear
+// it (web/src/media/README.md). Times and pulse gaps are read from the recording itself.
+const VIDEO_MOMENTS: { at: string; see: string; hear: string }[] = [
+  { at: '0:00', see: 'The app’s Home page: “NASA shows the Earth in pictures. If you cannot see the picture, or cannot spot the pattern, the data stays closed.” Beside it, NASA’s map of ocean currents, blue (cold) to red (warm), with two circles: Region A east of Japan and Region B in the equatorial Pacific. The view moves in on the map.',
+    hear: 'Voice: “NASA’s Earth pictures are made for eyes. Can we hear one?”' },
+  { at: '0:05', see: 'The Compare page, close on Region A, “Kuroshio eddies east of Japan”: short white lines pointing many ways, the number 0.08, and “Swirly · second pulse at 73% of the beat”.',
+    hear: 'Voice: “Region A: scattered lines, so long, then short.”' },
+  { at: '0:08', see: 'Enter is pressed. The button changes from “Listen to Region A” to “Stop Region A”, and a sound line draws one bar for each pulse.',
+    hear: 'Region A’s rhythm: seven short drum-like pulses, a long gap (0.73 s) then a short gap (0.27 s), three times over.' },
+  { at: '0:11', see: 'Enter stops the sound. Tab moves to Region B, “Equatorial Pacific streaks”: white lines mostly running left to right, the number 0.67, and “Partly lined up · second pulse at 58% of the beat”.',
+    hear: 'Voice: “Region B: lines partly line up, so more even.”' },
+  { at: '0:15', see: 'Enter is pressed. The button changes to “Stop Region B”, and the sound line draws Region B’s pulses.',
+    hear: 'Region B’s rhythm: seven pulses of the same sound, gaps of 0.58 s and 0.42 s, closer to equal than Region A’s.' },
+  { at: '0:18', see: 'Enter stops the sound. The view pulls back to both regions side by side, with their numbers 0.08 and 0.67.',
+    hear: 'Voice: “We measured how lined up the lines are.”' },
+  { at: '0:21', see: 'Home’s “The idea in three pictures”: a circle on the NASA picture, lines that are lined up or swirly, two beats (“Lined up: even”, “Swirly: long–short”), and the rule: the second pulse lands at 0.75 − 0.25 × alignment of the beat.',
+    hear: 'Voice: “Earth Sonata plays that as a rhythm, live.”' },
+  { at: '0:24', see: 'The view rises back to the NASA map with its two circles.',
+    hear: 'Voice: “So you can compare the places by ear, and not just by eye.”' },
+  { at: '0:28', see: 'End card: “A model; the rule is ours. The picture is a computer model, not a photo. The rhythm rule is a choice we made.” The NASA map with its name (Global Sea Surface Currents and Temperature, NASA SVS 3912, ECCO2 model output), its credit, and the addresses of the app and the code.',
+    hear: 'Voice: “A model; the rule is ours.”' },
+];
+
+interface Why {
+  who: string;
+  change: string;
+  check: ReactNode;
+}
+
+// Why it matters: who it helps. Each "check" points at the page or code that backs the claim. No
+// tester counts until they are in docs/ACCESSIBILITY_LOG.md; no school, place or person is named.
+const WHY: Why[] = [
+  {
+    who: 'People who are blind or have low vision',
+    change: 'A map of ocean currents says nothing if you cannot see it. Here each region becomes a rhythm, every sound is explained in words, and a keyboard is enough.',
+    check: <>Every control has a label and works from the keyboard. Explain says why each sound is what it is: <a href="#listen">Listen</a>.</>,
+  },
+  {
+    who: 'Students and teachers',
+    change: 'One number from the picture sets where the second pulse lands: a rule you can work out and check yourself, then test your ear in the listening game.',
+    check: <>The rule and every measurement, step by step: <a href="#how">How it’s made</a>.</>,
+  },
+  {
+    who: 'Anyone comparing two places',
+    change: 'A second way to notice a pattern: listen to both regions, then look again to see why they differ.',
+    check: <>Both regions side by side, each with its own Listen button: <a href="#compare">Compare</a>.</>,
+  },
+  {
+    who: 'Students like us',
+    change: 'Made by a student team, for students. It is free, with no sign-in and nothing to install, so any class with a browser can use it, and nothing plays until you press Play.',
+    check: <>The code is public: <a href={REPO_URL}>the code on GitHub<ExternalIcon /><span className="sr-only"> (GitHub website)</span></a>.</>,
+  },
+];
+
 export function HomeView({ source, pictures, headingRef }: Props) {
   const { scene, imageUrl } = source;
   const look = { firstLetter: source.firstLetter, neutral: source.regionStyle === 'neutral' };
   const regions = scene.regions.map((r) => ({ r, label: regionLabel(scene.regions, r.id, look.firstLetter) }));
   const first = scene.regions[0];
   const { width, height } = scene.frames;
+
+  // Esc stops all sound (App.tsx), and on Home the only sound is the video, so Esc pauses it too.
+  // Leaving Home removes the video, which stops it.
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === 'Escape') videoRef.current?.pause();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
     <div className="home">
@@ -91,6 +164,71 @@ export function HomeView({ source, pictures, headingRef }: Props) {
             </ul>
           }
         />
+      </section>
+
+      <section className="home-section" aria-labelledby="home-video-title">
+        <h2 id="home-video-title">See it in 30 seconds</h2>
+        <div className="home-video">
+          <div className="home-video-text">
+            <p className="home-video-line">
+              The real app, played with the keyboard: Region A, then Region B, then why the two sound different.
+            </p>
+            <p className="home-quiet">The video plays only when you press its Play button. Esc pauses it.</p>
+          </div>
+          <figure className="home-film">
+            {/* No autoplay, loop or muted: nothing sounds until its own Play is pressed. */}
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              poster={posterUrl}
+              controls
+              preload="metadata"
+              playsInline
+              aria-label="Earth Sonata in 30 seconds: a video with a voice, captions and the app’s sound"
+            />
+            <figcaption className="home-credit">
+              In the video: Global Sea Surface Currents and Temperature (NASA SVS 3912), ECCO2 model output. Credit:
+              NASA/Goddard Space Flight Center Scientific Visualization Studio.
+            </figcaption>
+          </figure>
+        </div>
+        <details className="home-transcript">
+          <summary>Read what the video shows and says</summary>
+          <p>
+            Throughout, a band along the bottom shows the spoken words as captions, the page on screen and the NASA
+            credit. The only sounds are the voice and the app’s own rhythm.
+          </p>
+          <div className="home-transcript-head" aria-hidden="true">
+            <span>Time</span><span>On screen</span><span>Sound</span>
+          </div>
+          <ol className="home-transcript-rows" role="list">
+            {VIDEO_MOMENTS.map((m) => (
+              <li key={m.at}>
+                <span className="home-transcript-at"><span className="sr-only">At </span>{m.at}</span>
+                <p><span className="sr-only">On screen: </span>{m.see}</p>
+                <p><span className="sr-only">Sound: </span>{m.hear}</p>
+              </li>
+            ))}
+          </ol>
+        </details>
+      </section>
+
+      <section className="home-section" aria-labelledby="home-why-title">
+        <h2 id="home-why-title">Why it matters</h2>
+        <p className="home-choice">NASA shares its pictures of Earth with everyone. Earth Sonata lets you hear them too.</p>
+        <div className="home-why-head" aria-hidden="true">
+          <span>Who</span><span>What changes</span><span>How you can check</span>
+        </div>
+        <ul className="home-why" role="list">
+          {WHY.map((w) => (
+            <li key={w.who}>
+              <h3>{w.who}</h3>
+              <p>{w.change}</p>
+              <p className="home-why-check">{w.check}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="home-why-note">We have not yet tested it with blind or low-vision listeners.</p>
       </section>
 
       <section className="home-section" aria-labelledby="home-idea-title">

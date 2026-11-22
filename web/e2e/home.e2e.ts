@@ -26,6 +26,11 @@ const scanNotes = (page: Page) => page.evaluate(() => (window as unknown as { __
 const problem = (page: Page) => page.getByRole('heading', { level: 2, name: /the data stays closed/ });
 /** The Earth synth exists only after Play has started the audio (transport.ts, initAudio). */
 const audioStarted = (page: Page) => page.evaluate(() => 'undefined' !== typeof (window as unknown as { __earthSynth?: unknown }).__earthSynth);
+const videoSection = (page: Page) => page.getByRole('region', { name: 'See it in 30 seconds' });
+const why = (page: Page) => page.getByRole('region', { name: 'Why it matters' });
+/** The 30-second video's state: it must sit still until its own Play is pressed. */
+const videoState = (page: Page) => page.locator('.home-film video').evaluate((v: HTMLVideoElement) =>
+  ({ paused: v.paused, time: v.currentTime, autoplay: v.autoplay || v.hasAttribute('autoplay'), loop: v.loop, muted: v.muted }));
 
 async function expectListen(page: Page) {
   await expect(page).toHaveURL(/#listen$/);
@@ -125,6 +130,8 @@ test('no sound starts before a press', async ({ page }) => {
   expect(await noteCount(page)).toBe(0);
   expect(await scanNotes(page)).toBe(0);
   expect(await melodyVoices(page)).toBe(0);
+  // The video waits for its own Play: not playing, not started, no autoplay.
+  expect(await videoState(page)).toEqual({ paused: true, time: 0, autoplay: false, loop: false, muted: false });
   // Home has no player, so no playing status for a screen reader to announce.
   await expect(page.getByRole('status')).toHaveCount(0);
   // Following "Start listening" is not a press of Play: Listen opens silent.
@@ -138,4 +145,78 @@ test('no sound starts before a press', async ({ page }) => {
   // scan (decision D1), whose first chime comes a few seconds into the sweep.
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await expect.poll(() => scanNotes(page), { timeout: 20_000 }).toBeGreaterThan(0);
+});
+
+test('the 30-second video: controls, a poster, the NASA credit, and the file is served as a video', async ({ page }) => {
+  await page.goto('/');
+  const video = videoSection(page).locator('video');
+  await expect(video).toHaveCount(1);
+  await expect(video).toHaveAttribute('controls', '');
+  await expect(video).toHaveAttribute('preload', 'metadata');
+  await expect(video).toHaveAccessibleName(/Earth Sonata in 30 seconds/);
+  await expect(videoSection(page).getByText('Credit: NASA/Goddard Space Flight Center Scientific Visualization Studio.')).toBeVisible();
+  // Playwright's own Chromium cannot decode H.264, so check that both files arrive, not that it plays.
+  for (const attr of ['src', 'poster']) {
+    const url = await video.evaluate((v, a) => new URL(v.getAttribute(a) ?? '', document.baseURI).href, attr);
+    const res = await page.request.get(url);
+    expect(res.status(), attr).toBe(200);
+    expect(res.headers()['content-type'], attr).toMatch(attr === 'src' ? /^video\/mp4/ : /^image\/jpeg/);
+  }
+});
+
+test('Esc pauses the video, as it stops every other sound', async ({ page }) => {
+  await page.goto('/');
+  // Count calls to pause() (the test browser cannot play H.264, so the call is what is checked).
+  await page.locator('.home-film video').evaluate((v: HTMLVideoElement) => {
+    const w = window as unknown as { __videoPauses: number };
+    w.__videoPauses = 0;
+    v.pause = () => { w.__videoPauses += 1; };
+  });
+  const pauses = () => page.evaluate(() => (window as unknown as { __videoPauses: number }).__videoPauses);
+  await page.keyboard.press('Control+Escape'); // with a modifier it is not Esc, as in App.tsx
+  expect(await pauses()).toBe(0);
+  await page.keyboard.press('Escape');
+  expect(await pauses()).toBe(1);
+});
+
+test('the video transcript opens by keyboard: every moment, what is on screen and what is heard', async ({ page }) => {
+  await page.goto('/');
+  const summary = videoSection(page).getByText('Read what the video shows and says');
+  const rows = videoSection(page).locator('.home-transcript-rows li');
+  await expect(rows.first()).toBeHidden();
+  await summary.focus();
+  await page.keyboard.press('Enter');
+  await expect(rows).toHaveCount(9);
+  await expect(rows.first()).toBeVisible();
+  const text = (await rows.allInnerTexts()).join('\n');
+  // Every spoken line, in the narration's own words.
+  for (const line of [
+    'NASA’s Earth pictures are made for eyes. Can we hear one?',
+    'Region A: scattered lines, so long, then short.',
+    'Region B: lines partly line up, so more even.',
+    'We measured how lined up the lines are.',
+    'Earth Sonata plays that as a rhythm, live.',
+    'So you can compare the places by ear, and not just by eye.',
+    'A model; the rule is ours.',
+  ]) expect(text).toContain(line);
+  // Both rhythms, as recorded: Region A's gaps 0.73 s and 0.27 s, Region B's 0.58 s and 0.42 s.
+  expect(text).toMatch(/0\.73 s\) then a short gap \(0\.27 s/);
+  expect(text).toMatch(/gaps of 0\.58 s and 0\.42 s/);
+});
+
+test('Why it matters: four groups, each with a link to check it, and the plain testing line', async ({ page }) => {
+  await page.goto('/');
+  const rows = why(page).getByRole('listitem');
+  await expect(rows).toHaveCount(4);
+  await expect(why(page).getByRole('heading', { level: 3 })).toHaveText([
+    'People who are blind or have low vision', 'Students and teachers', 'Anyone comparing two places', 'Students like us',
+  ]);
+  const hrefs = await rows.getByRole('link').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+  expect(hrefs).toEqual(['#listen', '#how', '#compare', 'https://github.com/Build-Future-Minds/The-Earth-Information-Jukebox']);
+  await expect(why(page).getByText('We have not yet tested it with blind or low-vision listeners.')).toBeVisible();
+  // No tester numbers until they are in docs/ACCESSIBILITY_LOG.md.
+  await expect(why(page)).not.toContainText(/\d+ (people|listeners|users|testers)/);
+  // Its links move to their pages like every other link on Home.
+  await rows.getByRole('link', { name: 'Compare' }).click();
+  await expect(tabs(page).getByRole('link', { name: 'Compare' })).toHaveAttribute('aria-current', 'page');
 });

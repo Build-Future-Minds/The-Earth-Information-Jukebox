@@ -85,6 +85,17 @@ have quick links for them to click and learn."
 5. **What it is and is not.** The three honesty lines (reuse `natureLine` and `describesLine` from
    `HowView.tsx` and `sources.ts`), then the credits.
 
+**Added 21 Nov (Developer A), between the opening and The idea in three pictures:**
+
+- **See it in 30 seconds.** The team's demo video (a recording of the real app, no generative AI;
+  `web/src/media/README.md`) with its NASA credit and a transcript of each moment (what is on
+  screen, what is heard). It never plays on its own, and Esc pauses it.
+- **Why it matters.** Who it helps, as ruled rows: people who are blind or have low vision,
+  students and teachers, anyone comparing two places, students like us. Each row links to the page
+  or code that backs it. It ends with "We have not yet tested it with blind or low-vision
+  listeners." until `docs/ACCESSIBILITY_LOG.md` has real sessions. No school, place or person is
+  named.
+
 **Where.** New `web/src/views/HomeView.tsx`; `web/src/views.ts` (add `home` and make it the default
 for an empty address; `#listen` and the other links keep working); `PageLinks.tsx` and `icons.tsx`
 (a Home tab); `App.tsx` (no picture or region choice on Home); `styles.css`.

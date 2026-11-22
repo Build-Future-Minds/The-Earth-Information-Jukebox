@@ -5,6 +5,8 @@ assets/video/
 *.webm
 *.exr
 *.tif
+# The one video we do commit: our own 30-second demo (8 MB), shown on Home. See web/src/media/README.md.
+!web/src/media/earth-sonata-30s.mp4
 
 # Python
 __pycache__/
