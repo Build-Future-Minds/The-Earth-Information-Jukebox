@@ -18,7 +18,7 @@ THESIS: The landing page is the first sheet of the same tide-table chart: the pr
 
 OWN-WORLD: Tide Table unchanged: almanac white or night navy, navy ink, tide-blue primary action, violet A and rose B with their letters, the dark chart well behind drawings, 1px hairline section rules, 4px corners, no shadows, Atkinson Hyperlegible Next with mono for numbers and SVS ids only.
 
-STORY: The visitor reads the problem (data locked in pictures), the idea (patterns become sound by checkable rules), sees where the two regions are, then the rule in three pictures, the five steps with links, quick links to every page and NASA source, and what the sound does not tell them.
+STORY: The visitor reads the problem (data locked in pictures), the idea (patterns become sound by checkable rules), sees where the two regions are, can watch the 30-second video of the real app (never on its own; Esc pauses it; a transcript of every moment), reads why it matters (who it helps, each row with a link to check it, and the plain line that no blind or low-vision listener has tested it yet), then the rule in three pictures, the five steps with links, quick links to every page and NASA source, and what the sound does not tell them.
 
 FIRST VIEWPORT: At 1440 x 900, left 5/12: the problem as the h2 (first sentence lighter, second in full ink, about 2.4rem), the idea at 1.35rem, then the one tide-blue "Start listening" link-button with the Listen icon and the line "Nothing plays until you press Play." Right 7/12: the ocean picture in its chart frame with both rings equal, credit directly under it, a key naming A and B. The top of "The idea in three pictures" shows above the fold.
 

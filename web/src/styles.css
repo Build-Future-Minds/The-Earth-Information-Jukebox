@@ -916,6 +916,40 @@ figure.scene figcaption { font-size: 0.85rem; }
 .home-section > h2 { font-size: 1.65rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
 @media (max-width: 640px) { .home-section > h2 { font-size: 1.4rem; } }
 
+/* See it in 30 seconds: the words on the left and the film on the right, split like the opening.
+   The film sits on the black well in a 1px ink frame, square, no shadow. The transcript under both
+   is a ruled table: a mono time, what is on screen, what is heard. */
+.home-video { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--xl); align-items: center; }
+.home-video-text { display: grid; gap: var(--sm); align-content: start; }
+.home-video-line { font-size: 1.15rem; font-weight: 450; line-height: 1.4; max-width: 34ch; text-wrap: pretty; }
+.home-film { margin: 0; display: grid; gap: 6px; min-width: 0; }
+.home-film video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--well); border: 1px solid var(--ink); }
+.home-transcript > summary { cursor: pointer; font-weight: 600; width: fit-content; min-height: 44px; display: flex;
+  align-items: center; gap: 8px; }
+.home-transcript[open] > summary { margin-bottom: var(--xs); }
+.home-transcript > p { color: var(--ink-2); max-width: 70ch; margin: 0 0 var(--sm); text-wrap: pretty; }
+.home-transcript-head, .home-transcript-rows li { display: grid; grid-template-columns: 3.5rem minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--md); }
+.home-transcript-head { font: 500 0.72rem/1 var(--font); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-2);
+  border-bottom: 1px solid var(--ink); padding-bottom: 8px; }
+.home-transcript-rows { list-style: none; margin: 0; padding: 0; }
+.home-transcript-rows li { border-bottom: 1px solid var(--rule); padding: 10px 0; align-items: baseline; }
+.home-transcript-rows p { margin: 0; text-wrap: pretty; }
+.home-transcript-at { font: 400 0.95rem/1.4 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+
+/* Why it matters: who it helps, as ruled rows like What it is and is not. The last column says
+   where to check each line, with a link. */
+.home-why-head, .home-why li { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--md); }
+.home-why-head { font: 500 0.72rem/1 var(--font); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-2);
+  border-bottom: 1px solid var(--ink); padding-bottom: 8px; margin-top: var(--xs); }
+.home-why { list-style: none; margin: 0; padding: 0; }
+.home-why li { border-bottom: 1px solid var(--rule); padding: 14px 0; align-items: baseline; }
+.home-why p { margin: 0; text-wrap: pretty; }
+.home-why-check { color: var(--ink-2); }
+.home-why-check a { color: var(--ink); white-space: nowrap; }
+.home-why-check a svg { vertical-align: -2px; margin-left: 4px; }
+.home-why-note { font-weight: 500; }
+
 /* The idea in three pictures: the How it's made drawings on one continuous black well in a 1px ink
    frame, read left to right, each step's words under its drawing. */
 .home-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -989,6 +1023,7 @@ figure.scene figcaption { font-size: 0.85rem; }
 @media (max-width: 900px) {
   .home-open { grid-template-columns: minmax(0, 1fr); gap: var(--lg); }
   .home-links { grid-template-columns: minmax(0, 1fr); gap: var(--lg); }
+  .home-video { grid-template-columns: minmax(0, 1fr); gap: var(--sm); }
 }
 @media (max-width: 760px) {
   /* One column: each drawing on its own framed well, joined by a downward arrow. */
@@ -1000,6 +1035,10 @@ figure.scene figcaption { font-size: 0.85rem; }
     background: none; border: 0; }
   .home-facts-head { display: none; }
   .home-facts li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .home-why-head { display: none; }
+  .home-why li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .home-transcript-head { display: none; }
+  .home-transcript-rows li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 }
 @media (max-width: 640px) {
   .home { gap: var(--lg); }
