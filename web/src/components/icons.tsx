@@ -31,6 +31,8 @@ export const CompareIcon = () => <Icon><circle cx="6" cy="10" r="3.5" /><circle 
 export const HowIcon = () => <Icon><path d="M3 15h4l2-10 2 10h6" /><path d="M3 5h14" /></Icon>;
 export const PlayAlongIcon = () => <Icon><rect x="3" y="4" width="14" height="12" rx="1" /><path d="M7.5 4v7M12.5 4v7M10 11v5" /></Icon>;
 export const GlobeIcon = () => <Icon><circle cx="10" cy="10" r="7.5" /><path d="M2.5 10h15M10 2.5c2.5 2.2 2.5 12.8 0 15M10 2.5c-2.5 2.2-2.5 12.8 0 15" /></Icon>;
+// Two sparks: the usual mark for "AI".
+export const AiUseIcon = () => <Icon><path d="M8 3.5l1.7 4.8 4.8 1.7-4.8 1.7L8 16.5l-1.7-4.8L1.5 10l4.8-1.7zM15.5 2.5v4M13.5 4.5h4" /></Icon>;
 export const GameIcon = () => <Icon><rect x="2.5" y="5" width="6" height="6" rx="1" /><rect x="11.5" y="9" width="6" height="6" rx="1" /><path d="M5.5 14v2.5M14.5 4.5V7" /></Icon>;
 
 // Home page marks: "leads to" between the three pictures, and a link that leaves for a NASA page.

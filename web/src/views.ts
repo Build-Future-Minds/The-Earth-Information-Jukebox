@@ -1,9 +1,9 @@
-// The app's views, picked by the URL hash (#home, #listen, #compare, #how, #play, #globe), so the back
+// The app's views, picked by the URL hash (#home, #listen, #compare, #how, #play, #globe, #ai), so the back
 // button and shared links work on GitHub Pages without a server or a routing library. An empty or
 // unknown address shows Home, the landing page (docs/page_plan.md, P0).
 import { useEffect, useState } from 'react';
 
-export type View = 'home' | 'listen' | 'compare' | 'how' | 'play' | 'globe';
+export type View = 'home' | 'listen' | 'compare' | 'how' | 'play' | 'globe' | 'ai';
 
 export const VIEWS: { key: View; label: string }[] = [
   { key: 'home', label: 'Home' },
@@ -12,6 +12,7 @@ export const VIEWS: { key: View; label: string }[] = [
   { key: 'how', label: "How it's made" },
   { key: 'play', label: 'Play along' },
   { key: 'globe', label: 'Globe' },
+  { key: 'ai', label: 'AI use' },
 ];
 
 /** The listening game is its own page (it has a way back), not a view. */

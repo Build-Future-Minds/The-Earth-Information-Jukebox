@@ -8,7 +8,7 @@ const tabs = (page: Page) => page.getByRole('navigation', { name: 'Pages' });
 
 test('page links are tabs with icons', async ({ page }) => {
   await openApp(page);
-  for (const name of ['Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'Game']) {
+  for (const name of ['Listen', 'Compare', "How it's made", 'Play along', 'Globe', 'AI use', 'Game']) {
     await expect(tabs(page).getByRole('link', { name }).locator('svg')).toHaveCount(1);
   }
 });

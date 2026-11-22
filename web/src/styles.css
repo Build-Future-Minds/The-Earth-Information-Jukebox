@@ -679,11 +679,19 @@ figure.scene figcaption { font-size: 0.85rem; }
 .key-hint { font: 500 0.7rem/1 var(--mono); color: inherit; opacity: 0.75; border: 0; padding: 0; background: none; }
 
 @media (max-width: 1560px) { .brand .lede { display: none; } }
-/* Seven tabs (Home added, P0) need tighter cells just above the bottom-bar width, or the top bar
-   scrolls sideways at 1024px. */
+/* Eight tabs (Home added in P0, AI use after it) are wider than the bar from 1024 to 1199px: the tabs
+   used to sit on top of the EARTH SONATA title there (114px at 1024px with seven). Here the tabs drop
+   their icons (decorative; the word names the tab, and the bottom bar below 1024px keeps them), and
+   the caps and the title are set a little tighter, so title, tabs and theme switch never touch. */
 @media (min-width: 1024px) and (max-width: 1199px) {
   .topbar { gap: var(--sm); }
-  .page-links a { padding-inline: 8px; gap: 5px; }
+  .brand h1 { letter-spacing: 0.2em; }
+  .page-links a { padding-inline: 7px; letter-spacing: 0.1em; }
+  .page-links a svg { display: none; }
+}
+/* Full-size cells need about 1353px beside the title; up to there the icons stay and the cells tighten. */
+@media (min-width: 1200px) and (max-width: 1359px) {
+  .page-links a { padding-inline: 7px; gap: 4px; letter-spacing: 0.1em; }
 }
 @media (max-width: 900px) {
   .page-links a { padding: 10px 12px; }
@@ -1068,6 +1076,11 @@ figure.scene figcaption { font-size: 0.85rem; }
 @media (max-width: 1023px) {
   .page-links a { font-size: 0.68rem; letter-spacing: 0.04em; }
   .page-links a:focus-visible { outline-color: currentColor; outline-offset: -4px; }
+}
+/* Eight cells in a phone-wide bar: the words shrink with the window (and the caps tighten) so "COMPARE"
+   stays inside its cell from 320px up. From 460px wide they are the size above. */
+@media (max-width: 460px) {
+  .page-links a { font-size: clamp(0.47rem, 2.3vw, 0.68rem); letter-spacing: 0.02em; }
 }
 
 /* ---------- Listen (P1): three numbered steps, the picture between its two sound axes ----------

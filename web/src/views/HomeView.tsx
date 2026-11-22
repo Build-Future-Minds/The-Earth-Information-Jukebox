@@ -6,7 +6,7 @@
 import { useEffect, useRef, type ComponentType, type ReactNode, type RefObject } from 'react';
 import { BeatPicture } from '../components/BeatPicture';
 import { regionLabel, regionStyle } from '../components/ExploreControls';
-import { ArrowIcon, CompareIcon, ExternalIcon, GameIcon, HowIcon, ListenIcon } from '../components/icons';
+import { AiUseIcon, ArrowIcon, CompareIcon, ExternalIcon, GameIcon, HowIcon, ListenIcon } from '../components/icons';
 import { Key, agree, scatter } from '../components/LookingAt';
 import { SceneView } from '../components/SceneView';
 import { describesLine, NASA_PAGES, natureLine, type Picture, type Source } from '../data/sources';
@@ -44,6 +44,7 @@ const APP_LINKS: { href: string; label: string; Icon: ComponentType }[] = [
   { href: '#listen', label: 'Listen', Icon: ListenIcon },
   { href: '#compare', label: 'Compare', Icon: CompareIcon },
   { href: '#how', label: "How it's made", Icon: HowIcon },
+  { href: '#ai', label: 'AI use', Icon: AiUseIcon },
   { href: GAME_HREF, label: 'Game', Icon: GameIcon },
 ];
 
